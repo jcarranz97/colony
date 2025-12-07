@@ -4,7 +4,7 @@ This guide walks you through setting up Colony for local development.
 
 ## Prerequisites
 
-- **Python 3.11+**
+- **Python 3.13+**
 - **Node.js 18+**
 - **Docker and Docker Compose**
 - **Git**
@@ -58,8 +58,70 @@ uv run fastapi dev
 uv run ruff check . --fix    # Lint and auto-fix issues
 uv run ruff format .         # Format code
 
+# Type checking
+uv run pyright .
+
 # Run tests
 uv run pytest
+```
+
+## Managing Dependencies
+
+### Adding Dependencies
+
+We use [uv](https://docs.astral.sh/uv/) for Python package management:
+
+```bash
+cd backend
+
+# Add a production dependency
+uv add fastapi
+
+# Add a development dependency
+uv add pytest --dev
+uv add ruff --dev
+
+# Add a dependency with version constraints
+uv add "fastapi>=0.100.0"
+
+# Add from a specific index or source
+uv add requests --index-url https://pypi.org/simple/
+```
+
+### Removing Dependencies
+
+```bash
+# Remove a dependency
+uv remove package-name
+
+# Remove a dev dependency
+uv remove package-name --dev
+```
+
+### Updating Dependencies
+
+```bash
+# Update all dependencies
+uv sync --upgrade
+
+# Update a specific package
+uv add package-name --upgrade
+
+# See outdated packages
+uv tree --outdated
+```
+
+### Installing Dependencies
+
+```bash
+# Install all dependencies (production + dev)
+uv sync
+
+# Install only production dependencies
+uv sync --no-dev
+
+# Install and update lock file
+uv sync --upgrade
 ```
 
 ### Frontend Setup
@@ -122,9 +184,10 @@ DEBUG=true
 ## Development Workflow
 
 1. **Make changes** to your code
-2. **Pre-commit hooks** will automatically run on commit
-3. **Test locally** using Docker Compose or individual services
-4. **Submit pull request** when ready
+2. **Add dependencies** if needed using `uv add`
+3. **Pre-commit hooks** will automatically run on commit
+4. **Test locally** using Docker Compose or individual services
+5. **Submit pull request** when ready
 
 ## Next Steps
 

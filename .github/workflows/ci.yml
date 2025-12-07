@@ -53,14 +53,6 @@ jobs:
         working-directory: ./backend
         run: uv sync
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Install Pyright
-        run: npm install -g pyright
-
       - name: Run Pyright
         working-directory: ./backend
-        run: pyright .
+        run: uv run pyright .
