@@ -16,6 +16,7 @@ colony/
 │   └── Dockerfile
 ├── shared/           # Shared types, constants
 ├── docs/            # Documentation
+├── .github/         # GitHub Actions workflows
 ├── docker-compose.yml
 └── README.md
 ```
@@ -67,5 +68,5 @@ This project serves multiple purposes:
 
 - **[Local Setup](setup/)** - Set up your development environment
 - **[Testing](testing/)** - Learn about our testing approach
-- **[Deployment](deployment/)** - Understand deployment processes
+- **[Deployment](deployment/)** - Understand deployment processes (including docs)
 - **[Architecture](../architecture/)** - Dive into system design
