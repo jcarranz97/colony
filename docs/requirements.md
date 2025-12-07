@@ -52,7 +52,7 @@ Colony is a standalone web application consisting of:
 
 ### 3.3 Payment Method Management
 - **FR-007**: Users must be able to create custom payment methods with the following attributes:
-    - Name (e.g., "Debito Chase", "Credito Chase", "Credito Capital", "Mexico Cash")
+    - Name (e.g., "Chase Debit", "Chase Credit", "Capital Credit", "Mexico Cash")
     - Type (Debit, Credit, Cash, Transfer)
     - Default currency (USD or MXN)
     - Active/Inactive status
@@ -69,15 +69,15 @@ Colony is a standalone web application consisting of:
 
 ### 3.4 Expense Template Management
 - **FR-018**: Users must be able to create expense templates with the following fields:
-    - Concepto (Description)
-    - Moneda (Currency: USD/MXN)
-    - Metodo Pago (Payment Method)
-    - Costo (Amount)
+    - Description
+    - Currency (USD/MXN)
+    - Payment Method
+    - Amount
     - Category (Fixed/Variable)
     - Recurrence Pattern
-    - Autopay details (optional)
-    - Estado (Status)
-    - Comentarios (Comments)
+    - Auto-pay details (optional)
+    - Status
+    - Comments
 - **FR-019**: System must support recurrence patterns:
     - **Daily**: Specific day of month (1st, 7th, etc.)
     - **Weekly**: Specific day of week (every Saturday)
@@ -93,7 +93,7 @@ Colony is a standalone web application consisting of:
 - **FR-024**: Users must be able to create expense cycles (6-week periods)
 - **FR-025**: System must automatically generate expenses for new cycles based on templates
 - **FR-026**: Users must be able to modify generated expenses within a cycle
-- **FR-027**: Users must be able to set "Debito Restante" (remaining balance) for each cycle
+- **FR-027**: Users must be able to set "Remaining Balance" for each cycle
 - **FR-028**: System must track cycle periods with start and end dates
 - **FR-029**: Users must be able to view cycle history
 
@@ -106,8 +106,8 @@ Colony is a standalone web application consisting of:
 
 ### 3.7 Expense Categorization
 - **FR-035**: System must categorize expenses as:
-    - **Gastos Fijos** (Fixed Expenses)
-    - **Gastos Variables** (Variable Expenses)
+    - **Fixed Expenses**
+    - **Variable Expenses**
 - **FR-036**: System must determine expense location based on currency:
     - **USD expenses** = USA-based expenses
     - **MXN expenses** = Mexico-based expenses
@@ -116,7 +116,7 @@ Colony is a standalone web application consisting of:
 
 ### 3.8 Financial Reporting and Analytics
 - **FR-039**: System must generate cycle summaries showing:
-    - Income (Pago) for the period
+    - Income for the period
     - Fixed expenses total
     - Variable expenses total
     - Mexico expenses total (MXN currency expenses converted to USD)
@@ -127,8 +127,8 @@ Colony is a standalone web application consisting of:
     - Amount paid per payment method
     - Amount pending per payment method
 - **FR-041**: System must calculate projected balances:
-    - "Antes de Pagar" (Before Paying)
-    - "Despues de Pagar" (After Paying)
+    - "Before Paying"
+    - "After Paying"
 - **FR-042**: Users must be able to view multi-period summaries (combining multiple cycles)
 - **FR-043**: System must support period-over-period comparisons
 - **FR-044**: System must provide expense breakdowns by:
@@ -185,14 +185,14 @@ Colony is a standalone web application consisting of:
 ### 6.1 Expense Template Schema
 ```
 - id: UUID
-- concepto: String (required)
-- moneda: Enum (USD, MXN)
-- metodo_pago: String (required)
-- costo_base: Decimal
+- description: String (required)
+- currency: Enum (USD, MXN)
+- payment_method: String (required)
+- base_amount: Decimal
 - recurrence_type: Enum (daily, weekly, monthly, custom)
 - recurrence_config: JSON (day_of_week, day_of_month, interval)
 - autopay_info: String (optional)
-- category: Enum (fijo, variable)
+- category: Enum (fixed, variable)
 - active: Boolean
 - created_at: DateTime
 - updated_at: DateTime
@@ -204,7 +204,7 @@ Colony is a standalone web application consisting of:
 - id: UUID
 - start_date: Date
 - end_date: Date
-- debito_restante: Decimal
+- remaining_balance: Decimal
 - income_amount: Decimal
 - status: Enum (active, completed, draft)
 - created_at: DateTime
@@ -216,16 +216,16 @@ Colony is a standalone web application consisting of:
 - id: UUID
 - cycle_id: UUID (FK)
 - template_id: UUID (FK, optional)
-- concepto: String
-- moneda: Enum (USD, MXN)
-- metodo_pago: String
-- costo: Decimal
-- costo_usd: Decimal (calculated)
-- fecha: Date
+- description: String
+- currency: Enum (USD, MXN)
+- payment_method: String
+- amount: Decimal
+- amount_usd: Decimal (calculated)
+- date: Date
 - autopay_info: String
-- estado: String
-- comentarios: String
-- category: Enum (fijo, variable)
+- status: String
+- comments: String
+- category: Enum (fixed, variable)
 - paid: Boolean
 - created_at: DateTime
 ```
@@ -233,7 +233,7 @@ Colony is a standalone web application consisting of:
 ### 6.4 Payment Method Schema
 ```
 - id: UUID
-- name: String (user-defined, e.g., "Debito Chase", "Credito Capital One")
+- name: String (user-defined, e.g., "Chase Debit", "Capital One Credit")
 - type: Enum (debit, credit, cash, transfer)
 - default_currency: Enum (USD, MXN)
 - description: String (optional, for user notes)
