@@ -1,0 +1,74 @@
+site_name: Colony Documentation
+site_description: Personal expense management application
+site_url: https://your-username.github.io/colony/
+
+repo_name: your-username/colony
+repo_url: https://github.com/your-username/colony
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - search.share
+    - toc.integrate
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - Requirements: requirements.md
+  - Architecture:
+    - Overview: architecture/index.md
+    - Backend: architecture/backend.md
+    - Frontend: architecture/frontend.md
+    - Database: architecture/database.md
+  - API Reference:
+    - Overview: api/index.md
+    - Authentication: api/authentication.md
+    - Expenses: api/expenses.md
+    - Categories: api/categories.md
+  - User Guide:
+    - Overview: user-guide/index.md
+    - Adding Expenses: user-guide/adding-expenses.md
+    - Categories: user-guide/categories.md
+    - Analytics: user-guide/analytics.md
+  - Development:
+    - Overview: development/index.md
+    - Local Setup: development/setup.md
+    - Testing: development/testing.md
+    - Deployment: development/deployment.md
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - admonition
+  - pymdownx.arithmatex:
+      generic: true
+  - footnotes
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.mark
+  - attr_list
+  - md_in_html
+
+plugins:
+  - search
+  - mkdocstrings
