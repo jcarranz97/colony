@@ -1,31 +1,3 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    <url>
-         <loc>https://your-username.github.io/colony/</loc>
-         <lastmod>2025-12-07</lastmod>
-    </url>
-    <url>
-         <loc>https://your-username.github.io/colony/requirements/</loc>
-         <lastmod>2025-12-07</lastmod>
-    </url>
-    <url>
-         <loc>https://your-username.github.io/colony/roadmap/</loc>
-         <lastmod>2025-12-07</lastmod>
-    </url>
-    <url>
-         <loc>https://your-username.github.io/colony/development/</loc>
-         <lastmod>2025-12-07</lastmod>
-    </url>
-    <url>
-         <loc>https://your-username.github.io/colony/development/code-quality/</loc>
-         <lastmod>2025-12-07</lastmod>
-    </url>
-    <url>
-         <loc>https://your-username.github.io/colony/development/deployment/</loc>
-         <lastmod>2025-12-07</lastmod>
-    </url>
-    <url>
-         <loc>https://your-username.github.io/colony/development/setup/</loc>
-         <lastmod>2025-12-07</lastmod>
-    </url>
 </urlset>
