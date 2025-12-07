@@ -18,7 +18,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'  # Match your project's Python version
+          python-version: '3.13'
 
       - name: Install uv
         uses: astral-sh/setup-uv@v3
@@ -34,3 +34,33 @@ jobs:
       - name: Ruff Format Check
         working-directory: ./backend
         run: uv run ruff format --check --diff .
+
+  pyright:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: uv sync
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Pyright
+        run: npm install -g pyright
+
+      - name: Run Pyright
+        working-directory: ./backend
+        run: pyright .
