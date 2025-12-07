@@ -32,6 +32,7 @@ theme:
 nav:
   - Home: index.md
   - Getting Started: getting-started.md
+  - Roadmap: roadmap.md
   - Requirements: requirements.md
   - Architecture:
     - Overview: architecture/index.md
@@ -55,20 +56,17 @@ nav:
     - Deployment: development/deployment.md
 
 markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  - admonition
-  - pymdownx.arithmatex:
-      generic: true
   - footnotes
-  - pymdownx.details
-  - pymdownx.superfences
-  - pymdownx.mark
   - attr_list
   - md_in_html
+  - tables
 
 plugins:
   - search
-  - mkdocstrings
