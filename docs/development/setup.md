@@ -13,7 +13,7 @@ This guide walks you through setting up Colony for local development.
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/colony.git
+git clone https://github.com/jcarranz97/colony.git
 cd colony
 
 # Install pre-commit hooks
