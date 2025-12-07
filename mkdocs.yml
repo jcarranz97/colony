@@ -31,29 +31,29 @@ theme:
 
 nav:
   - Home: index.md
-  - Getting Started: getting-started.md
+  # - Getting Started: getting-started.md
   - Roadmap: roadmap.md
   - Requirements: requirements.md
-  - Architecture:
-    - Overview: architecture/index.md
-    - Backend: architecture/backend.md
-    - Frontend: architecture/frontend.md
-    - Database: architecture/database.md
-  - API Reference:
-    - Overview: api/index.md
-    - Authentication: api/authentication.md
-    - Expenses: api/expenses.md
-    - Categories: api/categories.md
-  - User Guide:
-    - Overview: user-guide/index.md
-    - Adding Expenses: user-guide/adding-expenses.md
-    - Categories: user-guide/categories.md
-    - Analytics: user-guide/analytics.md
+  # - Architecture:
+  #   - Overview: architecture/index.md
+  #   - Backend: architecture/backend.md
+  #   - Frontend: architecture/frontend.md
+  #   - Database: architecture/database.md
+  # - API Reference:
+  #   - Overview: api/index.md
+  #   - Authentication: api/authentication.md
+  #   - Expenses: api/expenses.md
+  #   - Categories: api/categories.md
+  # - User Guide:
+  #   - Overview: user-guide/index.md
+  #   - Adding Expenses: user-guide/adding-expenses.md
+  #   - Categories: user-guide/categories.md
+  #   - Analytics: user-guide/analytics.md
   - Development:
     - Overview: development/index.md
     - Local Setup: development/setup.md
     - Code Quality: development/code-quality.md
-    - Testing: development/testing.md
+    # - Testing: development/testing.md
     - Deployment: development/deployment.md
 
 markdown_extensions:
