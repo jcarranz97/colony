@@ -57,6 +57,7 @@ erDiagram
         string category
         string recurrence_type
         json recurrence_config
+        date reference_date
         string autopay_info
         boolean active
         timestamp created_at
@@ -204,6 +205,7 @@ CREATE TABLE expense_templates (
     category expense_category NOT NULL,
     recurrence_type recurrence_type NOT NULL,
     recurrence_config JSONB NOT NULL DEFAULT '{}',
+    reference_date DATE NOT NULL,  -- Last known occurrence (e.g., "1/12/2025 - last insurance bill")
     autopay_info TEXT,
     active BOOLEAN DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -316,6 +318,412 @@ CREATE INDEX idx_exchange_rates_date ON exchange_rates(rate_date);
 - Templates can generate multiple expenses across cycles
 - Relationship tracks which template generated each expense
 - Optional relationship (manual expenses have NULL template_id)
+
+## Recurrence Configuration Schema
+
+The `recurrence_config` JSONB field stores type-specific configuration for calculating expense occurrences. The schema varies based on the `recurrence_type`.
+
+### Weekly Recurrence
+
+For expenses that occur on a specific day of the week (e.g., every Saturday for groceries).
+
+```json
+{
+  "day_of_week": 6
+}
+```
+
+**Schema:**
+- `day_of_week` (integer, required): Day of the week (0=Sunday, 1=Monday, ..., 6=Saturday)
+
+**Examples:**
+```json
+// Every Saturday (groceries)
+{
+  "day_of_week": 6
+}
+
+// Every Tuesday (therapy appointment)
+{
+  "day_of_week": 2
+}
+```
+
+**Calculation Logic:**
+1. Find the first occurrence of `day_of_week` on or after cycle start date
+2. Generate weekly occurrences until cycle end date
+3. Reference date is used to validate the pattern matches historical data
+
+### Bi-Weekly Recurrence
+
+For expenses that occur every 14 days, typically aligned with pay cycles.
+
+```json
+{
+  "interval_days": 14
+}
+```
+
+**Schema:**
+- `interval_days` (integer, required): Number of days between occurrences (typically 14)
+
+**Examples:**
+```json
+// Every 14 days (bi-weekly paycheck deductions)
+{
+  "interval_days": 14
+}
+
+// Every 10 days (custom medication refill)
+{
+  "interval_days": 10
+}
+```
+
+**Calculation Logic:**
+1. Start from reference date
+2. Add/subtract `interval_days` to find occurrences within cycle period
+3. Generate all dates that fall within cycle start/end dates
+
+### Monthly Recurrence
+
+For expenses that occur on the same day each month (e.g., rent, utilities).
+
+```json
+{
+  "day_of_month": 15
+}
+```
+
+**Schema:**
+- `day_of_month` (integer, required): Day of the month (1-31)
+- `handle_month_end` (boolean, optional): How to handle months with fewer days (default: false)
+
+**Examples:**
+```json
+// 1st of every month (rent)
+{
+  "day_of_month": 1
+}
+
+// 15th of every month (credit card payment)
+{
+  "day_of_month": 15
+}
+
+// Last day of month (salary)
+{
+  "day_of_month": 31,
+  "handle_month_end": true
+}
+```
+
+**Calculation Logic:**
+1. For each month that overlaps with cycle period
+2. Use `day_of_month` as the occurrence date
+3. If `handle_month_end` is true and `day_of_month` > days in month, use last day of month
+4. Skip months where the calculated date is outside cycle period
+
+### Custom Recurrence
+
+For complex patterns like quarterly, semi-annual, or irregular intervals.
+
+```json
+{
+  "interval": 3,
+  "unit": "months",
+  "day_of_month": 15
+}
+```
+
+**Schema:**
+- `interval` (integer, required): Number of units between occurrences
+- `unit` (string, required): Time unit - one of: "days", "weeks", "months", "years"
+- `day_of_month` (integer, optional): Specific day for month/year units (1-31)
+- `month_of_year` (integer, optional): Specific month for year units (1-12)
+- `day_of_week` (integer, optional): Specific day for week units (0-6)
+
+**Examples:**
+```json
+// Every 3 months on the 15th (quarterly insurance)
+{
+  "interval": 3,
+  "unit": "months",
+  "day_of_month": 15
+}
+
+// Every 2 months on the 1st (bi-monthly subscription)
+{
+  "interval": 2,
+  "unit": "months",
+  "day_of_month": 1
+}
+
+// Every 6 months on the 1st (semi-annual payment)
+{
+  "interval": 6,
+  "unit": "months",
+  "day_of_month": 1
+}
+
+// Every 45 days (custom interval)
+{
+  "interval": 45,
+  "unit": "days"
+}
+
+// Annually on January 1st (yearly subscription)
+{
+  "interval": 1,
+  "unit": "years",
+  "day_of_month": 1,
+  "month_of_year": 1
+}
+
+// Every 3 weeks on Wednesday
+{
+  "interval": 3,
+  "unit": "weeks",
+  "day_of_week": 3
+}
+```
+
+**Calculation Logic:**
+1. Start from reference date
+2. Calculate interval based on unit:
+   - `days`: Add/subtract `interval` days
+   - `weeks`: Add/subtract `interval * 7` days, optionally align to `day_of_week`
+   - `months`: Add/subtract `interval` months, use `day_of_month` if specified
+   - `years`: Add/subtract `interval` years, use `month_of_year` and `day_of_month` if specified
+3. Generate all occurrences that fall within cycle period
+
+## Implementation Examples
+
+### Python Calculation Functions
+
+```python
+from datetime import date, timedelta
+from dateutil.relativedelta import relativedelta
+from typing import List, Dict, Any
+
+def calculate_occurrences(
+    recurrence_type: str,
+    recurrence_config: Dict[str, Any],
+    reference_date: date,
+    cycle_start: date,
+    cycle_end: date
+) -> List[date]:
+    """Calculate expense occurrences within a cycle period."""
+
+    if recurrence_type == "weekly":
+        return calculate_weekly_occurrences(
+            recurrence_config, reference_date, cycle_start, cycle_end
+        )
+    elif recurrence_type == "bi_weekly":
+        return calculate_bi_weekly_occurrences(
+            recurrence_config, reference_date, cycle_start, cycle_end
+        )
+    elif recurrence_type == "monthly":
+        return calculate_monthly_occurrences(
+            recurrence_config, reference_date, cycle_start, cycle_end
+        )
+    elif recurrence_type == "custom":
+        return calculate_custom_occurrences(
+            recurrence_config, reference_date, cycle_start, cycle_end
+        )
+    else:
+        raise ValueError(f"Unknown recurrence type: {recurrence_type}")
+
+def calculate_weekly_occurrences(
+    config: Dict[str, Any],
+    reference_date: date,
+    cycle_start: date,
+    cycle_end: date
+) -> List[date]:
+    """Calculate weekly occurrences."""
+    day_of_week = config["day_of_week"]
+    occurrences = []
+
+    # Find first occurrence in or after cycle start
+    current_date = cycle_start
+    days_ahead = (day_of_week - current_date.weekday()) % 7
+    current_date += timedelta(days=days_ahead)
+
+    # Generate weekly occurrences
+    while current_date <= cycle_end:
+        occurrences.append(current_date)
+        current_date += timedelta(days=7)
+
+    return occurrences
+
+def calculate_bi_weekly_occurrences(
+    config: Dict[str, Any],
+    reference_date: date,
+    cycle_start: date,
+    cycle_end: date
+) -> List[date]:
+    """Calculate bi-weekly occurrences."""
+    interval = config["interval_days"]
+    occurrences = []
+
+    # Start from reference date and work backwards/forwards
+    current_date = reference_date
+
+    # Go backwards to find start point
+    while current_date > cycle_start:
+        current_date -= timedelta(days=interval)
+
+    # Go forward to find all occurrences in cycle
+    while current_date <= cycle_end:
+        if cycle_start <= current_date <= cycle_end:
+            occurrences.append(current_date)
+        current_date += timedelta(days=interval)
+
+    return occurrences
+
+def calculate_monthly_occurrences(
+    config: Dict[str, Any],
+    reference_date: date,
+    cycle_start: date,
+    cycle_end: date
+) -> List[date]:
+    """Calculate monthly occurrences."""
+    day_of_month = config["day_of_month"]
+    handle_month_end = config.get("handle_month_end", False)
+    occurrences = []
+
+    # Start from first month that overlaps with cycle
+    current_month = cycle_start.replace(day=1)
+
+    while current_month <= cycle_end:
+        try:
+            occurrence_date = current_month.replace(day=day_of_month)
+        except ValueError:
+            # Handle months with fewer days
+            if handle_month_end:
+                # Use last day of month
+                next_month = current_month + relativedelta(months=1)
+                occurrence_date = next_month - timedelta(days=1)
+            else:
+                # Skip this month
+                current_month += relativedelta(months=1)
+                continue
+
+        # Check if occurrence falls within cycle
+        if cycle_start <= occurrence_date <= cycle_end:
+            occurrences.append(occurrence_date)
+
+        current_month += relativedelta(months=1)
+
+    return occurrences
+
+def calculate_custom_occurrences(
+    config: Dict[str, Any],
+    reference_date: date,
+    cycle_start: date,
+    cycle_end: date
+) -> List[date]:
+    """Calculate custom interval occurrences."""
+    interval = config["interval"]
+    unit = config["unit"]
+    occurrences = []
+
+    current_date = reference_date
+
+    # Go backwards to find start point
+    while current_date > cycle_start:
+        if unit == "days":
+            current_date -= timedelta(days=interval)
+        elif unit == "weeks":
+            current_date -= timedelta(weeks=interval)
+        elif unit == "months":
+            current_date -= relativedelta(months=interval)
+        elif unit == "years":
+            current_date -= relativedelta(years=interval)
+
+    # Go forward to find all occurrences in cycle
+    while current_date <= cycle_end:
+        if cycle_start <= current_date <= cycle_end:
+            occurrences.append(current_date)
+
+        # Move to next occurrence
+        if unit == "days":
+            current_date += timedelta(days=interval)
+        elif unit == "weeks":
+            current_date += timedelta(weeks=interval)
+        elif unit == "months":
+            current_date += relativedelta(months=interval)
+        elif unit == "years":
+            current_date += relativedelta(years=interval)
+
+    return occurrences
+```
+
+### Validation Schema
+
+```python
+from pydantic import BaseModel, validator
+from typing import Optional, Literal
+
+class WeeklyConfig(BaseModel):
+    day_of_week: int
+
+    @validator('day_of_week')
+    def validate_day_of_week(cls, v):
+        if not 0 <= v <= 6:
+            raise ValueError('day_of_week must be between 0 and 6')
+        return v
+
+class BiWeeklyConfig(BaseModel):
+    interval_days: int
+
+    @validator('interval_days')
+    def validate_interval_days(cls, v):
+        if v <= 0:
+            raise ValueError('interval_days must be positive')
+        return v
+
+class MonthlyConfig(BaseModel):
+    day_of_month: int
+    handle_month_end: Optional[bool] = False
+
+    @validator('day_of_month')
+    def validate_day_of_month(cls, v):
+        if not 1 <= v <= 31:
+            raise ValueError('day_of_month must be between 1 and 31')
+        return v
+
+class CustomConfig(BaseModel):
+    interval: int
+    unit: Literal["days", "weeks", "months", "years"]
+    day_of_month: Optional[int] = None
+    month_of_year: Optional[int] = None
+    day_of_week: Optional[int] = None
+
+    @validator('interval')
+    def validate_interval(cls, v):
+        if v <= 0:
+            raise ValueError('interval must be positive')
+        return v
+
+    @validator('day_of_month')
+    def validate_day_of_month(cls, v):
+        if v is not None and not 1 <= v <= 31:
+            raise ValueError('day_of_month must be between 1 and 31')
+        return v
+
+    @validator('month_of_year')
+    def validate_month_of_year(cls, v):
+        if v is not None and not 1 <= v <= 12:
+            raise ValueError('month_of_year must be between 1 and 12')
+        return v
+
+    @validator('day_of_week')
+    def validate_day_of_week(cls, v):
+        if v is not None and not 0 <= v <= 6:
+            raise ValueError('day_of_week must be between 0 and 6')
+        return v
+```
 
 ## Key Design Decisions
 
