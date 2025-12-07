@@ -79,7 +79,6 @@ Colony is a standalone web application consisting of:
     - Status
     - Comments
 - **FR-019**: System must support recurrence patterns:
-    - **Daily**: Specific day of month (1st, 7th, etc.)
     - **Weekly**: Specific day of week (every Saturday)
     - **Bi-weekly**: Every 14 days from start date
     - **Monthly**: Same date each month
@@ -189,7 +188,7 @@ Colony is a standalone web application consisting of:
 - currency: Enum (USD, MXN)
 - payment_method: String (required)
 - base_amount: Decimal
-- recurrence_type: Enum (daily, weekly, monthly, custom)
+- recurrence_type: Enum (weekly, monthly, custom)
 - recurrence_config: JSON (day_of_week, day_of_month, interval)
 - autopay_info: String (optional)
 - category: Enum (fixed, variable)
