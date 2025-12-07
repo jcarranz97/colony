@@ -7,26 +7,29 @@ This document specifies the functional and non-functional requirements for Colon
 
 ### 1.2 Scope
 Colony will provide users with the ability to:
+
 - Track expenses across multiple currencies (USD, MXN)
 - Manage recurring expenses with various patterns
 - Create expense cycles (6-week periods)
 - Automatically generate expenses for new cycles
-- Categorize expenses (Fixed, Variable, Mexico-based)
+- Categorize expenses (Fixed, Variable)
 - Track payment methods and account balances
-- Generate financial summaries and projections
+- Generate financial summaries and projections by location and type
 
 ### 1.3 Current Workflow
 The system replaces a manual Excel-based process where users:
+
 - Track expenses every 6 weeks (3 pay cycles of bi-weekly payments)
 - Copy and modify recurring expenses for new periods
 - Manage expenses in USD and MXN currencies
-- Categorize expenses by type and location
+- Categorize expenses by type (Fixed/Variable) and implicitly by location via currency
 - Generate payment summaries by account/card
 
 ## 2. Overall Description
 
 ### 2.1 Product Perspective
 Colony is a standalone web application consisting of:
+
 - A RESTful API backend (FastAPI) with multi-currency support
 - A responsive web frontend (Next.js) with cycle management
 - A containerized deployment solution
@@ -85,29 +88,38 @@ Colony is a standalone web application consisting of:
 - **FR-024**: System must calculate dates based on recurrence patterns and cycle start date
 
 ### 3.6 Expense Categorization
-- **FR-025**: System must automatically categorize expenses as:
+- **FR-025**: System must categorize expenses as:
   - **Gastos Fijos** (Fixed Expenses)
   - **Gastos Variables** (Variable Expenses)
-  - **Gastos en Mexico** (Mexico Expenses)
-- **FR-026**: Users must be able to manually override expense categories
-- **FR-027**: System must provide category rules based on payment method and description patterns
+- **FR-026**: System must determine expense location based on currency:
+  - **USD expenses** = USA-based expenses
+  - **MXN expenses** = Mexico-based expenses
+- **FR-027**: Users must be able to manually override expense categories
+- **FR-028**: System must provide category rules based on payment method and description patterns
 
 ### 3.7 Financial Reporting and Analytics
-- **FR-028**: System must generate cycle summaries showing:
+- **FR-029**: System must generate cycle summaries showing:
   - Income (Pago) for the period
   - Fixed expenses total
   - Variable expenses total
-  - Mexico expenses total
+  - Mexico expenses total (MXN currency expenses converted to USD)
+  - USA expenses total (USD currency expenses)
   - Net balance (Income - Total Expenses)
-- **FR-029**: System must generate payment method summaries showing:
+- **FR-030**: System must generate payment method summaries showing:
   - Amount needed per payment method
   - Amount paid per payment method
   - Amount pending per payment method
-- **FR-030**: System must calculate projected balances:
+- **FR-031**: System must calculate projected balances:
   - "Antes de Pagar" (Before Paying)
   - "Despues de Pagar" (After Paying)
-- **FR-031**: Users must be able to view multi-period summaries (combining multiple cycles)
-- **FR-032**: System must support period-over-period comparisons
+- **FR-032**: Users must be able to view multi-period summaries (combining multiple cycles)
+- **FR-033**: System must support period-over-period comparisons
+- **FR-034**: System must provide expense breakdowns by:
+  - Category (Fixed vs Variable)
+  - Location (USA vs Mexico based on currency)
+  - Payment Method
+  - Time period
+
 
 ### 3.8 Data Import/Export
 - **FR-033**: Users must be able to import existing expense data from Excel/CSV
@@ -164,7 +176,7 @@ Colony is a standalone web application consisting of:
 - recurrence_type: Enum (daily, weekly, monthly, custom)
 - recurrence_config: JSON (day_of_week, day_of_month, interval)
 - autopay_info: String (optional)
-- category: Enum (fijo, variable, mexico)
+- category: Enum (fijo, variable)  # Simplified to just Fixed/Variable
 - active: Boolean
 - created_at: DateTime
 - updated_at: DateTime
@@ -195,7 +207,7 @@ Colony is a standalone web application consisting of:
 - autopay_info: String
 - estado: String
 - comentarios: String
-- category: Enum (fijo, variable, mexico)
+- category: Enum (fijo, variable)  # Simplified to just Fixed/Variable
 - paid: Boolean
 - created_at: DateTime
 ```
