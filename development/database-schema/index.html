@@ -840,6 +840,106 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#recurrence-configuration-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recurrence Configuration Schema
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Recurrence Configuration Schema">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#weekly-recurrence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Weekly Recurrence
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bi-weekly-recurrence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bi-Weekly Recurrence
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monthly-recurrence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monthly Recurrence
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-recurrence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Recurrence
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Examples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python-calculation-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python Calculation Functions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validation-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validation Schema
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#key-design-decisions" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1069,6 +1169,7 @@
         string category
         string recurrence_type
         json recurrence_config
+        date reference_date
         string autopay_info
         boolean active
         timestamp created_at
@@ -1232,15 +1333,16 @@
 <a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span><span class="n">category</span><span class="w"> </span><span class="n">expense_category</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">    </span><span class="n">recurrence_type</span><span class="w"> </span><span class="n">recurrence_type</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">    </span><span class="n">recurrence_config</span><span class="w"> </span><span class="n">JSONB</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;{}&#39;</span><span class="p">,</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">    </span><span class="n">autopay_info</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">    </span><span class="n">active</span><span class="w"> </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">true</span><span class="p">,</span>
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">    </span><span class="n">created_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="k">TIME</span><span class="w"> </span><span class="k">ZONE</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">(),</span>
-<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">    </span><span class="n">updated_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="k">TIME</span><span class="w"> </span><span class="k">ZONE</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">()</span>
-<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="p">);</span>
-<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>
-<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_expense_templates_user_id</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">expense_templates</span><span class="p">(</span><span class="n">user_id</span><span class="p">);</span>
-<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_expense_templates_active</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">expense_templates</span><span class="p">(</span><span class="n">active</span><span class="p">);</span>
-<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_expense_templates_category</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">expense_templates</span><span class="p">(</span><span class="n">category</span><span class="p">);</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">    </span><span class="n">reference_date</span><span class="w"> </span><span class="nb">DATE</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">  </span><span class="c1">-- Last known occurrence (e.g., &quot;1/12/2025 - last insurance bill&quot;)</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">    </span><span class="n">autopay_info</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">    </span><span class="n">active</span><span class="w"> </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">true</span><span class="p">,</span>
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">    </span><span class="n">created_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="k">TIME</span><span class="w"> </span><span class="k">ZONE</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">(),</span>
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">    </span><span class="n">updated_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="k">TIME</span><span class="w"> </span><span class="k">ZONE</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">()</span>
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="p">);</span>
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>
+<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_expense_templates_user_id</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">expense_templates</span><span class="p">(</span><span class="n">user_id</span><span class="p">);</span>
+<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_expense_templates_active</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">expense_templates</span><span class="p">(</span><span class="n">active</span><span class="p">);</span>
+<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_expense_templates_category</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">expense_templates</span><span class="p">(</span><span class="n">category</span><span class="p">);</span>
 </code></pre></div>
 <h3 id="cycles">Cycles</h3>
 <p>6-week expense management periods.</p>
@@ -1339,6 +1441,371 @@
 <li>Relationship tracks which template generated each expense</li>
 <li>Optional relationship (manual expenses have NULL template_id)</li>
 </ul>
+<h2 id="recurrence-configuration-schema">Recurrence Configuration Schema</h2>
+<p>The <code>recurrence_config</code> JSONB field stores type-specific configuration for calculating expense occurrences. The schema varies based on the <code>recurrence_type</code>.</p>
+<h3 id="weekly-recurrence">Weekly Recurrence</h3>
+<p>For expenses that occur on a specific day of the week (e.g., every Saturday for groceries).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="p">{</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nt">&quot;day_of_week&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">6</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Schema:</strong>
+- <code>day_of_week</code> (integer, required): Day of the week (0=Sunday, 1=Monday, ..., 6=Saturday)</p>
+<p><strong>Examples:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1">// Every Saturday (groceries)</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="p">{</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nt">&quot;day_of_week&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">6</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="p">}</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="c1">// Every Tuesday (therapy appointment)</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="p">{</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">  </span><span class="nt">&quot;day_of_week&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="p">}</span>
+</code></pre></div></p>
+<p><strong>Calculation Logic:</strong>
+1. Find the first occurrence of <code>day_of_week</code> on or after cycle start date
+2. Generate weekly occurrences until cycle end date
+3. Reference date is used to validate the pattern matches historical data</p>
+<h3 id="bi-weekly-recurrence">Bi-Weekly Recurrence</h3>
+<p>For expenses that occur every 14 days, typically aligned with pay cycles.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="p">{</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nt">&quot;interval_days&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">14</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Schema:</strong>
+- <code>interval_days</code> (integer, required): Number of days between occurrences (typically 14)</p>
+<p><strong>Examples:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1">// Every 14 days (bi-weekly paycheck deductions)</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="p">{</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="nt">&quot;interval_days&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">14</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="p">}</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="c1">// Every 10 days (custom medication refill)</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="p">{</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">  </span><span class="nt">&quot;interval_days&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="p">}</span>
+</code></pre></div></p>
+<p><strong>Calculation Logic:</strong>
+1. Start from reference date
+2. Add/subtract <code>interval_days</code> to find occurrences within cycle period
+3. Generate all dates that fall within cycle start/end dates</p>
+<h3 id="monthly-recurrence">Monthly Recurrence</h3>
+<p>For expenses that occur on the same day each month (e.g., rent, utilities).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="p">{</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nt">&quot;day_of_month&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Schema:</strong>
+- <code>day_of_month</code> (integer, required): Day of the month (1-31)
+- <code>handle_month_end</code> (boolean, optional): How to handle months with fewer days (default: false)</p>
+<p><strong>Examples:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1">// 1st of every month (rent)</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="p">{</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nt">&quot;day_of_month&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="p">}</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="c1">// 15th of every month (credit card payment)</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="p">{</span>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">  </span><span class="nt">&quot;day_of_month&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="p">}</span>
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="c1">// Last day of month (salary)</span>
+<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="p">{</span>
+<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="w">  </span><span class="nt">&quot;day_of_month&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">31</span><span class="p">,</span>
+<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a><span class="w">  </span><span class="nt">&quot;handle_month_end&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a><span class="p">}</span>
+</code></pre></div></p>
+<p><strong>Calculation Logic:</strong>
+1. For each month that overlaps with cycle period
+2. Use <code>day_of_month</code> as the occurrence date
+3. If <code>handle_month_end</code> is true and <code>day_of_month</code> &gt; days in month, use last day of month
+4. Skip months where the calculated date is outside cycle period</p>
+<h3 id="custom-recurrence">Custom Recurrence</h3>
+<p>For complex patterns like quarterly, semi-annual, or irregular intervals.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="p">{</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="nt">&quot;interval&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span><span class="nt">&quot;unit&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;months&quot;</span><span class="p">,</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">  </span><span class="nt">&quot;day_of_month&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Schema:</strong>
+- <code>interval</code> (integer, required): Number of units between occurrences
+- <code>unit</code> (string, required): Time unit - one of: "days", "weeks", "months", "years"
+- <code>day_of_month</code> (integer, optional): Specific day for month/year units (1-31)
+- <code>month_of_year</code> (integer, optional): Specific month for year units (1-12)
+- <code>day_of_week</code> (integer, optional): Specific day for week units (0-6)</p>
+<p><strong>Examples:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1">// Every 3 months on the 15th (quarterly insurance)</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="p">{</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">  </span><span class="nt">&quot;interval&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">  </span><span class="nt">&quot;unit&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;months&quot;</span><span class="p">,</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">  </span><span class="nt">&quot;day_of_month&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="p">}</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="c1">// Every 2 months on the 1st (bi-monthly subscription)</span>
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="p">{</span>
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="w">  </span><span class="nt">&quot;interval&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="w">  </span><span class="nt">&quot;unit&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;months&quot;</span><span class="p">,</span>
+<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="w">  </span><span class="nt">&quot;day_of_month&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="p">}</span>
+<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a>
+<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a><span class="c1">// Every 6 months on the 1st (semi-annual payment)</span>
+<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a><span class="p">{</span>
+<a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a><span class="w">  </span><span class="nt">&quot;interval&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span>
+<a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a><span class="w">  </span><span class="nt">&quot;unit&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;months&quot;</span><span class="p">,</span>
+<a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a><span class="w">  </span><span class="nt">&quot;day_of_month&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+<a id="__codelineno-14-20" name="__codelineno-14-20" href="#__codelineno-14-20"></a><span class="p">}</span>
+<a id="__codelineno-14-21" name="__codelineno-14-21" href="#__codelineno-14-21"></a>
+<a id="__codelineno-14-22" name="__codelineno-14-22" href="#__codelineno-14-22"></a><span class="c1">// Every 45 days (custom interval)</span>
+<a id="__codelineno-14-23" name="__codelineno-14-23" href="#__codelineno-14-23"></a><span class="p">{</span>
+<a id="__codelineno-14-24" name="__codelineno-14-24" href="#__codelineno-14-24"></a><span class="w">  </span><span class="nt">&quot;interval&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">45</span><span class="p">,</span>
+<a id="__codelineno-14-25" name="__codelineno-14-25" href="#__codelineno-14-25"></a><span class="w">  </span><span class="nt">&quot;unit&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;days&quot;</span>
+<a id="__codelineno-14-26" name="__codelineno-14-26" href="#__codelineno-14-26"></a><span class="p">}</span>
+<a id="__codelineno-14-27" name="__codelineno-14-27" href="#__codelineno-14-27"></a>
+<a id="__codelineno-14-28" name="__codelineno-14-28" href="#__codelineno-14-28"></a><span class="c1">// Annually on January 1st (yearly subscription)</span>
+<a id="__codelineno-14-29" name="__codelineno-14-29" href="#__codelineno-14-29"></a><span class="p">{</span>
+<a id="__codelineno-14-30" name="__codelineno-14-30" href="#__codelineno-14-30"></a><span class="w">  </span><span class="nt">&quot;interval&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-14-31" name="__codelineno-14-31" href="#__codelineno-14-31"></a><span class="w">  </span><span class="nt">&quot;unit&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;years&quot;</span><span class="p">,</span>
+<a id="__codelineno-14-32" name="__codelineno-14-32" href="#__codelineno-14-32"></a><span class="w">  </span><span class="nt">&quot;day_of_month&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-14-33" name="__codelineno-14-33" href="#__codelineno-14-33"></a><span class="w">  </span><span class="nt">&quot;month_of_year&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+<a id="__codelineno-14-34" name="__codelineno-14-34" href="#__codelineno-14-34"></a><span class="p">}</span>
+<a id="__codelineno-14-35" name="__codelineno-14-35" href="#__codelineno-14-35"></a>
+<a id="__codelineno-14-36" name="__codelineno-14-36" href="#__codelineno-14-36"></a><span class="c1">// Every 3 weeks on Wednesday</span>
+<a id="__codelineno-14-37" name="__codelineno-14-37" href="#__codelineno-14-37"></a><span class="p">{</span>
+<a id="__codelineno-14-38" name="__codelineno-14-38" href="#__codelineno-14-38"></a><span class="w">  </span><span class="nt">&quot;interval&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
+<a id="__codelineno-14-39" name="__codelineno-14-39" href="#__codelineno-14-39"></a><span class="w">  </span><span class="nt">&quot;unit&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;weeks&quot;</span><span class="p">,</span>
+<a id="__codelineno-14-40" name="__codelineno-14-40" href="#__codelineno-14-40"></a><span class="w">  </span><span class="nt">&quot;day_of_week&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span>
+<a id="__codelineno-14-41" name="__codelineno-14-41" href="#__codelineno-14-41"></a><span class="p">}</span>
+</code></pre></div></p>
+<p><strong>Calculation Logic:</strong>
+1. Start from reference date
+2. Calculate interval based on unit:
+   - <code>days</code>: Add/subtract <code>interval</code> days
+   - <code>weeks</code>: Add/subtract <code>interval * 7</code> days, optionally align to <code>day_of_week</code>
+   - <code>months</code>: Add/subtract <code>interval</code> months, use <code>day_of_month</code> if specified
+   - <code>years</code>: Add/subtract <code>interval</code> years, use <code>month_of_year</code> and <code>day_of_month</code> if specified
+3. Generate all occurrences that fall within cycle period</p>
+<h2 id="implementation-examples">Implementation Examples</h2>
+<h3 id="python-calculation-functions">Python Calculation Functions</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">timedelta</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">dateutil.relativedelta</span><span class="w"> </span><span class="kn">import</span> <span class="n">relativedelta</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="k">def</span><span class="w"> </span><span class="nf">calculate_occurrences</span><span class="p">(</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>    <span class="n">recurrence_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>    <span class="n">recurrence_config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>    <span class="n">reference_date</span><span class="p">:</span> <span class="n">date</span><span class="p">,</span>
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>    <span class="n">cycle_start</span><span class="p">:</span> <span class="n">date</span><span class="p">,</span>
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>    <span class="n">cycle_end</span><span class="p">:</span> <span class="n">date</span>
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">date</span><span class="p">]:</span>
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate expense occurrences within a cycle period.&quot;&quot;&quot;</span>
+<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a>
+<a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a>    <span class="k">if</span> <span class="n">recurrence_type</span> <span class="o">==</span> <span class="s2">&quot;weekly&quot;</span><span class="p">:</span>
+<a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a>        <span class="k">return</span> <span class="n">calculate_weekly_occurrences</span><span class="p">(</span>
+<a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a>            <span class="n">recurrence_config</span><span class="p">,</span> <span class="n">reference_date</span><span class="p">,</span> <span class="n">cycle_start</span><span class="p">,</span> <span class="n">cycle_end</span>
+<a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a>        <span class="p">)</span>
+<a id="__codelineno-15-18" name="__codelineno-15-18" href="#__codelineno-15-18"></a>    <span class="k">elif</span> <span class="n">recurrence_type</span> <span class="o">==</span> <span class="s2">&quot;bi_weekly&quot;</span><span class="p">:</span>
+<a id="__codelineno-15-19" name="__codelineno-15-19" href="#__codelineno-15-19"></a>        <span class="k">return</span> <span class="n">calculate_bi_weekly_occurrences</span><span class="p">(</span>
+<a id="__codelineno-15-20" name="__codelineno-15-20" href="#__codelineno-15-20"></a>            <span class="n">recurrence_config</span><span class="p">,</span> <span class="n">reference_date</span><span class="p">,</span> <span class="n">cycle_start</span><span class="p">,</span> <span class="n">cycle_end</span>
+<a id="__codelineno-15-21" name="__codelineno-15-21" href="#__codelineno-15-21"></a>        <span class="p">)</span>
+<a id="__codelineno-15-22" name="__codelineno-15-22" href="#__codelineno-15-22"></a>    <span class="k">elif</span> <span class="n">recurrence_type</span> <span class="o">==</span> <span class="s2">&quot;monthly&quot;</span><span class="p">:</span>
+<a id="__codelineno-15-23" name="__codelineno-15-23" href="#__codelineno-15-23"></a>        <span class="k">return</span> <span class="n">calculate_monthly_occurrences</span><span class="p">(</span>
+<a id="__codelineno-15-24" name="__codelineno-15-24" href="#__codelineno-15-24"></a>            <span class="n">recurrence_config</span><span class="p">,</span> <span class="n">reference_date</span><span class="p">,</span> <span class="n">cycle_start</span><span class="p">,</span> <span class="n">cycle_end</span>
+<a id="__codelineno-15-25" name="__codelineno-15-25" href="#__codelineno-15-25"></a>        <span class="p">)</span>
+<a id="__codelineno-15-26" name="__codelineno-15-26" href="#__codelineno-15-26"></a>    <span class="k">elif</span> <span class="n">recurrence_type</span> <span class="o">==</span> <span class="s2">&quot;custom&quot;</span><span class="p">:</span>
+<a id="__codelineno-15-27" name="__codelineno-15-27" href="#__codelineno-15-27"></a>        <span class="k">return</span> <span class="n">calculate_custom_occurrences</span><span class="p">(</span>
+<a id="__codelineno-15-28" name="__codelineno-15-28" href="#__codelineno-15-28"></a>            <span class="n">recurrence_config</span><span class="p">,</span> <span class="n">reference_date</span><span class="p">,</span> <span class="n">cycle_start</span><span class="p">,</span> <span class="n">cycle_end</span>
+<a id="__codelineno-15-29" name="__codelineno-15-29" href="#__codelineno-15-29"></a>        <span class="p">)</span>
+<a id="__codelineno-15-30" name="__codelineno-15-30" href="#__codelineno-15-30"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-15-31" name="__codelineno-15-31" href="#__codelineno-15-31"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown recurrence type: </span><span class="si">{</span><span class="n">recurrence_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-15-32" name="__codelineno-15-32" href="#__codelineno-15-32"></a>
+<a id="__codelineno-15-33" name="__codelineno-15-33" href="#__codelineno-15-33"></a><span class="k">def</span><span class="w"> </span><span class="nf">calculate_weekly_occurrences</span><span class="p">(</span>
+<a id="__codelineno-15-34" name="__codelineno-15-34" href="#__codelineno-15-34"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+<a id="__codelineno-15-35" name="__codelineno-15-35" href="#__codelineno-15-35"></a>    <span class="n">reference_date</span><span class="p">:</span> <span class="n">date</span><span class="p">,</span>
+<a id="__codelineno-15-36" name="__codelineno-15-36" href="#__codelineno-15-36"></a>    <span class="n">cycle_start</span><span class="p">:</span> <span class="n">date</span><span class="p">,</span>
+<a id="__codelineno-15-37" name="__codelineno-15-37" href="#__codelineno-15-37"></a>    <span class="n">cycle_end</span><span class="p">:</span> <span class="n">date</span>
+<a id="__codelineno-15-38" name="__codelineno-15-38" href="#__codelineno-15-38"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">date</span><span class="p">]:</span>
+<a id="__codelineno-15-39" name="__codelineno-15-39" href="#__codelineno-15-39"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate weekly occurrences.&quot;&quot;&quot;</span>
+<a id="__codelineno-15-40" name="__codelineno-15-40" href="#__codelineno-15-40"></a>    <span class="n">day_of_week</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;day_of_week&quot;</span><span class="p">]</span>
+<a id="__codelineno-15-41" name="__codelineno-15-41" href="#__codelineno-15-41"></a>    <span class="n">occurrences</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-15-42" name="__codelineno-15-42" href="#__codelineno-15-42"></a>
+<a id="__codelineno-15-43" name="__codelineno-15-43" href="#__codelineno-15-43"></a>    <span class="c1"># Find first occurrence in or after cycle start</span>
+<a id="__codelineno-15-44" name="__codelineno-15-44" href="#__codelineno-15-44"></a>    <span class="n">current_date</span> <span class="o">=</span> <span class="n">cycle_start</span>
+<a id="__codelineno-15-45" name="__codelineno-15-45" href="#__codelineno-15-45"></a>    <span class="n">days_ahead</span> <span class="o">=</span> <span class="p">(</span><span class="n">day_of_week</span> <span class="o">-</span> <span class="n">current_date</span><span class="o">.</span><span class="n">weekday</span><span class="p">())</span> <span class="o">%</span> <span class="mi">7</span>
+<a id="__codelineno-15-46" name="__codelineno-15-46" href="#__codelineno-15-46"></a>    <span class="n">current_date</span> <span class="o">+=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">days_ahead</span><span class="p">)</span>
+<a id="__codelineno-15-47" name="__codelineno-15-47" href="#__codelineno-15-47"></a>
+<a id="__codelineno-15-48" name="__codelineno-15-48" href="#__codelineno-15-48"></a>    <span class="c1"># Generate weekly occurrences</span>
+<a id="__codelineno-15-49" name="__codelineno-15-49" href="#__codelineno-15-49"></a>    <span class="k">while</span> <span class="n">current_date</span> <span class="o">&lt;=</span> <span class="n">cycle_end</span><span class="p">:</span>
+<a id="__codelineno-15-50" name="__codelineno-15-50" href="#__codelineno-15-50"></a>        <span class="n">occurrences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_date</span><span class="p">)</span>
+<a id="__codelineno-15-51" name="__codelineno-15-51" href="#__codelineno-15-51"></a>        <span class="n">current_date</span> <span class="o">+=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+<a id="__codelineno-15-52" name="__codelineno-15-52" href="#__codelineno-15-52"></a>
+<a id="__codelineno-15-53" name="__codelineno-15-53" href="#__codelineno-15-53"></a>    <span class="k">return</span> <span class="n">occurrences</span>
+<a id="__codelineno-15-54" name="__codelineno-15-54" href="#__codelineno-15-54"></a>
+<a id="__codelineno-15-55" name="__codelineno-15-55" href="#__codelineno-15-55"></a><span class="k">def</span><span class="w"> </span><span class="nf">calculate_bi_weekly_occurrences</span><span class="p">(</span>
+<a id="__codelineno-15-56" name="__codelineno-15-56" href="#__codelineno-15-56"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+<a id="__codelineno-15-57" name="__codelineno-15-57" href="#__codelineno-15-57"></a>    <span class="n">reference_date</span><span class="p">:</span> <span class="n">date</span><span class="p">,</span>
+<a id="__codelineno-15-58" name="__codelineno-15-58" href="#__codelineno-15-58"></a>    <span class="n">cycle_start</span><span class="p">:</span> <span class="n">date</span><span class="p">,</span>
+<a id="__codelineno-15-59" name="__codelineno-15-59" href="#__codelineno-15-59"></a>    <span class="n">cycle_end</span><span class="p">:</span> <span class="n">date</span>
+<a id="__codelineno-15-60" name="__codelineno-15-60" href="#__codelineno-15-60"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">date</span><span class="p">]:</span>
+<a id="__codelineno-15-61" name="__codelineno-15-61" href="#__codelineno-15-61"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate bi-weekly occurrences.&quot;&quot;&quot;</span>
+<a id="__codelineno-15-62" name="__codelineno-15-62" href="#__codelineno-15-62"></a>    <span class="n">interval</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;interval_days&quot;</span><span class="p">]</span>
+<a id="__codelineno-15-63" name="__codelineno-15-63" href="#__codelineno-15-63"></a>    <span class="n">occurrences</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-15-64" name="__codelineno-15-64" href="#__codelineno-15-64"></a>
+<a id="__codelineno-15-65" name="__codelineno-15-65" href="#__codelineno-15-65"></a>    <span class="c1"># Start from reference date and work backwards/forwards</span>
+<a id="__codelineno-15-66" name="__codelineno-15-66" href="#__codelineno-15-66"></a>    <span class="n">current_date</span> <span class="o">=</span> <span class="n">reference_date</span>
+<a id="__codelineno-15-67" name="__codelineno-15-67" href="#__codelineno-15-67"></a>
+<a id="__codelineno-15-68" name="__codelineno-15-68" href="#__codelineno-15-68"></a>    <span class="c1"># Go backwards to find start point</span>
+<a id="__codelineno-15-69" name="__codelineno-15-69" href="#__codelineno-15-69"></a>    <span class="k">while</span> <span class="n">current_date</span> <span class="o">&gt;</span> <span class="n">cycle_start</span><span class="p">:</span>
+<a id="__codelineno-15-70" name="__codelineno-15-70" href="#__codelineno-15-70"></a>        <span class="n">current_date</span> <span class="o">-=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">interval</span><span class="p">)</span>
+<a id="__codelineno-15-71" name="__codelineno-15-71" href="#__codelineno-15-71"></a>
+<a id="__codelineno-15-72" name="__codelineno-15-72" href="#__codelineno-15-72"></a>    <span class="c1"># Go forward to find all occurrences in cycle</span>
+<a id="__codelineno-15-73" name="__codelineno-15-73" href="#__codelineno-15-73"></a>    <span class="k">while</span> <span class="n">current_date</span> <span class="o">&lt;=</span> <span class="n">cycle_end</span><span class="p">:</span>
+<a id="__codelineno-15-74" name="__codelineno-15-74" href="#__codelineno-15-74"></a>        <span class="k">if</span> <span class="n">cycle_start</span> <span class="o">&lt;=</span> <span class="n">current_date</span> <span class="o">&lt;=</span> <span class="n">cycle_end</span><span class="p">:</span>
+<a id="__codelineno-15-75" name="__codelineno-15-75" href="#__codelineno-15-75"></a>            <span class="n">occurrences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_date</span><span class="p">)</span>
+<a id="__codelineno-15-76" name="__codelineno-15-76" href="#__codelineno-15-76"></a>        <span class="n">current_date</span> <span class="o">+=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">interval</span><span class="p">)</span>
+<a id="__codelineno-15-77" name="__codelineno-15-77" href="#__codelineno-15-77"></a>
+<a id="__codelineno-15-78" name="__codelineno-15-78" href="#__codelineno-15-78"></a>    <span class="k">return</span> <span class="n">occurrences</span>
+<a id="__codelineno-15-79" name="__codelineno-15-79" href="#__codelineno-15-79"></a>
+<a id="__codelineno-15-80" name="__codelineno-15-80" href="#__codelineno-15-80"></a><span class="k">def</span><span class="w"> </span><span class="nf">calculate_monthly_occurrences</span><span class="p">(</span>
+<a id="__codelineno-15-81" name="__codelineno-15-81" href="#__codelineno-15-81"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+<a id="__codelineno-15-82" name="__codelineno-15-82" href="#__codelineno-15-82"></a>    <span class="n">reference_date</span><span class="p">:</span> <span class="n">date</span><span class="p">,</span>
+<a id="__codelineno-15-83" name="__codelineno-15-83" href="#__codelineno-15-83"></a>    <span class="n">cycle_start</span><span class="p">:</span> <span class="n">date</span><span class="p">,</span>
+<a id="__codelineno-15-84" name="__codelineno-15-84" href="#__codelineno-15-84"></a>    <span class="n">cycle_end</span><span class="p">:</span> <span class="n">date</span>
+<a id="__codelineno-15-85" name="__codelineno-15-85" href="#__codelineno-15-85"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">date</span><span class="p">]:</span>
+<a id="__codelineno-15-86" name="__codelineno-15-86" href="#__codelineno-15-86"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate monthly occurrences.&quot;&quot;&quot;</span>
+<a id="__codelineno-15-87" name="__codelineno-15-87" href="#__codelineno-15-87"></a>    <span class="n">day_of_month</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;day_of_month&quot;</span><span class="p">]</span>
+<a id="__codelineno-15-88" name="__codelineno-15-88" href="#__codelineno-15-88"></a>    <span class="n">handle_month_end</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;handle_month_end&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-15-89" name="__codelineno-15-89" href="#__codelineno-15-89"></a>    <span class="n">occurrences</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-15-90" name="__codelineno-15-90" href="#__codelineno-15-90"></a>
+<a id="__codelineno-15-91" name="__codelineno-15-91" href="#__codelineno-15-91"></a>    <span class="c1"># Start from first month that overlaps with cycle</span>
+<a id="__codelineno-15-92" name="__codelineno-15-92" href="#__codelineno-15-92"></a>    <span class="n">current_month</span> <span class="o">=</span> <span class="n">cycle_start</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-15-93" name="__codelineno-15-93" href="#__codelineno-15-93"></a>
+<a id="__codelineno-15-94" name="__codelineno-15-94" href="#__codelineno-15-94"></a>    <span class="k">while</span> <span class="n">current_month</span> <span class="o">&lt;=</span> <span class="n">cycle_end</span><span class="p">:</span>
+<a id="__codelineno-15-95" name="__codelineno-15-95" href="#__codelineno-15-95"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-15-96" name="__codelineno-15-96" href="#__codelineno-15-96"></a>            <span class="n">occurrence_date</span> <span class="o">=</span> <span class="n">current_month</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">day</span><span class="o">=</span><span class="n">day_of_month</span><span class="p">)</span>
+<a id="__codelineno-15-97" name="__codelineno-15-97" href="#__codelineno-15-97"></a>        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+<a id="__codelineno-15-98" name="__codelineno-15-98" href="#__codelineno-15-98"></a>            <span class="c1"># Handle months with fewer days</span>
+<a id="__codelineno-15-99" name="__codelineno-15-99" href="#__codelineno-15-99"></a>            <span class="k">if</span> <span class="n">handle_month_end</span><span class="p">:</span>
+<a id="__codelineno-15-100" name="__codelineno-15-100" href="#__codelineno-15-100"></a>                <span class="c1"># Use last day of month</span>
+<a id="__codelineno-15-101" name="__codelineno-15-101" href="#__codelineno-15-101"></a>                <span class="n">next_month</span> <span class="o">=</span> <span class="n">current_month</span> <span class="o">+</span> <span class="n">relativedelta</span><span class="p">(</span><span class="n">months</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-15-102" name="__codelineno-15-102" href="#__codelineno-15-102"></a>                <span class="n">occurrence_date</span> <span class="o">=</span> <span class="n">next_month</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-15-103" name="__codelineno-15-103" href="#__codelineno-15-103"></a>            <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-15-104" name="__codelineno-15-104" href="#__codelineno-15-104"></a>                <span class="c1"># Skip this month</span>
+<a id="__codelineno-15-105" name="__codelineno-15-105" href="#__codelineno-15-105"></a>                <span class="n">current_month</span> <span class="o">+=</span> <span class="n">relativedelta</span><span class="p">(</span><span class="n">months</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-15-106" name="__codelineno-15-106" href="#__codelineno-15-106"></a>                <span class="k">continue</span>
+<a id="__codelineno-15-107" name="__codelineno-15-107" href="#__codelineno-15-107"></a>
+<a id="__codelineno-15-108" name="__codelineno-15-108" href="#__codelineno-15-108"></a>        <span class="c1"># Check if occurrence falls within cycle</span>
+<a id="__codelineno-15-109" name="__codelineno-15-109" href="#__codelineno-15-109"></a>        <span class="k">if</span> <span class="n">cycle_start</span> <span class="o">&lt;=</span> <span class="n">occurrence_date</span> <span class="o">&lt;=</span> <span class="n">cycle_end</span><span class="p">:</span>
+<a id="__codelineno-15-110" name="__codelineno-15-110" href="#__codelineno-15-110"></a>            <span class="n">occurrences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">occurrence_date</span><span class="p">)</span>
+<a id="__codelineno-15-111" name="__codelineno-15-111" href="#__codelineno-15-111"></a>
+<a id="__codelineno-15-112" name="__codelineno-15-112" href="#__codelineno-15-112"></a>        <span class="n">current_month</span> <span class="o">+=</span> <span class="n">relativedelta</span><span class="p">(</span><span class="n">months</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-15-113" name="__codelineno-15-113" href="#__codelineno-15-113"></a>
+<a id="__codelineno-15-114" name="__codelineno-15-114" href="#__codelineno-15-114"></a>    <span class="k">return</span> <span class="n">occurrences</span>
+<a id="__codelineno-15-115" name="__codelineno-15-115" href="#__codelineno-15-115"></a>
+<a id="__codelineno-15-116" name="__codelineno-15-116" href="#__codelineno-15-116"></a><span class="k">def</span><span class="w"> </span><span class="nf">calculate_custom_occurrences</span><span class="p">(</span>
+<a id="__codelineno-15-117" name="__codelineno-15-117" href="#__codelineno-15-117"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+<a id="__codelineno-15-118" name="__codelineno-15-118" href="#__codelineno-15-118"></a>    <span class="n">reference_date</span><span class="p">:</span> <span class="n">date</span><span class="p">,</span>
+<a id="__codelineno-15-119" name="__codelineno-15-119" href="#__codelineno-15-119"></a>    <span class="n">cycle_start</span><span class="p">:</span> <span class="n">date</span><span class="p">,</span>
+<a id="__codelineno-15-120" name="__codelineno-15-120" href="#__codelineno-15-120"></a>    <span class="n">cycle_end</span><span class="p">:</span> <span class="n">date</span>
+<a id="__codelineno-15-121" name="__codelineno-15-121" href="#__codelineno-15-121"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">date</span><span class="p">]:</span>
+<a id="__codelineno-15-122" name="__codelineno-15-122" href="#__codelineno-15-122"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate custom interval occurrences.&quot;&quot;&quot;</span>
+<a id="__codelineno-15-123" name="__codelineno-15-123" href="#__codelineno-15-123"></a>    <span class="n">interval</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;interval&quot;</span><span class="p">]</span>
+<a id="__codelineno-15-124" name="__codelineno-15-124" href="#__codelineno-15-124"></a>    <span class="n">unit</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;unit&quot;</span><span class="p">]</span>
+<a id="__codelineno-15-125" name="__codelineno-15-125" href="#__codelineno-15-125"></a>    <span class="n">occurrences</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-15-126" name="__codelineno-15-126" href="#__codelineno-15-126"></a>
+<a id="__codelineno-15-127" name="__codelineno-15-127" href="#__codelineno-15-127"></a>    <span class="n">current_date</span> <span class="o">=</span> <span class="n">reference_date</span>
+<a id="__codelineno-15-128" name="__codelineno-15-128" href="#__codelineno-15-128"></a>
+<a id="__codelineno-15-129" name="__codelineno-15-129" href="#__codelineno-15-129"></a>    <span class="c1"># Go backwards to find start point</span>
+<a id="__codelineno-15-130" name="__codelineno-15-130" href="#__codelineno-15-130"></a>    <span class="k">while</span> <span class="n">current_date</span> <span class="o">&gt;</span> <span class="n">cycle_start</span><span class="p">:</span>
+<a id="__codelineno-15-131" name="__codelineno-15-131" href="#__codelineno-15-131"></a>        <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="s2">&quot;days&quot;</span><span class="p">:</span>
+<a id="__codelineno-15-132" name="__codelineno-15-132" href="#__codelineno-15-132"></a>            <span class="n">current_date</span> <span class="o">-=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">interval</span><span class="p">)</span>
+<a id="__codelineno-15-133" name="__codelineno-15-133" href="#__codelineno-15-133"></a>        <span class="k">elif</span> <span class="n">unit</span> <span class="o">==</span> <span class="s2">&quot;weeks&quot;</span><span class="p">:</span>
+<a id="__codelineno-15-134" name="__codelineno-15-134" href="#__codelineno-15-134"></a>            <span class="n">current_date</span> <span class="o">-=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">weeks</span><span class="o">=</span><span class="n">interval</span><span class="p">)</span>
+<a id="__codelineno-15-135" name="__codelineno-15-135" href="#__codelineno-15-135"></a>        <span class="k">elif</span> <span class="n">unit</span> <span class="o">==</span> <span class="s2">&quot;months&quot;</span><span class="p">:</span>
+<a id="__codelineno-15-136" name="__codelineno-15-136" href="#__codelineno-15-136"></a>            <span class="n">current_date</span> <span class="o">-=</span> <span class="n">relativedelta</span><span class="p">(</span><span class="n">months</span><span class="o">=</span><span class="n">interval</span><span class="p">)</span>
+<a id="__codelineno-15-137" name="__codelineno-15-137" href="#__codelineno-15-137"></a>        <span class="k">elif</span> <span class="n">unit</span> <span class="o">==</span> <span class="s2">&quot;years&quot;</span><span class="p">:</span>
+<a id="__codelineno-15-138" name="__codelineno-15-138" href="#__codelineno-15-138"></a>            <span class="n">current_date</span> <span class="o">-=</span> <span class="n">relativedelta</span><span class="p">(</span><span class="n">years</span><span class="o">=</span><span class="n">interval</span><span class="p">)</span>
+<a id="__codelineno-15-139" name="__codelineno-15-139" href="#__codelineno-15-139"></a>
+<a id="__codelineno-15-140" name="__codelineno-15-140" href="#__codelineno-15-140"></a>    <span class="c1"># Go forward to find all occurrences in cycle</span>
+<a id="__codelineno-15-141" name="__codelineno-15-141" href="#__codelineno-15-141"></a>    <span class="k">while</span> <span class="n">current_date</span> <span class="o">&lt;=</span> <span class="n">cycle_end</span><span class="p">:</span>
+<a id="__codelineno-15-142" name="__codelineno-15-142" href="#__codelineno-15-142"></a>        <span class="k">if</span> <span class="n">cycle_start</span> <span class="o">&lt;=</span> <span class="n">current_date</span> <span class="o">&lt;=</span> <span class="n">cycle_end</span><span class="p">:</span>
+<a id="__codelineno-15-143" name="__codelineno-15-143" href="#__codelineno-15-143"></a>            <span class="n">occurrences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_date</span><span class="p">)</span>
+<a id="__codelineno-15-144" name="__codelineno-15-144" href="#__codelineno-15-144"></a>
+<a id="__codelineno-15-145" name="__codelineno-15-145" href="#__codelineno-15-145"></a>        <span class="c1"># Move to next occurrence</span>
+<a id="__codelineno-15-146" name="__codelineno-15-146" href="#__codelineno-15-146"></a>        <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="s2">&quot;days&quot;</span><span class="p">:</span>
+<a id="__codelineno-15-147" name="__codelineno-15-147" href="#__codelineno-15-147"></a>            <span class="n">current_date</span> <span class="o">+=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">interval</span><span class="p">)</span>
+<a id="__codelineno-15-148" name="__codelineno-15-148" href="#__codelineno-15-148"></a>        <span class="k">elif</span> <span class="n">unit</span> <span class="o">==</span> <span class="s2">&quot;weeks&quot;</span><span class="p">:</span>
+<a id="__codelineno-15-149" name="__codelineno-15-149" href="#__codelineno-15-149"></a>            <span class="n">current_date</span> <span class="o">+=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">weeks</span><span class="o">=</span><span class="n">interval</span><span class="p">)</span>
+<a id="__codelineno-15-150" name="__codelineno-15-150" href="#__codelineno-15-150"></a>        <span class="k">elif</span> <span class="n">unit</span> <span class="o">==</span> <span class="s2">&quot;months&quot;</span><span class="p">:</span>
+<a id="__codelineno-15-151" name="__codelineno-15-151" href="#__codelineno-15-151"></a>            <span class="n">current_date</span> <span class="o">+=</span> <span class="n">relativedelta</span><span class="p">(</span><span class="n">months</span><span class="o">=</span><span class="n">interval</span><span class="p">)</span>
+<a id="__codelineno-15-152" name="__codelineno-15-152" href="#__codelineno-15-152"></a>        <span class="k">elif</span> <span class="n">unit</span> <span class="o">==</span> <span class="s2">&quot;years&quot;</span><span class="p">:</span>
+<a id="__codelineno-15-153" name="__codelineno-15-153" href="#__codelineno-15-153"></a>            <span class="n">current_date</span> <span class="o">+=</span> <span class="n">relativedelta</span><span class="p">(</span><span class="n">years</span><span class="o">=</span><span class="n">interval</span><span class="p">)</span>
+<a id="__codelineno-15-154" name="__codelineno-15-154" href="#__codelineno-15-154"></a>
+<a id="__codelineno-15-155" name="__codelineno-15-155" href="#__codelineno-15-155"></a>    <span class="k">return</span> <span class="n">occurrences</span>
+</code></pre></div>
+<h3 id="validation-schema">Validation Schema</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">validator</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Literal</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="k">class</span><span class="w"> </span><span class="nc">WeeklyConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>    <span class="n">day_of_week</span><span class="p">:</span> <span class="nb">int</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>    <span class="nd">@validator</span><span class="p">(</span><span class="s1">&#39;day_of_week&#39;</span><span class="p">)</span>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">validate_day_of_week</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">v</span> <span class="o">&lt;=</span> <span class="mi">6</span><span class="p">:</span>
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;day_of_week must be between 0 and 6&#39;</span><span class="p">)</span>
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>        <span class="k">return</span> <span class="n">v</span>
+<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a>
+<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a><span class="k">class</span><span class="w"> </span><span class="nc">BiWeeklyConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a>    <span class="n">interval_days</span><span class="p">:</span> <span class="nb">int</span>
+<a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a>
+<a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a>    <span class="nd">@validator</span><span class="p">(</span><span class="s1">&#39;interval_days&#39;</span><span class="p">)</span>
+<a id="__codelineno-16-17" name="__codelineno-16-17" href="#__codelineno-16-17"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">validate_interval_days</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+<a id="__codelineno-16-18" name="__codelineno-16-18" href="#__codelineno-16-18"></a>        <span class="k">if</span> <span class="n">v</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-16-19" name="__codelineno-16-19" href="#__codelineno-16-19"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;interval_days must be positive&#39;</span><span class="p">)</span>
+<a id="__codelineno-16-20" name="__codelineno-16-20" href="#__codelineno-16-20"></a>        <span class="k">return</span> <span class="n">v</span>
+<a id="__codelineno-16-21" name="__codelineno-16-21" href="#__codelineno-16-21"></a>
+<a id="__codelineno-16-22" name="__codelineno-16-22" href="#__codelineno-16-22"></a><span class="k">class</span><span class="w"> </span><span class="nc">MonthlyConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<a id="__codelineno-16-23" name="__codelineno-16-23" href="#__codelineno-16-23"></a>    <span class="n">day_of_month</span><span class="p">:</span> <span class="nb">int</span>
+<a id="__codelineno-16-24" name="__codelineno-16-24" href="#__codelineno-16-24"></a>    <span class="n">handle_month_end</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+<a id="__codelineno-16-25" name="__codelineno-16-25" href="#__codelineno-16-25"></a>
+<a id="__codelineno-16-26" name="__codelineno-16-26" href="#__codelineno-16-26"></a>    <span class="nd">@validator</span><span class="p">(</span><span class="s1">&#39;day_of_month&#39;</span><span class="p">)</span>
+<a id="__codelineno-16-27" name="__codelineno-16-27" href="#__codelineno-16-27"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">validate_day_of_month</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+<a id="__codelineno-16-28" name="__codelineno-16-28" href="#__codelineno-16-28"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">v</span> <span class="o">&lt;=</span> <span class="mi">31</span><span class="p">:</span>
+<a id="__codelineno-16-29" name="__codelineno-16-29" href="#__codelineno-16-29"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;day_of_month must be between 1 and 31&#39;</span><span class="p">)</span>
+<a id="__codelineno-16-30" name="__codelineno-16-30" href="#__codelineno-16-30"></a>        <span class="k">return</span> <span class="n">v</span>
+<a id="__codelineno-16-31" name="__codelineno-16-31" href="#__codelineno-16-31"></a>
+<a id="__codelineno-16-32" name="__codelineno-16-32" href="#__codelineno-16-32"></a><span class="k">class</span><span class="w"> </span><span class="nc">CustomConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<a id="__codelineno-16-33" name="__codelineno-16-33" href="#__codelineno-16-33"></a>    <span class="n">interval</span><span class="p">:</span> <span class="nb">int</span>
+<a id="__codelineno-16-34" name="__codelineno-16-34" href="#__codelineno-16-34"></a>    <span class="n">unit</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;days&quot;</span><span class="p">,</span> <span class="s2">&quot;weeks&quot;</span><span class="p">,</span> <span class="s2">&quot;months&quot;</span><span class="p">,</span> <span class="s2">&quot;years&quot;</span><span class="p">]</span>
+<a id="__codelineno-16-35" name="__codelineno-16-35" href="#__codelineno-16-35"></a>    <span class="n">day_of_month</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-16-36" name="__codelineno-16-36" href="#__codelineno-16-36"></a>    <span class="n">month_of_year</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-16-37" name="__codelineno-16-37" href="#__codelineno-16-37"></a>    <span class="n">day_of_week</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-16-38" name="__codelineno-16-38" href="#__codelineno-16-38"></a>
+<a id="__codelineno-16-39" name="__codelineno-16-39" href="#__codelineno-16-39"></a>    <span class="nd">@validator</span><span class="p">(</span><span class="s1">&#39;interval&#39;</span><span class="p">)</span>
+<a id="__codelineno-16-40" name="__codelineno-16-40" href="#__codelineno-16-40"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">validate_interval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+<a id="__codelineno-16-41" name="__codelineno-16-41" href="#__codelineno-16-41"></a>        <span class="k">if</span> <span class="n">v</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-16-42" name="__codelineno-16-42" href="#__codelineno-16-42"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;interval must be positive&#39;</span><span class="p">)</span>
+<a id="__codelineno-16-43" name="__codelineno-16-43" href="#__codelineno-16-43"></a>        <span class="k">return</span> <span class="n">v</span>
+<a id="__codelineno-16-44" name="__codelineno-16-44" href="#__codelineno-16-44"></a>
+<a id="__codelineno-16-45" name="__codelineno-16-45" href="#__codelineno-16-45"></a>    <span class="nd">@validator</span><span class="p">(</span><span class="s1">&#39;day_of_month&#39;</span><span class="p">)</span>
+<a id="__codelineno-16-46" name="__codelineno-16-46" href="#__codelineno-16-46"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">validate_day_of_month</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+<a id="__codelineno-16-47" name="__codelineno-16-47" href="#__codelineno-16-47"></a>        <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">v</span> <span class="o">&lt;=</span> <span class="mi">31</span><span class="p">:</span>
+<a id="__codelineno-16-48" name="__codelineno-16-48" href="#__codelineno-16-48"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;day_of_month must be between 1 and 31&#39;</span><span class="p">)</span>
+<a id="__codelineno-16-49" name="__codelineno-16-49" href="#__codelineno-16-49"></a>        <span class="k">return</span> <span class="n">v</span>
+<a id="__codelineno-16-50" name="__codelineno-16-50" href="#__codelineno-16-50"></a>
+<a id="__codelineno-16-51" name="__codelineno-16-51" href="#__codelineno-16-51"></a>    <span class="nd">@validator</span><span class="p">(</span><span class="s1">&#39;month_of_year&#39;</span><span class="p">)</span>
+<a id="__codelineno-16-52" name="__codelineno-16-52" href="#__codelineno-16-52"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">validate_month_of_year</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+<a id="__codelineno-16-53" name="__codelineno-16-53" href="#__codelineno-16-53"></a>        <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">v</span> <span class="o">&lt;=</span> <span class="mi">12</span><span class="p">:</span>
+<a id="__codelineno-16-54" name="__codelineno-16-54" href="#__codelineno-16-54"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;month_of_year must be between 1 and 12&#39;</span><span class="p">)</span>
+<a id="__codelineno-16-55" name="__codelineno-16-55" href="#__codelineno-16-55"></a>        <span class="k">return</span> <span class="n">v</span>
+<a id="__codelineno-16-56" name="__codelineno-16-56" href="#__codelineno-16-56"></a>
+<a id="__codelineno-16-57" name="__codelineno-16-57" href="#__codelineno-16-57"></a>    <span class="nd">@validator</span><span class="p">(</span><span class="s1">&#39;day_of_week&#39;</span><span class="p">)</span>
+<a id="__codelineno-16-58" name="__codelineno-16-58" href="#__codelineno-16-58"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">validate_day_of_week</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+<a id="__codelineno-16-59" name="__codelineno-16-59" href="#__codelineno-16-59"></a>        <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">v</span> <span class="o">&lt;=</span> <span class="mi">6</span><span class="p">:</span>
+<a id="__codelineno-16-60" name="__codelineno-16-60" href="#__codelineno-16-60"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;day_of_week must be between 0 and 6&#39;</span><span class="p">)</span>
+<a id="__codelineno-16-61" name="__codelineno-16-61" href="#__codelineno-16-61"></a>        <span class="k">return</span> <span class="n">v</span>
+</code></pre></div>
 <h2 id="key-design-decisions">Key Design Decisions</h2>
 <h3 id="1-multi-currency-support">1. Multi-Currency Support</h3>
 <ul>
@@ -1372,32 +1839,32 @@
 </ul>
 <h2 id="sample-queries">Sample Queries</h2>
 <h3 id="generate-cycle-summary">Generate Cycle Summary</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">SELECT</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="k">c</span><span class="p">.</span><span class="n">name</span><span class="p">,</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="k">c</span><span class="p">.</span><span class="n">income_amount</span><span class="p">,</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="k">COUNT</span><span class="p">(</span><span class="n">ce</span><span class="p">.</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">total_expenses</span><span class="p">,</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="k">SUM</span><span class="p">(</span><span class="n">ce</span><span class="p">.</span><span class="n">amount_usd</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">total_amount_usd</span><span class="p">,</span>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="k">SUM</span><span class="p">(</span><span class="k">CASE</span><span class="w"> </span><span class="k">WHEN</span><span class="w"> </span><span class="n">ce</span><span class="p">.</span><span class="n">category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;fixed&#39;</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="n">ce</span><span class="p">.</span><span class="n">amount_usd</span><span class="w"> </span><span class="k">ELSE</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">END</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">fixed_expenses</span><span class="p">,</span>
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="k">SUM</span><span class="p">(</span><span class="k">CASE</span><span class="w"> </span><span class="k">WHEN</span><span class="w"> </span><span class="n">ce</span><span class="p">.</span><span class="n">category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;variable&#39;</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="n">ce</span><span class="p">.</span><span class="n">amount_usd</span><span class="w"> </span><span class="k">ELSE</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">END</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">variable_expenses</span><span class="p">,</span>
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">    </span><span class="k">c</span><span class="p">.</span><span class="n">income_amount</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="k">SUM</span><span class="p">(</span><span class="n">ce</span><span class="p">.</span><span class="n">amount_usd</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">net_balance</span>
-<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="k">FROM</span><span class="w"> </span><span class="n">cycles</span><span class="w"> </span><span class="k">c</span>
-<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">cycle_expenses</span><span class="w"> </span><span class="n">ce</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ce</span><span class="p">.</span><span class="n">cycle_id</span>
-<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="k">WHERE</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">user_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">$</span><span class="mi">1</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">$</span><span class="mi">2</span>
-<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">income_amount</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">SELECT</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">    </span><span class="k">c</span><span class="p">.</span><span class="n">name</span><span class="p">,</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">    </span><span class="k">c</span><span class="p">.</span><span class="n">income_amount</span><span class="p">,</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">    </span><span class="k">COUNT</span><span class="p">(</span><span class="n">ce</span><span class="p">.</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">total_expenses</span><span class="p">,</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">    </span><span class="k">SUM</span><span class="p">(</span><span class="n">ce</span><span class="p">.</span><span class="n">amount_usd</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">total_amount_usd</span><span class="p">,</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="w">    </span><span class="k">SUM</span><span class="p">(</span><span class="k">CASE</span><span class="w"> </span><span class="k">WHEN</span><span class="w"> </span><span class="n">ce</span><span class="p">.</span><span class="n">category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;fixed&#39;</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="n">ce</span><span class="p">.</span><span class="n">amount_usd</span><span class="w"> </span><span class="k">ELSE</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">END</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">fixed_expenses</span><span class="p">,</span>
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="w">    </span><span class="k">SUM</span><span class="p">(</span><span class="k">CASE</span><span class="w"> </span><span class="k">WHEN</span><span class="w"> </span><span class="n">ce</span><span class="p">.</span><span class="n">category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;variable&#39;</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="n">ce</span><span class="p">.</span><span class="n">amount_usd</span><span class="w"> </span><span class="k">ELSE</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">END</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">variable_expenses</span><span class="p">,</span>
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="w">    </span><span class="k">c</span><span class="p">.</span><span class="n">income_amount</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="k">SUM</span><span class="p">(</span><span class="n">ce</span><span class="p">.</span><span class="n">amount_usd</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">net_balance</span>
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="k">FROM</span><span class="w"> </span><span class="n">cycles</span><span class="w"> </span><span class="k">c</span>
+<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a><span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">cycle_expenses</span><span class="w"> </span><span class="n">ce</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ce</span><span class="p">.</span><span class="n">cycle_id</span>
+<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a><span class="k">WHERE</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">user_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">$</span><span class="mi">1</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">$</span><span class="mi">2</span>
+<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">income_amount</span><span class="p">;</span>
 </code></pre></div>
 <h3 id="payment-method-summary">Payment Method Summary</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">SELECT</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="n">pm</span><span class="p">.</span><span class="n">name</span><span class="p">,</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="n">pm</span><span class="p">.</span><span class="n">method_type</span><span class="p">,</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="k">COUNT</span><span class="p">(</span><span class="n">ce</span><span class="p">.</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">expense_count</span><span class="p">,</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="k">SUM</span><span class="p">(</span><span class="n">ce</span><span class="p">.</span><span class="n">amount_usd</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">total_amount</span><span class="p">,</span>
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="k">SUM</span><span class="p">(</span><span class="k">CASE</span><span class="w"> </span><span class="k">WHEN</span><span class="w"> </span><span class="n">ce</span><span class="p">.</span><span class="n">paid</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="n">ce</span><span class="p">.</span><span class="n">amount_usd</span><span class="w"> </span><span class="k">ELSE</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">END</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">paid_amount</span><span class="p">,</span>
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">    </span><span class="k">SUM</span><span class="p">(</span><span class="k">CASE</span><span class="w"> </span><span class="k">WHEN</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="n">ce</span><span class="p">.</span><span class="n">paid</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="n">ce</span><span class="p">.</span><span class="n">amount_usd</span><span class="w"> </span><span class="k">ELSE</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">END</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">pending_amount</span>
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="k">FROM</span><span class="w"> </span><span class="n">payment_methods</span><span class="w"> </span><span class="n">pm</span>
-<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">cycle_expenses</span><span class="w"> </span><span class="n">ce</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">pm</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ce</span><span class="p">.</span><span class="n">payment_method_id</span>
-<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">pm</span><span class="p">.</span><span class="n">user_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">$</span><span class="mi">1</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">ce</span><span class="p">.</span><span class="n">cycle_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">$</span><span class="mi">2</span>
-<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">pm</span><span class="p">.</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">pm</span><span class="p">.</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">pm</span><span class="p">.</span><span class="n">method_type</span>
-<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">total_amount</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">SELECT</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">    </span><span class="n">pm</span><span class="p">.</span><span class="n">name</span><span class="p">,</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">    </span><span class="n">pm</span><span class="p">.</span><span class="n">method_type</span><span class="p">,</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">    </span><span class="k">COUNT</span><span class="p">(</span><span class="n">ce</span><span class="p">.</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">expense_count</span><span class="p">,</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">    </span><span class="k">SUM</span><span class="p">(</span><span class="n">ce</span><span class="p">.</span><span class="n">amount_usd</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">total_amount</span><span class="p">,</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="w">    </span><span class="k">SUM</span><span class="p">(</span><span class="k">CASE</span><span class="w"> </span><span class="k">WHEN</span><span class="w"> </span><span class="n">ce</span><span class="p">.</span><span class="n">paid</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="n">ce</span><span class="p">.</span><span class="n">amount_usd</span><span class="w"> </span><span class="k">ELSE</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">END</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">paid_amount</span><span class="p">,</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">    </span><span class="k">SUM</span><span class="p">(</span><span class="k">CASE</span><span class="w"> </span><span class="k">WHEN</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="n">ce</span><span class="p">.</span><span class="n">paid</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="n">ce</span><span class="p">.</span><span class="n">amount_usd</span><span class="w"> </span><span class="k">ELSE</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">END</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">pending_amount</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="k">FROM</span><span class="w"> </span><span class="n">payment_methods</span><span class="w"> </span><span class="n">pm</span>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">cycle_expenses</span><span class="w"> </span><span class="n">ce</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">pm</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ce</span><span class="p">.</span><span class="n">payment_method_id</span>
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">pm</span><span class="p">.</span><span class="n">user_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">$</span><span class="mi">1</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">ce</span><span class="p">.</span><span class="n">cycle_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">$</span><span class="mi">2</span>
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">pm</span><span class="p">.</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">pm</span><span class="p">.</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">pm</span><span class="p">.</span><span class="n">method_type</span>
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">total_amount</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span>
 </code></pre></div>
 <p>This schema provides the foundation for all the functional requirements while maintaining data integrity and supporting complex financial reporting.</p>
 
