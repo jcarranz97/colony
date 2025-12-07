@@ -1,0 +1,1398 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Personal expense management application">
+      
+      
+      
+        <link rel="canonical" href="https://your-username.github.io/colony/requirements/">
+      
+      
+        <link rel="prev" href="../roadmap/">
+      
+      
+        <link rel="next" href="../development/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>Requirements - Colony Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.618322db.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#software-requirements-specification" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Colony Documentation" class="md-header__button md-logo" aria-label="Colony Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Colony Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Requirements
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/your-username/colony" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    your-username/colony
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../roadmap/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Roadmap
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Requirements
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../development/" class="md-tabs__link">
+          
+  
+  
+  Development
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Colony Documentation" class="md-nav__button md-logo" aria-label="Colony Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Colony Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/your-username/colony" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    your-username/colony
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requirements
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Introduction
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Introduction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 Purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-scope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 Scope
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-current-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 Current Workflow
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-overall-description" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Overall Description
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Overall Description">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-product-perspective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Product Perspective
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-user-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 User Classes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-functional-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Functional Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Functional Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-user-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 User Authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-currency-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Currency Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-payment-method-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 Payment Method Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-expense-template-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4 Expense Template Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#35-cycle-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5 Cycle Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#36-expense-management-within-cycles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.6 Expense Management Within Cycles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#37-expense-categorization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.7 Expense Categorization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#38-financial-reporting-and-analytics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.8 Financial Reporting and Analytics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#39-data-importexport" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.9 Data Import/Export
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-non-functional-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Non-Functional Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Non-Functional Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 Performance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 Security
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-usability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 Usability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#44-reliability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.4 Reliability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#45-internationalization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.5 Internationalization
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-technical-constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Technical Constraints
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-data-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Data Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Data Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-expense-template-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1 Expense Template Schema
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62-cycle-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2 Cycle Schema
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#63-cycle-expense-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.3 Cycle Expense Schema
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#64-payment-method-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.4 Payment Method Schema
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-integration-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Integration Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Integration Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-currency-exchange" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.1 Currency Exchange
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-future-integrations-nice-to-have" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.2 Future Integrations (Nice to Have)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/code-quality/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Code Quality
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/deployment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="software-requirements-specification">Software Requirements Specification</h1>
+<h2 id="1-introduction">1. Introduction</h2>
+<h3 id="11-purpose">1.1 Purpose</h3>
+<p>This document specifies the functional and non-functional requirements for Colony, a personal expense management application designed to replace Excel-based expense tracking with automated cycle management.</p>
+<h3 id="12-scope">1.2 Scope</h3>
+<p>Colony will provide users with the ability to:</p>
+<ul>
+<li>Track expenses across multiple currencies (USD, MXN)</li>
+<li>Manage recurring expenses with various patterns</li>
+<li>Create expense cycles (6-week periods)</li>
+<li>Automatically generate expenses for new cycles</li>
+<li>Categorize expenses (Fixed, Variable)</li>
+<li>Track payment methods and account balances</li>
+<li>Generate financial summaries and projections by location and type</li>
+</ul>
+<h3 id="13-current-workflow">1.3 Current Workflow</h3>
+<p>The system replaces a manual Excel-based process where users:</p>
+<ul>
+<li>Track expenses every 6 weeks (3 pay cycles of bi-weekly payments)</li>
+<li>Copy and modify recurring expenses for new periods</li>
+<li>Manage expenses in USD and MXN currencies</li>
+<li>Categorize expenses by type (Fixed/Variable) and implicitly by location via currency</li>
+<li>Generate payment summaries by account/card</li>
+</ul>
+<h2 id="2-overall-description">2. Overall Description</h2>
+<h3 id="21-product-perspective">2.1 Product Perspective</h3>
+<p>Colony is a standalone web application consisting of:</p>
+<ul>
+<li>A RESTful API backend (FastAPI) with multi-currency support</li>
+<li>A responsive web frontend (Next.js) with cycle management</li>
+<li>A containerized deployment solution</li>
+</ul>
+<h3 id="22-user-classes">2.2 User Classes</h3>
+<ul>
+<li><strong>Primary User</strong>: Individual managing personal expenses across multiple currencies and accounts</li>
+<li><strong>Administrator</strong>: System maintainer (for self-hosted instances)</li>
+</ul>
+<h2 id="3-functional-requirements">3. Functional Requirements</h2>
+<h3 id="31-user-authentication">3.1 User Authentication</h3>
+<ul>
+<li><strong>FR-001</strong>: Users must be able to create an account</li>
+<li><strong>FR-002</strong>: Users must be able to log in securely</li>
+<li><strong>FR-003</strong>: Users must be able to reset their password</li>
+</ul>
+<h3 id="32-currency-management">3.2 Currency Management</h3>
+<ul>
+<li><strong>FR-004</strong>: System must support multiple currencies (USD, MXN)</li>
+<li><strong>FR-005</strong>: System must track exchange rates for currency conversion</li>
+<li><strong>FR-006</strong>: System must convert expenses to base currency (USD) for reporting</li>
+</ul>
+<h3 id="33-payment-method-management">3.3 Payment Method Management</h3>
+<ul>
+<li><strong>FR-007</strong>: Users must be able to create custom payment methods with the following attributes:<ul>
+<li>Name (e.g., "Chase Debit", "Chase Credit", "Capital Credit", "Mexico Cash")</li>
+<li>Type (Debit, Credit, Cash, Transfer)</li>
+<li>Default currency (USD or MXN)</li>
+<li>Active/Inactive status</li>
+</ul>
+</li>
+<li><strong>FR-008</strong>: Users must be able to edit existing payment methods</li>
+<li><strong>FR-009</strong>: Users must be able to deactivate payment methods (soft delete to preserve historical data)</li>
+<li><strong>FR-010</strong>: Users must be able to assign descriptive names to payment methods</li>
+<li><strong>FR-011</strong>: Users must be able to specify payment method type (debit, credit, cash, transfer)</li>
+<li><strong>FR-012</strong>: Users must be able to set a default currency for each payment method</li>
+<li><strong>FR-013</strong>: System must prevent deletion of payment methods that are used in existing expenses</li>
+<li><strong>FR-014</strong>: Users must be able to deactivate payment methods to hide them from new expense creation</li>
+<li><strong>FR-015</strong>: System must provide default payment method templates for common use cases</li>
+<li><strong>FR-016</strong>: System must validate that payment method and currency combinations are logical</li>
+<li><strong>FR-017</strong>: Users must be able to view all payment methods (active and inactive)</li>
+</ul>
+<h3 id="34-expense-template-management">3.4 Expense Template Management</h3>
+<ul>
+<li><strong>FR-018</strong>: Users must be able to create expense templates with the following fields:<ul>
+<li>Description</li>
+<li>Currency (USD/MXN)</li>
+<li>Payment Method</li>
+<li>Amount</li>
+<li>Category (Fixed/Variable)</li>
+<li>Recurrence Pattern</li>
+<li>Auto-pay details (optional)</li>
+<li>Status</li>
+<li>Comments</li>
+</ul>
+</li>
+<li><strong>FR-019</strong>: System must support recurrence patterns:<ul>
+<li><strong>Daily</strong>: Specific day of month (1st, 7th, etc.)</li>
+<li><strong>Weekly</strong>: Specific day of week (every Saturday)</li>
+<li><strong>Bi-weekly</strong>: Every 14 days from start date</li>
+<li><strong>Monthly</strong>: Same date each month</li>
+<li><strong>Custom</strong>: User-defined intervals</li>
+</ul>
+</li>
+<li><strong>FR-020</strong>: Users must be able to edit expense templates</li>
+<li><strong>FR-021</strong>: Users must be able to delete expense templates</li>
+<li><strong>FR-022</strong>: Users must be able to view all expense templates</li>
+<li><strong>FR-023</strong>: Each expense must specify currency and payment method</li>
+</ul>
+<h3 id="35-cycle-management">3.5 Cycle Management</h3>
+<ul>
+<li><strong>FR-024</strong>: Users must be able to create expense cycles (6-week periods)</li>
+<li><strong>FR-025</strong>: System must automatically generate expenses for new cycles based on templates</li>
+<li><strong>FR-026</strong>: Users must be able to modify generated expenses within a cycle</li>
+<li><strong>FR-027</strong>: Users must be able to set "Remaining Balance" for each cycle</li>
+<li><strong>FR-028</strong>: System must track cycle periods with start and end dates</li>
+<li><strong>FR-029</strong>: Users must be able to view cycle history</li>
+</ul>
+<h3 id="36-expense-management-within-cycles">3.6 Expense Management Within Cycles</h3>
+<ul>
+<li><strong>FR-030</strong>: Users must be able to manually add expenses to a cycle</li>
+<li><strong>FR-031</strong>: Users must be able to edit cycle expenses</li>
+<li><strong>FR-032</strong>: Users must be able to delete cycle expenses</li>
+<li><strong>FR-033</strong>: Users must be able to mark expenses as paid/unpaid</li>
+<li><strong>FR-034</strong>: System must calculate dates based on recurrence patterns and cycle start date</li>
+</ul>
+<h3 id="37-expense-categorization">3.7 Expense Categorization</h3>
+<ul>
+<li><strong>FR-035</strong>: System must categorize expenses as:<ul>
+<li><strong>Fixed Expenses</strong></li>
+<li><strong>Variable Expenses</strong></li>
+</ul>
+</li>
+<li><strong>FR-036</strong>: System must determine expense location based on currency:<ul>
+<li><strong>USD expenses</strong> = USA-based expenses</li>
+<li><strong>MXN expenses</strong> = Mexico-based expenses</li>
+</ul>
+</li>
+<li><strong>FR-037</strong>: Users must be able to manually override expense categories</li>
+<li><strong>FR-038</strong>: System must provide category rules based on payment method and description patterns</li>
+</ul>
+<h3 id="38-financial-reporting-and-analytics">3.8 Financial Reporting and Analytics</h3>
+<ul>
+<li><strong>FR-039</strong>: System must generate cycle summaries showing:<ul>
+<li>Income for the period</li>
+<li>Fixed expenses total</li>
+<li>Variable expenses total</li>
+<li>Mexico expenses total (MXN currency expenses converted to USD)</li>
+<li>USA expenses total (USD currency expenses)</li>
+<li>Net balance (Income - Total Expenses)</li>
+</ul>
+</li>
+<li><strong>FR-040</strong>: System must generate payment method summaries showing:<ul>
+<li>Amount needed per payment method</li>
+<li>Amount paid per payment method</li>
+<li>Amount pending per payment method</li>
+</ul>
+</li>
+<li><strong>FR-041</strong>: System must calculate projected balances:<ul>
+<li>"Before Paying"</li>
+<li>"After Paying"</li>
+</ul>
+</li>
+<li><strong>FR-042</strong>: Users must be able to view multi-period summaries (combining multiple cycles)</li>
+<li><strong>FR-043</strong>: System must support period-over-period comparisons</li>
+<li><strong>FR-044</strong>: System must provide expense breakdowns by:<ul>
+<li>Category (Fixed vs Variable)</li>
+<li>Location (USA vs Mexico based on currency)</li>
+<li>Payment Method</li>
+<li>Time period</li>
+</ul>
+</li>
+</ul>
+<h3 id="39-data-importexport">3.9 Data Import/Export</h3>
+<ul>
+<li><strong>FR-045</strong>: Users must be able to import existing expense data from Excel/CSV</li>
+<li><strong>FR-046</strong>: Users must be able to export cycle data to Excel/CSV</li>
+<li><strong>FR-047</strong>: System must support bulk expense template creation</li>
+</ul>
+<h2 id="4-non-functional-requirements">4. Non-Functional Requirements</h2>
+<h3 id="41-performance">4.1 Performance</h3>
+<ul>
+<li><strong>NFR-001</strong>: Cycle generation must complete within 5 seconds for 50+ expense templates</li>
+<li><strong>NFR-002</strong>: Currency conversion must be real-time or cached for same-day accuracy</li>
+<li><strong>NFR-003</strong>: Financial reports must generate within 3 seconds</li>
+</ul>
+<h3 id="42-security">4.2 Security</h3>
+<ul>
+<li><strong>NFR-004</strong>: All financial data must be encrypted at rest</li>
+<li><strong>NFR-005</strong>: All API endpoints must be authenticated</li>
+<li><strong>NFR-006</strong>: Passwords must be securely hashed</li>
+<li><strong>NFR-007</strong>: Data transmission must be encrypted (HTTPS)</li>
+</ul>
+<h3 id="43-usability">4.3 Usability</h3>
+<ul>
+<li><strong>NFR-008</strong>: Interface must be responsive across devices</li>
+<li><strong>NFR-009</strong>: Currency amounts must display with proper formatting ($1,234.56)</li>
+<li><strong>NFR-010</strong>: Date selection must be intuitive for cycle creation</li>
+<li><strong>NFR-011</strong>: Bulk operations (cycle generation) must show progress indicators</li>
+</ul>
+<h3 id="44-reliability">4.4 Reliability</h3>
+<ul>
+<li><strong>NFR-012</strong>: System must handle currency conversion failures gracefully</li>
+<li><strong>NFR-013</strong>: Data must be automatically backed up</li>
+<li><strong>NFR-014</strong>: System must prevent duplicate expense generation in cycles</li>
+</ul>
+<h3 id="45-internationalization">4.5 Internationalization</h3>
+<ul>
+<li><strong>NFR-015</strong>: Interface must support English and Spanish languages</li>
+<li><strong>NFR-016</strong>: Currency formatting must respect locale (USD vs MXN display)</li>
+<li><strong>NFR-017</strong>: Date formats must be configurable</li>
+</ul>
+<h2 id="5-technical-constraints">5. Technical Constraints</h2>
+<ul>
+<li>Must use FastAPI for backend API</li>
+<li>Must use Next.js for frontend</li>
+<li>Must be containerizable with Docker</li>
+<li>Must work in modern web browsers</li>
+<li>Must support SQLite for development and PostgreSQL for production</li>
+<li>Must integrate with currency exchange rate APIs</li>
+</ul>
+<h2 id="6-data-requirements">6. Data Requirements</h2>
+<h3 id="61-expense-template-schema">6.1 Expense Template Schema</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>- id: UUID
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>- description: String (required)
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>- currency: Enum (USD, MXN)
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>- payment_method: String (required)
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>- base_amount: Decimal
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>- recurrence_type: Enum (daily, weekly, monthly, custom)
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>- recurrence_config: JSON (day_of_week, day_of_month, interval)
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>- autopay_info: String (optional)
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>- category: Enum (fixed, variable)
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>- active: Boolean
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>- created_at: DateTime
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>- updated_at: DateTime
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>- user_id: UUID (FK)
+</code></pre></div>
+<h3 id="62-cycle-schema">6.2 Cycle Schema</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>- id: UUID
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>- start_date: Date
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>- end_date: Date
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>- remaining_balance: Decimal
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>- income_amount: Decimal
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>- status: Enum (active, completed, draft)
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>- created_at: DateTime
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>- user_id: UUID (FK)
+</code></pre></div>
+<h3 id="63-cycle-expense-schema">6.3 Cycle Expense Schema</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>- id: UUID
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>- cycle_id: UUID (FK)
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>- template_id: UUID (FK, optional)
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>- description: String
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>- currency: Enum (USD, MXN)
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>- payment_method: String
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>- amount: Decimal
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>- amount_usd: Decimal (calculated)
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>- date: Date
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>- autopay_info: String
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>- status: String
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>- comments: String
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>- category: Enum (fixed, variable)
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>- paid: Boolean
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>- created_at: DateTime
+</code></pre></div>
+<h3 id="64-payment-method-schema">6.4 Payment Method Schema</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>- id: UUID
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>- name: String (user-defined, e.g., &quot;Chase Debit&quot;, &quot;Capital One Credit&quot;)
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>- type: Enum (debit, credit, cash, transfer)
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>- default_currency: Enum (USD, MXN)
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>- description: String (optional, for user notes)
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>- active: Boolean
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>- created_at: DateTime
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>- updated_at: DateTime
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>- user_id: UUID (FK)
+</code></pre></div>
+<h2 id="7-integration-requirements">7. Integration Requirements</h2>
+<h3 id="71-currency-exchange">7.1 Currency Exchange</h3>
+<ul>
+<li><strong>IR-001</strong>: System must integrate with currency exchange API (e.g., Exchange Rates API)</li>
+<li><strong>IR-002</strong>: Exchange rates must be cached and updated daily</li>
+<li><strong>IR-003</strong>: Historical exchange rates must be stored for accurate reporting</li>
+</ul>
+<h3 id="72-future-integrations-nice-to-have">7.2 Future Integrations (Nice to Have)</h3>
+<ul>
+<li><strong>IR-004</strong>: Bank account integration for automatic expense importing</li>
+<li><strong>IR-005</strong>: Mobile app notifications for upcoming expenses</li>
+<li><strong>IR-006</strong>: Email reports for cycle summaries</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "search.share", "toc.integrate"], "search": "../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+    
+  </body>
+</html>
