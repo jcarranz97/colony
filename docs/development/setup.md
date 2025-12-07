@@ -2,15 +2,30 @@
 
 This guide walks you through setting up Colony for local development.
 
-## Option 1: Docker Development (Recommended)
+## Prerequisites
 
-The easiest way to get started is using Docker Compose:
+- **Python 3.11+**
+- **Node.js 18+**
+- **Docker and Docker Compose**
+- **Git**
+
+## Initial Setup
 
 ```bash
 # Clone the repository
 git clone https://github.com/your-username/colony.git
 cd colony
 
+# Install pre-commit hooks
+pip install pre-commit
+pre-commit install
+```
+
+## Option 1: Docker Development (Recommended)
+
+The easiest way to get started is using Docker Compose:
+
+```bash
 # Start all services
 docker-compose up --build
 
@@ -40,6 +55,9 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 # Install dependencies
 pip install -r requirements.txt
 
+# Install development dependencies
+pip install black isort flake8 pytest
+
 # Run development server
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
@@ -51,6 +69,9 @@ cd frontend
 
 # Install dependencies
 npm install
+
+# Install development dependencies
+npm install --save-dev prettier eslint
 
 # Run development server
 npm run dev
@@ -66,6 +87,19 @@ pip install mkdocs-material
 
 # Serve documentation
 mkdocs serve
+```
+
+## Code Quality Setup
+
+```bash
+# Install pre-commit (if not already done)
+pip install pre-commit
+
+# Install git hooks
+pre-commit install
+
+# Run on all files (first time)
+pre-commit run --all-files
 ```
 
 ## Environment Variables
@@ -85,55 +119,15 @@ ACCESS_TOKEN_EXPIRE_MINUTES=30
 DEBUG=true
 ```
 
-## Development Tools
+## Development Workflow
 
-### Recommended VS Code Extensions
-- Python
-- Pylance
-- ES7+ React/Redux/React-Native snippets
-- Tailwind CSS IntelliSense
-- Docker
+1. **Make changes** to your code
+2. **Pre-commit hooks** will automatically run on commit
+3. **Test locally** using Docker Compose or individual services
+4. **Submit pull request** when ready
 
-### Code Formatting
-```bash
-# Backend (Python)
-pip install black isort flake8
-black backend/
-isort backend/
+## Next Steps
 
-# Frontend (JavaScript/TypeScript)
-npm install -g prettier
-prettier --write frontend/src/
-```
-
-## Troubleshooting
-
-### Common Issues
-
-**Port Already in Use**
-```bash
-# Kill process using port 8000
-sudo lsof -t -i:8000 | xargs kill -9
-
-# Or use different port
-uvicorn app.main:app --reload --port 8001
-```
-
-**Docker Build Issues**
-```bash
-# Clean Docker cache
-docker system prune -a
-
-# Rebuild without cache
-docker-compose build --no-cache
-```
-
-**Frontend Dependencies**
-```bash
-# Clear npm cache
-npm cache clean --force
-
-# Delete node_modules and reinstall
-rm -rf frontend/node_modules
-cd frontend && npm install
-```
+- **[Code Quality](code-quality/)** - Learn about our code standards and pre-commit hooks
+- **[Testing](testing/)** - Understand our testing approach
+- **[Architecture](../architecture/)** - Explore the system design

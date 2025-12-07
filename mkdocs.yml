@@ -52,6 +52,7 @@ nav:
   - Development:
     - Overview: development/index.md
     - Local Setup: development/setup.md
+    - Code Quality: development/code-quality.md
     - Testing: development/testing.md
     - Deployment: development/deployment.md
 

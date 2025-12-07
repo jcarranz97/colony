@@ -10,7 +10,7 @@ colony/
 │   ├── app/
 │   ├── requirements.txt
 │   └── Dockerfile
-├── frontend/         # Next.js application  
+├── frontend/         # Next.js application
 │   ├── src/
 │   ├── package.json
 │   └── Dockerfile
@@ -26,7 +26,7 @@ colony/
 This project serves multiple purposes:
 
 - **Personal Finance Management**: Create a robust tool for tracking personal expenses
-- **Technology Practice**: Explore modern web development technologies  
+- **Technology Practice**: Explore modern web development technologies
 - **Learning Experience**: Implement best practices in full-stack development
 
 ## Prerequisites for Development
@@ -67,6 +67,7 @@ This project serves multiple purposes:
 ## Next Steps
 
 - **[Local Setup](setup/)** - Set up your development environment
+- **[Code Quality](code-quality/)** - Code standards and pre-commit hooks
 - **[Testing](testing/)** - Learn about our testing approach
 - **[Deployment](deployment/)** - Understand deployment processes (including docs)
 - **[Architecture](../architecture/)** - Dive into system design
