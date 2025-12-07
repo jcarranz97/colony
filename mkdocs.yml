@@ -1,9 +1,8 @@
 site_name: Colony Documentation
 site_description: Personal expense management application
-site_url: https://your-username.github.io/colony/
 
-repo_name: your-username/colony
-repo_url: https://github.com/your-username/colony
+repo_name: jcarranz97/colony
+repo_url: https://github.com/jcarranz97/colony
 
 theme:
   name: material

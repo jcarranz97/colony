@@ -79,7 +79,7 @@ Colony is built using modern, industry-standard technologies:
 
 - **📖 Documentation**: You're in the right place! Browse the sections above
 - **🚀 Quick Start**: New to Colony? Check out [Getting Started](getting-started/)
-- **🐛 Issues**: Found a bug? Report it on [GitHub Issues](https://github.com/your-username/colony/issues)
+- **🐛 Issues**: Found a bug? Report it on [GitHub Issues](https://github.com/jcarranza97/colony/issues)
 - **💡 Feature Requests**: Have an idea? Open a feature request on GitHub
 
 ## About This Project

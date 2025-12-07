@@ -40,7 +40,7 @@ This project serves multiple purposes:
 
 1. **Fork and Clone**
    ```bash
-   git clone https://github.com/your-username/colony.git
+   git clone https://github.com/jcarranz97/colony.git
    cd colony
    ```
 

@@ -4,7 +4,8 @@ A modern personal expense management application built with FastAPI and Next.js.
 
 ## Overview
 
-Colony helps you track and manage your personal expenses efficiently. Built as a monorepo, it combines a powerful FastAPI backend with a sleek Next.js frontend.
+Colony helps you track and manage your personal expenses efficiently. Built as a
+monorepo, it combines a powerful FastAPI backend with a sleek Next.js frontend.
 
 ## Features
 
@@ -17,26 +18,31 @@ Colony helps you track and manage your personal expenses efficiently. Built as a
 ## Quick Start
 
 ### Prerequisites
+
 - Docker and Docker Compose
 
 ### Run with Docker
+
 ```bash
-git clone https://github.com/your-username/colony.git
+git clone https://github.com/jcarranz97/colony.git
 cd colony
 docker-compose up --build
 ```
 
 ### Access the Application
-- **Frontend**: http://localhost:3000
-- **API**: http://localhost:8000
-- **API Docs**: http://localhost:8000/docs
-- **Documentation**: http://localhost:8001
+
+- **Frontend**: <http://localhost:3000>
+- **API**: <http://localhost:8000>
+- **API Docs**: <http://localhost:8000/docs>
+- **Documentation**: <http://localhost:8001>
 
 ## Documentation
 
-For detailed information, visit our [documentation](docs/) or run:
+For detailed information, visit our
+[documentation](https://jcarranz97.github.io/colony/) or run:
+
 ```bash
-cd docs && mkdocs serve
+mkdocs serve
 ```
 
 ## Tech Stack
@@ -48,7 +54,9 @@ cd docs && mkdocs serve
 
 ## Contributing
 
-This is primarily a personal project for learning and expense management. See our [development guide](docs/development/) for contribution guidelines.
+This is primarily a personal project for learning and expense management. See our
+[development guide](https://jcarranz97.github.io/colony/development/) for
+contribution guidelines.
 
 ## License
 
@@ -56,4 +64,6 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-📚 **[View Full Documentation](docs/)** | 🚀 **[Development Guide](docs/development/)** | 🐛 **[Issues](https://github.com/your-username/colony/issues)**
+📚 **[View Full Documentation](https://jcarranz97.github.io/colony/)** |
+🚀 **[Development Guide](https://jcarranz97.github.io/colony/development/)** |
+🐛 **[Issues](https://github.com/jcarranz97/colony/issues)**
