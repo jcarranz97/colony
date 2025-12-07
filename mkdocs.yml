@@ -52,13 +52,17 @@ nav:
     - Overview: development/index.md
     - Local Setup: development/setup.md
     - Code Quality: development/code-quality.md
+    - Database Schema: development/database-schema.md
     # - Testing: development/testing.md
     - Deployment: development/deployment.md
 
 markdown_extensions:
   - admonition
   - pymdownx.details
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.inlinehilite
@@ -70,3 +74,6 @@ markdown_extensions:
 
 plugins:
   - search
+
+extra_javascript:
+  - https://unpkg.com/mermaid@10.6.1/dist/mermaid.min.js
