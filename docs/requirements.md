@@ -45,86 +45,102 @@ Colony is a standalone web application consisting of:
 - **FR-002**: Users must be able to log in securely
 - **FR-003**: Users must be able to reset their password
 
-### 3.2 Currency and Payment Method Management
+### 3.2 Currency Management
 - **FR-004**: System must support multiple currencies (USD, MXN)
 - **FR-005**: System must track exchange rates for currency conversion
-- **FR-006**: Users must be able to define payment methods (Debito Chase, Credito Chase, Credito Capital, Mexico, etc.)
-- **FR-007**: Each expense must specify currency and payment method
-- **FR-008**: System must convert expenses to base currency (USD) for reporting
+- **FR-006**: System must convert expenses to base currency (USD) for reporting
 
-### 3.3 Expense Template Management
-- **FR-009**: Users must be able to create expense templates with the following fields:
-  - Concepto (Description)
-  - Moneda (Currency: USD/MXN)
-  - Metodo Pago (Payment Method)
-  - Costo (Amount)
-  - Recurrence Pattern
-  - Autopay details (optional)
-  - Estado (Status)
-  - Comentarios (Comments)
-- **FR-010**: System must support recurrence patterns:
-  - **Daily**: Specific day of month (1st, 7th, etc.)
-  - **Weekly**: Specific day of week (every Saturday)
-  - **Bi-weekly**: Every 14 days from start date
-  - **Monthly**: Same date each month
-  - **Custom**: User-defined intervals
-- **FR-011**: Users must be able to edit expense templates
-- **FR-012**: Users must be able to delete expense templates
-- **FR-013**: Users must be able to view all expense templates
+### 3.3 Payment Method Management
+- **FR-007**: Users must be able to create custom payment methods with the following attributes:
+    - Name (e.g., "Debito Chase", "Credito Chase", "Credito Capital", "Mexico Cash")
+    - Type (Debit, Credit, Cash, Transfer)
+    - Default currency (USD or MXN)
+    - Active/Inactive status
+- **FR-008**: Users must be able to edit existing payment methods
+- **FR-009**: Users must be able to deactivate payment methods (soft delete to preserve historical data)
+- **FR-010**: Users must be able to assign descriptive names to payment methods
+- **FR-011**: Users must be able to specify payment method type (debit, credit, cash, transfer)
+- **FR-012**: Users must be able to set a default currency for each payment method
+- **FR-013**: System must prevent deletion of payment methods that are used in existing expenses
+- **FR-014**: Users must be able to deactivate payment methods to hide them from new expense creation
+- **FR-015**: System must provide default payment method templates for common use cases
+- **FR-016**: System must validate that payment method and currency combinations are logical
+- **FR-017**: Users must be able to view all payment methods (active and inactive)
 
-### 3.4 Cycle Management
-- **FR-014**: Users must be able to create expense cycles (6-week periods)
-- **FR-015**: System must automatically generate expenses for new cycles based on templates
-- **FR-016**: Users must be able to modify generated expenses within a cycle
-- **FR-017**: Users must be able to set "Debito Restante" (remaining balance) for each cycle
-- **FR-018**: System must track cycle periods with start and end dates
-- **FR-019**: Users must be able to view cycle history
+### 3.4 Expense Template Management
+- **FR-018**: Users must be able to create expense templates with the following fields:
+    - Concepto (Description)
+    - Moneda (Currency: USD/MXN)
+    - Metodo Pago (Payment Method)
+    - Costo (Amount)
+    - Category (Fixed/Variable)
+    - Recurrence Pattern
+    - Autopay details (optional)
+    - Estado (Status)
+    - Comentarios (Comments)
+- **FR-019**: System must support recurrence patterns:
+    - **Daily**: Specific day of month (1st, 7th, etc.)
+    - **Weekly**: Specific day of week (every Saturday)
+    - **Bi-weekly**: Every 14 days from start date
+    - **Monthly**: Same date each month
+    - **Custom**: User-defined intervals
+- **FR-020**: Users must be able to edit expense templates
+- **FR-021**: Users must be able to delete expense templates
+- **FR-022**: Users must be able to view all expense templates
+- **FR-023**: Each expense must specify currency and payment method
 
-### 3.5 Expense Management Within Cycles
-- **FR-020**: Users must be able to manually add expenses to a cycle
-- **FR-021**: Users must be able to edit cycle expenses
-- **FR-022**: Users must be able to delete cycle expenses
-- **FR-023**: Users must be able to mark expenses as paid/unpaid
-- **FR-024**: System must calculate dates based on recurrence patterns and cycle start date
+### 3.5 Cycle Management
+- **FR-024**: Users must be able to create expense cycles (6-week periods)
+- **FR-025**: System must automatically generate expenses for new cycles based on templates
+- **FR-026**: Users must be able to modify generated expenses within a cycle
+- **FR-027**: Users must be able to set "Debito Restante" (remaining balance) for each cycle
+- **FR-028**: System must track cycle periods with start and end dates
+- **FR-029**: Users must be able to view cycle history
 
-### 3.6 Expense Categorization
-- **FR-025**: System must categorize expenses as:
-  - **Gastos Fijos** (Fixed Expenses)
-  - **Gastos Variables** (Variable Expenses)
-- **FR-026**: System must determine expense location based on currency:
-  - **USD expenses** = USA-based expenses
-  - **MXN expenses** = Mexico-based expenses
-- **FR-027**: Users must be able to manually override expense categories
-- **FR-028**: System must provide category rules based on payment method and description patterns
+### 3.6 Expense Management Within Cycles
+- **FR-030**: Users must be able to manually add expenses to a cycle
+- **FR-031**: Users must be able to edit cycle expenses
+- **FR-032**: Users must be able to delete cycle expenses
+- **FR-033**: Users must be able to mark expenses as paid/unpaid
+- **FR-034**: System must calculate dates based on recurrence patterns and cycle start date
 
-### 3.7 Financial Reporting and Analytics
-- **FR-029**: System must generate cycle summaries showing:
-  - Income (Pago) for the period
-  - Fixed expenses total
-  - Variable expenses total
-  - Mexico expenses total (MXN currency expenses converted to USD)
-  - USA expenses total (USD currency expenses)
-  - Net balance (Income - Total Expenses)
-- **FR-030**: System must generate payment method summaries showing:
-  - Amount needed per payment method
-  - Amount paid per payment method
-  - Amount pending per payment method
-- **FR-031**: System must calculate projected balances:
-  - "Antes de Pagar" (Before Paying)
-  - "Despues de Pagar" (After Paying)
-- **FR-032**: Users must be able to view multi-period summaries (combining multiple cycles)
-- **FR-033**: System must support period-over-period comparisons
-- **FR-034**: System must provide expense breakdowns by:
-  - Category (Fixed vs Variable)
-  - Location (USA vs Mexico based on currency)
-  - Payment Method
-  - Time period
+### 3.7 Expense Categorization
+- **FR-035**: System must categorize expenses as:
+    - **Gastos Fijos** (Fixed Expenses)
+    - **Gastos Variables** (Variable Expenses)
+- **FR-036**: System must determine expense location based on currency:
+    - **USD expenses** = USA-based expenses
+    - **MXN expenses** = Mexico-based expenses
+- **FR-037**: Users must be able to manually override expense categories
+- **FR-038**: System must provide category rules based on payment method and description patterns
 
+### 3.8 Financial Reporting and Analytics
+- **FR-039**: System must generate cycle summaries showing:
+    - Income (Pago) for the period
+    - Fixed expenses total
+    - Variable expenses total
+    - Mexico expenses total (MXN currency expenses converted to USD)
+    - USA expenses total (USD currency expenses)
+    - Net balance (Income - Total Expenses)
+- **FR-040**: System must generate payment method summaries showing:
+    - Amount needed per payment method
+    - Amount paid per payment method
+    - Amount pending per payment method
+- **FR-041**: System must calculate projected balances:
+    - "Antes de Pagar" (Before Paying)
+    - "Despues de Pagar" (After Paying)
+- **FR-042**: Users must be able to view multi-period summaries (combining multiple cycles)
+- **FR-043**: System must support period-over-period comparisons
+- **FR-044**: System must provide expense breakdowns by:
+    - Category (Fixed vs Variable)
+    - Location (USA vs Mexico based on currency)
+    - Payment Method
+    - Time period
 
-### 3.8 Data Import/Export
-- **FR-033**: Users must be able to import existing expense data from Excel/CSV
-- **FR-034**: Users must be able to export cycle data to Excel/CSV
-- **FR-035**: System must support bulk expense template creation
+### 3.9 Data Import/Export
+- **FR-045**: Users must be able to import existing expense data from Excel/CSV
+- **FR-046**: Users must be able to export cycle data to Excel/CSV
+- **FR-047**: System must support bulk expense template creation
 
 ## 4. Non-Functional Requirements
 
@@ -176,10 +192,11 @@ Colony is a standalone web application consisting of:
 - recurrence_type: Enum (daily, weekly, monthly, custom)
 - recurrence_config: JSON (day_of_week, day_of_month, interval)
 - autopay_info: String (optional)
-- category: Enum (fijo, variable)  # Simplified to just Fixed/Variable
+- category: Enum (fijo, variable)
 - active: Boolean
 - created_at: DateTime
 - updated_at: DateTime
+- user_id: UUID (FK)
 ```
 
 ### 6.2 Cycle Schema
@@ -191,6 +208,7 @@ Colony is a standalone web application consisting of:
 - income_amount: Decimal
 - status: Enum (active, completed, draft)
 - created_at: DateTime
+- user_id: UUID (FK)
 ```
 
 ### 6.3 Cycle Expense Schema
@@ -207,7 +225,7 @@ Colony is a standalone web application consisting of:
 - autopay_info: String
 - estado: String
 - comentarios: String
-- category: Enum (fijo, variable)  # Simplified to just Fixed/Variable
+- category: Enum (fijo, variable)
 - paid: Boolean
 - created_at: DateTime
 ```
@@ -215,10 +233,14 @@ Colony is a standalone web application consisting of:
 ### 6.4 Payment Method Schema
 ```
 - id: UUID
-- name: String (Debito Chase, Credito Chase, etc.)
-- type: Enum (debit, credit, cash)
-- currency: Enum (USD, MXN)
+- name: String (user-defined, e.g., "Debito Chase", "Credito Capital One")
+- type: Enum (debit, credit, cash, transfer)
+- default_currency: Enum (USD, MXN)
+- description: String (optional, for user notes)
 - active: Boolean
+- created_at: DateTime
+- updated_at: DateTime
+- user_id: UUID (FK)
 ```
 
 ## 7. Integration Requirements
