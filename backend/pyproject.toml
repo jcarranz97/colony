@@ -39,7 +39,6 @@ line-ending = "auto"
 skip-magic-trailing-comma = false
 
 [tool.ruff.lint]
-# Enable comprehensive rule sets for open source projects
 select = [
     "E",    # pycodestyle errors
     "W",    # pycodestyle warnings
@@ -52,6 +51,7 @@ select = [
     "D",    # pydocstyle
     "S",    # bandit security
     "A",    # flake8-builtins
+    "ANN",  # flake8-annotations (ADD THIS)
     "COM",  # flake8-commas
     "C4",   # flake8-comprehensions
     "DTZ",  # flake8-datetimez
@@ -70,7 +70,6 @@ select = [
     "RUF",  # ruff-specific rules
 ]
 
-# Rules to ignore for practical development
 ignore = [
     "D100",    # Missing docstring in public module
     "D104",    # Missing docstring in public package

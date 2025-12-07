@@ -19,6 +19,6 @@ app.include_router(
 
 
 @app.get("/")
-async def root():
+async def root() -> dict:
     """Root endpoint returning a welcome message."""
     return {"message": "Hello Bigger Applications!"}

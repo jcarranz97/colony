@@ -6,7 +6,7 @@ router = APIRouter()
 
 
 @router.post("/")
-async def update_admin():
+async def update_admin() -> dict:
     """Perform administrative update operations.
 
     This endpoint handles various admin-related updates and maintenance tasks.

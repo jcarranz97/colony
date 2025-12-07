@@ -16,7 +16,7 @@ fake_items_db = {"plumbus": {"name": "Plumbus"}, "gun": {"name": "Portal Gun"}}
 
 
 @router.get("/")
-async def read_items():
+async def read_items() -> dict:
     """Retrieve all items from the database.
 
     Returns:
@@ -30,7 +30,7 @@ async def read_items():
 
 
 @router.get("/{item_id}")
-async def read_item(item_id: str):
+async def read_item(item_id: str) -> dict:
     """Retrieve a specific item by its ID.
 
     Args:
@@ -56,7 +56,7 @@ async def read_item(item_id: str):
     tags=["custom"],
     responses={403: {"description": "Operation forbidden"}},
 )
-async def update_item(item_id: str):
+async def update_item(item_id: str) -> dict:
     """Update a specific item (restricted to 'plumbus' only).
 
     Args:
