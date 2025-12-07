@@ -48,18 +48,18 @@ For development with hot reloading:
 ```bash
 cd backend
 
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Install development dependencies
-pip install black isort flake8 pytest
+# Install dependencies using uv
+uv sync
 
 # Run development server
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+uv run fastapi dev
+
+# For linting and formatting
+uv run ruff check . --fix    # Lint and auto-fix issues
+uv run ruff format .         # Format code
+
+# Run tests
+uv run pytest
 ```
 
 ### Frontend Setup

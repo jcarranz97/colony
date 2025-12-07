@@ -31,9 +31,7 @@ Our pre-commit configuration includes:
 - **JSON/TOML syntax validation**
 
 #### Python (Backend)
-- **Black** - Code formatting
-- **isort** - Import sorting
-- **flake8** - Linting and style checking
+- **Ruff** - Fast linting and code formatting (replaces Black, isort, and flake8)
 
 #### JavaScript/TypeScript (Frontend)
 - **Prettier** - Code formatting for JS, TS, JSON, CSS, and Markdown
@@ -55,9 +53,23 @@ pre-commit run --all-files
 # Run on staged files only
 pre-commit run
 
-# Run specific hook
-pre-commit run black
-pre-commit run prettier
+```
+
+### Manual Python Code Quality
+
+You can also run ruff manually for development:
+
+```bash
+cd backend
+
+# Check and auto-fix linting issues
+uv run ruff check . --fix
+
+# Format code
+uv run ruff format .
+
+# Run both checks
+uv run ruff format . && uv run ruff check . --fix
 ```
 
 ### Bypassing Hooks
@@ -76,7 +88,7 @@ git commit -m "your message" --no-verify
 Pre-commit uses several configuration files:
 
 - **`.pre-commit-config.yaml`** - Main pre-commit configuration
-- **`.flake8`** (if needed) - Python linting configuration
+- **`pyproject.toml`** - Ruff configuration (linting and formatting rules)
 - **`.prettierrc`** (if needed) - JavaScript/TypeScript formatting
 - **`.markdownlint.json`** (if needed) - Markdown linting rules
 
@@ -84,10 +96,10 @@ Pre-commit uses several configuration files:
 
 ### Python (Backend)
 
-We follow Python community standards:
+We follow Python community standards using Ruff:
 
 - **PEP 8** style guide
-- **Black** for automatic formatting
+- **Ruff** for automatic formatting and linting
 - **88 character line limit**
 - **Type hints** for function signatures
 - **Docstrings** for classes and functions
@@ -147,13 +159,13 @@ Recommended extensions and settings:
 ```json
 // .vscode/settings.json
 {
-  "python.defaultInterpreterPath": "./backend/venv/bin/python",
-  "python.formatting.provider": "black",
-  "python.linting.enabled": true,
-  "python.linting.flake8Enabled": true,
+  "python.defaultInterpreterPath": "./backend/.venv/bin/python",
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.organizeImports": true
+  },
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff"
   },
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -171,9 +183,7 @@ Create `.vscode/extensions.json`:
 {
   "recommendations": [
     "ms-python.python",
-    "ms-python.black-formatter",
-    "ms-python.isort",
-    "ms-python.flake8",
+    "charliermarsh.ruff",
     "esbenp.prettier-vscode",
     "bradlc.vscode-tailwindcss",
     "ms-vscode.vscode-docker",
@@ -202,12 +212,16 @@ Pre-commit hooks also run in CI/CD to ensure code quality:
 pre-commit run --all-files
 ```
 
-**Python import errors:**
+**Python formatting/linting issues:**
 ```bash
 # Make sure you're in the correct directory
 cd backend
-python -m isort .
-python -m black .
+
+# Fix linting issues
+uv run ruff check . --fix
+
+# Format code
+uv run ruff format .
 ```
 
 **Node.js formatting issues:**
