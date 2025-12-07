@@ -106,6 +106,45 @@ erDiagram
     }
 ```
 
+## Global Types
+
+Before creating tables, we define custom types that ensure data consistency across the schema:
+
+```sql
+-- ===========================================
+-- GLOBAL ENUMS (Create these first)
+-- ===========================================
+
+-- Supported currencies (ISO 4217 codes)
+CREATE TYPE currency_code AS ENUM ('USD', 'MXN');
+
+-- Payment method types
+CREATE TYPE payment_method_type AS ENUM ('debit', 'credit', 'cash', 'transfer');
+
+-- Expense categorization
+CREATE TYPE expense_category AS ENUM ('fixed', 'variable');
+
+-- Template recurrence patterns
+CREATE TYPE recurrence_type AS ENUM ('weekly', 'bi_weekly', 'monthly', 'custom');
+
+-- Cycle lifecycle states
+CREATE TYPE cycle_status AS ENUM ('draft', 'active', 'completed');
+
+-- Individual expense states
+CREATE TYPE expense_status AS ENUM ('pending', 'paid', 'cancelled', 'overdue');
+```
+
+### ENUM Descriptions
+
+| Type | Values | Description |
+|------|--------|-------------|
+| `currency_code` | `USD`, `MXN` | ISO 4217 currency codes for supported currencies |
+| `payment_method_type` | `debit`, `credit`, `cash`, `transfer` | Types of payment methods available |
+| `expense_category` | `fixed`, `variable` | Expense categorization for budgeting |
+| `recurrence_type` | `weekly`, `bi_weekly`, `monthly`, `custom` | How often template expenses recur |
+| `cycle_status` | `draft`, `active`, `completed` | Lifecycle state of expense cycles |
+| `expense_status` | `pending`, `paid`, `cancelled`, `overdue` | Current state of individual expenses |
+
 ## Table Definitions
 
 ### Users
@@ -118,7 +157,7 @@ CREATE TABLE users (
     password_hash VARCHAR(255) NOT NULL,
     first_name VARCHAR(100),
     last_name VARCHAR(100),
-    preferred_currency VARCHAR(3) DEFAULT 'USD',
+    preferred_currency currency_code DEFAULT 'USD',  -- Uses global ENUM
     locale VARCHAR(10) DEFAULT 'en-US',
     active BOOLEAN DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -133,15 +172,12 @@ CREATE INDEX idx_users_active ON users(active);
 User-defined payment methods (cards, accounts, cash).
 
 ```sql
-CREATE TYPE payment_method_type AS ENUM ('debit', 'credit', 'cash', 'transfer');
-CREATE TYPE currency_code AS ENUM ('USD', 'MXN');
-
 CREATE TABLE payment_methods (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     name VARCHAR(100) NOT NULL,
-    method_type payment_method_type NOT NULL,
-    default_currency currency_code NOT NULL,
+    method_type payment_method_type NOT NULL,        -- Uses global ENUM
+    default_currency currency_code NOT NULL,         -- Uses global ENUM
     description TEXT,
     active BOOLEAN DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -158,9 +194,6 @@ CREATE INDEX idx_payment_methods_active ON payment_methods(active);
 Reusable templates for recurring expenses.
 
 ```sql
-CREATE TYPE expense_category AS ENUM ('fixed', 'variable');
-CREATE TYPE recurrence_type AS ENUM ('weekly', 'bi_weekly', 'monthly', 'custom');
-
 CREATE TABLE expense_templates (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -186,8 +219,6 @@ CREATE INDEX idx_expense_templates_category ON expense_templates(category);
 6-week expense management periods.
 
 ```sql
-CREATE TYPE cycle_status AS ENUM ('draft', 'active', 'completed');
-
 CREATE TABLE cycles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -213,8 +244,6 @@ CREATE INDEX idx_cycles_dates ON cycles(start_date, end_date);
 Individual expenses within a cycle.
 
 ```sql
-CREATE TYPE expense_status AS ENUM ('pending', 'paid', 'cancelled', 'overdue');
-
 CREATE TABLE cycle_expenses (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     cycle_id UUID NOT NULL REFERENCES cycles(id) ON DELETE CASCADE,
