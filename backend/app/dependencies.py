@@ -7,7 +7,7 @@ from fastapi import Header, HTTPException
 
 # Get tokens from environment variables with fallback for development
 VALID_X_TOKEN = os.getenv("X_TOKEN", "fake-super-secret-token")
-VALID_QUERY_TOKEN = os.getenv("QUERY_TOKEN", "jessica")
+VALID_QUERY_TOKEN = os.getenv("QUERY_TOKEN", "oriana")
 
 
 async def get_token_header(x_token: Annotated[str, Header()]) -> None:
