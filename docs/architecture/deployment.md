@@ -32,25 +32,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Configure Git Credentials
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-      
+
       - uses: actions/setup-python@v4
         with:
           python-version: 3.x
-      
+
       - name: Cache dependencies
         uses: actions/cache@v3
         with:
           key: ${{ github.ref }}
           path: .cache
-      
+
       - name: Install dependencies
         run: pip install mkdocs-material
-      
+
       - name: Deploy to GitHub Pages
         run: mkdocs gh-deploy --force
 ```
@@ -73,7 +73,7 @@ Ensure your GitHub repository has the following settings:
 
 1. **Go to Settings > Pages**
 2. **Source**: Deploy from a branch
-3. **Branch**: `gh-pages` 
+3. **Branch**: `gh-pages`
 4. **Folder**: `/ (root)`
 
 The `gh-deploy` command automatically creates and manages the `gh-pages` branch.
@@ -113,7 +113,7 @@ mkdocs serve
 
 *Coming soon - Docker containerization and deployment strategies*
 
-### Frontend Deployment  
+### Frontend Deployment
 
 *Coming soon - Static site deployment options*
 
