@@ -36,7 +36,7 @@ This roadmap outlines the planned development phases for Colony.
 
 **Legend:**
 - ✅ Completed
-- 🚧 In Progress  
+- 🚧 In Progress
 - 📅 Planned
 - 🔮 Future Consideration
 - 💫 Polish Phase
