@@ -157,6 +157,7 @@ Get current user information.
 Get all user's payment methods.
 
 **Query Parameters:**
+
 - `active` (boolean, optional): Filter by active status
 - `currency` (string, optional): Filter by default currency
 
@@ -240,6 +241,7 @@ Deactivate a payment method (soft delete).
 Get all user's expense templates.
 
 **Query Parameters:**
+
 - `active` (boolean, optional): Filter by active status
 - `category` (string, optional): Filter by category (fixed/variable)
 - `currency` (string, optional): Filter by currency
@@ -311,6 +313,7 @@ Delete an expense template.
 Get all user's cycles.
 
 **Query Parameters:**
+
 - `status` (string, optional): Filter by status (draft/active/completed)
 - `limit` (integer, optional): Number of results per page
 - `offset` (integer, optional): Number of results to skip
@@ -398,6 +401,7 @@ Delete a cycle and all associated expenses.
 Get all expenses for a specific cycle.
 
 **Query Parameters:**
+
 - `status` (string, optional): Filter by status (pending/paid/cancelled/overdue)
 - `category` (string, optional): Filter by category (fixed/variable)
 - `currency` (string, optional): Filter by currency
@@ -544,6 +548,7 @@ Get detailed cycle summary and analytics.
 Compare multiple cycles.
 
 **Query Parameters:**
+
 - `cycle_ids` (array, required): Comma-separated cycle IDs
 - `metrics` (array, optional): Specific metrics to compare
 
@@ -573,6 +578,7 @@ Get all system enums for form validation.
 Get current exchange rates.
 
 **Query Parameters:**
+
 - `from` (string, optional): Source currency
 - `to` (string, optional): Target currency
 - `date` (string, optional): Specific date (YYYY-MM-DD)
