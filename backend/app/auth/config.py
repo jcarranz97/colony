@@ -1,19 +1,5 @@
-from pydantic_settings import BaseSettings  # Changed import
-from typing import Optional
+# Remove this file or keep it as an alias
+from app.config import settings
 
-
-class AuthSettings(BaseSettings):
-    # JWT Settings
-    SECRET_KEY: str = "your-secret-key-here-change-in-production"
-    ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-
-    # OAuth2 Settings
-    TOKEN_URL: str = "auth/login"
-
-    class Config:
-        env_file = ".env"
-        env_prefix = "AUTH_"
-
-
-auth_settings = AuthSettings()
+# Alias for backward compatibility
+auth_settings = settings.AUTH
