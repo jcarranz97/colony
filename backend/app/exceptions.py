@@ -101,15 +101,28 @@ class ExternalServiceError(AppExceptionError):
         )
 
 
-# Exception Handlers
+# Exception Handlers - Fix the type annotations
 async def app_exception_handler(
-    request: Request, exc: AppExceptionError
+    request: Request,
+    exc: Exception,  # Change from AppExceptionError to Exception
 ) -> JSONResponse:
-    """Global exception handler for AppExceptionError instances.
+    """Global exception handler for AppExceptionError instances."""
+    # Type guard to ensure we're dealing with AppExceptionError
+    if not isinstance(exc, AppExceptionError):
+        # This shouldn't happen, but handle gracefully
+        logger.error(f"Unexpected exception type in app_exception_handler: {type(exc)}")
+        return JSONResponse(
+            status_code=500,
+            content={
+                "success": False,
+                "error": {
+                    "code": "INTERNAL_SERVER_ERROR",
+                    "message": "An unexpected error occurred",
+                    "details": {},
+                },
+            },
+        )
 
-    This handler will catch all AppExceptionError instances and return
-    a standardized JSON error response.
-    """
     logger.error(
         f"AppExceptionError: {exc.error_code} - {exc.message}",
         extra={
@@ -124,12 +137,13 @@ async def app_exception_handler(
     return JSONResponse(status_code=exc.status_code, content=exc.to_dict())
 
 
-async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
-    """Global exception handler for HTTPException instances.
+async def http_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    """Global exception handler for HTTPException instances."""
+    # Type guard
+    if not isinstance(exc, HTTPException):
+        # Fallback for unexpected types
+        return await generic_exception_handler(request, exc)
 
-    This handler ensures all HTTP exceptions return the same
-    JSON format as AppExceptionError.
-    """
     logger.error(
         f"HTTPException: {exc.status_code} - {exc.detail}",
         extra={
@@ -154,9 +168,14 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
 
 
 async def validation_exception_handler(
-    request: Request, exc: ValueError
+    request: Request,
+    exc: Exception,  # Change from ValueError to Exception
 ) -> JSONResponse:
     """Global exception handler for validation errors."""
+    # Type guard
+    if not isinstance(exc, ValueError):
+        return await generic_exception_handler(request, exc)
+
     logger.error(
         f"ValidationError: {exc!s}",
         extra={"error": str(exc), "url": str(request.url), "method": request.method},
@@ -172,11 +191,7 @@ async def validation_exception_handler(
 
 
 async def generic_exception_handler(request: Request, exc: Exception) -> JSONResponse:
-    """Global exception handler for any unhandled exceptions.
-
-    This is a catch-all handler that should never be reached in production,
-    but provides a safety net for unexpected errors.
-    """
+    """Global exception handler for any unhandled exceptions."""
     logger.error(
         f"Unhandled exception: {type(exc).__name__} - {exc!s}",
         extra={
@@ -185,7 +200,7 @@ async def generic_exception_handler(request: Request, exc: Exception) -> JSONRes
             "url": str(request.url),
             "method": request.method,
         },
-        exc_info=True,  # Include traceback in logs
+        exc_info=True,
     )
 
     return JSONResponse(
