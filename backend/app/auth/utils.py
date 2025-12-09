@@ -6,7 +6,7 @@ from jwt.exceptions import InvalidTokenError
 from pwdlib import PasswordHash
 
 from .config import auth_settings
-from .exceptions import InvalidTokenException
+from .exceptions import InvalidTokenExceptionError
 
 # Initialize password hasher
 pwd_context = PasswordHash.recommended()
@@ -49,7 +49,7 @@ def verify_token(token: str) -> dict[str, Any]:
             token, auth_settings.SECRET_KEY, algorithms=[auth_settings.ALGORITHM]
         )
     except InvalidTokenError as e:
-        raise InvalidTokenException from e
+        raise InvalidTokenExceptionError from e
 
 
 def extract_email_from_token(token: str) -> str:
@@ -58,6 +58,6 @@ def extract_email_from_token(token: str) -> str:
     email: str = payload.get("sub")
 
     if email is None:
-        raise InvalidTokenException
+        raise InvalidTokenExceptionError
 
     return email

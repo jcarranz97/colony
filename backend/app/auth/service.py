@@ -7,9 +7,9 @@ from . import models, schemas, utils
 from .config import auth_settings
 from .constants import JWT_TOKEN_PREFIX
 from .exceptions import (
-    IncorrectPasswordException,
-    InvalidCredentialsException,
-    UserAlreadyExistsException,
+    IncorrectPasswordExceptionError,
+    InvalidCredentialsExceptionError,
+    UserAlreadyExistsExceptionError,
 )
 
 
@@ -25,7 +25,7 @@ class AuthService:
         )
 
         if existing_user:
-            raise UserAlreadyExistsException(user_create.email)
+            raise UserAlreadyExistsExceptionError(user_create.email)
 
         # Hash password
         hashed_password = utils.get_password_hash(user_create.password)
@@ -47,7 +47,7 @@ class AuthService:
             return db_user
         except IntegrityError as e:
             db.rollback()
-            raise UserAlreadyExistsException(user_create.email) from e
+            raise UserAlreadyExistsExceptionError(user_create.email) from e
 
     @staticmethod
     def authenticate_user(db: Session, email: str, password: str) -> models.User:
@@ -59,10 +59,10 @@ class AuthService:
         )
 
         if not user:
-            raise InvalidCredentialsException
+            raise InvalidCredentialsExceptionError
 
         if not utils.verify_password(password, user.password_hash):
-            raise InvalidCredentialsException
+            raise InvalidCredentialsExceptionError
 
         return user
 
@@ -107,7 +107,7 @@ class AuthService:
         if not utils.verify_password(
             password_update.current_password, user.password_hash
         ):
-            raise IncorrectPasswordException
+            raise IncorrectPasswordExceptionError
 
         # Hash new password
         new_password_hash = utils.get_password_hash(password_update.new_password)

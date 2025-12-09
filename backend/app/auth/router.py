@@ -9,9 +9,9 @@ from app.dependencies import get_db
 from . import schemas, service
 from .dependencies import CurrentActiveUser
 from .exceptions import (
-    IncorrectPasswordException,
-    InvalidCredentialsException,
-    UserAlreadyExistsException,
+    IncorrectPasswordExceptionError,
+    InvalidCredentialsExceptionError,
+    UserAlreadyExistsExceptionError,
 )
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
@@ -32,7 +32,7 @@ async def register(
     try:
         user = service.auth_service.create_user(db, user_data)
         return schemas.UserResponse.from_orm(user)
-    except UserAlreadyExistsException as e:
+    except UserAlreadyExistsExceptionError as e:
         raise HTTPException(status_code=e.status_code, detail=e.message) from e
 
 
@@ -52,7 +52,7 @@ async def login(
 
         return service.auth_service.create_access_token(user)
 
-    except InvalidCredentialsException as e:
+    except InvalidCredentialsExceptionError as e:
         raise HTTPException(
             status_code=e.status_code,
             detail=e.message,
@@ -89,7 +89,7 @@ async def update_current_user_password(
     try:
         service.auth_service.update_password(db, current_user, password_update)
         return {"message": "Password updated successfully"}
-    except IncorrectPasswordException as e:
+    except IncorrectPasswordExceptionError as e:
         raise HTTPException(status_code=e.status_code, detail=e.message) from e
 
 

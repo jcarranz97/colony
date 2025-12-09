@@ -8,7 +8,7 @@ from app.database import get_db
 
 from . import models, service, utils
 from .exceptions import (
-    InvalidTokenException,
+    InvalidTokenExceptionError,
 )
 
 # Fix the tokenUrl - it should be relative to the docs page
@@ -25,7 +25,7 @@ async def get_current_user(
     """Get current authenticated user from JWT token."""
     try:
         email = utils.extract_email_from_token(token)
-    except InvalidTokenException as e:
+    except InvalidTokenExceptionError as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",

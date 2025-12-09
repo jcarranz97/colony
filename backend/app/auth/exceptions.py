@@ -5,11 +5,11 @@ from app.exceptions import AppExceptionError
 from .constants import ErrorCode
 
 
-class AuthException(AppExceptionError):
+class AuthExceptionError(AppExceptionError):
     """Base authentication exception."""
 
 
-class UserNotFoundException(AuthException):
+class UserNotFoundExceptionError(AuthExceptionError):
     """Exception raised when a user is not found."""
 
     def __init__(self) -> None:
@@ -20,7 +20,7 @@ class UserNotFoundException(AuthException):
         )
 
 
-class UserAlreadyExistsException(AuthException):
+class UserAlreadyExistsExceptionError(AuthExceptionError):
     """Exception raised when attempting to create a user that already exists."""
 
     def __init__(self, email: str) -> None:
@@ -31,7 +31,7 @@ class UserAlreadyExistsException(AuthException):
         )
 
 
-class InvalidCredentialsException(AuthException):
+class InvalidCredentialsExceptionError(AuthExceptionError):
     """Exception raised when provided credentials are invalid."""
 
     def __init__(self) -> None:
@@ -42,7 +42,7 @@ class InvalidCredentialsException(AuthException):
         )
 
 
-class InactiveUserException(AuthException):
+class InactiveUserExceptionError(AuthExceptionError):
     """Exception raised when attempting to authenticate an inactive user."""
 
     def __init__(self) -> None:
@@ -53,7 +53,7 @@ class InactiveUserException(AuthException):
         )
 
 
-class InvalidTokenException(AuthException):
+class InvalidTokenExceptionError(AuthExceptionError):
     """Exception raised when a JWT token is invalid or expired."""
 
     def __init__(self) -> None:
@@ -64,7 +64,7 @@ class InvalidTokenException(AuthException):
         )
 
 
-class IncorrectPasswordException(AuthException):
+class IncorrectPasswordExceptionError(AuthExceptionError):
     """Exception raised when the current password provided is incorrect."""
 
     def __init__(self) -> None:
@@ -75,7 +75,7 @@ class IncorrectPasswordException(AuthException):
         )
 
 
-class PasswordTooWeakException(AuthException):
+class PasswordTooWeakExceptionError(AuthExceptionError):
     """Exception raised when a password doesn't meet security requirements."""
 
     def __init__(
@@ -88,7 +88,7 @@ class PasswordTooWeakException(AuthException):
         )
 
 
-class TokenExpiredException(AuthException):
+class TokenExpiredExceptionError(AuthExceptionError):
     """Exception raised when a JWT token has expired."""
 
     def __init__(self) -> None:
