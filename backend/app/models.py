@@ -1,7 +1,8 @@
-from sqlalchemy import Column, DateTime, Boolean
-from sqlalchemy.dialects.postgresql import UUID
-from datetime import datetime
 import uuid
+from datetime import datetime
+
+from sqlalchemy import Boolean, Column, DateTime
+from sqlalchemy.dialects.postgresql import UUID
 
 from app.database import Base
 
