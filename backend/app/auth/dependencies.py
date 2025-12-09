@@ -1,14 +1,14 @@
 from typing import Annotated
+
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
 from app.dependencies import get_db
+
 from . import models, service, utils
 from .exceptions import (
     InvalidTokenException,
-    InactiveUserException,
-    UserNotFoundException,
 )
 
 # Fix the tokenUrl - it should be relative to the docs page
@@ -19,17 +19,18 @@ oauth2_scheme = OAuth2PasswordBearer(
 
 
 async def get_current_user(
-    token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)
+    token: Annotated[str, Depends(oauth2_scheme)],
+    db: Annotated[Session, Depends(get_db)],  # Use Annotated consistently
 ) -> models.User:
     """Get current authenticated user from JWT token."""
     try:
         email = utils.extract_email_from_token(token)
-    except InvalidTokenException:
+    except InvalidTokenException as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
-        )
+        ) from e
 
     user = service.auth_service.get_user_by_email(db, email=email)
     if user is None:
