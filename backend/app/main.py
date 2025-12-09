@@ -1,24 +1,64 @@
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
-from .dependencies import get_query_token, get_token_header
-from .internal import admin
-from .routers import items, users
-
-app = FastAPI(dependencies=[Depends(get_query_token)])
-
-
-app.include_router(users.router)
-app.include_router(items.router)
-app.include_router(
-    admin.router,
-    prefix="/admin",
-    tags=["admin"],
-    dependencies=[Depends(get_token_header)],
-    responses={418: {"description": "I'm a teapot"}},
+from app.auth.router import router as auth_router
+from app.config import settings
+from app.exceptions import (
+    AppExceptionError,
+    app_exception_handler,
+    generic_exception_handler,
+    http_exception_handler,
+    validation_exception_handler,
 )
 
 
-@app.get("/")
-async def root() -> dict:
-    """Root endpoint returning a welcome message."""
-    return {"message": "Hello Bigger Applications!"}
+def create_app() -> FastAPI:
+    """Create and configure the FastAPI application."""
+    app = FastAPI(
+        title=settings.APP_NAME,
+        version=settings.VERSION,
+        description="Personal expense management API",
+        docs_url="/docs",
+        redoc_url="/redoc",
+    )
+
+    # Add exception handlers
+    app.add_exception_handler(AppExceptionError, app_exception_handler)
+    app.add_exception_handler(HTTPException, http_exception_handler)
+    app.add_exception_handler(ValueError, validation_exception_handler)
+    app.add_exception_handler(Exception, generic_exception_handler)
+
+    # Add CORS middleware
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.ALLOWED_HOSTS,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    # Include routers
+    app.include_router(auth_router, prefix="/api/v1")
+
+    @app.get("/")
+    async def root() -> dict[str, str]:
+        """Root endpoint providing basic app info."""
+        return {
+            "message": f"{settings.APP_NAME} is running",
+            "version": settings.VERSION,
+            "environment": "development",
+        }
+
+    @app.get("/health")
+    async def health_check() -> dict[str, str]:
+        """Health check endpoint."""
+        return {
+            "status": "healthy",
+            "service": "colony-api",
+            "version": settings.VERSION,
+        }
+
+    return app
+
+
+app = create_app()

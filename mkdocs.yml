@@ -36,9 +36,10 @@ nav:
   - Requirements: requirements.md
   - Architecture:
     # - Overview: architecture/index.md
-    # - Backend: architecture/backend.md
     # - Frontend: architecture/frontend.md
     - Database: architecture/database-schema.md
+    - Backend: architecture/backend.md
+    - API: architecture/api-specification.md
     - Deployment: architecture/deployment.md
   # - API Reference:
   #   - Overview: api/index.md
