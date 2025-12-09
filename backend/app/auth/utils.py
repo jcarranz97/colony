@@ -55,9 +55,9 @@ def verify_token(token: str) -> dict[str, Any]:
 def extract_email_from_token(token: str) -> str:
     """Extract email from JWT token."""
     payload = verify_token(token)
-    email: str = payload.get("sub")
+    email = payload.get("sub")
 
-    if email is None:
+    if not email or not isinstance(email, str):
         raise InvalidTokenExceptionError
 
     return email
