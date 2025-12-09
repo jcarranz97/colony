@@ -1,13 +1,12 @@
-from sqlalchemy import Column, String, Boolean, DateTime
-from sqlalchemy.dialects.postgresql import UUID, ENUM
-from sqlalchemy.orm import relationship
-from datetime import datetime
-import uuid
+
+from sqlalchemy import Column, String
+from sqlalchemy.dialects.postgresql import ENUM
 
 from app.models import BaseModel
 
 
 class User(BaseModel):
+    """User model representing application users."""
     __tablename__ = "users"
 
     email = Column(String(255), unique=True, nullable=False, index=True)
@@ -22,7 +21,8 @@ class User(BaseModel):
     # expense_templates = relationship("ExpenseTemplate", back_populates="user")
     # cycles = relationship("Cycle", back_populates="user")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """String representation of the User model."""
         return (
             f"<User(email='{self.email}', name='{self.first_name} {self.last_name}')>"
         )
