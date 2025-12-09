@@ -1,4 +1,3 @@
-
 from sqlalchemy import Column, String
 from sqlalchemy.dialects.postgresql import ENUM
 
@@ -7,6 +6,7 @@ from app.models import BaseModel
 
 class User(BaseModel):
     """User model representing application users."""
+
     __tablename__ = "users"
 
     email = Column(String(255), unique=True, nullable=False, index=True)

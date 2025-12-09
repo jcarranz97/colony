@@ -1,5 +1,6 @@
 class ErrorCode:
     """Authentication error codes."""
+
     USER_NOT_FOUND = "USER_NOT_FOUND"
     USER_ALREADY_EXISTS = "USER_ALREADY_EXISTS"
     INVALID_CREDENTIALS = "INVALID_CREDENTIALS"
