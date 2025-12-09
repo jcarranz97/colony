@@ -1,5 +1,6 @@
 from sqlalchemy import Column, String
 from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models import BaseModel
 
@@ -9,12 +10,12 @@ class User(BaseModel):
 
     __tablename__ = "users"
 
-    email = Column(String(255), unique=True, nullable=False, index=True)
-    password_hash = Column(String(255), nullable=False)
-    first_name = Column(String(100))
-    last_name = Column(String(100))
-    preferred_currency = Column(ENUM("USD", "MXN", name="currency_code"), default="USD")
-    locale = Column(String(10), default="en-US")
+    email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    first_name: Mapped[str] = mapped_column(String(100))
+    last_name: Mapped[str] = mapped_column(String(100))
+    preferred_currency: Mapped[str] = mapped_column(ENUM("USD", "MXN", name="currency_code"), default="USD")
+    locale: Mapped[str] = mapped_column(String(10), default="en-US")
 
     # Relationships will be added when other domains are implemented
     # payment_methods = relationship("PaymentMethod", back_populates="user")
