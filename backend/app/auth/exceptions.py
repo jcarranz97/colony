@@ -1,16 +1,18 @@
-from fastapi import HTTPException, status
+from fastapi import status
+
 from app.exceptions import AppException
+
 from .constants import ErrorCode
 
 
 class AuthException(AppException):
-    """Base authentication exception"""
-
-    pass
+    """Base authentication exception."""
 
 
 class UserNotFoundException(AuthException):
-    def __init__(self):
+    """Exception raised when a user is not found."""
+
+    def __init__(self) -> None:
         super().__init__(
             error_code=ErrorCode.USER_NOT_FOUND,
             message="User not found",
@@ -19,7 +21,9 @@ class UserNotFoundException(AuthException):
 
 
 class UserAlreadyExistsException(AuthException):
-    def __init__(self, email: str):
+    """Exception raised when attempting to create a user that already exists."""
+
+    def __init__(self, email: str) -> None:
         super().__init__(
             error_code=ErrorCode.USER_ALREADY_EXISTS,
             message=f"User with email {email} already exists",
@@ -28,7 +32,9 @@ class UserAlreadyExistsException(AuthException):
 
 
 class InvalidCredentialsException(AuthException):
-    def __init__(self):
+    """Exception raised when provided credentials are invalid."""
+
+    def __init__(self) -> None:
         super().__init__(
             error_code=ErrorCode.INVALID_CREDENTIALS,
             message="Incorrect email or password",
@@ -37,7 +43,9 @@ class InvalidCredentialsException(AuthException):
 
 
 class InactiveUserException(AuthException):
-    def __init__(self):
+    """Exception raised when attempting to authenticate an inactive user."""
+
+    def __init__(self) -> None:
         super().__init__(
             error_code=ErrorCode.INACTIVE_USER,
             message="User account is inactive",
@@ -46,7 +54,9 @@ class InactiveUserException(AuthException):
 
 
 class InvalidTokenException(AuthException):
-    def __init__(self):
+    """Exception raised when a JWT token is invalid or expired."""
+
+    def __init__(self) -> None:
         super().__init__(
             error_code=ErrorCode.INVALID_TOKEN,
             message="Could not validate credentials",
@@ -55,9 +65,35 @@ class InvalidTokenException(AuthException):
 
 
 class IncorrectPasswordException(AuthException):
-    def __init__(self):
+    """Exception raised when the current password provided is incorrect."""
+
+    def __init__(self) -> None:
         super().__init__(
             error_code=ErrorCode.INCORRECT_PASSWORD,
             message="Current password is incorrect",
             status_code=status.HTTP_400_BAD_REQUEST,
+        )
+
+
+class PasswordTooWeakException(AuthException):
+    """Exception raised when a password doesn't meet security requirements."""
+
+    def __init__(
+        self, message: str = "Password does not meet security requirements"
+    ) -> None:
+        super().__init__(
+            error_code=ErrorCode.PASSWORD_TOO_WEAK,
+            message=message,
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+
+
+class TokenExpiredException(AuthException):
+    """Exception raised when a JWT token has expired."""
+
+    def __init__(self) -> None:
+        super().__init__(
+            error_code=ErrorCode.TOKEN_EXPIRED,
+            message="Token has expired",
+            status_code=status.HTTP_401_UNAUTHORIZED,
         )
