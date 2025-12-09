@@ -1,7 +1,7 @@
 from app.database import Base, engine
 
 
-def create_tables():
+def create_tables() -> None:
     """Create all tables in the database."""
     print("Creating database tables...")
     Base.metadata.create_all(bind=engine)
