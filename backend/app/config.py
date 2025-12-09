@@ -5,12 +5,12 @@ class AuthSettings(BaseSettings):
     """Authentication related settings."""
 
     # JWT Settings
-    SECRET_KEY: str = "your-secret-key-change-in-production"  # noqa: S105
+    SECRET_KEY: str = "your-secret-key-change-in-production"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     # OAuth2 Settings
-    TOKEN_URL: str = "auth/login"  # noqa: S105
+    TOKEN_URL: str = "auth/login"
 
     class Config:
         """Configuration for environment variable prefix."""
@@ -32,7 +32,7 @@ class Settings(BaseSettings):
     )
 
     # Security
-    SECRET_KEY: str = "your-secret-key-change-in-production"  # noqa: S105
+    SECRET_KEY: str = "your-secret-key-change-in-production"
 
     # CORS
     ALLOWED_HOSTS: list = ["http://localhost:3000"]
