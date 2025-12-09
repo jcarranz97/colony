@@ -1,11 +1,11 @@
 from fastapi import status
 
-from app.exceptions import AppException
+from app.exceptions import AppExceptionError
 
 from .constants import ErrorCode
 
 
-class AuthException(AppException):
+class AuthException(AppExceptionError):
     """Base authentication exception."""
 
 
