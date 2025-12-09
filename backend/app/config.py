@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     """Application configuration settings."""
 
     # Application
-    APP_NAME: str
+    APP_NAME: str = "Colony API"
     VERSION: str = "1.0.0"
     DEBUG: bool = True
 
