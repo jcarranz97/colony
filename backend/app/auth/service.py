@@ -1,20 +1,21 @@
 from datetime import timedelta
-from typing import Optional
-from sqlalchemy.orm import Session
+
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 
 from . import models, schemas, utils
 from .config import auth_settings
+from .constants import JWT_TOKEN_PREFIX
 from .exceptions import (
-    UserNotFoundException,
-    UserAlreadyExistsException,
-    InvalidCredentialsException,
-    InactiveUserException,
     IncorrectPasswordException,
+    InvalidCredentialsException,
+    UserAlreadyExistsException,
 )
 
 
 class AuthService:
+    """Authentication service for user management and token handling."""
+
     @staticmethod
     def create_user(db: Session, user_create: schemas.UserCreate) -> models.User:
         """Create a new user."""
@@ -44,43 +45,42 @@ class AuthService:
             db.commit()
             db.refresh(db_user)
             return db_user
-        except IntegrityError:
+        except IntegrityError as e:
             db.rollback()
-            raise UserAlreadyExistsException(user_create.email)
+            raise UserAlreadyExistsException(user_create.email) from e
 
     @staticmethod
     def authenticate_user(db: Session, email: str, password: str) -> models.User:
         """Authenticate user with email and password."""
-        print("Authenticating user:", email)
         user = (
             db.query(models.User)
-            .filter(models.User.email == email, models.User.active == True)
+            .filter(models.User.email == email, models.User.active)
             .first()
         )
 
         if not user:
-            raise InvalidCredentialsException()
+            raise InvalidCredentialsException
 
         if not utils.verify_password(password, user.password_hash):
-            raise InvalidCredentialsException()
+            raise InvalidCredentialsException
 
         return user
 
     @staticmethod
-    def get_user_by_email(db: Session, email: str) -> Optional[models.User]:
+    def get_user_by_email(db: Session, email: str) -> models.User | None:
         """Get user by email."""
         return (
             db.query(models.User)
-            .filter(models.User.email == email, models.User.active == True)
+            .filter(models.User.email == email, models.User.active)
             .first()
         )
 
     @staticmethod
-    def get_user_by_id(db: Session, user_id: str) -> Optional[models.User]:
+    def get_user_by_id(db: Session, user_id: str) -> models.User | None:
         """Get user by ID."""
         return (
             db.query(models.User)
-            .filter(models.User.id == user_id, models.User.active == True)
+            .filter(models.User.id == user_id, models.User.active)
             .first()
         )
 
@@ -107,7 +107,7 @@ class AuthService:
         if not utils.verify_password(
             password_update.current_password, user.password_hash
         ):
-            raise IncorrectPasswordException()
+            raise IncorrectPasswordException
 
         # Hash new password
         new_password_hash = utils.get_password_hash(password_update.new_password)
@@ -129,7 +129,7 @@ class AuthService:
 
         return schemas.Token(
             access_token=access_token,
-            token_type="bearer",
+            token_type=JWT_TOKEN_PREFIX,
             expires_in=auth_settings.ACCESS_TOKEN_EXPIRE_MINUTES
             * 60,  # Convert to seconds
         )
