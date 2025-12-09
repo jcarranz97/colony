@@ -1,18 +1,19 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.config import settings
 from app.auth.router import router as auth_router
+from app.config import settings
 from app.exceptions import (
     AppExceptionError,
     app_exception_handler,
+    generic_exception_handler,
     http_exception_handler,
     validation_exception_handler,
-    generic_exception_handler,
 )
 
 
 def create_app() -> FastAPI:
+    """Create and configure the FastAPI application."""
     app = FastAPI(
         title=settings.APP_NAME,
         version=settings.VERSION,
@@ -40,7 +41,8 @@ def create_app() -> FastAPI:
     app.include_router(auth_router, prefix="/api/v1")
 
     @app.get("/")
-    async def root():
+    async def root() -> dict[str, str]:
+        """Root endpoint providing basic app info."""
         return {
             "message": f"{settings.APP_NAME} is running",
             "version": settings.VERSION,
@@ -48,7 +50,8 @@ def create_app() -> FastAPI:
         }
 
     @app.get("/health")
-    async def health_check():
+    async def health_check() -> dict[str, str]:
+        """Health check endpoint."""
         return {
             "status": "healthy",
             "service": "colony-api",
