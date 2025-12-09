@@ -5,17 +5,21 @@ from sqlalchemy.orm import Session
 
 from app.dependencies import get_db
 from . import models, service, utils
-from .exceptions import InvalidTokenException, InactiveUserException, UserNotFoundException
+from .exceptions import (
+    InvalidTokenException,
+    InactiveUserException,
+    UserNotFoundException,
+)
 
 # Fix the tokenUrl - it should be relative to the docs page
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="api/v1/auth/login",  # Remove the leading slash
-    scheme_name="Bearer"
+    scheme_name="Bearer",
 )
 
+
 async def get_current_user(
-    token: Annotated[str, Depends(oauth2_scheme)],
-    db: Session = Depends(get_db)
+    token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)
 ) -> models.User:
     """Get current authenticated user from JWT token."""
     try:
@@ -37,16 +41,17 @@ async def get_current_user(
 
     return user
 
+
 async def get_current_active_user(
-    current_user: Annotated[models.User, Depends(get_current_user)]
+    current_user: Annotated[models.User, Depends(get_current_user)],
 ) -> models.User:
     """Get current active user."""
     if not current_user.active:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Inactive user"
+            status_code=status.HTTP_403_FORBIDDEN, detail="Inactive user"
         )
     return current_user
+
 
 # Type aliases for dependency injection
 CurrentUser = Annotated[models.User, Depends(get_current_user)]

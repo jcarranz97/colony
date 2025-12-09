@@ -1,6 +1,7 @@
 from pydantic_settings import BaseSettings  # Changed import
 from typing import Optional
 
+
 class AuthSettings(BaseSettings):
     # JWT Settings
     SECRET_KEY: str = "your-secret-key-here-change-in-production"
@@ -13,5 +14,6 @@ class AuthSettings(BaseSettings):
     class Config:
         env_file = ".env"
         env_prefix = "AUTH_"
+
 
 auth_settings = AuthSettings()

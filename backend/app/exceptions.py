@@ -5,6 +5,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class AppException(Exception):
     """
     Base application exception class.
@@ -17,7 +18,7 @@ class AppException(Exception):
         error_code: str,
         message: str,
         status_code: int = 500,
-        details: Optional[Dict[str, Any]] = None
+        details: Optional[Dict[str, Any]] = None,
     ):
         self.error_code = error_code
         self.message = message
@@ -32,20 +33,26 @@ class AppException(Exception):
             "error": {
                 "code": self.error_code,
                 "message": self.message,
-                "details": self.details
-            }
+                "details": self.details,
+            },
         }
+
 
 class ValidationException(AppException):
     """Exception for validation errors."""
 
-    def __init__(self, message: str = "Validation failed", details: Optional[Dict[str, Any]] = None):
+    def __init__(
+        self,
+        message: str = "Validation failed",
+        details: Optional[Dict[str, Any]] = None,
+    ):
         super().__init__(
             error_code="VALIDATION_ERROR",
             message=message,
             status_code=400,
-            details=details
+            details=details,
         )
+
 
 class NotFoundError(AppException):
     """Exception for resource not found errors."""
@@ -54,38 +61,34 @@ class NotFoundError(AppException):
         super().__init__(
             error_code="RESOURCE_NOT_FOUND",
             message=f"{resource} not found",
-            status_code=404
+            status_code=404,
         )
+
 
 class ConflictError(AppException):
     """Exception for resource conflict errors."""
 
     def __init__(self, message: str = "Resource conflict"):
         super().__init__(
-            error_code="RESOURCE_CONFLICT",
-            message=message,
-            status_code=409
+            error_code="RESOURCE_CONFLICT", message=message, status_code=409
         )
+
 
 class InternalServerError(AppException):
     """Exception for internal server errors."""
 
     def __init__(self, message: str = "Internal server error"):
         super().__init__(
-            error_code="INTERNAL_SERVER_ERROR",
-            message=message,
-            status_code=500
+            error_code="INTERNAL_SERVER_ERROR", message=message, status_code=500
         )
+
 
 class DatabaseError(AppException):
     """Exception for database-related errors."""
 
     def __init__(self, message: str = "Database error"):
-        super().__init__(
-            error_code="DATABASE_ERROR",
-            message=message,
-            status_code=500
-        )
+        super().__init__(error_code="DATABASE_ERROR", message=message, status_code=500)
+
 
 class ExternalServiceError(AppException):
     """Exception for external service errors."""
@@ -94,8 +97,9 @@ class ExternalServiceError(AppException):
         super().__init__(
             error_code="EXTERNAL_SERVICE_ERROR",
             message=f"{service}: {message}",
-            status_code=502
+            status_code=502,
         )
+
 
 # Exception Handlers
 async def app_exception_handler(request: Request, exc: AppException) -> JSONResponse:
@@ -112,14 +116,12 @@ async def app_exception_handler(request: Request, exc: AppException) -> JSONResp
             "status_code": exc.status_code,
             "details": exc.details,
             "url": str(request.url),
-            "method": request.method
-        }
+            "method": request.method,
+        },
     )
 
-    return JSONResponse(
-        status_code=exc.status_code,
-        content=exc.to_dict()
-    )
+    return JSONResponse(status_code=exc.status_code, content=exc.to_dict())
+
 
 async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
     """
@@ -134,8 +136,8 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
             "status_code": exc.status_code,
             "detail": exc.detail,
             "url": str(request.url),
-            "method": request.method
-        }
+            "method": request.method,
+        },
     )
 
     return JSONResponse(
@@ -145,35 +147,31 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
             "error": {
                 "code": f"HTTP_{exc.status_code}",
                 "message": exc.detail,
-                "details": {}
-            }
-        }
+                "details": {},
+            },
+        },
     )
 
-async def validation_exception_handler(request: Request, exc: ValueError) -> JSONResponse:
+
+async def validation_exception_handler(
+    request: Request, exc: ValueError
+) -> JSONResponse:
     """
     Global exception handler for validation errors.
     """
     logger.error(
         f"ValidationError: {str(exc)}",
-        extra={
-            "error": str(exc),
-            "url": str(request.url),
-            "method": request.method
-        }
+        extra={"error": str(exc), "url": str(request.url), "method": request.method},
     )
 
     return JSONResponse(
         status_code=422,
         content={
             "success": False,
-            "error": {
-                "code": "VALIDATION_ERROR",
-                "message": str(exc),
-                "details": {}
-            }
-        }
+            "error": {"code": "VALIDATION_ERROR", "message": str(exc), "details": {}},
+        },
     )
+
 
 async def generic_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """
@@ -188,9 +186,9 @@ async def generic_exception_handler(request: Request, exc: Exception) -> JSONRes
             "exception_type": type(exc).__name__,
             "error": str(exc),
             "url": str(request.url),
-            "method": request.method
+            "method": request.method,
         },
-        exc_info=True  # Include traceback in logs
+        exc_info=True,  # Include traceback in logs
     )
 
     return JSONResponse(
@@ -200,14 +198,16 @@ async def generic_exception_handler(request: Request, exc: Exception) -> JSONRes
             "error": {
                 "code": "INTERNAL_SERVER_ERROR",
                 "message": "An unexpected error occurred",
-                "details": {}
-            }
-        }
+                "details": {},
+            },
+        },
     )
+
 
 # Global error codes
 class GlobalErrorCode:
     """Global error codes used across the application."""
+
     VALIDATION_ERROR = "VALIDATION_ERROR"
     RESOURCE_NOT_FOUND = "RESOURCE_NOT_FOUND"
     RESOURCE_CONFLICT = "RESOURCE_CONFLICT"

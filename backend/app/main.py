@@ -8,8 +8,9 @@ from app.exceptions import (
     app_exception_handler,
     http_exception_handler,
     validation_exception_handler,
-    generic_exception_handler
+    generic_exception_handler,
 )
+
 
 def create_app() -> FastAPI:
     app = FastAPI(
@@ -17,7 +18,7 @@ def create_app() -> FastAPI:
         version=settings.VERSION,
         description="Personal expense management API",
         docs_url="/docs",
-        redoc_url="/redoc"
+        redoc_url="/redoc",
     )
 
     # Add exception handlers
@@ -43,7 +44,7 @@ def create_app() -> FastAPI:
         return {
             "message": f"{settings.APP_NAME} is running",
             "version": settings.VERSION,
-            "environment": "development"
+            "environment": "development",
         }
 
     @app.get("/health")
@@ -51,9 +52,10 @@ def create_app() -> FastAPI:
         return {
             "status": "healthy",
             "service": "colony-api",
-            "version": settings.VERSION
+            "version": settings.VERSION,
         }
 
     return app
+
 
 app = create_app()

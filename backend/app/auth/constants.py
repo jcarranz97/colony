@@ -8,6 +8,7 @@ class ErrorCode:
     INCORRECT_PASSWORD = "INCORRECT_PASSWORD"
     PASSWORD_TOO_WEAK = "PASSWORD_TOO_WEAK"
 
+
 # JWT Constants
 JWT_TOKEN_PREFIX = "Bearer"
 JWT_SUBJECT = "access"

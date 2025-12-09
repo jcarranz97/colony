@@ -6,6 +6,7 @@ import uuid
 
 from app.models import BaseModel
 
+
 class User(BaseModel):
     __tablename__ = "users"
 
@@ -13,8 +14,8 @@ class User(BaseModel):
     password_hash = Column(String(255), nullable=False)
     first_name = Column(String(100))
     last_name = Column(String(100))
-    preferred_currency = Column(ENUM('USD', 'MXN', name='currency_code'), default='USD')
-    locale = Column(String(10), default='en-US')
+    preferred_currency = Column(ENUM("USD", "MXN", name="currency_code"), default="USD")
+    locale = Column(String(10), default="en-US")
 
     # Relationships will be added when other domains are implemented
     # payment_methods = relationship("PaymentMethod", back_populates="user")
@@ -22,4 +23,6 @@ class User(BaseModel):
     # cycles = relationship("Cycle", back_populates="user")
 
     def __repr__(self):
-        return f"<User(email='{self.email}', name='{self.first_name} {self.last_name}')>"
+        return (
+            f"<User(email='{self.email}', name='{self.first_name} {self.last_name}')>"
+        )
