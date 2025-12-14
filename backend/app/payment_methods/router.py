@@ -20,6 +20,16 @@ DatabaseDep = Annotated[Session, Depends(get_db)]
 
 
 @router.get(
+    "/health",
+    summary="Payment method health check",
+    description="Health check endpoint for payment methods domain",
+)
+async def payment_method_health_check() -> dict[str, str]:
+    """Payment methods domain health check."""
+    return {"status": "healthy", "domain": "payment_methods"}
+
+
+@router.get(
     "/",
     response_model=list[schemas.PaymentMethodResponse],
     summary="Get all payment methods",
@@ -115,13 +125,3 @@ async def delete_payment_method(
         from fastapi import HTTPException
 
         raise HTTPException(status_code=e.status_code, detail=e.message) from e
-
-
-@router.get(
-    "/{payment_method_id}/health",
-    summary="Payment method health check",
-    description="Health check endpoint for payment methods domain",
-)
-async def payment_method_health_check() -> dict[str, str]:
-    """Payment methods domain health check."""
-    return {"status": "healthy", "domain": "payment_methods"}

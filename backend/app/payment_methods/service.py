@@ -73,7 +73,7 @@ class PaymentMethodService:
             .filter(
                 and_(
                     models.PaymentMethod.user_id == user_id,
-                    models.PaymentMethod.active == True,
+                    models.PaymentMethod.active,
                 )
             )
             .count()
@@ -91,7 +91,7 @@ class PaymentMethodService:
                 and_(
                     models.PaymentMethod.user_id == user_id,
                     models.PaymentMethod.name == payment_method_data.name,
-                    models.PaymentMethod.active == True,
+                    models.PaymentMethod.active,
                 )
             )
             .first()
@@ -126,7 +126,7 @@ class PaymentMethodService:
                 "Failed to create payment method",
                 extra={"user_id": user_id, "error": str(e)},
             )
-            raise PaymentMethodNameExistsException(payment_method_data.name)
+            raise PaymentMethodNameExistsException(payment_method_data.name) from e
 
     @staticmethod
     def update_payment_method(
@@ -148,7 +148,7 @@ class PaymentMethodService:
                     and_(
                         models.PaymentMethod.user_id == payment_method.user_id,
                         models.PaymentMethod.name == payment_method_data.name,
-                        models.PaymentMethod.active == True,
+                        models.PaymentMethod.active,
                         models.PaymentMethod.id != payment_method.id,
                     )
                 )
@@ -182,7 +182,7 @@ class PaymentMethodService:
             )
             raise PaymentMethodNameExistsException(
                 payment_method_data.name or payment_method.name
-            )
+            ) from e
 
     @staticmethod
     def delete_payment_method(
@@ -218,7 +218,7 @@ class PaymentMethodService:
             .filter(
                 and_(
                     models.PaymentMethod.user_id == user_id,
-                    models.PaymentMethod.active == True,
+                    models.PaymentMethod.active,
                 )
             )
             .order_by(models.PaymentMethod.name)
