@@ -1,6 +1,6 @@
-from sqlalchemy import Column, ForeignKey, String, Text
+from sqlalchemy import ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import ENUM, UUID
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models import BaseModel
 
@@ -13,19 +13,23 @@ class PaymentMethod(BaseModel):
     __tablename__ = "payment_methods"
 
     # Core fields
-    user_id = Column(
+    user_id: Mapped[UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
-    name = Column(String(100), nullable=False)
-    method_type = Column(ENUM(PaymentMethodType), nullable=False)
-    default_currency = Column(ENUM(CurrencyCode), nullable=False)
-    description = Column(Text, nullable=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    method_type: Mapped[PaymentMethodType] = mapped_column(
+        ENUM(PaymentMethodType), nullable=False
+    )
+    default_currency: Mapped[CurrencyCode] = mapped_column(
+        ENUM(CurrencyCode), nullable=False
+    )
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # Relationships
     user = relationship("User", back_populates="payment_methods")
     # The following relationships will be added when other domains are implemented
-    # expense_templates = relationship(
-    #    "ExpenseTemplate", back_populates="payment_method")
+    # expense_templates =
+    # relationship("ExpenseTemplate", back_populates="payment_method")
     # cycle_expenses = relationship("CycleExpense", back_populates="payment_method")
 
     # Table constraints
