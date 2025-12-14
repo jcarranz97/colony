@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 from .constants import CurrencyCode, PaymentMethodType
 
@@ -20,7 +20,8 @@ class PaymentMethodBase(BaseModel):
         None, max_length=500, description="Optional description"
     )
 
-    @validator("name")
+    @field_validator("name")
+    @classmethod
     def validate_name(cls, v: str) -> str:
         """Validate payment method name."""
         name = v.strip()
@@ -28,7 +29,8 @@ class PaymentMethodBase(BaseModel):
             raise ValueError("Payment method name cannot be empty")
         return name
 
-    @validator("description")
+    @field_validator("description")
+    @classmethod
     def validate_description(cls, v: str | None) -> str | None:
         """Validate description."""
         if v is not None:
@@ -53,7 +55,8 @@ class PaymentMethodUpdate(BaseModel):
         None, description="Whether the payment method is active"
     )
 
-    @validator("name")
+    @field_validator("name")
+    @classmethod
     def validate_name(cls, v: str | None) -> str | None:
         """Validate payment method name."""
         if v is not None:
@@ -62,7 +65,8 @@ class PaymentMethodUpdate(BaseModel):
                 raise ValueError("Payment method name cannot be empty")
         return v
 
-    @validator("description")
+    @field_validator("description")
+    @classmethod
     def validate_description(cls, v: str | None) -> str | None:
         """Validate description."""
         if v is not None:
@@ -80,10 +84,7 @@ class PaymentMethodResponse(PaymentMethodBase):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        """Pydantic configuration for ORM compatibility."""
-
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 class PaymentMethodSummary(BaseModel):
@@ -93,7 +94,4 @@ class PaymentMethodSummary(BaseModel):
     name: str
     method_type: PaymentMethodType
 
-    class Config:
-        """Pydantic configuration for ORM compatibility."""
-
-        from_attributes = True
+    model_config = {"from_attributes": True}
