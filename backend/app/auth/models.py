@@ -1,6 +1,6 @@
 from sqlalchemy import String
 from sqlalchemy.dialects.postgresql import ENUM
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models import BaseModel
 
@@ -21,8 +21,11 @@ class User(BaseModel):
     )
     locale: Mapped[str] = mapped_column(String(10), default="en-US")
 
+    # Relationships
+    payment_methods = relationship(
+        "PaymentMethod", back_populates="user", cascade="all, delete-orphan"
+    )
     # Relationships will be added when other domains are implemented
-    # payment_methods = relationship("PaymentMethod", back_populates="user")
     # expense_templates = relationship("ExpenseTemplate", back_populates="user")
     # cycles = relationship("Cycle", back_populates="user")
 
