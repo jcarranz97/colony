@@ -5,11 +5,11 @@ from app.exceptions import AppExceptionError
 from .constants import ErrorCode
 
 
-class PaymentMethodException(AppExceptionError):
+class PaymentMethodExceptionError(AppExceptionError):
     """Base payment method exception."""
 
 
-class PaymentMethodNotFoundException(PaymentMethodException):
+class PaymentMethodNotFoundExceptionError(PaymentMethodExceptionError):
     """Exception raised when a payment method is not found."""
 
     def __init__(self, payment_method_id: str | None = None) -> None:
@@ -22,7 +22,7 @@ class PaymentMethodNotFoundException(PaymentMethodException):
         )
 
 
-class PaymentMethodNameExistsException(PaymentMethodException):
+class PaymentMethodNameExistsExceptionError(PaymentMethodExceptionError):
     """Exception raised when payment method name already exists for user."""
 
     def __init__(self, name: str) -> None:
@@ -34,7 +34,7 @@ class PaymentMethodNameExistsException(PaymentMethodException):
         )
 
 
-class PaymentMethodInUseException(PaymentMethodException):
+class PaymentMethodInUseExceptionError(PaymentMethodExceptionError):
     """Exception raised when trying to delete a payment method that's in use."""
 
     def __init__(self, payment_method_id: str) -> None:
@@ -46,7 +46,7 @@ class PaymentMethodInUseException(PaymentMethodException):
         )
 
 
-class InvalidPaymentMethodTypeException(PaymentMethodException):
+class InvalidPaymentMethodTypeExceptionError(PaymentMethodExceptionError):
     """Exception raised when payment method type is invalid."""
 
     def __init__(self, method_type: str) -> None:
@@ -58,7 +58,7 @@ class InvalidPaymentMethodTypeException(PaymentMethodException):
         )
 
 
-class InvalidCurrencyException(PaymentMethodException):
+class InvalidCurrencyExceptionError(PaymentMethodExceptionError):
     """Exception raised when currency is invalid."""
 
     def __init__(self, currency: str) -> None:

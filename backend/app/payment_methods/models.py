@@ -24,7 +24,8 @@ class PaymentMethod(BaseModel):
     # Relationships
     user = relationship("User", back_populates="payment_methods")
     # The following relationships will be added when other domains are implemented
-    # expense_templates = relationship("ExpenseTemplate", back_populates="payment_method")
+    # expense_templates = relationship(
+    #    "ExpenseTemplate", back_populates="payment_method")
     # cycle_expenses = relationship("CycleExpense", back_populates="payment_method")
 
     # Table constraints
@@ -34,7 +35,11 @@ class PaymentMethod(BaseModel):
     )
 
     def __repr__(self) -> str:
-        return f"<PaymentMethod(id={self.id}, name='{self.name}', type='{self.method_type}')>"
+        """String representation of the PaymentMethod model."""
+        return (
+            f"<PaymentMethod(id={self.id}, name='{self.name}', "
+            f"type='{self.method_type}')>"
+        )
 
     def to_dict(self) -> dict:
         """Convert model to dictionary."""

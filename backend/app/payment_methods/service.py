@@ -7,8 +7,8 @@ from sqlalchemy.orm import Session
 from . import models, schemas
 from .constants import MAX_PAYMENT_METHODS_PER_USER
 from .exceptions import (
-    PaymentMethodInUseException,
-    PaymentMethodNameExistsException,
+    PaymentMethodInUseExceptionError,
+    PaymentMethodNameExistsExceptionError,
 )
 
 logger = logging.getLogger(__name__)
@@ -80,7 +80,7 @@ class PaymentMethodService:
         )
 
         if existing_count >= MAX_PAYMENT_METHODS_PER_USER:
-            raise PaymentMethodInUseException(
+            raise PaymentMethodInUseExceptionError(
                 f"Maximum {MAX_PAYMENT_METHODS_PER_USER} payment methods allowed"
             )
 
@@ -98,7 +98,7 @@ class PaymentMethodService:
         )
 
         if existing_method:
-            raise PaymentMethodNameExistsException(payment_method_data.name)
+            raise PaymentMethodNameExistsExceptionError(payment_method_data.name)
 
         try:
             payment_method = models.PaymentMethod(
@@ -126,7 +126,7 @@ class PaymentMethodService:
                 "Failed to create payment method",
                 extra={"user_id": user_id, "error": str(e)},
             )
-            raise PaymentMethodNameExistsException(payment_method_data.name) from e
+            raise PaymentMethodNameExistsExceptionError(payment_method_data.name) from e
 
     @staticmethod
     def update_payment_method(
@@ -156,7 +156,7 @@ class PaymentMethodService:
             )
 
             if existing_method:
-                raise PaymentMethodNameExistsException(payment_method_data.name)
+                raise PaymentMethodNameExistsExceptionError(payment_method_data.name)
 
         try:
             update_data = payment_method_data.model_dump(exclude_unset=True)
@@ -180,7 +180,7 @@ class PaymentMethodService:
                 "Failed to update payment method",
                 extra={"payment_method_id": str(payment_method.id), "error": str(e)},
             )
-            raise PaymentMethodNameExistsException(
+            raise PaymentMethodNameExistsExceptionError(
                 payment_method_data.name or payment_method.name
             ) from e
 

@@ -7,7 +7,7 @@ from app.auth.dependencies import CurrentActiveUser
 from app.dependencies import get_db
 
 from . import service
-from .exceptions import PaymentMethodNotFoundException
+from .exceptions import PaymentMethodNotFoundExceptionError
 
 
 async def get_payment_method_by_id(
@@ -21,7 +21,7 @@ async def get_payment_method_by_id(
     )
 
     if not payment_method:
-        raise PaymentMethodNotFoundException(payment_method_id)
+        raise PaymentMethodNotFoundExceptionError(payment_method_id)
 
     return payment_method
 

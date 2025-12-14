@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.auth.dependencies import CurrentActiveUser
@@ -9,8 +9,8 @@ from app.dependencies import get_db
 from . import schemas, service
 from .dependencies import PaymentMethodDep
 from .exceptions import (
-    PaymentMethodInUseException,
-    PaymentMethodNameExistsException,
+    PaymentMethodInUseExceptionError,
+    PaymentMethodNameExistsExceptionError,
 )
 
 router = APIRouter(prefix="/payment-methods", tags=["payment-methods"])
@@ -33,7 +33,9 @@ async def payment_method_health_check() -> dict[str, str]:
     "/",
     response_model=list[schemas.PaymentMethodResponse],
     summary="Get all payment methods",
-    description="Retrieve all payment methods for the authenticated user with optional filters",
+    description=(
+        "Retrieve all payment methods for the authenticated user with optional filters"
+    ),
 )
 async def get_payment_methods(
     current_user: CurrentActiveUser,
@@ -66,9 +68,7 @@ async def create_payment_method(
             db, payment_method_data, str(current_user.id)
         )
         return schemas.PaymentMethodResponse.model_validate(payment_method)
-    except PaymentMethodNameExistsException as e:
-        from fastapi import HTTPException
-
+    except PaymentMethodNameExistsExceptionError as e:
         raise HTTPException(status_code=e.status_code, detail=e.message) from e
 
 
@@ -102,9 +102,7 @@ async def update_payment_method(
             db, payment_method, payment_method_data
         )
         return schemas.PaymentMethodResponse.model_validate(updated_payment_method)
-    except PaymentMethodNameExistsException as e:
-        from fastapi import HTTPException
-
+    except PaymentMethodNameExistsExceptionError as e:
         raise HTTPException(status_code=e.status_code, detail=e.message) from e
 
 
@@ -121,7 +119,5 @@ async def delete_payment_method(
     """Deactivate a payment method (soft delete)."""
     try:
         service.payment_method_service.delete_payment_method(db, payment_method)
-    except PaymentMethodInUseException as e:
-        from fastapi import HTTPException
-
+    except PaymentMethodInUseExceptionError as e:
         raise HTTPException(status_code=e.status_code, detail=e.message) from e
