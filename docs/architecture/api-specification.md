@@ -508,7 +508,7 @@ Get all expenses for a specific cycle.
 - `currency` (string, optional): Filter by currency
 - `payment_method_id` (string, optional): Filter by payment method
 - `comment_search` (string, optional): Search within comment text
-- `include_comment_history` (boolean, optional): Include full comment history (default: false)
+- `include_comments` (boolean, optional): Include current comment with each expense (default: false)
 
 **Response:** `200 OK`
 ```json
@@ -525,9 +525,9 @@ Get all expenses for a specific cycle.
       "status": "paid",
       "paid": true,
       "paid_at": "2025-01-01T08:00:00Z",
-      "comments": {
+      "current_comment": {
         "text": "Rent increased by $100 due to annual lease adjustment",
-        "last_updated": "2025-01-01T07:30:00Z"
+        "created_at": "2025-01-01T07:30:00Z"
       },
       "autopay_info": "Auto-pay enabled",
       "template_id": "123e4567-e89b-12d3-a456-426614174003",
@@ -563,9 +563,7 @@ Add a manual expense to a cycle.
   "amount": "350.00",
   "due_date": "2025-01-15",
   "category": "variable",
-  "comments": {
-    "text": "Unexpected car repair - transmission issue"
-  }
+  "initial_comment": "Unexpected car repair - transmission issue"
 }
 ```
 
@@ -582,9 +580,9 @@ Add a manual expense to a cycle.
   "status": "pending",
   "paid": false,
   "paid_at": null,
-  "comments": {
+  "current_comment": {
     "text": "Unexpected car repair - transmission issue",
-    "last_updated": "2025-01-01T00:00:00Z"
+    "created_at": "2025-01-01T00:00:00Z"
   },
   "autopay_info": null,
   "template_id": null,
@@ -599,7 +597,7 @@ Add a manual expense to a cycle.
 ```
 
 #### GET /cycles/{cycle_id}/expenses/{expense_id}
-Get a specific expense with optional comment history.
+Get a specific expense with comment history.
 
 **Query Parameters:**
 - `include_comment_history` (boolean, optional): Include full comment history (default: true)
@@ -617,9 +615,9 @@ Get a specific expense with optional comment history.
   "status": "paid",
   "paid": true,
   "paid_at": "2025-01-01T08:00:00Z",
-  "comments": {
+  "current_comment": {
     "text": "Rent increased by $100 due to annual lease adjustment",
-    "last_updated": "2025-01-01T07:30:00Z"
+    "created_at": "2025-01-01T07:30:00Z"
   },
   "comment_history": [
     {
@@ -646,17 +644,15 @@ Get a specific expense with optional comment history.
 ```
 
 #### PUT /cycles/{cycle_id}/expenses/{expense_id}
-Update an expense.
+Update an expense. If you want to add a comment along with the update, use the comments endpoint separately or include `update_comment`.
 
 **Request Body:**
 ```json
 {
   "amount": "1300.00",
-  "comments": {
-    "text": "Amount increased for January due to utility cost adjustment"
-  },
   "paid": true,
-  "paid_at": "2025-01-01T14:30:00Z"
+  "paid_at": "2025-01-01T14:30:00Z",
+  "update_comment": "Amount increased for January due to utility cost adjustment"
 }
 ```
 
@@ -673,9 +669,9 @@ Update an expense.
   "status": "paid",
   "paid": true,
   "paid_at": "2025-01-01T14:30:00Z",
-  "comments": {
+  "current_comment": {
     "text": "Amount increased for January due to utility cost adjustment",
-    "last_updated": "2025-01-01T14:30:00Z"
+    "created_at": "2025-01-01T14:30:00Z"
   },
   "autopay_info": "Auto-pay enabled",
   "template_id": "123e4567-e89b-12d3-a456-426614174003",
@@ -751,6 +747,25 @@ Get all comments for an expense.
 }
 ```
 
+#### PUT /cycles/{cycle_id}/expenses/{expense_id}/comments/{comment_id}
+Update a specific comment.
+
+**Request Body:**
+```json
+{
+  "text": "This expense won't apply in March - vacation month (updated)"
+}
+```
+
+**Response:** `200 OK`
+```json
+{
+  "id": "comment-uuid-3",
+  "text": "This expense won't apply in March - vacation month (updated)",
+  "created_at": "2025-01-20T14:45:00Z"
+}
+```
+
 #### DELETE /cycles/{cycle_id}/expenses/{expense_id}/comments/{comment_id}
 Delete a specific comment.
 
@@ -820,8 +835,8 @@ Get detailed cycle summary and analytics.
 Advanced expense search within a cycle.
 
 **Query Parameters:**
-- `q` (string, optional): General search query
-- `comment_search` (string, optional): Search within comment text
+- `q` (string, optional): General search query (searches description and comments)
+- `comment_search` (string, optional): Search specifically within comment text
 - `status` (string, optional): Filter by status
 - `category` (string, optional): Filter by category
 - `amount_min` (decimal, optional): Minimum amount filter
@@ -841,9 +856,9 @@ Advanced expense search within a cycle.
       "amount": "1200.00",
       "due_date": "2025-01-01",
       "status": "paid",
-      "comments": {
+      "current_comment": {
         "text": "Rent increased by $100 due to annual lease adjustment",
-        "last_updated": "2025-01-01T07:30:00Z"
+        "created_at": "2025-01-01T07:30:00Z"
       },
       "comment_match": "annual lease adjustment"
     }
@@ -941,31 +956,45 @@ System health check.
 }
 ```
 
-## Enhanced Comments Features
+## Comments System
 
-### Comment Structure
-Comments are stored in two ways:
-1. **Current comment** (JSONB in expense): Latest comment with metadata
-2. **Comment history** (separate table): Full audit trail of all comments
+The comments system uses a dedicated table for full history tracking without any legacy JSONB fields.
 
-### Comment API Features
+### Comment Features
 
-#### Structured Comments
+#### Comment Structure
+- **Text-only**: Simple text comments (1-2000 characters)
+- **Full history**: Complete audit trail in dedicated table
+- **Chronological order**: Comments ordered by creation timestamp
+- **Full-text search**: PostgreSQL advanced text search
+
+#### Current Comment Display
+The API shows the "current comment" by returning the most recent comment for each expense when requested:
+
 ```json
 {
-  "text": "Comment text here",
-  "last_updated": "2025-01-15T10:30:00Z"
+  "current_comment": {
+    "text": "Most recent comment text",
+    "created_at": "2025-01-15T10:30:00Z"
+  }
 }
 ```
 
-#### Comment Search Capabilities
+### Comment API Features
+
+#### Adding Comments
+- **During expense creation**: Use `initial_comment` field
+- **During expense updates**: Use `update_comment` field (adds new comment)
+- **Standalone comments**: Use dedicated comments endpoint
+
+#### Comment Search
 - **Full-text search**: Search within comment text across all expenses
 - **Contextual search**: Find expenses based on comment content
-- **Recent activity**: Track recent comment changes
+- **Date-based filtering**: Find comments within time periods
 
 #### Comment Analytics
 - **Comment insights**: Track comment activity per cycle
-- **Attention indicators**: Identify expenses with high comment activity
+- **Activity indicators**: Identify expenses with high comment activity
 - **Search highlighting**: Show matching text in search results
 
 ## Error Codes
@@ -1033,9 +1062,29 @@ Comments are stored in two ways:
 
 ### Working with Comments
 
+#### Adding Comments During Expense Creation
+```javascript
+// Create expense with initial comment
+const expense = await fetch(`/api/v1/cycles/${cycleId}/expenses`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer ' + token
+  },
+  body: JSON.stringify({
+    description: 'Car insurance',
+    amount: '150.00',
+    due_date: '2025-01-15',
+    category: 'fixed',
+    payment_method_id: paymentMethodId,
+    initial_comment: 'Rate increased due to coverage upgrade'
+  })
+});
+```
+
 #### Adding Comments During Expense Updates
 ```javascript
-// Update expense with new comment
+// Update expense and add comment
 const response = await fetch(`/api/v1/cycles/${cycleId}/expenses/${expenseId}`, {
   method: 'PUT',
   headers: {
@@ -1044,10 +1093,8 @@ const response = await fetch(`/api/v1/cycles/${cycleId}/expenses/${expenseId}`, 
   },
   body: JSON.stringify({
     amount: '1350.00',
-    comments: {
-      text: 'Amount increased due to inflation adjustment'
-    },
-    paid: true
+    paid: true,
+    update_comment: 'Amount increased due to inflation adjustment'
   })
 });
 ```
@@ -1071,7 +1118,7 @@ const commentResponse = await fetch(`/api/v1/cycles/${cycleId}/expenses/${expens
 ```javascript
 // Search for expenses with specific comment content
 const searchResponse = await fetch(
-  `/api/v1/cycles/${cycleId}/expenses?comment_search=inflation&include_comment_history=true`,
+  `/api/v1/cycles/${cycleId}/expenses?comment_search=inflation&include_comments=true`,
   {
     headers: {
       'Authorization': 'Bearer ' + token
@@ -1098,28 +1145,25 @@ const advancedSearchResponse = await fetch(
 );
 ```
 
-### Creating a Complete Expense Cycle with Comments
-
-1. **Create Payment Methods** (if not exists)
-2. **Create Expense Templates**
-3. **Create Cycle** with automatic template generation
-4. **Add Comments** to expenses as needed
-5. **Track Payment Status** and update comments
-6. **Search and Filter** expenses by comment content
-7. **Generate Reports** with comment insights
-
-### Example Workflow with Comments
+### Complete Workflow Example
 
 ```javascript
-// 1. Create cycle and add expense
-const cycle = await createCycle({
-  name: 'February 2025 Cycle',
-  start_date: '2025-02-01',
-  end_date: '2025-03-14',
-  income_amount: '5000.00'
+// 1. Create cycle
+const cycle = await fetch(`/api/v1/cycles`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer ' + token
+  },
+  body: JSON.stringify({
+    name: 'February 2025 Cycle',
+    start_date: '2025-02-01',
+    end_date: '2025-03-14',
+    income_amount: '5000.00'
+  })
 });
 
-// 2. Add manual expense with initial comment
+// 2. Add expense with initial comment
 const expense = await fetch(`/api/v1/cycles/${cycle.id}/expenses`, {
   method: 'POST',
   headers: {
@@ -1132,13 +1176,11 @@ const expense = await fetch(`/api/v1/cycles/${cycle.id}/expenses`, {
     due_date: '2025-02-15',
     category: 'fixed',
     payment_method_id: paymentMethodId,
-    comments: {
-      text: 'Rate increased by $25 due to coverage upgrade'
-    }
+    initial_comment: 'Rate increased by $25 due to coverage upgrade'
   })
 });
 
-// 3. Later, add additional comment
+// 3. Add additional comment
 await fetch(`/api/v1/cycles/${cycle.id}/expenses/${expense.id}/comments`, {
   method: 'POST',
   headers: {
@@ -1150,7 +1192,7 @@ await fetch(`/api/v1/cycles/${cycle.id}/expenses/${expense.id}/comments`, {
   })
 });
 
-// 4. Mark as paid with comment update
+// 4. Mark as paid with update comment
 await fetch(`/api/v1/cycles/${cycle.id}/expenses/${expense.id}`, {
   method: 'PUT',
   headers: {
@@ -1160,15 +1202,21 @@ await fetch(`/api/v1/cycles/${cycle.id}/expenses/${expense.id}`, {
   body: JSON.stringify({
     paid: true,
     paid_at: new Date().toISOString(),
-    comments: {
-      text: 'Payment processed successfully via auto-pay'
-    }
+    update_comment: 'Payment processed successfully via auto-pay'
   })
 });
 
 // 5. Search for expenses with rate changes
 const rateChangeExpenses = await fetch(
   `/api/v1/cycles/${cycle.id}/expenses/search?comment_search=rate increased`,
+  {
+    headers: { 'Authorization': 'Bearer ' + token }
+  }
+);
+
+// 6. Get full comment history for an expense
+const expenseDetails = await fetch(
+  `/api/v1/cycles/${cycle.id}/expenses/${expense.id}?include_comment_history=true`,
   {
     headers: { 'Authorization': 'Bearer ' + token }
   }
