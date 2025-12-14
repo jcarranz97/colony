@@ -6,9 +6,10 @@ Colony uses PostgreSQL for reliable financial data management with ACID transact
 
 - **ACID Compliance**: Essential for financial data integrity
 - **Complex Queries**: Supports advanced reporting and analytics
-- **JSON Support**: Flexible configuration storage (recurrence patterns)
+- **JSON Support**: Flexible configuration storage (recurrence patterns, comments)
 - **Decimal Precision**: Accurate financial calculations
 - **Mature Ecosystem**: Well-supported with excellent tooling
+- **Full-Text Search**: Advanced comment search capabilities
 
 ## Schema Overview
 
@@ -18,6 +19,7 @@ erDiagram
     users ||--o{ expense_templates : creates
     users ||--o{ cycles : manages
     cycles ||--o{ cycle_expenses : contains
+    cycle_expenses ||--o{ expense_comments : has
     expense_templates ||--o{ cycle_expenses : generates
     payment_methods ||--o{ expense_templates : uses
     payment_methods ||--o{ cycle_expenses : uses
@@ -90,11 +92,18 @@ erDiagram
         string category
         string autopay_info
         string status
-        string comments
+        jsonb comments
         boolean paid
         timestamp paid_at
         timestamp created_at
         timestamp updated_at
+    }
+
+    expense_comments {
+        uuid id PK
+        uuid expense_id FK
+        string text
+        timestamp created_at
     }
 
     exchange_rates {
@@ -243,7 +252,7 @@ CREATE INDEX idx_cycles_dates ON cycles(start_date, end_date);
 ```
 
 ### Cycle Expenses
-Individual expenses within a cycle.
+Individual expenses within a cycle with enhanced comment support.
 
 ```sql
 CREATE TABLE cycle_expenses (
@@ -259,7 +268,7 @@ CREATE TABLE cycle_expenses (
     category expense_category NOT NULL,
     autopay_info TEXT,
     status expense_status DEFAULT 'pending',
-    comments TEXT,
+    comments JSONB DEFAULT NULL,  -- Enhanced structured comments
     paid BOOLEAN DEFAULT false,
     paid_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -271,6 +280,27 @@ CREATE INDEX idx_cycle_expenses_template_id ON cycle_expenses(template_id);
 CREATE INDEX idx_cycle_expenses_due_date ON cycle_expenses(due_date);
 CREATE INDEX idx_cycle_expenses_status ON cycle_expenses(status);
 CREATE INDEX idx_cycle_expenses_paid ON cycle_expenses(paid);
+-- GIN index for comments search functionality
+CREATE INDEX idx_cycle_expenses_comments ON cycle_expenses USING GIN (comments);
+```
+
+### Expense Comments
+Detailed comment history for expenses.
+
+```sql
+CREATE TABLE expense_comments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    expense_id UUID NOT NULL REFERENCES cycle_expenses(id) ON DELETE CASCADE,
+    text TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+
+    CONSTRAINT comment_text_length CHECK (char_length(text) >= 1 AND char_length(text) <= 2000)
+);
+
+CREATE INDEX idx_expense_comments_expense_id ON expense_comments(expense_id);
+CREATE INDEX idx_expense_comments_created_at ON expense_comments(created_at);
+-- Full-text search index for comment text
+CREATE INDEX idx_expense_comments_text_search ON expense_comments USING GIN (to_tsvector('english', text));
 ```
 
 ### Exchange Rates
@@ -290,6 +320,38 @@ CREATE TABLE exchange_rates (
 
 CREATE INDEX idx_exchange_rates_currencies ON exchange_rates(from_currency, to_currency);
 CREATE INDEX idx_exchange_rates_date ON exchange_rates(rate_date);
+```
+
+## Enhanced Comments Schema
+
+### Comments Field Structure (JSONB)
+
+The `comments` field in `cycle_expenses` stores the current comment state as structured data:
+
+```json
+{
+  "text": "Amount increased by $50 due to inflation adjustment",
+  "last_updated": "2025-01-15T10:30:00Z"
+}
+```
+
+**Schema:**
+- `text` (string, required): Current comment text (1-2000 characters)
+- `last_updated` (timestamp, required): When the comment was last modified
+
+### Comment History (expense_comments table)
+
+Provides full audit trail of all comment changes:
+
+```sql
+-- Example comment history for an expense
+SELECT
+    id,
+    text,
+    created_at
+FROM expense_comments
+WHERE expense_id = '123e4567-e89b-12d3-a456-426614174005'
+ORDER BY created_at DESC;
 ```
 
 ## Relationship Details
@@ -314,10 +376,65 @@ CREATE INDEX idx_exchange_rates_date ON exchange_rates(rate_date);
 - Expenses can be generated from templates
 - Manual expenses allowed within cycles
 
+### Cycle Expenses → Expense Comments (1:N)
+- Each expense can have multiple comments
+- Comments provide detailed history and notes
+- Full-text search enabled for comment content
+
 ### Template → Cycle Expenses (1:N)
 - Templates can generate multiple expenses across cycles
 - Relationship tracks which template generated each expense
 - Optional relationship (manual expenses have NULL template_id)
+
+## Comment Search Capabilities
+
+### Full-Text Search Examples
+
+```sql
+-- Search comments containing specific words
+SELECT DISTINCT ce.*
+FROM cycle_expenses ce
+JOIN expense_comments ec ON ce.id = ec.expense_id
+WHERE to_tsvector('english', ec.text) @@ plainto_tsquery('english', 'inflation increase');
+
+-- Search current comments (JSONB field)
+SELECT *
+FROM cycle_expenses
+WHERE comments->>'text' ILIKE '%inflation%';
+
+-- Find expenses with comments containing multiple keywords
+SELECT DISTINCT ce.*
+FROM cycle_expenses ce
+JOIN expense_comments ec ON ce.id = ec.expense_id
+WHERE to_tsvector('english', ec.text) @@ to_tsquery('english', 'inflation & increase');
+```
+
+### Comment Analytics Queries
+
+```sql
+-- Expenses with most comments (indicating complex situations)
+SELECT
+    ce.description,
+    ce.amount,
+    COUNT(ec.id) as comment_count,
+    MAX(ec.created_at) as latest_comment
+FROM cycle_expenses ce
+LEFT JOIN expense_comments ec ON ce.id = ec.expense_id
+GROUP BY ce.id, ce.description, ce.amount
+HAVING COUNT(ec.id) > 0
+ORDER BY comment_count DESC;
+
+-- Recent comment activity for a cycle
+SELECT
+    ce.description,
+    ec.text,
+    ec.created_at
+FROM cycle_expenses ce
+JOIN expense_comments ec ON ce.id = ec.expense_id
+WHERE ce.cycle_id = $1
+  AND ec.created_at >= NOW() - INTERVAL '7 days'
+ORDER BY ec.created_at DESC;
+```
 
 ## Recurrence Configuration Schema
 
@@ -488,243 +605,6 @@ For complex patterns like quarterly, semi-annual, or irregular intervals.
 }
 ```
 
-**Calculation Logic:**
-1. Start from reference date
-2. Calculate interval based on unit:
-   - `days`: Add/subtract `interval` days
-   - `weeks`: Add/subtract `interval * 7` days, optionally align to `day_of_week`
-   - `months`: Add/subtract `interval` months, use `day_of_month` if specified
-   - `years`: Add/subtract `interval` years, use `month_of_year` and `day_of_month` if specified
-3. Generate all occurrences that fall within cycle period
-
-## Implementation Examples
-
-### Python Calculation Functions
-
-```python
-from datetime import date, timedelta
-from dateutil.relativedelta import relativedelta
-from typing import List, Dict, Any
-
-def calculate_occurrences(
-    recurrence_type: str,
-    recurrence_config: Dict[str, Any],
-    reference_date: date,
-    cycle_start: date,
-    cycle_end: date
-) -> List[date]:
-    """Calculate expense occurrences within a cycle period."""
-
-    if recurrence_type == "weekly":
-        return calculate_weekly_occurrences(
-            recurrence_config, reference_date, cycle_start, cycle_end
-        )
-    elif recurrence_type == "bi_weekly":
-        return calculate_bi_weekly_occurrences(
-            recurrence_config, reference_date, cycle_start, cycle_end
-        )
-    elif recurrence_type == "monthly":
-        return calculate_monthly_occurrences(
-            recurrence_config, reference_date, cycle_start, cycle_end
-        )
-    elif recurrence_type == "custom":
-        return calculate_custom_occurrences(
-            recurrence_config, reference_date, cycle_start, cycle_end
-        )
-    else:
-        raise ValueError(f"Unknown recurrence type: {recurrence_type}")
-
-def calculate_weekly_occurrences(
-    config: Dict[str, Any],
-    reference_date: date,
-    cycle_start: date,
-    cycle_end: date
-) -> List[date]:
-    """Calculate weekly occurrences."""
-    day_of_week = config["day_of_week"]
-    occurrences = []
-
-    # Find first occurrence in or after cycle start
-    current_date = cycle_start
-    days_ahead = (day_of_week - current_date.weekday()) % 7
-    current_date += timedelta(days=days_ahead)
-
-    # Generate weekly occurrences
-    while current_date <= cycle_end:
-        occurrences.append(current_date)
-        current_date += timedelta(days=7)
-
-    return occurrences
-
-def calculate_bi_weekly_occurrences(
-    config: Dict[str, Any],
-    reference_date: date,
-    cycle_start: date,
-    cycle_end: date
-) -> List[date]:
-    """Calculate bi-weekly occurrences."""
-    interval = config["interval_days"]
-    occurrences = []
-
-    # Start from reference date and work backwards/forwards
-    current_date = reference_date
-
-    # Go backwards to find start point
-    while current_date > cycle_start:
-        current_date -= timedelta(days=interval)
-
-    # Go forward to find all occurrences in cycle
-    while current_date <= cycle_end:
-        if cycle_start <= current_date <= cycle_end:
-            occurrences.append(current_date)
-        current_date += timedelta(days=interval)
-
-    return occurrences
-
-def calculate_monthly_occurrences(
-    config: Dict[str, Any],
-    reference_date: date,
-    cycle_start: date,
-    cycle_end: date
-) -> List[date]:
-    """Calculate monthly occurrences."""
-    day_of_month = config["day_of_month"]
-    handle_month_end = config.get("handle_month_end", False)
-    occurrences = []
-
-    # Start from first month that overlaps with cycle
-    current_month = cycle_start.replace(day=1)
-
-    while current_month <= cycle_end:
-        try:
-            occurrence_date = current_month.replace(day=day_of_month)
-        except ValueError:
-            # Handle months with fewer days
-            if handle_month_end:
-                # Use last day of month
-                next_month = current_month + relativedelta(months=1)
-                occurrence_date = next_month - timedelta(days=1)
-            else:
-                # Skip this month
-                current_month += relativedelta(months=1)
-                continue
-
-        # Check if occurrence falls within cycle
-        if cycle_start <= occurrence_date <= cycle_end:
-            occurrences.append(occurrence_date)
-
-        current_month += relativedelta(months=1)
-
-    return occurrences
-
-def calculate_custom_occurrences(
-    config: Dict[str, Any],
-    reference_date: date,
-    cycle_start: date,
-    cycle_end: date
-) -> List[date]:
-    """Calculate custom interval occurrences."""
-    interval = config["interval"]
-    unit = config["unit"]
-    occurrences = []
-
-    current_date = reference_date
-
-    # Go backwards to find start point
-    while current_date > cycle_start:
-        if unit == "days":
-            current_date -= timedelta(days=interval)
-        elif unit == "weeks":
-            current_date -= timedelta(weeks=interval)
-        elif unit == "months":
-            current_date -= relativedelta(months=interval)
-        elif unit == "years":
-            current_date -= relativedelta(years=interval)
-
-    # Go forward to find all occurrences in cycle
-    while current_date <= cycle_end:
-        if cycle_start <= current_date <= cycle_end:
-            occurrences.append(current_date)
-
-        # Move to next occurrence
-        if unit == "days":
-            current_date += timedelta(days=interval)
-        elif unit == "weeks":
-            current_date += timedelta(weeks=interval)
-        elif unit == "months":
-            current_date += relativedelta(months=interval)
-        elif unit == "years":
-            current_date += relativedelta(years=interval)
-
-    return occurrences
-```
-
-### Validation Schema
-
-```python
-from pydantic import BaseModel, validator
-from typing import Optional, Literal
-
-class WeeklyConfig(BaseModel):
-    day_of_week: int
-
-    @validator('day_of_week')
-    def validate_day_of_week(cls, v):
-        if not 0 <= v <= 6:
-            raise ValueError('day_of_week must be between 0 and 6')
-        return v
-
-class BiWeeklyConfig(BaseModel):
-    interval_days: int
-
-    @validator('interval_days')
-    def validate_interval_days(cls, v):
-        if v <= 0:
-            raise ValueError('interval_days must be positive')
-        return v
-
-class MonthlyConfig(BaseModel):
-    day_of_month: int
-    handle_month_end: Optional[bool] = False
-
-    @validator('day_of_month')
-    def validate_day_of_month(cls, v):
-        if not 1 <= v <= 31:
-            raise ValueError('day_of_month must be between 1 and 31')
-        return v
-
-class CustomConfig(BaseModel):
-    interval: int
-    unit: Literal["days", "weeks", "months", "years"]
-    day_of_month: Optional[int] = None
-    month_of_year: Optional[int] = None
-    day_of_week: Optional[int] = None
-
-    @validator('interval')
-    def validate_interval(cls, v):
-        if v <= 0:
-            raise ValueError('interval must be positive')
-        return v
-
-    @validator('day_of_month')
-    def validate_day_of_month(cls, v):
-        if v is not None and not 1 <= v <= 31:
-            raise ValueError('day_of_month must be between 1 and 31')
-        return v
-
-    @validator('month_of_year')
-    def validate_month_of_year(cls, v):
-        if v is not None and not 1 <= v <= 12:
-            raise ValueError('month_of_year must be between 1 and 12')
-        return v
-
-    @validator('day_of_week')
-    def validate_day_of_week(cls, v):
-        if v is not None and not 0 <= v <= 6:
-            raise ValueError('day_of_week must be between 0 and 6')
-        return v
-```
-
 ## Key Design Decisions
 
 ### 1. Multi-Currency Support
@@ -739,6 +619,7 @@ class CustomConfig(BaseModel):
 
 ### 3. JSONB for Configuration
 - Flexible recurrence pattern storage
+- Enhanced comment structure with metadata
 - PostgreSQL's JSONB provides indexing and querying
 - Schema evolution without migrations
 
@@ -746,15 +627,21 @@ class CustomConfig(BaseModel):
 - Created/updated timestamps on all tables
 - `paid_at` timestamp for expense tracking
 - Date-based cycle management
+- Comment history with full timestamps
 
 ### 5. Constraints and Validation
 - Check constraints for positive amounts
 - Unique constraints for business rules
 - Foreign key cascades for data cleanup
+- Text length limits for comments
+
+### 6. Search and Analytics
+- Full-text search on comment content
+- Advanced comment analytics capabilities
 
 ## Sample Queries
 
-### Generate Cycle Summary
+### Generate Cycle Summary with Comment Insights
 ```sql
 SELECT
     c.name,
@@ -763,14 +650,16 @@ SELECT
     SUM(ce.amount_usd) as total_amount_usd,
     SUM(CASE WHEN ce.category = 'fixed' THEN ce.amount_usd ELSE 0 END) as fixed_expenses,
     SUM(CASE WHEN ce.category = 'variable' THEN ce.amount_usd ELSE 0 END) as variable_expenses,
-    c.income_amount - SUM(ce.amount_usd) as net_balance
+    c.income_amount - SUM(ce.amount_usd) as net_balance,
+    COUNT(ec.id) as total_comments
 FROM cycles c
 LEFT JOIN cycle_expenses ce ON c.id = ce.cycle_id
+LEFT JOIN expense_comments ec ON ce.id = ec.expense_id
 WHERE c.user_id = $1 AND c.id = $2
 GROUP BY c.id, c.name, c.income_amount;
 ```
 
-### Payment Method Summary
+### Payment Method Summary with Comment Analysis
 ```sql
 SELECT
     pm.name,
@@ -778,12 +667,35 @@ SELECT
     COUNT(ce.id) as expense_count,
     SUM(ce.amount_usd) as total_amount,
     SUM(CASE WHEN ce.paid THEN ce.amount_usd ELSE 0 END) as paid_amount,
-    SUM(CASE WHEN NOT ce.paid THEN ce.amount_usd ELSE 0 END) as pending_amount
+    SUM(CASE WHEN NOT ce.paid THEN ce.amount_usd ELSE 0 END) as pending_amount,
+    COUNT(ec.id) as comment_count
 FROM payment_methods pm
 LEFT JOIN cycle_expenses ce ON pm.id = ce.payment_method_id
+LEFT JOIN expense_comments ec ON ce.id = ec.expense_id
 WHERE pm.user_id = $1 AND ce.cycle_id = $2
 GROUP BY pm.id, pm.name, pm.method_type
 ORDER BY total_amount DESC;
 ```
 
-This schema provides the foundation for all the functional requirements while maintaining data integrity and supporting complex financial reporting.
+### Expenses Requiring Attention (Based on Comment Activity)
+```sql
+SELECT
+    ce.description,
+    ce.amount,
+    ce.due_date,
+    ce.status,
+    COUNT(ec.id) as comment_count,
+    MAX(ec.created_at) as latest_comment_date,
+    ce.comments->>'text' as current_comment
+FROM cycle_expenses ce
+LEFT JOIN expense_comments ec ON ce.id = ec.expense_id
+WHERE ce.cycle_id = $1
+  AND (
+    COUNT(ec.id) > 2  -- Expenses with many comments
+    OR ce.comments IS NOT NULL  -- Expenses with current comments
+  )
+GROUP BY ce.id, ce.description, ce.amount, ce.due_date, ce.status, ce.comments
+ORDER BY latest_comment_date DESC NULLS LAST;
+```
+
+This enhanced schema provides comprehensive comment functionality while maintaining simplicity by removing the tags system. The comments remain powerful for tracking expense changes and notes without the complexity of tag management.
