@@ -6,7 +6,7 @@ Colony uses PostgreSQL for reliable financial data management with ACID transact
 
 - **ACID Compliance**: Essential for financial data integrity
 - **Complex Queries**: Supports advanced reporting and analytics
-- **JSON Support**: Flexible configuration storage (recurrence patterns, comments)
+- **JSON Support**: Flexible configuration storage (recurrence patterns)
 - **Decimal Precision**: Accurate financial calculations
 - **Mature Ecosystem**: Well-supported with excellent tooling
 - **Full-Text Search**: Advanced comment search capabilities
@@ -92,7 +92,6 @@ erDiagram
         string category
         string autopay_info
         string status
-        jsonb comments
         boolean paid
         timestamp paid_at
         timestamp created_at
@@ -252,7 +251,7 @@ CREATE INDEX idx_cycles_dates ON cycles(start_date, end_date);
 ```
 
 ### Cycle Expenses
-Individual expenses within a cycle with enhanced comment support.
+Individual expenses within a cycle.
 
 ```sql
 CREATE TABLE cycle_expenses (
@@ -268,7 +267,6 @@ CREATE TABLE cycle_expenses (
     category expense_category NOT NULL,
     autopay_info TEXT,
     status expense_status DEFAULT 'pending',
-    comments JSONB DEFAULT NULL,  -- Enhanced structured comments
     paid BOOLEAN DEFAULT false,
     paid_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -280,12 +278,10 @@ CREATE INDEX idx_cycle_expenses_template_id ON cycle_expenses(template_id);
 CREATE INDEX idx_cycle_expenses_due_date ON cycle_expenses(due_date);
 CREATE INDEX idx_cycle_expenses_status ON cycle_expenses(status);
 CREATE INDEX idx_cycle_expenses_paid ON cycle_expenses(paid);
--- GIN index for comments search functionality
-CREATE INDEX idx_cycle_expenses_comments ON cycle_expenses USING GIN (comments);
 ```
 
 ### Expense Comments
-Detailed comment history for expenses.
+Detailed comment history and notes for expenses.
 
 ```sql
 CREATE TABLE expense_comments (
@@ -322,26 +318,35 @@ CREATE INDEX idx_exchange_rates_currencies ON exchange_rates(from_currency, to_c
 CREATE INDEX idx_exchange_rates_date ON exchange_rates(rate_date);
 ```
 
-## Enhanced Comments Schema
+## Comments System
 
-### Comments Field Structure (JSONB)
+The comments system provides a comprehensive way to track notes, changes, and important information about expenses using a dedicated table for full history tracking.
 
-The `comments` field in `cycle_expenses` stores the current comment state as structured data:
+### Comment Features
 
-```json
-{
-  "text": "Amount increased by $50 due to inflation adjustment",
-  "last_updated": "2025-01-15T10:30:00Z"
-}
+#### Comment Structure
+- **Text content**: 1-2000 character comments
+- **Full history**: Complete audit trail of all comment changes
+- **Chronological order**: Comments ordered by creation time
+- **Full-text search**: PostgreSQL's advanced text search capabilities
+
+#### Current Comment Display
+The API determines the "current" comment by selecting the most recent comment for each expense:
+
+```sql
+-- Get current comment for an expense
+SELECT
+    text,
+    created_at as last_updated
+FROM expense_comments
+WHERE expense_id = $1
+ORDER BY created_at DESC
+LIMIT 1;
 ```
 
-**Schema:**
-- `text` (string, required): Current comment text (1-2000 characters)
-- `last_updated` (timestamp, required): When the comment was last modified
+### Comment History Management
 
-### Comment History (expense_comments table)
-
-Provides full audit trail of all comment changes:
+The `expense_comments` table provides complete comment history:
 
 ```sql
 -- Example comment history for an expense
@@ -352,6 +357,14 @@ SELECT
 FROM expense_comments
 WHERE expense_id = '123e4567-e89b-12d3-a456-426614174005'
 ORDER BY created_at DESC;
+```
+
+**Example history:**
+```
+id                                   | text                                    | created_at
+comment-uuid-3                       | Payment delayed due to bank processing | 2025-01-20T14:45:00Z
+comment-uuid-2                       | Amount increased by $50 due to inflation| 2025-01-15T10:30:00Z
+comment-uuid-1                       | Standard monthly payment                | 2024-12-15T10:00:00Z
 ```
 
 ## Relationship Details
@@ -397,16 +410,19 @@ FROM cycle_expenses ce
 JOIN expense_comments ec ON ce.id = ec.expense_id
 WHERE to_tsvector('english', ec.text) @@ plainto_tsquery('english', 'inflation increase');
 
--- Search current comments (JSONB field)
-SELECT *
-FROM cycle_expenses
-WHERE comments->>'text' ILIKE '%inflation%';
-
 -- Find expenses with comments containing multiple keywords
 SELECT DISTINCT ce.*
 FROM cycle_expenses ce
 JOIN expense_comments ec ON ce.id = ec.expense_id
 WHERE to_tsvector('english', ec.text) @@ to_tsquery('english', 'inflation & increase');
+
+-- Search for expenses with comments in a specific time period
+SELECT DISTINCT ce.*
+FROM cycle_expenses ce
+JOIN expense_comments ec ON ce.id = ec.expense_id
+WHERE ec.created_at >= '2025-01-01'
+  AND ec.created_at < '2025-02-01'
+  AND to_tsvector('english', ec.text) @@ plainto_tsquery('english', 'adjustment');
 ```
 
 ### Comment Analytics Queries
@@ -434,6 +450,22 @@ JOIN expense_comments ec ON ce.id = ec.expense_id
 WHERE ce.cycle_id = $1
   AND ec.created_at >= NOW() - INTERVAL '7 days'
 ORDER BY ec.created_at DESC;
+
+-- Expenses with comments but no recent activity (may need attention)
+SELECT
+    ce.description,
+    ce.amount,
+    ce.due_date,
+    ce.status,
+    COUNT(ec.id) as comment_count,
+    MAX(ec.created_at) as last_comment_date
+FROM cycle_expenses ce
+LEFT JOIN expense_comments ec ON ce.id = ec.expense_id
+WHERE ce.cycle_id = $1
+GROUP BY ce.id, ce.description, ce.amount, ce.due_date, ce.status
+HAVING COUNT(ec.id) > 0
+   AND MAX(ec.created_at) < NOW() - INTERVAL '30 days'
+ORDER BY last_comment_date ASC;
 ```
 
 ## Recurrence Configuration Schema
@@ -619,7 +651,6 @@ For complex patterns like quarterly, semi-annual, or irregular intervals.
 
 ### 3. JSONB for Configuration
 - Flexible recurrence pattern storage
-- Enhanced comment structure with metadata
 - PostgreSQL's JSONB provides indexing and querying
 - Schema evolution without migrations
 
@@ -635,9 +666,11 @@ For complex patterns like quarterly, semi-annual, or irregular intervals.
 - Foreign key cascades for data cleanup
 - Text length limits for comments
 
-### 6. Search and Analytics
-- Full-text search on comment content
-- Advanced comment analytics capabilities
+### 6. Comments-Only Approach
+- Dedicated table for full comment history
+- No legacy JSONB comments field
+- Full-text search capabilities
+- Clean, normalized design
 
 ## Sample Queries
 
@@ -646,12 +679,13 @@ For complex patterns like quarterly, semi-annual, or irregular intervals.
 SELECT
     c.name,
     c.income_amount,
-    COUNT(ce.id) as total_expenses,
+    COUNT(DISTINCT ce.id) as total_expenses,
     SUM(ce.amount_usd) as total_amount_usd,
     SUM(CASE WHEN ce.category = 'fixed' THEN ce.amount_usd ELSE 0 END) as fixed_expenses,
     SUM(CASE WHEN ce.category = 'variable' THEN ce.amount_usd ELSE 0 END) as variable_expenses,
     c.income_amount - SUM(ce.amount_usd) as net_balance,
-    COUNT(ec.id) as total_comments
+    COUNT(ec.id) as total_comments,
+    COUNT(DISTINCT CASE WHEN ec.id IS NOT NULL THEN ce.id END) as expenses_with_comments
 FROM cycles c
 LEFT JOIN cycle_expenses ce ON c.id = ce.cycle_id
 LEFT JOIN expense_comments ec ON ce.id = ec.expense_id
@@ -664,7 +698,7 @@ GROUP BY c.id, c.name, c.income_amount;
 SELECT
     pm.name,
     pm.method_type,
-    COUNT(ce.id) as expense_count,
+    COUNT(DISTINCT ce.id) as expense_count,
     SUM(ce.amount_usd) as total_amount,
     SUM(CASE WHEN ce.paid THEN ce.amount_usd ELSE 0 END) as paid_amount,
     SUM(CASE WHEN NOT ce.paid THEN ce.amount_usd ELSE 0 END) as pending_amount,
@@ -686,16 +720,32 @@ SELECT
     ce.status,
     COUNT(ec.id) as comment_count,
     MAX(ec.created_at) as latest_comment_date,
-    ce.comments->>'text' as current_comment
+    (SELECT text FROM expense_comments
+     WHERE expense_id = ce.id
+     ORDER BY created_at DESC LIMIT 1) as current_comment
 FROM cycle_expenses ce
 LEFT JOIN expense_comments ec ON ce.id = ec.expense_id
 WHERE ce.cycle_id = $1
-  AND (
-    COUNT(ec.id) > 2  -- Expenses with many comments
-    OR ce.comments IS NOT NULL  -- Expenses with current comments
-  )
-GROUP BY ce.id, ce.description, ce.amount, ce.due_date, ce.status, ce.comments
+GROUP BY ce.id, ce.description, ce.amount, ce.due_date, ce.status
+HAVING COUNT(ec.id) > 2  -- Expenses with many comments indicating complexity
 ORDER BY latest_comment_date DESC NULLS LAST;
 ```
 
-This enhanced schema provides comprehensive comment functionality while maintaining simplicity by removing the tags system. The comments remain powerful for tracking expense changes and notes without the complexity of tag management.
+### Expenses with Current Comments (for API responses)
+```sql
+SELECT
+    ce.*,
+    latest_comment.text as current_comment_text,
+    latest_comment.created_at as current_comment_updated
+FROM cycle_expenses ce
+LEFT JOIN LATERAL (
+    SELECT text, created_at
+    FROM expense_comments ec
+    WHERE ec.expense_id = ce.id
+    ORDER BY ec.created_at DESC
+    LIMIT 1
+) latest_comment ON true
+WHERE ce.cycle_id = $1;
+```
+
+This clean schema design removes all legacy comment fields and focuses on the dedicated `expense_comments` table for all comment functionality. This provides better data normalization, full comment history, and powerful search capabilities without the complexity of maintaining dual comment systems.
