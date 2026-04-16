@@ -497,8 +497,6 @@ Delete a cycle and all associated expenses.
 
 **Response:** `204 No Content`
 
-### 5. Cycle Expenses
-
 #### GET /cycles/{cycle_id}/expenses
 Get all expenses for a specific cycle.
 
@@ -611,8 +609,6 @@ Delete an expense from a cycle.
 
 **Response:** `204 No Content`
 
-### 6. Reports & Analytics
-
 #### GET /cycles/{cycle_id}/summary
 Get detailed cycle summary and analytics.
 
@@ -666,6 +662,8 @@ Get detailed cycle summary and analytics.
 }
 ```
 
+### 5. Reports & Analytics
+
 #### GET /reports/cycles-comparison
 Compare multiple cycles.
 
@@ -698,7 +696,7 @@ Compare multiple cycles.
 }
 ```
 
-### 7. System Endpoints
+### 6. System Endpoints
 
 #### GET /enums
 Get all system enums for form validation.
