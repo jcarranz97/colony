@@ -135,6 +135,20 @@ async def delete_cycle(cycle: CycleDep, db: DatabaseDep) -> None:
     service.cycle_service.delete_cycle(db, cycle)
 
 
+@router.get(
+    "/{cycle_id}/summary",
+    response_model=schemas.CycleSummaryResponse,
+    summary="Get cycle summary",
+    description=(
+        "Return a detailed financial summary for a cycle: totals by category, "
+        "by payment method, by currency, and a status count breakdown."
+    ),
+)
+async def get_cycle_summary(cycle: CycleDep) -> schemas.CycleSummaryResponse:
+    """Return a detailed financial summary for a cycle."""
+    return service.cycle_service.build_cycle_summary(cycle)
+
+
 # ---------------------------------------------------------------------------
 # Cycle expense endpoints
 # ---------------------------------------------------------------------------

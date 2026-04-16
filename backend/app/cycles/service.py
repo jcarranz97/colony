@@ -385,6 +385,107 @@ class CycleService:
         return cycle
 
     @staticmethod
+    def build_cycle_summary(cycle: models.Cycle) -> schemas.CycleSummaryResponse:
+        """Build a detailed financial summary for *cycle*.
+
+        Computes financial totals, per-payment-method breakdowns, per-currency
+        stats, and a status count — all from the cycle's already-loaded
+        expenses relationship.
+
+        Args:
+            cycle: The Cycle ORM instance with expenses loaded.
+
+        Returns:
+            CycleSummaryResponse schema instance.
+        """
+        active = [e for e in cycle.expenses if e.active]
+        countable = [e for e in active if e.status != ExpenseStatus.CANCELLED]
+
+        # --- Financial totals ------------------------------------------------
+        total_usd = sum((e.amount_usd for e in countable), Decimal("0"))
+        fixed_usd = sum(
+            (e.amount_usd for e in countable if e.category == ExpenseCategory.FIXED),
+            Decimal("0"),
+        )
+        variable_usd = sum(
+            (e.amount_usd for e in countable if e.category == ExpenseCategory.VARIABLE),
+            Decimal("0"),
+        )
+        # USD currency → US expenses; MXN → Mexico expenses
+        usa_usd = sum(
+            (e.amount_usd for e in countable if e.currency == CurrencyCode.USD),
+            Decimal("0"),
+        )
+        mexico_usd = sum(
+            (e.amount_usd for e in countable if e.currency == CurrencyCode.MXN),
+            Decimal("0"),
+        )
+        financial = schemas.FinancialSummary(
+            total_expenses_usd=total_usd,
+            fixed_expenses_usd=fixed_usd,
+            variable_expenses_usd=variable_usd,
+            usa_expenses_usd=usa_usd,
+            mexico_expenses_usd=mexico_usd,
+            net_balance=cycle.income_amount - total_usd,
+        )
+
+        # --- By payment method -----------------------------------------------
+        pm_groups: dict[str, list[models.CycleExpense]] = {}
+        for e in countable:
+            pm_groups.setdefault(str(e.payment_method_id), []).append(e)
+
+        by_payment_method: list[schemas.PaymentMethodBreakdown] = []
+        for expenses in pm_groups.values():
+            pm = expenses[0].payment_method
+            by_payment_method.append(
+                schemas.PaymentMethodBreakdown(
+                    payment_method=schemas.PaymentMethodSummary.model_validate(pm),
+                    total_amount=sum((e.amount_usd for e in expenses), Decimal("0")),
+                    paid_amount=sum(
+                        (e.amount_usd for e in expenses if e.paid), Decimal("0")
+                    ),
+                    pending_amount=sum(
+                        (e.amount_usd for e in expenses if not e.paid), Decimal("0")
+                    ),
+                    expense_count=len(expenses),
+                )
+            )
+
+        # --- By currency -----------------------------------------------------
+        currency_groups: dict[str, list[models.CycleExpense]] = {}
+        for e in countable:
+            key = e.currency.value if hasattr(e.currency, "value") else str(e.currency)
+            currency_groups.setdefault(key, []).append(e)
+
+        by_currency: dict[str, schemas.CurrencyStats] = {}
+        for currency_code, expenses in currency_groups.items():
+            native_total = sum((e.amount for e in expenses), Decimal("0"))
+            usd_total = sum((e.amount_usd for e in expenses), Decimal("0"))
+            by_currency[currency_code] = schemas.CurrencyStats(
+                total_amount=native_total,
+                total_amount_usd=(
+                    usd_total if currency_code != CurrencyCode.USD.value else None
+                ),
+                expense_count=len(expenses),
+            )
+
+        # --- Status breakdown ------------------------------------------------
+        status_breakdown = schemas.StatusBreakdown(
+            pending=sum(1 for e in active if e.status == ExpenseStatus.PENDING),
+            paid=sum(1 for e in active if e.status == ExpenseStatus.PAID),
+            overdue=sum(1 for e in active if e.status == ExpenseStatus.OVERDUE),
+            cancelled=sum(1 for e in active if e.status == ExpenseStatus.CANCELLED),
+        )
+
+        return schemas.CycleSummaryResponse(
+            cycle=schemas.CycleInfo.model_validate(cycle),
+            financial=financial,
+            by_payment_method=by_payment_method,
+            by_currency=by_currency,
+            status_breakdown=status_breakdown,
+        )
+
+    @staticmethod
     def delete_cycle(db: Session, cycle: models.Cycle) -> None:
         """Soft-delete a cycle and all its active expenses.
 
