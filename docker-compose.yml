@@ -13,12 +13,31 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U colony_user -d colony_db"]
       interval: 30s
       timeout: 10s
       retries: 3
+
+  seeder:
+    image: python:3.13-slim
+    container_name: colony-seeder
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+      - ./seed_data.yaml:/seed_data.yaml
+    environment:
+      DATABASE_URL: postgresql://colony_user:colony_password@postgres:5432/colony_db
+      SEED_FILE: /seed_data.yaml
+      PYTHONPATH: /app
+      UV_PROJECT_ENVIRONMENT: /tmp/.venv
+    command: >-
+      bash -c "pip install uv --quiet && uv sync --no-dev --quiet &&
+      uv run python scripts/seed_db.py"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
 
   # Optional: pgAdmin for database management
   # pgadmin:
