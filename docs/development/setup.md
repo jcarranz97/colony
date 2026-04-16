@@ -39,6 +39,78 @@ docker-compose up -d --build
 - **API Documentation**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
 
+## Seed Data
+
+The repository ships with a `seed_data.yaml` file at the project root. When
+you run `docker-compose up`, a one-time `seeder` service automatically creates
+the database schema and populates it with initial development data, so you can
+log in and start using the app immediately without making any manual API calls.
+
+### Default dev credentials
+
+| Field    | Value              |
+|----------|--------------------|
+| Email    | `dev@colony.local` |
+| Password | `colony123`        |
+
+These credentials are ready to use as-is for local development. If you prefer
+your own, edit `seed_data.yaml` **before** running `docker-compose up` for the
+first time.
+
+### YAML structure
+
+```yaml
+users:
+  - email: user@example.com
+    password: plaintext-password   # hashed with Argon2ID at seed time
+    first_name: First
+    last_name: Last
+    preferred_currency: USD        # USD | MXN
+    locale: en-US
+    payment_methods:
+      - name: US Bank Debit
+        method_type: debit         # debit | credit | cash | transfer
+        default_currency: USD      # USD | MXN
+        description: Optional note
+```
+
+### Re-seeding manually
+
+The seed script is **idempotent** — running it again skips records that already
+exist. Use this to pick up new entries you add to `seed_data.yaml`:
+
+```bash
+docker-compose run --rm seeder
+```
+
+Or locally (outside Docker):
+
+```bash
+cd backend
+DATABASE_URL=postgresql://colony_user:colony_password@localhost:5432/colony_db \
+  SEED_FILE=../seed_data.yaml \
+  uv run python scripts/seed_db.py
+```
+
+### Starting fresh
+
+By default, `docker-compose down` stops and removes containers but **keeps
+the `postgres_data` volume**, so your database survives restarts. This is
+intentional for day-to-day development — you don't lose your work every time
+you restart Docker.
+
+To wipe all data and re-seed from scratch, add the `-v` flag:
+
+```bash
+docker-compose down -v          # removes the postgres_data volume
+docker-compose up -d --build    # recreates schema + seeds automatically
+```
+
+Use `-v` when you need a truly clean slate, for example after modifying
+`seed_data.yaml` or testing a schema change.
+
+---
+
 ## Option 2: Local Development
 
 For development with hot reloading:

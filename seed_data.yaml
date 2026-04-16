@@ -1,0 +1,35 @@
+# Development seed data — auto-loaded on docker-compose up
+#
+# This file defines the initial data pre-loaded into the database when the
+# project is started for the first time. It is safe to run multiple times
+# (idempotent: existing records are skipped).
+#
+# Default dev credentials:
+#   Email:    dev@colony.local
+#   Password: colony123
+#
+# You can modify this file before running docker-compose for the first time
+# to use your own credentials and payment methods.
+
+users:
+  - email: dev@colony.local
+    password: colony123
+    first_name: John
+    last_name: Doe
+    preferred_currency: USD
+    locale: en-US
+    payment_methods:
+      - name: US Bank Debit
+        method_type: debit
+        default_currency: USD
+        description: Main US debit card
+      - name: Cash USD
+        method_type: cash
+        default_currency: USD
+      - name: MX Bank Debit
+        method_type: debit
+        default_currency: MXN
+        description: Mexico debit card
+      - name: Cash MXN
+        method_type: cash
+        default_currency: MXN
