@@ -56,3 +56,44 @@ jobs:
       - name: Run Pyright
         working-directory: ./backend
         run: uv run pyright .
+
+  pytest:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: colony_user
+          POSTGRES_PASSWORD: colony_password
+          POSTGRES_DB: colony_test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://colony_user:colony_password@localhost:5432/colony_test_db
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: uv sync --all-groups
+
+      - name: Run pytest
+        working-directory: ./backend
+        run: uv run pytest --tb=short -q

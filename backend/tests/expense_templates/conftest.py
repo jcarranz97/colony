@@ -1,0 +1,101 @@
+import uuid
+from datetime import date
+from decimal import Decimal
+
+import pytest
+from sqlalchemy.orm import Session
+
+from app.auth.models import User
+from app.auth.utils import get_password_hash
+from app.expense_templates.constants import (
+    CurrencyCode,
+    ExpenseCategory,
+    RecurrenceType,
+)
+from app.expense_templates.models import ExpenseTemplate
+from app.payment_methods.constants import (
+    CurrencyCode as PMCurrencyCode,
+    PaymentMethodType,
+)
+from app.payment_methods.models import PaymentMethod
+
+
+@pytest.fixture
+def test_user(db: Session) -> User:
+    user = User(
+        email=f"test_{uuid.uuid4().hex[:8]}@example.com",
+        password_hash=get_password_hash("testpassword123"),
+        first_name="Test",
+        last_name="User",
+        preferred_currency="USD",
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+@pytest.fixture
+def other_user(db: Session) -> User:
+    user = User(
+        email=f"other_{uuid.uuid4().hex[:8]}@example.com",
+        password_hash=get_password_hash("testpassword123"),
+        first_name="Other",
+        last_name="User",
+        preferred_currency="USD",
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+@pytest.fixture
+def test_payment_method(db: Session, test_user: User) -> PaymentMethod:
+    pm = PaymentMethod(
+        user_id=test_user.id,
+        name="Chase Debit",
+        method_type=PaymentMethodType.DEBIT,
+        default_currency=PMCurrencyCode.USD,
+    )
+    db.add(pm)
+    db.commit()
+    db.refresh(pm)
+    return pm
+
+
+@pytest.fixture
+def other_payment_method(db: Session, other_user: User) -> PaymentMethod:
+    pm = PaymentMethod(
+        user_id=other_user.id,
+        name="Other Card",
+        method_type=PaymentMethodType.CREDIT,
+        default_currency=PMCurrencyCode.USD,
+    )
+    db.add(pm)
+    db.commit()
+    db.refresh(pm)
+    return pm
+
+
+@pytest.fixture
+def test_template(
+    db: Session,
+    test_user: User,
+    test_payment_method: PaymentMethod,
+) -> ExpenseTemplate:
+    template = ExpenseTemplate(
+        user_id=test_user.id,
+        payment_method_id=test_payment_method.id,
+        description="Groceries",
+        currency=CurrencyCode.USD,
+        base_amount=Decimal("150.00"),
+        category=ExpenseCategory.VARIABLE,
+        recurrence_type=RecurrenceType.WEEKLY,
+        recurrence_config={"day_of_week": 6},
+        reference_date=date(2024, 12, 21),
+    )
+    db.add(template)
+    db.commit()
+    db.refresh(template)
+    return template
