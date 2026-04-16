@@ -87,6 +87,7 @@ ignore = [
     "D203",    # 1 blank line required before class docstring (conflicts with D211)
     "D213",    # Multi-line docstring summary should start at the second line
     "S101",    # Use of assert detected (common in tests)
+    "S105",    # Possible hardcoded password assigned
     "PLR0913", # Too many arguments to function call
     "COM812",  # Trailing comma missing (conflicts with formatter)
     "ISC001",  # Implicitly concatenated string literals (conflicts with formatter)
