@@ -57,9 +57,7 @@ class TestGetExpenseTemplates:
 
     def test_list_filter_by_active(self, client, test_user, test_template):
         headers = get_auth_headers(client, test_user)
-        response = client.get(
-            "/api/v1/expense-templates/?active=true", headers=headers
-        )
+        response = client.get("/api/v1/expense-templates/?active=true", headers=headers)
         assert response.status_code == 200
         assert all(t["active"] for t in response.json())
 
@@ -174,9 +172,7 @@ class TestGetExpenseTemplateById:
 
 class TestUpdateExpenseTemplate:
     def test_update_requires_auth(self, client, test_template):
-        response = client.put(
-            f"/api/v1/expense-templates/{test_template.id}", json={}
-        )
+        response = client.put(f"/api/v1/expense-templates/{test_template.id}", json={})
         assert response.status_code == 401
 
     def test_partial_update_success(self, client, test_user, test_template):
@@ -215,9 +211,7 @@ class TestDeleteExpenseTemplate:
 
     def test_deleted_template_returns_inactive(self, client, test_user, test_template):
         headers = get_auth_headers(client, test_user)
-        client.delete(
-            f"/api/v1/expense-templates/{test_template.id}", headers=headers
-        )
+        client.delete(f"/api/v1/expense-templates/{test_template.id}", headers=headers)
         response = client.get(
             f"/api/v1/expense-templates/{test_template.id}", headers=headers
         )

@@ -41,9 +41,7 @@ class ExpenseTemplate(BaseModel):
         ENUM(RecurrenceType, name="recurrence_type"),
         nullable=False,
     )
-    recurrence_config: Mapped[dict] = mapped_column(
-        JSONB, nullable=False, default=dict
-    )
+    recurrence_config: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
     reference_date: Mapped[date] = mapped_column(Date, nullable=False)
     autopay_info: Mapped[str | None] = mapped_column(Text, nullable=True)
 
@@ -62,6 +60,4 @@ class ExpenseTemplate(BaseModel):
 
     def __repr__(self) -> str:
         """String representation of ExpenseTemplate."""
-        return (
-            f"<ExpenseTemplate(id={self.id}, description='{self.description}')>"
-        )
+        return f"<ExpenseTemplate(id={self.id}, description='{self.description}')>"

@@ -68,14 +68,10 @@ def _validate_monthly_config(config: dict[str, Any]) -> None:
         or not isinstance(dom, int)
         or not (_MIN_DAY_OF_MONTH <= dom <= _MAX_DAY_OF_MONTH)
     ):
-        raise ValueError(
-            "monthly recurrence_config requires 'day_of_month' (int 1-31)"
-        )
+        raise ValueError("monthly recurrence_config requires 'day_of_month' (int 1-31)")
     handle = config.get("handle_month_end", False)
     if not isinstance(handle, bool):
-        raise ValueError(
-            "monthly recurrence_config 'handle_month_end' must be a bool"
-        )
+        raise ValueError("monthly recurrence_config 'handle_month_end' must be a bool")
 
 
 def _validate_custom_config(config: dict[str, Any]) -> None:
@@ -92,21 +88,16 @@ def _validate_custom_config(config: dict[str, Any]) -> None:
     dom = config.get("day_of_month")
 
     if not isinstance(interval, int) or interval <= 0:
-        raise ValueError(
-            "custom recurrence_config requires 'interval' (positive int)"
-        )
+        raise ValueError("custom recurrence_config requires 'interval' (positive int)")
     valid_units = {"days", "weeks", "months"}
     if unit not in valid_units:
         raise ValueError(
             f"custom recurrence_config 'unit' must be one of {valid_units}"
         )
     if dom is not None and (
-        not isinstance(dom, int)
-        or not (_MIN_DAY_OF_MONTH <= dom <= _MAX_DAY_OF_MONTH)
+        not isinstance(dom, int) or not (_MIN_DAY_OF_MONTH <= dom <= _MAX_DAY_OF_MONTH)
     ):
-        raise ValueError(
-            "custom recurrence_config 'day_of_month' must be int 1-31"
-        )
+        raise ValueError("custom recurrence_config 'day_of_month' must be int 1-31")
 
 
 # Maps each RecurrenceType to its config validator function

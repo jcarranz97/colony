@@ -244,9 +244,7 @@ class TestDeleteExpenseTemplate:
         template_id = test_template.id
         expense_template_service.delete_expense_template(db, test_template)
         record = (
-            db.query(ExpenseTemplate)
-            .filter(ExpenseTemplate.id == template_id)
-            .first()
+            db.query(ExpenseTemplate).filter(ExpenseTemplate.id == template_id).first()
         )
         assert record is not None
         assert record.active is False

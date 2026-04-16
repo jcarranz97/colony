@@ -36,9 +36,7 @@ class PaymentMethodNotFoundExceptionError(ExpenseTemplateExceptionError):
         Args:
             payment_method_id: The ID of the payment method that was not found.
         """
-        details = (
-            {"payment_method_id": payment_method_id} if payment_method_id else {}
-        )
+        details = {"payment_method_id": payment_method_id} if payment_method_id else {}
         super().__init__(
             error_code=ErrorCode.PAYMENT_METHOD_NOT_FOUND,
             message="Payment method not found",
