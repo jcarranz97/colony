@@ -26,7 +26,7 @@ pre-commit install
 The easiest way to get started is using Docker Compose:
 
 ```bash
-# Start all services
+# Start all services (with hot reload enabled)
 docker-compose up --build
 
 # Or run in detached mode
@@ -34,10 +34,16 @@ docker-compose up -d --build
 ```
 
 ### Services Available
-- **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8000
-- **API Documentation**: http://localhost:8000/docs
+- **API Documentation (Swagger UI)**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
+
+### Hot Reload
+
+The backend service mounts the `backend/` directory as a volume, so any code
+changes you make locally are reflected immediately inside the container —
+no restart needed. FastAPI's development server (`fastapi dev`) watches for
+file changes and reloads automatically.
 
 ## Seed Data
 
@@ -111,9 +117,9 @@ Use `-v` when you need a truly clean slate, for example after modifying
 
 ---
 
-## Option 2: Local Development
+## Option 2: Local Development (without Docker)
 
-For development with hot reloading:
+For running the backend directly on your machine without Docker:
 
 ### Backend Setup
 

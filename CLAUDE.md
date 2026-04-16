@@ -82,6 +82,9 @@ docker-compose up --build
 - ReDoc: <http://localhost:8000/redoc>
 - Docs site: <http://localhost:8001>
 
+Hot reload is enabled: the `backend/` directory is mounted as a volume so
+code changes are picked up automatically without restarting the container.
+
 ### Local (uv)
 
 ```bash
