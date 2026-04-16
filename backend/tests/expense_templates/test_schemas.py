@@ -4,6 +4,7 @@ from decimal import Decimal
 import pytest
 from pydantic import ValidationError
 
+from app.expense_templates.constants import RecurrenceType
 from app.expense_templates.schemas import ExpenseTemplateCreate, ExpenseTemplateUpdate
 
 BASE_VALID = {
@@ -141,7 +142,7 @@ class TestExpenseTemplateUpdate:
         # Both provided and mismatched config raises
         with pytest.raises(ValidationError, match="day_of_week"):
             ExpenseTemplateUpdate(
-                recurrence_type="weekly",
+                recurrence_type=RecurrenceType.WEEKLY,
                 recurrence_config={"interval_days": 14},  # wrong for weekly
             )
 
@@ -151,7 +152,7 @@ class TestExpenseTemplateUpdate:
         assert schema.recurrence_config == {"day_of_week": 5}
 
     def test_only_recurrence_type_valid(self):
-        schema = ExpenseTemplateUpdate(recurrence_type="monthly")
+        schema = ExpenseTemplateUpdate(recurrence_type=RecurrenceType.MONTHLY)
         assert schema.recurrence_type is not None
 
     def test_clear_autopay_info(self):
