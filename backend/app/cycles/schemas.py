@@ -273,6 +273,82 @@ class CycleExpensesListResponse(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# Cycle summary schemas
+# ---------------------------------------------------------------------------
+
+
+class CycleInfo(BaseModel):
+    """Basic cycle info embedded in the summary response."""
+
+    id: uuid.UUID
+    name: str
+    start_date: date
+    end_date: date
+    income_amount: Decimal
+
+    model_config = {
+        "from_attributes": True,
+        "json_encoders": {Decimal: str},
+    }
+
+
+class FinancialSummary(BaseModel):
+    """Financial breakdown for the cycle summary."""
+
+    total_expenses_usd: Decimal
+    fixed_expenses_usd: Decimal
+    variable_expenses_usd: Decimal
+    usa_expenses_usd: Decimal
+    mexico_expenses_usd: Decimal
+    net_balance: Decimal
+
+    model_config = {"json_encoders": {Decimal: str}}
+
+
+class PaymentMethodBreakdown(BaseModel):
+    """Per-payment-method expense breakdown."""
+
+    payment_method: PaymentMethodSummary
+    total_amount: Decimal
+    paid_amount: Decimal
+    pending_amount: Decimal
+    expense_count: int
+
+    model_config = {"json_encoders": {Decimal: str}}
+
+
+class CurrencyStats(BaseModel):
+    """Expense stats for a single currency."""
+
+    total_amount: Decimal
+    total_amount_usd: Decimal | None = None
+    expense_count: int
+
+    model_config = {"json_encoders": {Decimal: str}}
+
+
+class StatusBreakdown(BaseModel):
+    """Count of expenses by status."""
+
+    pending: int
+    paid: int
+    overdue: int
+    cancelled: int
+
+
+class CycleSummaryResponse(BaseModel):
+    """Full cycle summary response."""
+
+    cycle: CycleInfo
+    financial: FinancialSummary
+    by_payment_method: list[PaymentMethodBreakdown]
+    by_currency: dict[str, CurrencyStats]
+    status_breakdown: StatusBreakdown
+
+    model_config = {"json_encoders": {Decimal: str}}
+
+
+# ---------------------------------------------------------------------------
 # Query parameter types
 # ---------------------------------------------------------------------------
 
