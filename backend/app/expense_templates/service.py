@@ -11,6 +11,7 @@ from .exceptions import (
     InvalidRecurrenceConfigExceptionError,
     PaymentMethodNotFoundExceptionError,
 )
+from .schemas import _RECURRENCE_VALIDATORS
 
 logger = logging.getLogger(__name__)
 
@@ -206,10 +207,7 @@ class ExpenseTemplateService:
 
         # When only recurrence_config is updated (no recurrence_type change),
         # validate the new config against the template's existing recurrence_type.
-        # Local import to avoid circular reference with schemas module.
         if "recurrence_config" in update_data and "recurrence_type" not in update_data:
-            from .schemas import _RECURRENCE_VALIDATORS
-
             validator = _RECURRENCE_VALIDATORS.get(template.recurrence_type)
             if validator:
                 try:
