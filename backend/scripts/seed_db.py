@@ -11,10 +11,12 @@ from sqlalchemy.orm import Session
 
 from app.auth.models import User
 from app.auth.utils import get_password_hash
-from app.database import Base, SessionLocal, engine
+from app.cycles import schemas as cycle_schemas, service as cycle_service_module
 
-# ExpenseTemplate must be imported so SQLAlchemy's mapper can resolve the
-# relationship declared on User and PaymentMethod before any query runs.
+# These imports ensure SQLAlchemy's mapper can resolve all relationships
+# before any query runs, and that create_all creates every table.
+from app.cycles.models import Cycle, CycleExpense, ExchangeRate  # noqa: F401
+from app.database import Base, SessionLocal, engine
 from app.expense_templates.models import ExpenseTemplate
 from app.payment_methods.models import PaymentMethod
 
@@ -144,6 +146,106 @@ def seed_expense_template(
     print(f"      ✅ Created expense template '{description}'.")
 
 
+def seed_exchange_rate(db: Session, rate_data: dict[str, Any]) -> None:
+    """Create an exchange rate record if one does not already exist for the date.
+
+    Args:
+        db: Active SQLAlchemy session.
+        rate_data: Dict with keys ``from_currency``, ``to_currency``, ``rate``,
+            and ``rate_date``.
+    """
+    from_c = rate_data["from_currency"]
+    to_c = rate_data["to_currency"]
+    rate_date = date.fromisoformat(rate_data["rate_date"])
+
+    existing = (
+        db.query(ExchangeRate)
+        .filter(
+            ExchangeRate.from_currency == from_c,
+            ExchangeRate.to_currency == to_c,
+            ExchangeRate.rate_date == rate_date,
+        )
+        .first()
+    )
+
+    if existing:
+        print(
+            f"  ⏭️  Exchange rate {from_c}→{to_c} on {rate_date} "
+            "already exists, skipping."
+        )
+        return
+
+    db.add(
+        ExchangeRate(
+            from_currency=from_c,
+            to_currency=to_c,
+            rate=Decimal(str(rate_data["rate"])),
+            rate_date=rate_date,
+        )
+    )
+    db.flush()
+    print(
+        f"  ✅ Created exchange rate {from_c}→{to_c} "
+        f"= {rate_data['rate']} ({rate_date})."
+    )
+
+
+def seed_cycle(db: Session, user: User, cycle_data: dict[str, Any]) -> None:
+    """Create a cycle (with generated expenses) for the user if it doesn't exist.
+
+    Uses the cycle service so that template generation, remaining balance
+    calculation, and all business rules are applied consistently.
+
+    Args:
+        db: Active SQLAlchemy session.
+        user: The User instance to associate the cycle with.
+        cycle_data: Dict of cycle fields from the seed YAML.
+    """
+    name = cycle_data["name"]
+    existing = (
+        db.query(Cycle)
+        .filter(
+            Cycle.user_id == user.id,
+            Cycle.name == name,
+            Cycle.active.is_(True),
+        )
+        .first()
+    )
+
+    if existing:
+        print(f"    ⏭️  Cycle '{name}' already exists, skipping.")
+        return
+
+    create_schema = cycle_schemas.CycleCreate(
+        name=name,
+        start_date=date.fromisoformat(cycle_data["start_date"]),
+        end_date=date.fromisoformat(cycle_data["end_date"]),
+        income_amount=Decimal(str(cycle_data["income_amount"])),
+        generate_from_templates=cycle_data.get("generate_from_templates", False),
+    )
+
+    try:
+        cycle = cycle_service_module.cycle_service.create_cycle(
+            db, create_schema, str(user.id)
+        )
+    except Exception as exc:
+        print(f"    ⚠️  Failed to create cycle '{name}': {exc}")
+        db.rollback()
+        return
+
+    # Apply the desired status if different from the default "draft"
+    desired_status = cycle_data.get("status", "draft")
+    if desired_status != "draft":
+        cycle.status = desired_status
+        db.commit()
+
+    expense_count = sum(1 for e in cycle.expenses if e.active)
+    print(
+        f"    ✅ Created cycle '{name}' [{desired_status}] "
+        f"with {expense_count} generated expense(s)."
+    )
+
+
 def seed_database(seed_file: Path) -> None:
     """Seed the database with initial development data from a YAML file.
 
@@ -159,6 +261,14 @@ def seed_database(seed_file: Path) -> None:
         data = yaml.safe_load(f)
 
     with SessionLocal() as db:
+        # Seed top-level exchange rates first (required for MXN→USD conversions)
+        rates_data = data.get("exchange_rates", [])
+        if rates_data:
+            print(f"Processing {len(rates_data)} exchange rate(s)...")
+            for rate_data in rates_data:
+                seed_exchange_rate(db, rate_data)
+            db.commit()
+
         users_data = data.get("users", [])
         print(f"Processing {len(users_data)} user(s)...")
 
@@ -181,6 +291,11 @@ def seed_database(seed_file: Path) -> None:
                     )
                     continue
                 seed_expense_template(db, user, pm, tmpl_data)
+
+            db.commit()  # commit templates before generating cycle expenses
+
+            for cycle_data in user_data.get("cycles", []):
+                seed_cycle(db, user, cycle_data)
 
         db.commit()
 

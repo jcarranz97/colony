@@ -28,7 +28,7 @@ class User(BaseModel):
     expense_templates = relationship(
         "ExpenseTemplate", back_populates="user", cascade="all, delete-orphan"
     )
-    # cycles = relationship("Cycle", back_populates="user")
+    cycles = relationship("Cycle", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         """String representation of the User model."""

@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.auth.router import router as auth_router
 from app.config import settings
+from app.cycles.router import router as cycles_router
 from app.exceptions import (
     AppExceptionError,
     app_exception_handler,
@@ -43,6 +44,7 @@ def create_app() -> FastAPI:
     app.include_router(auth_router, prefix="/api/v1")
     app.include_router(payment_methods_router, prefix="/api/v1")
     app.include_router(expense_templates_router, prefix="/api/v1")
+    app.include_router(cycles_router, prefix="/api/v1")
 
     @app.get("/")
     async def root() -> dict[str, str]:
