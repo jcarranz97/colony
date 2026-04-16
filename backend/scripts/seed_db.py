@@ -51,9 +51,7 @@ def seed_user(db: Session, user_data: dict[str, Any]) -> User:
     return user
 
 
-def seed_payment_method(
-    db: Session, user: User, pm_data: dict[str, Any]
-) -> None:
+def seed_payment_method(db: Session, user: User, pm_data: dict[str, Any]) -> None:
     """Create a payment method for the user if it does not already exist.
 
     Args:
