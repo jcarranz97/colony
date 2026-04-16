@@ -816,6 +816,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#hot-reload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hot Reload
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -883,15 +894,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#option-2-local-development" class="md-nav__link">
+  <a href="#option-2-local-development-without-docker" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Option 2: Local Development
+        Option 2: Local Development (without Docker)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Option 2: Local Development">
+    <nav class="md-nav" aria-label="Option 2: Local Development (without Docker)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1121,7 +1132,7 @@
 </code></pre></div>
 <h2 id="option-1-docker-development-recommended">Option 1: Docker Development (Recommended)</h2>
 <p>The easiest way to get started is using Docker Compose:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Start all services</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Start all services (with hot reload enabled)</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>docker-compose<span class="w"> </span>up<span class="w"> </span>--build
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Or run in detached mode</span>
@@ -1129,11 +1140,15 @@
 </code></pre></div>
 <h3 id="services-available">Services Available</h3>
 <ul>
-<li><strong>Frontend</strong>: http://localhost:3000</li>
 <li><strong>Backend API</strong>: http://localhost:8000</li>
-<li><strong>API Documentation</strong>: http://localhost:8000/docs</li>
+<li><strong>API Documentation (Swagger UI)</strong>: http://localhost:8000/docs</li>
 <li><strong>ReDoc</strong>: http://localhost:8000/redoc</li>
 </ul>
+<h3 id="hot-reload">Hot Reload</h3>
+<p>The backend service mounts the <code>backend/</code> directory as a volume, so any code
+changes you make locally are reflected immediately inside the container —
+no restart needed. FastAPI's development server (<code>fastapi dev</code>) watches for
+file changes and reloads automatically.</p>
 <h2 id="seed-data">Seed Data</h2>
 <p>The repository ships with a <code>seed_data.yaml</code> file at the project root. When
 you run <code>docker-compose up</code>, a one-time <code>seeder</code> service automatically creates
@@ -1198,8 +1213,8 @@ you restart Docker.</p>
 <p>Use <code>-v</code> when you need a truly clean slate, for example after modifying
 <code>seed_data.yaml</code> or testing a schema change.</p>
 <hr />
-<h2 id="option-2-local-development">Option 2: Local Development</h2>
-<p>For development with hot reloading:</p>
+<h2 id="option-2-local-development-without-docker">Option 2: Local Development (without Docker)</h2>
+<p>For running the backend directly on your machine without Docker:</p>
 <h3 id="backend-setup">Backend Setup</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nb">cd</span><span class="w"> </span>backend
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
