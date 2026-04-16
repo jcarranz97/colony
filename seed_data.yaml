@@ -11,6 +11,13 @@
 # You can modify this file before running docker-compose for the first time
 # to use your own credentials and payment methods.
 
+# Exchange rates are seeded before users so MXN template generation works.
+exchange_rates:
+  - from_currency: MXN
+    to_currency: USD
+    rate: "0.050000"
+    rate_date: "2026-01-01"
+
 users:
   - email: dev@colony.local
     password: colony123
@@ -111,3 +118,27 @@ users:
         recurrence_config:
           day_of_week: 0
         reference_date: "2025-01-05"
+
+    # Cycles are created after templates so expenses can be generated.
+    # Each 6-week window aligns with bi-weekly pay periods.
+    cycles:
+      - name: Jan-Feb 2026 Cycle
+        start_date: "2026-01-01"
+        end_date: "2026-02-11"
+        income_amount: "5000.00"
+        status: completed
+        generate_from_templates: true
+
+      - name: Feb-Mar 2026 Cycle
+        start_date: "2026-02-12"
+        end_date: "2026-03-25"
+        income_amount: "5000.00"
+        status: active
+        generate_from_templates: true
+
+      - name: Apr-May 2026 Cycle
+        start_date: "2026-04-01"
+        end_date: "2026-05-13"
+        income_amount: "5200.00"
+        status: draft
+        generate_from_templates: true
