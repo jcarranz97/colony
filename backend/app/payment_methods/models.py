@@ -28,7 +28,7 @@ class PaymentMethod(BaseModel):
     # Relationships
     user = relationship("User", back_populates="payment_methods")
     expense_templates = relationship("ExpenseTemplate", back_populates="payment_method")
-    # cycle_expenses = relationship("CycleExpense", back_populates="payment_method")
+    cycle_expenses = relationship("CycleExpense", back_populates="payment_method")
 
     # Table constraints
     __table_args__ = (
