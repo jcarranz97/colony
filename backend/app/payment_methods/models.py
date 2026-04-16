@@ -27,9 +27,7 @@ class PaymentMethod(BaseModel):
 
     # Relationships
     user = relationship("User", back_populates="payment_methods")
-    # The following relationships will be added when other domains are implemented
-    # expense_templates =
-    # relationship("ExpenseTemplate", back_populates="payment_method")
+    expense_templates = relationship("ExpenseTemplate", back_populates="payment_method")
     # cycle_expenses = relationship("CycleExpense", back_populates="payment_method")
 
     # Table constraints

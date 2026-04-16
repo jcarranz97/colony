@@ -25,8 +25,9 @@ class User(BaseModel):
     payment_methods = relationship(
         "PaymentMethod", back_populates="user", cascade="all, delete-orphan"
     )
-    # Relationships will be added when other domains are implemented
-    # expense_templates = relationship("ExpenseTemplate", back_populates="user")
+    expense_templates = relationship(
+        "ExpenseTemplate", back_populates="user", cascade="all, delete-orphan"
+    )
     # cycles = relationship("Cycle", back_populates="user")
 
     def __repr__(self) -> str:

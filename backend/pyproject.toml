@@ -16,7 +16,10 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "httpx>=0.28.0",
     "pyright>=1.1.407",
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.25.0",
     "ruff>=0.12.12",
     "sqlalchemy[mypy]>=2.0.44",
 ]
@@ -84,6 +87,7 @@ ignore = [
     "D203",    # 1 blank line required before class docstring (conflicts with D211)
     "D213",    # Multi-line docstring summary should start at the second line
     "S101",    # Use of assert detected (common in tests)
+    "S105",    # Possible hardcoded password assigned
     "PLR0913", # Too many arguments to function call
     "COM812",  # Trailing comma missing (conflicts with formatter)
     "ISC001",  # Implicitly concatenated string literals (conflicts with formatter)
@@ -92,6 +96,7 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 # Test files can be more relaxed
 "tests/**/*.py" = [
+    "ANN",     # No annotation requirements in tests
     "D",       # No docstring requirements in tests
     "S101",    # Allow assert statements in tests
     "ARG",     # Unused arguments common in test fixtures
@@ -131,3 +136,7 @@ mark-parentheses = false
 [tool.ruff.lint.flake8-quotes]
 inline-quotes = "double"
 multiline-quotes = "double"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
