@@ -1,0 +1,1893 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Personal expense management application">
+      
+      
+      
+      
+        <link rel="prev" href="../requirements/">
+      
+      
+        <link rel="next" href="../architecture/database-schema/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Use Cases - Colony Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#use-case-specification" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Colony Documentation" class="md-header__button md-logo" aria-label="Colony Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Colony Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Use Cases
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jcarranz97/colony" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jcarranz97/colony
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../roadmap/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Roadmap
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../requirements/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Requirements
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Use Cases
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../architecture/database-schema/" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../development/" class="md-tabs__link">
+          
+  
+  
+  Development
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Colony Documentation" class="md-nav__button md-logo" aria-label="Colony Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Colony Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jcarranz97/colony" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jcarranz97/colony
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use Cases
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use Cases
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#actors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Actors
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#use-case-index" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use Case Index
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#system-overview-diagram" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        System Overview Diagram
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Authentication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#uc-01-register-account" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UC-01: Register Account
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uc-02-log-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UC-02: Log In
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uc-03-log-out" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UC-03: Log Out
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#payment-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Payment Methods
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Payment Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#uc-04-create-payment-method" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UC-04: Create Payment Method
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uc-05-edit-payment-method" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UC-05: Edit Payment Method
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uc-06-deactivate-payment-method" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UC-06: Deactivate Payment Method
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uc-07-view-payment-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UC-07: View Payment Methods
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#expense-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expense Templates
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Expense Templates">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#uc-08-create-expense-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UC-08: Create Expense Template
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uc-09-edit-expense-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UC-09: Edit Expense Template
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uc-10-delete-expense-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UC-10: Delete Expense Template
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uc-11-view-expense-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UC-11: View Expense Templates
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cycle-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cycle Management
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cycle Management">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#uc-12-create-cycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UC-12: Create Cycle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uc-13-view-cycle-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UC-13: View Cycle List
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uc-14-view-cycle-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UC-14: View Cycle Details
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uc-15-view-cycle-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UC-15: View Cycle Summary
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cycle-expenses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cycle Expenses
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cycle Expenses">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#uc-16-add-expense-to-cycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UC-16: Add Expense to Cycle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uc-17-edit-cycle-expense" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UC-17: Edit Cycle Expense
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uc-18-delete-cycle-expense" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UC-18: Delete Cycle Expense
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uc-19-mark-expense-as-paid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UC-19: Mark Expense as Paid
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#out-of-scope-planned-for-future-phases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Out of Scope (Planned for Future Phases)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/database-schema/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/backend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/api-specification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/deployment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/code-quality/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Code Quality
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="use-case-specification">Use Case Specification</h1>
+<p>This document describes the use cases for Colony — the specific goals a user
+can accomplish through the application and the step-by-step flows to achieve
+them. Use cases complement the <a href="../requirements/">Software Requirements Specification</a>
+by describing the <em>how</em>, not just the <em>what</em>.</p>
+<p>Each use case references the functional requirements it satisfies (FR-###).</p>
+<hr />
+<h2 id="actors">Actors</h2>
+<table>
+<thead>
+<tr>
+<th>Actor</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>User</strong></td>
+<td>An authenticated individual managing their personal expenses</td>
+</tr>
+<tr>
+<td><strong>Guest</strong></td>
+<td>An unauthenticated visitor (can only register or log in)</td>
+</tr>
+<tr>
+<td><strong>System</strong></td>
+<td>Automated behavior triggered by user actions or schedules</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="use-case-index">Use Case Index</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Actor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#uc-01-register-account">UC-01</a></td>
+<td>Register Account</td>
+<td>Guest</td>
+</tr>
+<tr>
+<td><a href="#uc-02-log-in">UC-02</a></td>
+<td>Log In</td>
+<td>Guest</td>
+</tr>
+<tr>
+<td><a href="#uc-03-log-out">UC-03</a></td>
+<td>Log Out</td>
+<td>User</td>
+</tr>
+<tr>
+<td><a href="#uc-04-create-payment-method">UC-04</a></td>
+<td>Create Payment Method</td>
+<td>User</td>
+</tr>
+<tr>
+<td><a href="#uc-05-edit-payment-method">UC-05</a></td>
+<td>Edit Payment Method</td>
+<td>User</td>
+</tr>
+<tr>
+<td><a href="#uc-06-deactivate-payment-method">UC-06</a></td>
+<td>Deactivate Payment Method</td>
+<td>User</td>
+</tr>
+<tr>
+<td><a href="#uc-07-view-payment-methods">UC-07</a></td>
+<td>View Payment Methods</td>
+<td>User</td>
+</tr>
+<tr>
+<td><a href="#uc-08-create-expense-template">UC-08</a></td>
+<td>Create Expense Template</td>
+<td>User</td>
+</tr>
+<tr>
+<td><a href="#uc-09-edit-expense-template">UC-09</a></td>
+<td>Edit Expense Template</td>
+<td>User</td>
+</tr>
+<tr>
+<td><a href="#uc-10-delete-expense-template">UC-10</a></td>
+<td>Delete Expense Template</td>
+<td>User</td>
+</tr>
+<tr>
+<td><a href="#uc-11-view-expense-templates">UC-11</a></td>
+<td>View Expense Templates</td>
+<td>User</td>
+</tr>
+<tr>
+<td><a href="#uc-12-create-cycle">UC-12</a></td>
+<td>Create Cycle</td>
+<td>User</td>
+</tr>
+<tr>
+<td><a href="#uc-13-view-cycle-list">UC-13</a></td>
+<td>View Cycle List</td>
+<td>User</td>
+</tr>
+<tr>
+<td><a href="#uc-14-view-cycle-details">UC-14</a></td>
+<td>View Cycle Details</td>
+<td>User</td>
+</tr>
+<tr>
+<td><a href="#uc-15-view-cycle-summary">UC-15</a></td>
+<td>View Cycle Summary</td>
+<td>User</td>
+</tr>
+<tr>
+<td><a href="#uc-16-add-expense-to-cycle">UC-16</a></td>
+<td>Add Expense to Cycle</td>
+<td>User</td>
+</tr>
+<tr>
+<td><a href="#uc-17-edit-cycle-expense">UC-17</a></td>
+<td>Edit Cycle Expense</td>
+<td>User</td>
+</tr>
+<tr>
+<td><a href="#uc-18-delete-cycle-expense">UC-18</a></td>
+<td>Delete Cycle Expense</td>
+<td>User</td>
+</tr>
+<tr>
+<td><a href="#uc-19-mark-expense-as-paid">UC-19</a></td>
+<td>Mark Expense as Paid</td>
+<td>User</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="system-overview-diagram">System Overview Diagram</h2>
+<p>The following diagram shows all actors and the functional areas they interact
+with. Each area maps to the detailed sections below.</p>
+<pre class="mermaid"><code>graph LR
+    Guest((Guest))
+    User((User))
+
+    subgraph Colony["Colony — System Boundary"]
+        direction TB
+        Auth(["Authentication\nUC-01 – UC-03"])
+        PM(["Payment Methods\nUC-04 – UC-07"])
+        ET(["Expense Templates\nUC-08 – UC-11"])
+        CM(["Cycle Management\nUC-12 – UC-15"])
+        CE(["Cycle Expenses\nUC-16 – UC-19"])
+    end
+
+    Guest --&gt; Auth
+    User --&gt; Auth
+    User --&gt; PM
+    User --&gt; ET
+    User --&gt; CM
+    User --&gt; CE</code></pre>
+<hr />
+<h2 id="authentication">Authentication</h2>
+<pre class="mermaid"><code>graph LR
+    Guest((Guest))
+    User((User))
+
+    UC01([UC-01: Register Account])
+    UC02([UC-02: Log In])
+    UC03([UC-03: Log Out])
+
+    Guest --&gt; UC01
+    Guest --&gt; UC02
+    User --&gt; UC03</code></pre>
+<h3 id="uc-01-register-account">UC-01: Register Account</h3>
+<p><strong>Actor:</strong> Guest</p>
+<p><strong>Related Requirements:</strong> FR-001</p>
+<p><strong>Preconditions:</strong> The user does not have an existing account.</p>
+<p><strong>Main Flow:</strong></p>
+<ol>
+<li>Guest submits email, password, first name, and last name.</li>
+<li>System validates that the email is not already registered.</li>
+<li>System hashes the password securely (Argon2ID).</li>
+<li>System creates the user account.</li>
+<li>System returns the user profile.</li>
+</ol>
+<p><strong>Alternative Flows:</strong></p>
+<ul>
+<li><strong>A1 — Email already registered:</strong> System returns a 409 error. Guest is
+  prompted to log in or reset their password.</li>
+<li><strong>A2 — Invalid password format:</strong> System returns a 422 error listing the
+  violated constraints.</li>
+</ul>
+<p><strong>Postconditions:</strong> A new user account exists. The user can now log in.</p>
+<hr />
+<h3 id="uc-02-log-in">UC-02: Log In</h3>
+<p><strong>Actor:</strong> Guest</p>
+<p><strong>Related Requirements:</strong> FR-002</p>
+<p><strong>Preconditions:</strong> The user has a registered account.</p>
+<p><strong>Main Flow:</strong></p>
+<ol>
+<li>Guest submits email and password.</li>
+<li>System verifies the credentials.</li>
+<li>System issues a JWT access token.</li>
+<li>Guest receives the token and is now authenticated.</li>
+</ol>
+<p><strong>Alternative Flows:</strong></p>
+<ul>
+<li><strong>A1 — Wrong credentials:</strong> System returns a 401 error. No token is issued.</li>
+<li><strong>A2 — Inactive account:</strong> System returns a 403 error.</li>
+</ul>
+<p><strong>Postconditions:</strong> The user holds a valid JWT token required by all subsequent
+use cases.</p>
+<hr />
+<h3 id="uc-03-log-out">UC-03: Log Out</h3>
+<p><strong>Actor:</strong> User</p>
+<p><strong>Related Requirements:</strong> FR-002</p>
+<p><strong>Preconditions:</strong> The user is logged in.</p>
+<p><strong>Main Flow:</strong></p>
+<ol>
+<li>User discards the JWT token client-side.</li>
+<li>Subsequent requests without a valid token are rejected with 401.</li>
+</ol>
+<p><strong>Notes:</strong> Colony uses stateless JWT auth; there is no server-side token
+invalidation. Expiry is enforced by the token TTL.</p>
+<hr />
+<h2 id="payment-methods">Payment Methods</h2>
+<pre class="mermaid"><code>graph LR
+    User((User))
+
+    UC04([UC-04: Create Payment Method])
+    UC05([UC-05: Edit Payment Method])
+    UC06([UC-06: Deactivate Payment Method])
+    UC07([UC-07: View Payment Methods])
+
+    User --&gt; UC04
+    User --&gt; UC05
+    User --&gt; UC06
+    User --&gt; UC07</code></pre>
+<h3 id="uc-04-create-payment-method">UC-04: Create Payment Method</h3>
+<p><strong>Actor:</strong> User</p>
+<p><strong>Related Requirements:</strong> FR-007, FR-012, FR-016</p>
+<p><strong>Preconditions:</strong> User is authenticated.</p>
+<p><strong>Main Flow:</strong></p>
+<ol>
+<li>User submits a payment method with: name, type (debit/credit/cash/transfer),
+   and default currency (USD/MXN).</li>
+<li>System validates that the name is unique for this user.</li>
+<li>System creates the payment method with <code>active: true</code>.</li>
+<li>System returns the created payment method.</li>
+</ol>
+<p><strong>Alternative Flows:</strong></p>
+<ul>
+<li><strong>A1 — Duplicate name:</strong> System returns a 409 error.</li>
+<li><strong>A2 — Invalid type/currency combination:</strong> System returns a 422 error.</li>
+</ul>
+<p><strong>Postconditions:</strong> The new payment method is available for selection when
+creating expense templates and cycle expenses.</p>
+<hr />
+<h3 id="uc-05-edit-payment-method">UC-05: Edit Payment Method</h3>
+<p><strong>Actor:</strong> User</p>
+<p><strong>Related Requirements:</strong> FR-008</p>
+<p><strong>Preconditions:</strong> User is authenticated. The payment method exists and belongs to the user.</p>
+<p><strong>Main Flow:</strong></p>
+<ol>
+<li>User submits updated fields (name, type, default currency, description).</li>
+<li>System validates the changes.</li>
+<li>System updates the payment method and returns the updated record.</li>
+</ol>
+<p><strong>Alternative Flows:</strong></p>
+<ul>
+<li><strong>A1 — Payment method not found:</strong> System returns a 404 error.</li>
+<li><strong>A2 — Name conflict with another existing method:</strong> System returns a 409
+  error.</li>
+</ul>
+<p><strong>Postconditions:</strong> The payment method reflects the new values. Existing
+expenses that reference this method are unaffected (they store a snapshot or
+reference by ID).</p>
+<hr />
+<h3 id="uc-06-deactivate-payment-method">UC-06: Deactivate Payment Method</h3>
+<p><strong>Actor:</strong> User</p>
+<p><strong>Related Requirements:</strong> FR-009, FR-013, FR-014</p>
+<p><strong>Preconditions:</strong> User is authenticated. The payment method exists and belongs to the user.</p>
+<p><strong>Main Flow:</strong></p>
+<ol>
+<li>User requests deactivation of a payment method.</li>
+<li>System sets <code>active: false</code> (soft delete — historical data is preserved).</li>
+<li>System returns the updated payment method.</li>
+</ol>
+<p><strong>Alternative Flows:</strong></p>
+<ul>
+<li><strong>A1 — Payment method not found:</strong> System returns a 404 error.</li>
+</ul>
+<p><strong>Postconditions:</strong> The payment method no longer appears in selectors for new
+expense creation but remains visible in historical expense data.</p>
+<hr />
+<h3 id="uc-07-view-payment-methods">UC-07: View Payment Methods</h3>
+<p><strong>Actor:</strong> User</p>
+<p><strong>Related Requirements:</strong> FR-017</p>
+<p><strong>Preconditions:</strong> User is authenticated.</p>
+<p><strong>Main Flow:</strong></p>
+<ol>
+<li>User requests the list of payment methods.</li>
+<li>System returns all payment methods belonging to the user (active and
+   inactive), ordered by name.</li>
+</ol>
+<p><strong>Notes:</strong> The frontend may filter by <code>active: true</code> to populate form dropdowns,
+and show all records in management screens.</p>
+<hr />
+<h2 id="expense-templates">Expense Templates</h2>
+<pre class="mermaid"><code>graph LR
+    User((User))
+
+    UC08([UC-08: Create Expense Template])
+    UC09([UC-09: Edit Expense Template])
+    UC10([UC-10: Delete Expense Template])
+    UC11([UC-11: View Expense Templates])
+
+    User --&gt; UC08
+    User --&gt; UC09
+    User --&gt; UC10
+    User --&gt; UC11</code></pre>
+<h3 id="uc-08-create-expense-template">UC-08: Create Expense Template</h3>
+<p><strong>Actor:</strong> User</p>
+<p><strong>Related Requirements:</strong> FR-018, FR-019, FR-023</p>
+<p><strong>Preconditions:</strong> User is authenticated. At least one payment method exists.</p>
+<p><strong>Main Flow:</strong></p>
+<ol>
+<li>User submits a template with: description, currency, payment method ID,
+   amount, category (fixed/variable), and recurrence pattern.</li>
+<li>System validates all fields including the recurrence config structure.</li>
+<li>System creates the template with <code>active: true</code>.</li>
+<li>System returns the created template.</li>
+</ol>
+<p><strong>Recurrence Config Examples:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Config</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Weekly (every Saturday)</td>
+<td><code>{"type": "weekly", "day_of_week": 6}</code></td>
+</tr>
+<tr>
+<td>Bi-weekly (every 14 days)</td>
+<td><code>{"type": "bi-weekly", "interval_days": 14}</code></td>
+</tr>
+<tr>
+<td>Monthly (on the 15th)</td>
+<td><code>{"type": "monthly", "day_of_month": 15}</code></td>
+</tr>
+<tr>
+<td>Custom (every 30 days)</td>
+<td><code>{"type": "custom", "interval_days": 30}</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Alternative Flows:</strong></p>
+<ul>
+<li><strong>A1 — Payment method not found or inactive:</strong> System returns a 404/422 error.</li>
+<li><strong>A2 — Invalid recurrence config:</strong> System returns a 422 error describing the
+  expected structure.</li>
+</ul>
+<p><strong>Postconditions:</strong> The template will be used to auto-generate expenses when a
+new cycle is created (UC-12).</p>
+<hr />
+<h3 id="uc-09-edit-expense-template">UC-09: Edit Expense Template</h3>
+<p><strong>Actor:</strong> User</p>
+<p><strong>Related Requirements:</strong> FR-020</p>
+<p><strong>Preconditions:</strong> User is authenticated. The template exists and belongs to the user.</p>
+<p><strong>Main Flow:</strong></p>
+<ol>
+<li>User submits updated fields.</li>
+<li>System validates the changes.</li>
+<li>System updates the template and returns the updated record.</li>
+</ol>
+<p><strong>Notes:</strong> Editing a template does not retroactively modify expenses already
+generated in past cycles. It only affects future cycle generation.</p>
+<p><strong>Alternative Flows:</strong></p>
+<ul>
+<li><strong>A1 — Template not found:</strong> System returns a 404 error.</li>
+</ul>
+<p><strong>Postconditions:</strong> Future cycles created after this edit will use the new
+template values.</p>
+<hr />
+<h3 id="uc-10-delete-expense-template">UC-10: Delete Expense Template</h3>
+<p><strong>Actor:</strong> User</p>
+<p><strong>Related Requirements:</strong> FR-021</p>
+<p><strong>Preconditions:</strong> User is authenticated. The template exists and belongs to the user.</p>
+<p><strong>Main Flow:</strong></p>
+<ol>
+<li>User requests deletion of a template.</li>
+<li>System soft-deletes the template (<code>active: false</code>).</li>
+<li>System confirms deletion.</li>
+</ol>
+<p><strong>Alternative Flows:</strong></p>
+<ul>
+<li><strong>A1 — Template not found:</strong> System returns a 404 error.</li>
+</ul>
+<p><strong>Postconditions:</strong> The template is excluded from future cycle generation.
+Cycle expenses previously generated from this template are unaffected.</p>
+<hr />
+<h3 id="uc-11-view-expense-templates">UC-11: View Expense Templates</h3>
+<p><strong>Actor:</strong> User</p>
+<p><strong>Related Requirements:</strong> FR-022</p>
+<p><strong>Preconditions:</strong> User is authenticated.</p>
+<p><strong>Main Flow:</strong></p>
+<ol>
+<li>User requests the list of expense templates.</li>
+<li>System returns all templates belonging to the user, including recurrence
+   pattern details and linked payment method info.</li>
+</ol>
+<hr />
+<h2 id="cycle-management">Cycle Management</h2>
+<pre class="mermaid"><code>graph LR
+    User((User))
+    System((System))
+
+    UC12([UC-12: Create Cycle])
+    UC13([UC-13: View Cycle List])
+    UC14([UC-14: View Cycle Details])
+    UC15([UC-15: View Cycle Summary])
+
+    User --&gt; UC12
+    User --&gt; UC13
+    User --&gt; UC14
+    User --&gt; UC15
+    System -.-&gt;|auto-generates expenses| UC12</code></pre>
+<h3 id="uc-12-create-cycle">UC-12: Create Cycle</h3>
+<p><strong>Actor:</strong> User</p>
+<p><strong>Related Requirements:</strong> FR-024, FR-025, FR-028</p>
+<p><strong>Preconditions:</strong> User is authenticated.</p>
+<p><strong>Main Flow:</strong></p>
+<ol>
+<li>User provides a start date (and optionally an income amount and remaining
+   balance).</li>
+<li>System calculates the end date as <code>start_date + 6 weeks - 1 day</code>.</li>
+<li>System creates the cycle record.</li>
+<li>System queries all active expense templates for the user.</li>
+<li>System generates cycle expenses from each template, computing the expense
+   date based on the template's recurrence config and the cycle's start date.</li>
+<li>System returns the created cycle along with the count of generated expenses.</li>
+</ol>
+<p><strong>Alternative Flows:</strong></p>
+<ul>
+<li><strong>A1 — Overlapping cycle dates:</strong> System returns a 409 error if a cycle with
+  overlapping dates already exists for this user.</li>
+<li><strong>A2 — No active templates:</strong> Cycle is created with zero auto-generated
+  expenses. User can add expenses manually (UC-16).</li>
+</ul>
+<p><strong>Postconditions:</strong> A 6-week cycle exists. Expenses derived from templates are
+ready for review and modification.</p>
+<hr />
+<h3 id="uc-13-view-cycle-list">UC-13: View Cycle List</h3>
+<p><strong>Actor:</strong> User</p>
+<p><strong>Related Requirements:</strong> FR-029</p>
+<p><strong>Preconditions:</strong> User is authenticated.</p>
+<p><strong>Main Flow:</strong></p>
+<ol>
+<li>User requests the list of cycles.</li>
+<li>System returns all cycles for the user, ordered by start date descending,
+   including status and date range for each.</li>
+</ol>
+<hr />
+<h3 id="uc-14-view-cycle-details">UC-14: View Cycle Details</h3>
+<p><strong>Actor:</strong> User</p>
+<p><strong>Related Requirements:</strong> FR-026, FR-029</p>
+<p><strong>Preconditions:</strong> User is authenticated. The cycle exists and belongs to the user.</p>
+<p><strong>Main Flow:</strong></p>
+<ol>
+<li>User requests details for a specific cycle by ID.</li>
+<li>System returns the cycle record plus the full list of associated expenses,
+   each with payment method info, paid status, category, and currency.</li>
+</ol>
+<hr />
+<h3 id="uc-15-view-cycle-summary">UC-15: View Cycle Summary</h3>
+<p><strong>Actor:</strong> User</p>
+<p><strong>Related Requirements:</strong> FR-039, FR-040, FR-041</p>
+<p><strong>Preconditions:</strong> User is authenticated. The cycle exists and belongs to the user.</p>
+<p><strong>Main Flow:</strong></p>
+<ol>
+<li>User requests the summary for a specific cycle.</li>
+<li>System aggregates all cycle expenses and returns:<ul>
+<li><strong>Income</strong> for the period</li>
+<li><strong>Fixed expenses total</strong> (USD)</li>
+<li><strong>Variable expenses total</strong> (USD)</li>
+<li><strong>USA expenses total</strong> (USD currency expenses only)</li>
+<li><strong>Mexico expenses total</strong> (MXN expenses converted to USD)</li>
+<li><strong>Total expenses</strong> (fixed + variable)</li>
+<li><strong>Net balance</strong> (income − total expenses)</li>
+<li><strong>Per payment method breakdown</strong>: amount needed, paid, and pending</li>
+</ul>
+</li>
+</ol>
+<p><strong>Notes:</strong> MXN amounts are converted using the stored exchange rate for the
+cycle period.</p>
+<hr />
+<h2 id="cycle-expenses">Cycle Expenses</h2>
+<pre class="mermaid"><code>graph LR
+    User((User))
+
+    UC16([UC-16: Add Expense to Cycle])
+    UC17([UC-17: Edit Cycle Expense])
+    UC18([UC-18: Delete Cycle Expense])
+    UC19([UC-19: Mark Expense as Paid])
+
+    User --&gt; UC16
+    User --&gt; UC17
+    User --&gt; UC18
+    User --&gt; UC19</code></pre>
+<h3 id="uc-16-add-expense-to-cycle">UC-16: Add Expense to Cycle</h3>
+<p><strong>Actor:</strong> User</p>
+<p><strong>Related Requirements:</strong> FR-030, FR-023</p>
+<p><strong>Preconditions:</strong> User is authenticated. The cycle exists and belongs to the user.</p>
+<p><strong>Main Flow:</strong></p>
+<ol>
+<li>User submits an expense with: description, currency, payment method ID,
+   amount, date, category, and optionally autopay info and comments.</li>
+<li>System validates that the date falls within the cycle's start/end range.</li>
+<li>System creates the expense and associates it with the cycle.</li>
+<li>System returns the created expense.</li>
+</ol>
+<p><strong>Alternative Flows:</strong></p>
+<ul>
+<li><strong>A1 — Date outside cycle range:</strong> System returns a 422 error.</li>
+<li><strong>A2 — Payment method not found:</strong> System returns a 404/422 error.</li>
+</ul>
+<p><strong>Postconditions:</strong> The expense is included in cycle totals and reports.</p>
+<hr />
+<h3 id="uc-17-edit-cycle-expense">UC-17: Edit Cycle Expense</h3>
+<p><strong>Actor:</strong> User</p>
+<p><strong>Related Requirements:</strong> FR-031</p>
+<p><strong>Preconditions:</strong> User is authenticated. The expense exists within a cycle belonging to the user.</p>
+<p><strong>Main Flow:</strong></p>
+<ol>
+<li>User submits updated fields for the expense.</li>
+<li>System validates the changes (date still within cycle range, valid payment
+   method, etc.).</li>
+<li>System updates the expense and returns the updated record.</li>
+</ol>
+<p><strong>Alternative Flows:</strong></p>
+<ul>
+<li><strong>A1 — Expense not found:</strong> System returns a 404 error.</li>
+<li><strong>A2 — Cycle is closed/completed:</strong> System may reject edits to prevent
+  retroactive changes to completed cycles.</li>
+</ul>
+<hr />
+<h3 id="uc-18-delete-cycle-expense">UC-18: Delete Cycle Expense</h3>
+<p><strong>Actor:</strong> User</p>
+<p><strong>Related Requirements:</strong> FR-032</p>
+<p><strong>Preconditions:</strong> User is authenticated. The expense exists within a cycle belonging to the user.</p>
+<p><strong>Main Flow:</strong></p>
+<ol>
+<li>User requests deletion of a specific cycle expense.</li>
+<li>System soft-deletes the expense (<code>active: false</code>).</li>
+<li>System confirms deletion.</li>
+</ol>
+<p><strong>Postconditions:</strong> The expense is excluded from future cycle totals and
+reports.</p>
+<hr />
+<h3 id="uc-19-mark-expense-as-paid">UC-19: Mark Expense as Paid</h3>
+<p><strong>Actor:</strong> User</p>
+<p><strong>Related Requirements:</strong> FR-033</p>
+<p><strong>Preconditions:</strong> User is authenticated. The expense exists within a cycle belonging to the user.</p>
+<p><strong>Main Flow:</strong></p>
+<ol>
+<li>User toggles the paid status of an expense.</li>
+<li>System updates <code>paid: true</code> (or <code>false</code> to reverse).</li>
+<li>System returns the updated expense.</li>
+</ol>
+<p><strong>Postconditions:</strong> The cycle summary (UC-15) reflects the updated paid/pending
+amounts per payment method.</p>
+<hr />
+<h2 id="out-of-scope-planned-for-future-phases">Out of Scope (Planned for Future Phases)</h2>
+<p>The following use cases are identified in the requirements but are not yet
+implemented and are excluded from the initial frontend build:</p>
+<table>
+<thead>
+<tr>
+<th>Use Case</th>
+<th>Related Requirements</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Reset Password</td>
+<td>FR-003</td>
+</tr>
+<tr>
+<td>Import from Excel/CSV</td>
+<td>FR-045, FR-046</td>
+</tr>
+<tr>
+<td>Currency Exchange Rate Management</td>
+<td>FR-004, FR-005, FR-006</td>
+</tr>
+<tr>
+<td>Multi-period Summary / Period Comparison</td>
+<td>FR-042, FR-043</td>
+</tr>
+<tr>
+<td>Expense Template Recurrence Config via UI Wizard</td>
+<td>FR-019</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "search.share", "toc.integrate", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@10.6.1/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>
