@@ -1,0 +1,2623 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Personal expense management application">
+      
+      
+      
+      
+        <link rel="prev" href="../../use-cases/">
+      
+      
+        <link rel="next" href="../database-schema/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Frontend - Colony Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#frontend-architecture" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Colony Documentation" class="md-header__button md-logo" aria-label="Colony Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Colony Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Frontend
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jcarranz97/colony" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jcarranz97/colony
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../roadmap/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Roadmap
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../requirements/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Requirements
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../use-cases/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Use Cases
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../development/" class="md-tabs__link">
+          
+  
+  
+  Development
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Colony Documentation" class="md-nav__button md-logo" aria-label="Colony Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Colony Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jcarranz97/colony" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jcarranz97/colony
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use Cases
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frontend
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frontend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tech-stack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tech Stack
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#heroui-design-principles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HeroUI Design Principles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#project-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Project Structure
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#routing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Routing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Routing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#layout-nesting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Layout Nesting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#route-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Route Table
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Authentication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jwt-storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JWT Storage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#route-protection-middleware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Route Protection (Middleware)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#token-expiry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Token Expiry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#server-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Server Actions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api-client-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API Client Layer
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="API Client Layer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#base-client" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Base Client
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#feature-api-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Feature API Modules
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#state-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        State Management
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#form-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Form Handling
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Form Handling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validation-schemas-helpersschemasts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validation Schemas (helpers/schemas.ts)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#component-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Component Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Component Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#shared-components-componentsshared" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shared Components (components/shared/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#feature-folder-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Feature Folder Pattern
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recurrence-config-builder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recurrence Config Builder
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expense-table-filters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expense Table Filters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cycle-summary-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cycle Summary Layout
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#styling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Styling
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Styling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#css-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CSS Setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#provider-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Provider Setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dark-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dark Mode
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#color-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Color Conventions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Flow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Flow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#read-list-page" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Read (List Page)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mutation-create-update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mutation (Create / Update)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mark-expense-as-paid-uc-19" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mark Expense as Paid (UC-19)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environment-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Environment Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#docker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Docker
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Plan
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation Plan">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-scaffold-the-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1 — Scaffold the Project
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-install-heroui-and-configure-styles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2 — Install HeroUI and Configure Styles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-implement-the-api-client-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3 — Implement the API Client Layer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-auth-server-actions-and-middleware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4 — Auth Server Actions and Middleware
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-5-auth-pages-login-register" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5 — Auth Pages (Login &amp; Register)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-6-app-shell-layout-sidebar-navbar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 6 — App Shell (Layout, Sidebar, Navbar)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-7-payment-methods-feature" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 7 — Payment Methods Feature
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-8-expense-templates-feature" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 8 — Expense Templates Feature
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-9-cycles-feature" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 9 — Cycles Feature
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-10-cycle-summary-page" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 10 — Cycle Summary Page
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-11-settings-page" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 11 — Settings Page
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../database-schema/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../backend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api-specification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/code-quality/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Code Quality
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="frontend-architecture">Frontend Architecture</h1>
+<p>Colony's frontend is a Next.js 15 application that communicates with the Colony FastAPI backend over a JSON REST API. It uses HeroUI v3 as the component library, Tailwind CSS v4 for utility styling, and TypeScript throughout.</p>
+<hr />
+<h2 id="tech-stack">Tech Stack</h2>
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th>Version</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>next</code></td>
+<td><code>^15.x</code></td>
+<td>App framework — App Router, Server Components, Server Actions</td>
+</tr>
+<tr>
+<td><code>react</code> / <code>react-dom</code></td>
+<td><code>^19.x</code></td>
+<td>UI runtime (React 19 required by HeroUI v3)</td>
+</tr>
+<tr>
+<td><code>typescript</code></td>
+<td><code>^5.x</code></td>
+<td>Static typing</td>
+</tr>
+<tr>
+<td><code>@heroui/react</code></td>
+<td><code>^3.x</code></td>
+<td>Component library — Button, Input, Select, Table, Card, Modal, Chip, etc.</td>
+</tr>
+<tr>
+<td><code>@heroui/styles</code></td>
+<td><code>^3.x</code></td>
+<td>HeroUI CSS styles (required alongside <code>@heroui/react</code>)</td>
+</tr>
+<tr>
+<td><code>tailwindcss</code></td>
+<td><code>^4.x</code></td>
+<td>Utility CSS (Tailwind v4 required by HeroUI v3)</td>
+</tr>
+<tr>
+<td><code>next-themes</code></td>
+<td><code>^0.3.x</code></td>
+<td>Dark/light mode switching</td>
+</tr>
+<tr>
+<td><code>clsx</code></td>
+<td><code>^2.x</code></td>
+<td>Conditional className composition</td>
+</tr>
+<tr>
+<td><code>formik</code></td>
+<td><code>^2.x</code></td>
+<td>Form state management</td>
+</tr>
+<tr>
+<td><code>yup</code></td>
+<td><code>^1.x</code></td>
+<td>Schema-based form validation</td>
+</tr>
+<tr>
+<td><code>react-icons</code></td>
+<td><code>^5.x</code></td>
+<td>Icon set</td>
+</tr>
+<tr>
+<td><code>date-fns</code></td>
+<td><code>^3.x</code></td>
+<td>Date arithmetic — cycle length calculations, due date formatting</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="heroui-design-principles">HeroUI Design Principles</h2>
+<p>The following 10 principles from the <a href="https://heroui.com/docs/react/getting-started/design-principles">HeroUI documentation</a> govern all component usage and customization decisions in this project.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Principle</th>
+<th>Application in Colony</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Semantic Intent Over Visual Style</strong></td>
+<td>Use <code>color="primary"</code> / <code>color="danger"</code> / <code>color="success"</code> — never apply raw Tailwind color classes to HeroUI components</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Accessibility as Foundation</strong></td>
+<td>HeroUI is built on React Aria — keyboard navigation and screen reader support come for free; never override ARIA attributes</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Composition Over Configuration</strong></td>
+<td>Use compound components (e.g., <code>&lt;Table&gt;</code> + <code>&lt;TableBody&gt;</code> + <code>&lt;TableRow&gt;</code>) rather than monolithic config props</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Progressive Disclosure</strong></td>
+<td>Start with the minimum required props; add <code>classNames</code>, <code>variant</code>, or <code>size</code> only when the default is insufficient</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>Predictable Behavior</strong></td>
+<td>Use the standard size set (<code>sm</code> / <code>md</code> / <code>lg</code>) and variant names consistently across all components</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>Type Safety First</strong></td>
+<td>HeroUI component props are fully typed — let TypeScript IntelliSense guide prop selection rather than guessing</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>Separation of Styles and Logic</strong></td>
+<td>Customize appearance via the <code>classNames</code> prop or CSS variables, not by wrapping components in extra <code>div</code>s</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>Developer Experience Excellence</strong></td>
+<td>Use HeroUI's descriptive error messages and component documentation when debugging display issues</td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>Complete Customization</strong></td>
+<td>Use CSS variables (<code>--heroui-*</code>) for global theme overrides; use <code>classNames</code> for per-instance overrides</td>
+</tr>
+<tr>
+<td>10</td>
+<td><strong>Open and Extensible</strong></td>
+<td>Wrap HeroUI components in <code>components/shared/</code> only when Colony-specific behavior (e.g., status color-coding) needs to be centralized</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="project-structure">Project Structure</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>frontend/
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── app/                              # Next.js App Router root
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│   ├── layout.tsx                    # Root HTML shell — wraps with &lt;Providers&gt;
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│   ├── providers.tsx                 # HeroUIProvider + NextThemesProvider
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│   ├── (auth)/                       # Public route group — no auth required
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│   │   ├── layout.tsx                # Centered card layout, no sidebar
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│   │   ├── login/
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│   │   │   └── page.tsx
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│   │   └── register/
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│   │       └── page.tsx
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│   └── (app)/                        # Protected route group — requires auth cookie
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│       ├── layout.tsx                # App shell — Sidebar + Navbar
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>│       ├── page.tsx                  # Redirect → /cycles
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>│       ├── payment-methods/
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>│       │   ├── page.tsx
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>│       │   └── [id]/page.tsx
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>│       ├── expense-templates/
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>│       │   ├── page.tsx
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>│       │   └── [id]/page.tsx
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>│       ├── cycles/
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>│       │   ├── page.tsx
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>│       │   └── [id]/
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>│       │       ├── page.tsx
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>│       │       └── summary/page.tsx
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>│       └── settings/
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>│           └── page.tsx
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>│
+<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>├── components/                       # Feature-organized UI components
+<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>│   ├── auth/
+<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>│   │   ├── login.tsx                 # Login form (Formik + Yup)
+<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>│   │   ├── register.tsx              # Registration form
+<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>│   │   └── auth-layout.tsx           # Split-panel auth shell
+<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>│   ├── payment-methods/
+<a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a>│   │   ├── index.tsx                 # List page root
+<a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a>│   │   ├── table.tsx                 # PaymentMethodsTable
+<a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a>│   │   ├── render-cell.tsx           # Per-column cell renderer
+<a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a>│   │   ├── add-payment-method.tsx    # Create modal
+<a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a>│   │   ├── edit-payment-method.tsx   # Edit modal
+<a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a>│   │   └── actions.ts                # fetch/create/update/delete helpers
+<a id="__codelineno-0-40" name="__codelineno-0-40" href="#__codelineno-0-40"></a>│   ├── expense-templates/
+<a id="__codelineno-0-41" name="__codelineno-0-41" href="#__codelineno-0-41"></a>│   │   ├── index.tsx
+<a id="__codelineno-0-42" name="__codelineno-0-42" href="#__codelineno-0-42"></a>│   │   ├── table.tsx
+<a id="__codelineno-0-43" name="__codelineno-0-43" href="#__codelineno-0-43"></a>│   │   ├── render-cell.tsx
+<a id="__codelineno-0-44" name="__codelineno-0-44" href="#__codelineno-0-44"></a>│   │   ├── add-expense-template.tsx
+<a id="__codelineno-0-45" name="__codelineno-0-45" href="#__codelineno-0-45"></a>│   │   ├── edit-expense-template.tsx
+<a id="__codelineno-0-46" name="__codelineno-0-46" href="#__codelineno-0-46"></a>│   │   ├── recurrence-config-builder.tsx  # Dynamic recurrence form sub-component
+<a id="__codelineno-0-47" name="__codelineno-0-47" href="#__codelineno-0-47"></a>│   │   └── actions.ts
+<a id="__codelineno-0-48" name="__codelineno-0-48" href="#__codelineno-0-48"></a>│   ├── cycles/
+<a id="__codelineno-0-49" name="__codelineno-0-49" href="#__codelineno-0-49"></a>│   │   ├── index.tsx                 # Cycle card grid
+<a id="__codelineno-0-50" name="__codelineno-0-50" href="#__codelineno-0-50"></a>│   │   ├── cycle-card.tsx            # Per-cycle card component
+<a id="__codelineno-0-51" name="__codelineno-0-51" href="#__codelineno-0-51"></a>│   │   ├── create-cycle.tsx          # Create cycle modal
+<a id="__codelineno-0-52" name="__codelineno-0-52" href="#__codelineno-0-52"></a>│   │   ├── cycle-detail/
+<a id="__codelineno-0-53" name="__codelineno-0-53" href="#__codelineno-0-53"></a>│   │   │   ├── index.tsx             # Cycle detail root
+<a id="__codelineno-0-54" name="__codelineno-0-54" href="#__codelineno-0-54"></a>│   │   │   ├── cycle-header.tsx      # Name, dates, status, income
+<a id="__codelineno-0-55" name="__codelineno-0-55" href="#__codelineno-0-55"></a>│   │   │   ├── expenses-table.tsx    # Filterable expense list
+<a id="__codelineno-0-56" name="__codelineno-0-56" href="#__codelineno-0-56"></a>│   │   │   ├── expense-filters.tsx   # Filter bar (status, category, currency, method)
+<a id="__codelineno-0-57" name="__codelineno-0-57" href="#__codelineno-0-57"></a>│   │   │   ├── add-expense.tsx       # Add manual expense modal
+<a id="__codelineno-0-58" name="__codelineno-0-58" href="#__codelineno-0-58"></a>│   │   │   ├── edit-expense.tsx      # Edit expense modal
+<a id="__codelineno-0-59" name="__codelineno-0-59" href="#__codelineno-0-59"></a>│   │   │   └── render-cell.tsx
+<a id="__codelineno-0-60" name="__codelineno-0-60" href="#__codelineno-0-60"></a>│   │   ├── cycle-summary/
+<a id="__codelineno-0-61" name="__codelineno-0-61" href="#__codelineno-0-61"></a>│   │   │   ├── index.tsx             # Summary page root
+<a id="__codelineno-0-62" name="__codelineno-0-62" href="#__codelineno-0-62"></a>│   │   │   ├── financial-summary-cards.tsx
+<a id="__codelineno-0-63" name="__codelineno-0-63" href="#__codelineno-0-63"></a>│   │   │   ├── payment-method-breakdown.tsx
+<a id="__codelineno-0-64" name="__codelineno-0-64" href="#__codelineno-0-64"></a>│   │   │   ├── currency-stats.tsx
+<a id="__codelineno-0-65" name="__codelineno-0-65" href="#__codelineno-0-65"></a>│   │   │   └── status-breakdown.tsx
+<a id="__codelineno-0-66" name="__codelineno-0-66" href="#__codelineno-0-66"></a>│   │   └── actions.ts
+<a id="__codelineno-0-67" name="__codelineno-0-67" href="#__codelineno-0-67"></a>│   ├── layout/
+<a id="__codelineno-0-68" name="__codelineno-0-68" href="#__codelineno-0-68"></a>│   │   ├── layout.tsx                # App shell composition
+<a id="__codelineno-0-69" name="__codelineno-0-69" href="#__codelineno-0-69"></a>│   │   └── layout-context.ts         # SidebarContext
+<a id="__codelineno-0-70" name="__codelineno-0-70" href="#__codelineno-0-70"></a>│   ├── sidebar/
+<a id="__codelineno-0-71" name="__codelineno-0-71" href="#__codelineno-0-71"></a>│   │   ├── sidebar.tsx
+<a id="__codelineno-0-72" name="__codelineno-0-72" href="#__codelineno-0-72"></a>│   │   └── sidebar-item.tsx
+<a id="__codelineno-0-73" name="__codelineno-0-73" href="#__codelineno-0-73"></a>│   ├── navbar/
+<a id="__codelineno-0-74" name="__codelineno-0-74" href="#__codelineno-0-74"></a>│   │   ├── navbar.tsx
+<a id="__codelineno-0-75" name="__codelineno-0-75" href="#__codelineno-0-75"></a>│   │   └── user-dropdown.tsx         # Avatar, profile link, logout
+<a id="__codelineno-0-76" name="__codelineno-0-76" href="#__codelineno-0-76"></a>│   ├── settings/
+<a id="__codelineno-0-77" name="__codelineno-0-77" href="#__codelineno-0-77"></a>│   │   └── index.tsx                 # Profile + password tabs
+<a id="__codelineno-0-78" name="__codelineno-0-78" href="#__codelineno-0-78"></a>│   └── shared/
+<a id="__codelineno-0-79" name="__codelineno-0-79" href="#__codelineno-0-79"></a>│       ├── status-chip.tsx           # CycleStatus / ExpenseStatus colored chip
+<a id="__codelineno-0-80" name="__codelineno-0-80" href="#__codelineno-0-80"></a>│       ├── currency-badge.tsx        # USD / MXN badge
+<a id="__codelineno-0-81" name="__codelineno-0-81" href="#__codelineno-0-81"></a>│       ├── category-badge.tsx        # fixed / variable badge
+<a id="__codelineno-0-82" name="__codelineno-0-82" href="#__codelineno-0-82"></a>│       ├── amount-display.tsx        # Locale-formatted decimal
+<a id="__codelineno-0-83" name="__codelineno-0-83" href="#__codelineno-0-83"></a>│       ├── confirm-modal.tsx         # Generic destructive-action confirmation
+<a id="__codelineno-0-84" name="__codelineno-0-84" href="#__codelineno-0-84"></a>│       ├── empty-state.tsx           # Empty list placeholder
+<a id="__codelineno-0-85" name="__codelineno-0-85" href="#__codelineno-0-85"></a>│       └── loading-skeleton.tsx      # Table/card loading state
+<a id="__codelineno-0-86" name="__codelineno-0-86" href="#__codelineno-0-86"></a>│
+<a id="__codelineno-0-87" name="__codelineno-0-87" href="#__codelineno-0-87"></a>├── actions/
+<a id="__codelineno-0-88" name="__codelineno-0-88" href="#__codelineno-0-88"></a>│   └── auth.action.ts                # createAuthCookie / deleteAuthCookie / getAuthToken
+<a id="__codelineno-0-89" name="__codelineno-0-89" href="#__codelineno-0-89"></a>│
+<a id="__codelineno-0-90" name="__codelineno-0-90" href="#__codelineno-0-90"></a>├── lib/                              # API client layer
+<a id="__codelineno-0-91" name="__codelineno-0-91" href="#__codelineno-0-91"></a>│   ├── api-client.ts                 # Base fetch wrapper — auth header injection + error normalization
+<a id="__codelineno-0-92" name="__codelineno-0-92" href="#__codelineno-0-92"></a>│   ├── auth.api.ts
+<a id="__codelineno-0-93" name="__codelineno-0-93" href="#__codelineno-0-93"></a>│   ├── payment-methods.api.ts
+<a id="__codelineno-0-94" name="__codelineno-0-94" href="#__codelineno-0-94"></a>│   ├── expense-templates.api.ts
+<a id="__codelineno-0-95" name="__codelineno-0-95" href="#__codelineno-0-95"></a>│   └── cycles.api.ts
+<a id="__codelineno-0-96" name="__codelineno-0-96" href="#__codelineno-0-96"></a>│
+<a id="__codelineno-0-97" name="__codelineno-0-97" href="#__codelineno-0-97"></a>├── helpers/
+<a id="__codelineno-0-98" name="__codelineno-0-98" href="#__codelineno-0-98"></a>│   ├── schemas.ts                    # All Yup validation schemas
+<a id="__codelineno-0-99" name="__codelineno-0-99" href="#__codelineno-0-99"></a>│   ├── types.ts                      # All TypeScript types and interfaces
+<a id="__codelineno-0-100" name="__codelineno-0-100" href="#__codelineno-0-100"></a>│   └── formatters.ts                 # Currency, date, and balance formatters
+<a id="__codelineno-0-101" name="__codelineno-0-101" href="#__codelineno-0-101"></a>│
+<a id="__codelineno-0-102" name="__codelineno-0-102" href="#__codelineno-0-102"></a>├── config/
+<a id="__codelineno-0-103" name="__codelineno-0-103" href="#__codelineno-0-103"></a>│   └── fonts.ts                      # Next.js Google Font declarations
+<a id="__codelineno-0-104" name="__codelineno-0-104" href="#__codelineno-0-104"></a>│
+<a id="__codelineno-0-105" name="__codelineno-0-105" href="#__codelineno-0-105"></a>├── styles/
+<a id="__codelineno-0-106" name="__codelineno-0-106" href="#__codelineno-0-106"></a>│   └── globals.css                   # Tailwind + HeroUI CSS imports
+<a id="__codelineno-0-107" name="__codelineno-0-107" href="#__codelineno-0-107"></a>│
+<a id="__codelineno-0-108" name="__codelineno-0-108" href="#__codelineno-0-108"></a>├── public/
+<a id="__codelineno-0-109" name="__codelineno-0-109" href="#__codelineno-0-109"></a>├── .env.local                        # Local dev environment variables
+<a id="__codelineno-0-110" name="__codelineno-0-110" href="#__codelineno-0-110"></a>├── .env.example                      # Template for required env vars
+<a id="__codelineno-0-111" name="__codelineno-0-111" href="#__codelineno-0-111"></a>├── middleware.ts                     # Auth guard (cookie check + route protection)
+<a id="__codelineno-0-112" name="__codelineno-0-112" href="#__codelineno-0-112"></a>├── next.config.ts                    # Next.js config (standalone output)
+<a id="__codelineno-0-113" name="__codelineno-0-113" href="#__codelineno-0-113"></a>├── tailwind.config.ts                # Tailwind config
+<a id="__codelineno-0-114" name="__codelineno-0-114" href="#__codelineno-0-114"></a>├── postcss.config.js
+<a id="__codelineno-0-115" name="__codelineno-0-115" href="#__codelineno-0-115"></a>├── tsconfig.json                     # TypeScript config with @/* path alias
+<a id="__codelineno-0-116" name="__codelineno-0-116" href="#__codelineno-0-116"></a>└── Dockerfile                        # Multi-stage Docker build
+</code></pre></div>
+<hr />
+<h2 id="routing">Routing</h2>
+<p>Route groups use Next.js App Router conventions. The <code>(auth)</code> group handles unauthenticated pages; the <code>(app)</code> group is protected by <code>middleware.ts</code>.</p>
+<h3 id="layout-nesting">Layout Nesting</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>app/layout.tsx                        ← HTML root + &lt;Providers /&gt;
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  ├── app/(auth)/layout.tsx           ← Centered auth layout
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>  │     ├── /login
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>  │     └── /register
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>  └── app/(app)/layout.tsx            ← Sidebar + Navbar shell
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>        ├── /                         → redirect to /cycles
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>        ├── /payment-methods
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>        ├── /payment-methods/[id]
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>        ├── /expense-templates
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>        ├── /expense-templates/[id]
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>        ├── /cycles
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>        ├── /cycles/[id]
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>        ├── /cycles/[id]/summary
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>        └── /settings
+</code></pre></div>
+<h3 id="route-table">Route Table</h3>
+<table>
+<thead>
+<tr>
+<th>URL</th>
+<th>Use Cases</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/login</code></td>
+<td>UC-02</td>
+<td>Redirects to <code>/cycles</code> if already authenticated</td>
+</tr>
+<tr>
+<td><code>/register</code></td>
+<td>UC-01</td>
+<td>Redirects to <code>/cycles</code> if already authenticated</td>
+</tr>
+<tr>
+<td><code>/</code></td>
+<td>—</td>
+<td>Redirects to <code>/cycles</code></td>
+</tr>
+<tr>
+<td><code>/payment-methods</code></td>
+<td>UC-04, UC-06, UC-07</td>
+<td>Modal-driven inline CRUD</td>
+</tr>
+<tr>
+<td><code>/payment-methods/[id]</code></td>
+<td>UC-05</td>
+<td>Edit detail page</td>
+</tr>
+<tr>
+<td><code>/expense-templates</code></td>
+<td>UC-08, UC-10, UC-11</td>
+<td>Modal-driven inline CRUD</td>
+</tr>
+<tr>
+<td><code>/expense-templates/[id]</code></td>
+<td>UC-09</td>
+<td>Edit detail page</td>
+</tr>
+<tr>
+<td><code>/cycles</code></td>
+<td>UC-12, UC-13</td>
+<td>Card grid + create modal</td>
+</tr>
+<tr>
+<td><code>/cycles/[id]</code></td>
+<td>UC-14, UC-16–19</td>
+<td>Expense list with filters</td>
+</tr>
+<tr>
+<td><code>/cycles/[id]/summary</code></td>
+<td>UC-15</td>
+<td>Financial summary view</td>
+</tr>
+<tr>
+<td><code>/settings</code></td>
+<td>—</td>
+<td>User profile + password change</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="authentication">Authentication</h2>
+<h3 id="jwt-storage">JWT Storage</h3>
+<p>The backend issues a JWT with a 30-minute TTL. The frontend stores it in an <code>httpOnly</code> cookie named <code>colony-token</code>. This prevents JavaScript access, protecting against XSS attacks. The cookie is set server-side via a Next.js Server Action immediately after a successful login.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Login flow:
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  1. User submits login form
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>  2. Client calls POST /api/v1/auth/login
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>  3. Backend returns { access_token, token_type, expires_in }
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>  4. createAuthCookie(token) Server Action sets:
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>       Set-Cookie: colony-token=&lt;jwt&gt;; HttpOnly; Secure; SameSite=Lax; Path=/
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>  5. Browser redirects to /cycles
+</code></pre></div>
+<h3 id="route-protection-middleware">Route Protection (Middleware)</h3>
+<p><code>middleware.ts</code> runs before every render. It enforces the auth boundary with no reliance on client-side React:</p>
+<ul>
+<li>Unauthenticated requests to any <code>(app)</code> route → redirect to <code>/login</code></li>
+<li>Authenticated requests to <code>/login</code> or <code>/register</code> → redirect to <code>/cycles</code></li>
+<li>JWT signature validation is delegated to the API — if the API returns 401, the <code>apiClient</code> handles redirect</li>
+</ul>
+<h3 id="token-expiry">Token Expiry</h3>
+<p>The <code>apiClient</code> base wrapper intercepts HTTP 401 responses:</p>
+<ol>
+<li>Calls <code>deleteAuthCookie()</code> Server Action</li>
+<li>Redirects to <code>/login</code></li>
+</ol>
+<p>There is no silent token refresh — the backend does not expose a refresh token endpoint.</p>
+<h3 id="server-actions">Server Actions</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">// actions/auth.action.ts</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="s2">&quot;use server&quot;</span><span class="p">;</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">cookies</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;next/headers&quot;</span><span class="p">;</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">createAuthCookie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">token</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">cookies</span><span class="p">()).</span><span class="nx">set</span><span class="p">(</span><span class="s2">&quot;colony-token&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">token</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">    </span><span class="nx">httpOnly</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span><span class="nx">secure</span><span class="o">:</span><span class="w"> </span><span class="kt">process.env.NODE_ENV</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s2">&quot;production&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">    </span><span class="nx">sameSite</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;lax&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">    </span><span class="nx">path</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;/&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">    </span><span class="nx">maxAge</span><span class="o">:</span><span class="w"> </span><span class="kt">30</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">60</span><span class="p">,</span><span class="w">  </span><span class="c1">// match 30-minute backend TTL</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">  </span><span class="p">});</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="p">};</span>
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">deleteAuthCookie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="w">  </span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">cookies</span><span class="p">()).</span><span class="ow">delete</span><span class="p">(</span><span class="s2">&quot;colony-token&quot;</span><span class="p">);</span>
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="p">};</span>
+<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>
+<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">getAuthToken</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">()</span><span class="o">:</span><span class="w"> </span><span class="nb">Promise</span><span class="o">&lt;</span><span class="kt">string</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kc">undefined</span><span class="o">&gt;</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">cookies</span><span class="p">()).</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;colony-token&quot;</span><span class="p">)</span><span class="o">?</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+<a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a><span class="p">};</span>
+</code></pre></div>
+<hr />
+<h2 id="api-client-layer">API Client Layer</h2>
+<h3 id="base-client">Base Client</h3>
+<p><code>lib/api-client.ts</code> is the single typed fetch wrapper used by all feature API modules.</p>
+<p><strong>Responsibilities:</strong></p>
+<ul>
+<li>Reads <code>colony-token</code> cookie and injects <code>Authorization: Bearer &lt;token&gt;</code> header</li>
+<li>Sets <code>Content-Type: application/json</code></li>
+<li>Calls <code>fetch(${NEXT_PUBLIC_API_URL}${path}, options)</code></li>
+<li>Returns <code>{ success: true; data: T }</code> on success</li>
+<li>Returns <code>{ success: false; error: { code: string; message: string } }</code> on API error</li>
+<li>On HTTP 401: deletes cookie and redirects to <code>/login</code></li>
+</ul>
+<p><strong>Return type:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kr">type</span><span class="w"> </span><span class="nx">ApiResponse</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">success</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">;</span><span class="w"> </span><span class="nx">data</span><span class="o">:</span><span class="w"> </span><span class="kt">T</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">success</span><span class="o">:</span><span class="w"> </span><span class="kt">false</span><span class="p">;</span><span class="w"> </span><span class="nx">error</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">code</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span><span class="w"> </span><span class="nx">message</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">};</span>
+</code></pre></div>
+<h3 id="feature-api-modules">Feature API Modules</h3>
+<p>Each module in <code>lib/</code> wraps <code>apiClient</code> with typed helpers for one domain:</p>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Helpers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lib/auth.api.ts</code></td>
+<td><code>login</code>, <code>register</code>, <code>getMe</code>, <code>updateMe</code>, <code>updatePassword</code></td>
+</tr>
+<tr>
+<td><code>lib/payment-methods.api.ts</code></td>
+<td><code>fetchPaymentMethods</code>, <code>createPaymentMethod</code>, <code>updatePaymentMethod</code>, <code>deletePaymentMethod</code></td>
+</tr>
+<tr>
+<td><code>lib/expense-templates.api.ts</code></td>
+<td><code>fetchExpenseTemplates</code>, <code>createExpenseTemplate</code>, <code>updateExpenseTemplate</code>, <code>deleteExpenseTemplate</code></td>
+</tr>
+<tr>
+<td><code>lib/cycles.api.ts</code></td>
+<td><code>fetchCycles</code>, <code>createCycle</code>, <code>updateCycle</code>, <code>deleteCycle</code>, <code>getCycleSummary</code>, <code>fetchCycleExpenses</code>, <code>createCycleExpense</code>, <code>updateCycleExpense</code>, <code>deleteCycleExpense</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="state-management">State Management</h2>
+<p>Colony uses <code>useState</code> as the primary state mechanism. React Context is used only for true cross-tree UI state (sidebar). There is no Redux, Zustand, or SWR.</p>
+<table>
+<thead>
+<tr>
+<th>Data</th>
+<th>Location</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>JWT token</td>
+<td><code>httpOnly</code> cookie</td>
+<td>Security — inaccessible to JavaScript</td>
+</tr>
+<tr>
+<td>Payment methods list</td>
+<td><code>useState</code> in payment methods page</td>
+<td>Local to that feature</td>
+</tr>
+<tr>
+<td>Templates list</td>
+<td><code>useState</code> in templates page</td>
+<td>Local to that feature</td>
+</tr>
+<tr>
+<td>Cycle list</td>
+<td><code>useState</code> in cycles page</td>
+<td>Local to that feature</td>
+</tr>
+<tr>
+<td>Cycle expenses</td>
+<td><code>useState</code> in cycle detail</td>
+<td>Local to cycle detail</td>
+</tr>
+<tr>
+<td>Cycle summary</td>
+<td><code>useState</code> in summary page</td>
+<td>Local to summary page</td>
+</tr>
+<tr>
+<td>Sidebar collapsed</td>
+<td><code>SidebarContext</code></td>
+<td>Cross-tree UI state</td>
+</tr>
+<tr>
+<td>Form state</td>
+<td>Formik internal</td>
+<td>Managed by Formik</td>
+</tr>
+<tr>
+<td>Modal open/close</td>
+<td><code>useState</code> in parent</td>
+<td>Simple boolean</td>
+</tr>
+<tr>
+<td>Active filters</td>
+<td><code>useState</code> in filter bar</td>
+<td>Local UI state</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="form-handling">Form Handling</h2>
+<p>All forms use <strong>Formik</strong> for state management and <strong>Yup</strong> for schema validation.</p>
+<h3 id="pattern">Pattern</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="o">&lt;</span><span class="nx">Formik</span><span class="w"> </span><span class="nx">initialValues</span><span class="o">=</span><span class="p">{</span><span class="nx">initialValues</span><span class="p">}</span><span class="w"> </span><span class="nx">validationSchema</span><span class="o">=</span><span class="p">{</span><span class="nx">SomeSchema</span><span class="p">}</span><span class="w"> </span><span class="nx">onSubmit</span><span class="o">=</span><span class="p">{</span><span class="nx">handleSubmit</span><span class="p">}</span><span class="o">&gt;</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="p">{({</span><span class="w"> </span><span class="nx">values</span><span class="p">,</span><span class="w"> </span><span class="nx">errors</span><span class="p">,</span><span class="w"> </span><span class="nx">touched</span><span class="p">,</span><span class="w"> </span><span class="nx">handleChange</span><span class="p">,</span><span class="w"> </span><span class="nx">handleSubmit</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="o">&lt;</span><span class="nx">Input</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">      </span><span class="nx">value</span><span class="o">=</span><span class="p">{</span><span class="nx">values</span><span class="p">.</span><span class="nx">fieldName</span><span class="p">}</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">      </span><span class="nx">isInvalid</span><span class="o">=</span><span class="p">{</span><span class="o">!!</span><span class="nx">errors</span><span class="p">.</span><span class="nx">fieldName</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!!</span><span class="nx">touched</span><span class="p">.</span><span class="nx">fieldName</span><span class="p">}</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">      </span><span class="nx">errorMessage</span><span class="o">=</span><span class="p">{</span><span class="nx">errors</span><span class="p">.</span><span class="nx">fieldName</span><span class="p">}</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">      </span><span class="nx">onChange</span><span class="o">=</span><span class="p">{</span><span class="nx">handleChange</span><span class="p">(</span><span class="s2">&quot;fieldName&quot;</span><span class="p">)}</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="o">/&gt;</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">  </span><span class="p">)}</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="o">&lt;</span><span class="err">/Formik&gt;</span>
+</code></pre></div>
+<h3 id="validation-schemas-helpersschemasts">Validation Schemas (<code>helpers/schemas.ts</code>)</h3>
+<p>All Yup schemas live in a single file:</p>
+<table>
+<thead>
+<tr>
+<th>Schema</th>
+<th>Used In</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>LoginSchema</code></td>
+<td>Login form</td>
+</tr>
+<tr>
+<td><code>RegisterSchema</code></td>
+<td>Registration form</td>
+</tr>
+<tr>
+<td><code>PaymentMethodSchema</code></td>
+<td>Create/edit payment method</td>
+</tr>
+<tr>
+<td><code>ExpenseTemplateSchema</code></td>
+<td>Create/edit expense template (includes recurrence_config sub-schema)</td>
+</tr>
+<tr>
+<td><code>CycleCreateSchema</code></td>
+<td>Create cycle (end_date auto-computed)</td>
+</tr>
+<tr>
+<td><code>CycleExpenseSchema</code></td>
+<td>Add/edit cycle expense</td>
+</tr>
+<tr>
+<td><code>UpdateProfileSchema</code></td>
+<td>Settings profile tab</td>
+</tr>
+<tr>
+<td><code>UpdatePasswordSchema</code></td>
+<td>Settings password tab</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>ExpenseTemplateSchema</code> uses Yup <code>when()</code> to validate <code>recurrence_config</code> conditionally based on <code>recurrence_type</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nx">recurrence_config</span><span class="o">:</span><span class="w"> </span><span class="kt">object</span><span class="p">().</span><span class="nx">when</span><span class="p">(</span><span class="s2">&quot;recurrence_type&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nx">is</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;weekly&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nx">then</span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="nx">s</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">s</span><span class="p">.</span><span class="nx">shape</span><span class="p">({</span><span class="w"> </span><span class="nx">day_of_week</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">().</span><span class="nx">min</span><span class="p">(</span><span class="mf">0</span><span class="p">).</span><span class="nx">max</span><span class="p">(</span><span class="mf">6</span><span class="p">).</span><span class="nx">required</span><span class="p">()</span><span class="w"> </span><span class="p">}),</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="p">}).</span><span class="nx">when</span><span class="p">(</span><span class="s2">&quot;recurrence_type&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="nx">is</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;bi_weekly&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">  </span><span class="nx">then</span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="nx">s</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">s</span><span class="p">.</span><span class="nx">shape</span><span class="p">({</span><span class="w"> </span><span class="nx">interval_days</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">().</span><span class="nx">positive</span><span class="p">().</span><span class="nx">integer</span><span class="p">().</span><span class="nx">required</span><span class="p">()</span><span class="w"> </span><span class="p">}),</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="p">}).</span><span class="nx">when</span><span class="p">(</span><span class="s2">&quot;recurrence_type&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">  </span><span class="nx">is</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;monthly&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">  </span><span class="nx">then</span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="nx">s</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">s</span><span class="p">.</span><span class="nx">shape</span><span class="p">({</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">    </span><span class="nx">day_of_month</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">().</span><span class="nx">min</span><span class="p">(</span><span class="mf">1</span><span class="p">).</span><span class="nx">max</span><span class="p">(</span><span class="mf">31</span><span class="p">).</span><span class="nx">required</span><span class="p">(),</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">    </span><span class="nx">handle_month_end</span><span class="o">:</span><span class="w"> </span><span class="kt">boolean</span><span class="p">().</span><span class="nx">optional</span><span class="p">(),</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">  </span><span class="p">}),</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="p">}).</span><span class="nx">when</span><span class="p">(</span><span class="s2">&quot;recurrence_type&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">  </span><span class="nx">is</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;custom&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">  </span><span class="nx">then</span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="nx">s</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">s</span><span class="p">.</span><span class="nx">shape</span><span class="p">({</span>
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="w">    </span><span class="nx">interval</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">().</span><span class="nx">positive</span><span class="p">().</span><span class="nx">integer</span><span class="p">().</span><span class="nx">required</span><span class="p">(),</span>
+<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="w">    </span><span class="nx">unit</span><span class="o">:</span><span class="w"> </span><span class="kt">mixed</span><span class="p">().</span><span class="nx">oneOf</span><span class="p">([</span><span class="s2">&quot;days&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;weeks&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;months&quot;</span><span class="p">]).</span><span class="nx">required</span><span class="p">(),</span>
+<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="w">  </span><span class="p">}),</span>
+<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="p">}),</span>
+</code></pre></div>
+<hr />
+<h2 id="component-architecture">Component Architecture</h2>
+<h3 id="shared-components-componentsshared">Shared Components (<code>components/shared/</code>)</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Props</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&lt;StatusChip status /&gt;</code></td>
+<td><code>CycleStatus \| ExpenseStatus</code></td>
+<td>draft=gray, active=blue, completed=green, pending=yellow, paid=green, overdue=red, cancelled=gray</td>
+</tr>
+<tr>
+<td><code>&lt;CurrencyBadge currency /&gt;</code></td>
+<td><code>"USD" \| "MXN"</code></td>
+<td>USD=blue (primary), MXN=orange (warning)</td>
+</tr>
+<tr>
+<td><code>&lt;CategoryBadge category /&gt;</code></td>
+<td><code>"fixed" \| "variable"</code></td>
+<td>fixed=purple (secondary), variable=teal (success)</td>
+</tr>
+<tr>
+<td><code>&lt;AmountDisplay amount currency /&gt;</code></td>
+<td><code>string, string</code></td>
+<td><code>Intl.NumberFormat</code> with locale currency symbol</td>
+</tr>
+<tr>
+<td><code>&lt;ConfirmModal /&gt;</code></td>
+<td><code>isOpen, onClose, onConfirm, title, message</code></td>
+<td>Two-button destructive-action confirmation</td>
+</tr>
+<tr>
+<td><code>&lt;EmptyState /&gt;</code></td>
+<td><code>message, icon</code></td>
+<td>Centered empty list placeholder</td>
+</tr>
+<tr>
+<td><code>&lt;LoadingSkeleton /&gt;</code></td>
+<td><code>rows</code></td>
+<td>Table row skeleton during loading</td>
+</tr>
+</tbody>
+</table>
+<h3 id="feature-folder-pattern">Feature Folder Pattern</h3>
+<p>Each feature mirrors the tienda-web convention:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>components/{feature}/
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>  index.tsx         ← Page root: breadcrumb, header, action buttons
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>  table.tsx         ← HeroUI &lt;Table&gt; with column definitions
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>  render-cell.tsx   ← Switch on columnKey → returns JSX per cell
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>  add-{entity}.tsx  ← Create modal with Formik form
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>  edit-{entity}.tsx ← Edit modal pre-populated from existing record
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>  actions.ts        ← fetch/create/update/delete helpers (wraps lib/ modules)
+</code></pre></div>
+<h3 id="recurrence-config-builder">Recurrence Config Builder</h3>
+<p><code>components/expense-templates/recurrence-config-builder.tsx</code> renders a different sub-form based on <code>recurrence_type</code>. It uses <code>useFormikContext()</code> to avoid prop-drilling Formik state, and resets <code>recurrence_config</code> to <code>{}</code> when <code>recurrence_type</code> changes.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>weekly    → Day of Week select (Sunday=0 … Saturday=6)
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>bi_weekly → Interval Days number input (default: 14)
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>monthly   → Day of Month (1–31) + Handle Month End toggle
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>custom    → Every N + Unit (days/weeks/months) + optional Day of Month
+</code></pre></div>
+<h3 id="expense-table-filters">Expense Table Filters</h3>
+<p><code>components/cycles/cycle-detail/expense-filters.tsx</code> renders a horizontal filter bar. Filter state lives in the parent <code>cycle-detail/index.tsx</code> and is passed as query parameters to <code>fetchCycleExpenses()</code> when changed:</p>
+<table>
+<thead>
+<tr>
+<th>Filter</th>
+<th>Options</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Status</td>
+<td>all, pending, paid, overdue, cancelled</td>
+</tr>
+<tr>
+<td>Category</td>
+<td>all, fixed, variable</td>
+</tr>
+<tr>
+<td>Currency</td>
+<td>all, USD, MXN</td>
+</tr>
+<tr>
+<td>Payment Method</td>
+<td methods="methods" payment="payment" user_s="user's">all,</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cycle-summary-layout">Cycle Summary Layout</h3>
+<p>The <code>/cycles/[id]/summary</code> page is composed from four sub-components:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Row 1: [Income] [Total Expenses] [Net Balance]  ← green if positive, red if negative
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>Row 2: [Fixed Expenses] [Variable Expenses]
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>Row 3: [USA Expenses USD] [Mexico Expenses MXN→USD]
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>Row 4: Payment Method Breakdown Table
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>        Method | Total | Paid | Pending | Count
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>Row 5: Status Chips
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>        Pending(N)  Paid(N)  Overdue(N)  Cancelled(N)
+</code></pre></div>
+<hr />
+<h2 id="styling">Styling</h2>
+<p>HeroUI v3 uses a <strong>CSS import</strong> approach — there is no Tailwind plugin.</p>
+<h3 id="installation">Installation</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>npm<span class="w"> </span>install<span class="w"> </span>@heroui/react<span class="w"> </span>@heroui/styles
+</code></pre></div>
+<h3 id="css-setup">CSS Setup</h3>
+<p>Import order is mandatory — <code>tailwindcss</code> must come first:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c">/* styles/globals.css */</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="p">@</span><span class="k">import</span><span class="w"> </span><span class="s2">&quot;tailwindcss&quot;</span><span class="p">;</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="p">@</span><span class="k">import</span><span class="w"> </span><span class="s2">&quot;@heroui/styles&quot;</span><span class="p">;</span>
+</code></pre></div>
+<p>See the <a href="https://heroui.com/docs/react/getting-started/quick-start">HeroUI Quick Start</a> for full setup details.</p>
+<h3 id="provider-setup">Provider Setup</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1">// app/providers.tsx</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="s2">&quot;use client&quot;</span><span class="p">;</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">HeroUIProvider</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;@heroui/react&quot;</span><span class="p">;</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">ThemeProvider</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="nx">NextThemesProvider</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;next-themes&quot;</span><span class="p">;</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="k">export</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">Providers</span><span class="p">({</span><span class="w"> </span><span class="nx">children</span><span class="w"> </span><span class="p">}</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">children</span><span class="o">:</span><span class="w"> </span><span class="kt">React.ReactNode</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">    </span><span class="o">&lt;</span><span class="nx">HeroUIProvider</span><span class="o">&gt;</span>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="w">      </span><span class="o">&lt;</span><span class="nx">NextThemesProvider</span><span class="w"> </span><span class="nx">defaultTheme</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="w"> </span><span class="nx">attribute</span><span class="o">=</span><span class="s2">&quot;class&quot;</span><span class="o">&gt;</span>
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="w">        </span><span class="p">{</span><span class="nx">children</span><span class="p">}</span>
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="w">      </span><span class="o">&lt;</span><span class="err">/NextThemesProvider&gt;</span>
+<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="w">    </span><span class="o">&lt;</span><span class="err">/HeroUIProvider&gt;</span>
+<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="w">  </span><span class="p">);</span>
+<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="dark-mode">Dark Mode</h3>
+<p><code>next-themes</code> sets the <code>class</code> attribute on <code>&lt;html&gt;</code>. HeroUI reads the <code>dark</code> class to switch its color tokens. The navbar includes a theme toggle button using <code>useTheme()</code> from <code>next-themes</code>.</p>
+<h3 id="color-conventions">Color Conventions</h3>
+<table>
+<thead>
+<tr>
+<th>Status / Value</th>
+<th>HeroUI <code>color</code></th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>draft</code></td>
+<td><code>default</code> (gray)</td>
+<td>Cycle status</td>
+</tr>
+<tr>
+<td><code>active</code></td>
+<td><code>primary</code> (blue)</td>
+<td>Cycle status</td>
+</tr>
+<tr>
+<td><code>completed</code></td>
+<td><code>success</code> (green)</td>
+<td>Cycle status</td>
+</tr>
+<tr>
+<td><code>pending</code></td>
+<td><code>warning</code> (yellow)</td>
+<td>Expense status</td>
+</tr>
+<tr>
+<td><code>paid</code></td>
+<td><code>success</code> (green)</td>
+<td>Expense status</td>
+</tr>
+<tr>
+<td><code>overdue</code></td>
+<td><code>danger</code> (red)</td>
+<td>Expense status</td>
+</tr>
+<tr>
+<td><code>cancelled</code></td>
+<td><code>default</code> (gray)</td>
+<td>Expense status</td>
+</tr>
+<tr>
+<td><code>USD</code></td>
+<td><code>primary</code> (blue)</td>
+<td>Currency badge</td>
+</tr>
+<tr>
+<td><code>MXN</code></td>
+<td><code>warning</code> (orange)</td>
+<td>Currency badge</td>
+</tr>
+<tr>
+<td><code>fixed</code></td>
+<td><code>secondary</code> (purple)</td>
+<td>Category badge</td>
+</tr>
+<tr>
+<td><code>variable</code></td>
+<td><code>success</code> (teal)</td>
+<td>Category badge</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="data-flow">Data Flow</h2>
+<h3 id="read-list-page">Read (List Page)</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>Component mounts
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>  → useEffect triggers actions.ts fetch helper
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>    → lib/*.api.ts calls apiClient(path, token)
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>      → fetch(NEXT_PUBLIC_API_URL + path) with Authorization header
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>        → API returns JSON list
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>  → apiClient returns { success: true, data: [...] }
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>  → setState(data) → React re-renders table
+</code></pre></div>
+<h3 id="mutation-create-update">Mutation (Create / Update)</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>User fills Formik form → Yup validates
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>  → handleSubmit calls create/updateXxx(values, token)
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>    → lib helper calls apiClient with POST/PUT
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>      → On success: close modal, refresh list (refetch or splice state)
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>      → On error: setError(error.message) displayed inline
+</code></pre></div>
+<h3 id="mark-expense-as-paid-uc-19">Mark Expense as Paid (UC-19)</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>User clicks paid toggle
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>  → updateCycleExpense(cycleId, expId, { paid: !paid }, token)
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>    → On success: optimistic local state update (no full re-fetch)
+</code></pre></div>
+<hr />
+<h2 id="environment-configuration">Environment Configuration</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># .env.local</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="nv">NEXT_PUBLIC_API_URL</span><span class="o">=</span>http://localhost:8000/api/v1
+</code></pre></div>
+<p><code>NEXT_PUBLIC_API_URL</code> is the only required variable. The <code>NEXT_PUBLIC_</code> prefix exposes it to both Server Components and Client Components.</p>
+<h3 id="docker">Docker</h3>
+<p><code>next.config.ts</code> must include <code>output: "standalone"</code> for Docker deployment:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">nextConfig</span><span class="o">:</span><span class="w"> </span><span class="kt">NextConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">  </span><span class="nx">output</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;standalone&quot;</span><span class="p">,</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="p">};</span>
+</code></pre></div>
+<p>Add a <code>frontend</code> service to <code>docker-compose.yml</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nt">frontend</span><span class="p">:</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span><span class="nt">build</span><span class="p">:</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">    </span><span class="nt">context</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./frontend</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">    </span><span class="nt">dockerfile</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Dockerfile</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">  </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">colony-frontend</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="w">  </span><span class="nt">environment</span><span class="p">:</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">    </span><span class="nt">NEXT_PUBLIC_API_URL</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http://backend:8000/api/v1</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="w">  </span><span class="nt">ports</span><span class="p">:</span>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;3000:3000&quot;</span>
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="w">  </span><span class="nt">depends_on</span><span class="p">:</span>
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">backend</span>
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="w">  </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">unless-stopped</span>
+</code></pre></div>
+<hr />
+<h2 id="implementation-plan">Implementation Plan</h2>
+<p>Each step is self-contained and can be executed independently in order.</p>
+<h3 id="step-1-scaffold-the-project">Step 1 — Scaffold the Project</h3>
+<p><strong>Goal</strong>: Create the Next.js 15 project with TypeScript, Tailwind v4, and App Router inside <code>colony/frontend/</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nb">cd</span><span class="w"> </span>/home/jcarranz/repos/colony
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>npx<span class="w"> </span>create-next-app@latest<span class="w"> </span>frontend<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">  </span>--typescript<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">  </span>--tailwind<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">  </span>--app<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="w">  </span>--src-dir<span class="o">=</span><span class="nb">false</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="w">  </span>--import-alias<span class="w"> </span><span class="s2">&quot;@/*&quot;</span>
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="nb">cd</span><span class="w"> </span>frontend
+</code></pre></div>
+<p>Update <code>next.config.ts</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">import</span><span class="w"> </span><span class="kr">type</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">NextConfig</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;next&quot;</span><span class="p">;</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="kd">const</span><span class="w"> </span><span class="nx">nextConfig</span><span class="o">:</span><span class="w"> </span><span class="kt">NextConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">output</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;standalone&quot;</span><span class="w"> </span><span class="p">};</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="nx">nextConfig</span><span class="p">;</span>
+</code></pre></div>
+<p>Create <code>.env.local</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+</code></pre></div>
+<p>Create <code>.env.example</code> with the same keys but no values.</p>
+<p><strong>Verify</strong>: <code>npm run dev</code> starts on port 3000 with no errors.</p>
+<hr />
+<h3 id="step-2-install-heroui-and-configure-styles">Step 2 — Install HeroUI and Configure Styles</h3>
+<p><strong>Goal</strong>: Install HeroUI v3, configure via CSS imports, set up Providers, and establish dark mode.</p>
+<blockquote>
+<p>HeroUI v3 uses a CSS-import approach — there is no Tailwind plugin or <code>tailwind.config.ts</code> changes needed.</p>
+</blockquote>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>npm<span class="w"> </span>install<span class="w"> </span>@heroui/react<span class="w"> </span>@heroui/styles<span class="w"> </span>next-themes<span class="w"> </span>clsx
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>npm<span class="w"> </span>install<span class="w"> </span>react-icons<span class="w"> </span>date-fns<span class="w"> </span>formik<span class="w"> </span>yup
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>npm<span class="w"> </span>install<span class="w"> </span>-D<span class="w"> </span>@types/node
+</code></pre></div>
+<p>Update <code>styles/globals.css</code> (import order is mandatory):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="p">@</span><span class="k">import</span><span class="w"> </span><span class="s2">&quot;tailwindcss&quot;</span><span class="p">;</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="p">@</span><span class="k">import</span><span class="w"> </span><span class="s2">&quot;@heroui/styles&quot;</span><span class="p">;</span>
+</code></pre></div>
+<p>Create <code>app/providers.tsx</code> (see <a href="#provider-setup">Provider Setup</a> above).</p>
+<p>Update <code>app/layout.tsx</code> to wrap with <code>&lt;Providers&gt;</code> and apply the Inter font.</p>
+<p>Create <code>config/fonts.ts</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Inter</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;next/font/google&quot;</span><span class="p">;</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">fontSans</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Inter</span><span class="p">({</span><span class="w"> </span><span class="nx">subsets</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;latin&quot;</span><span class="p">],</span><span class="w"> </span><span class="nx">variable</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;--font-sans&quot;</span><span class="w"> </span><span class="p">});</span>
+</code></pre></div>
+<p><strong>Verify</strong>: A HeroUI <code>&lt;Button color="primary"&gt;Test&lt;/Button&gt;</code> renders with correct HeroUI styling.</p>
+<hr />
+<h3 id="step-3-implement-the-api-client-layer">Step 3 — Implement the API Client Layer</h3>
+<p><strong>Goal</strong>: Build the typed fetch wrapper and all feature API modules.</p>
+<p>Create <code>lib/api-client.ts</code>:</p>
+<ul>
+<li>Generic <code>apiClient&lt;T&gt;(path, options?)</code> returning <code>ApiResponse&lt;T&gt;</code></li>
+<li>Injects <code>Authorization: Bearer &lt;token&gt;</code> and <code>Content-Type: application/json</code></li>
+<li>Reads token from <code>colony-token</code> cookie (<code>document.cookie</code> on client; passed explicitly from Server Components)</li>
+<li>Returns <code>{ success: true; data: T }</code> or <code>{ success: false; error: { code, message } }</code></li>
+<li>On 401: deletes cookie and redirects to <code>/login</code></li>
+</ul>
+<p>Create <code>helpers/types.ts</code> — TypeScript interfaces mirroring all backend schemas:</p>
+<ul>
+<li><code>Token</code>, <code>UserResponse</code>, <code>UpdateUserRequest</code>, <code>UpdatePasswordRequest</code></li>
+<li><code>PaymentMethod</code>, <code>CreatePaymentMethodRequest</code>, <code>UpdatePaymentMethodRequest</code></li>
+<li><code>ExpenseTemplate</code>, <code>CreateExpenseTemplateRequest</code> with <code>RecurrenceConfig</code> discriminated union</li>
+<li><code>Cycle</code>, <code>CreateCycleRequest</code>, <code>CycleSummary</code></li>
+<li><code>CycleExpense</code>, <code>CreateCycleExpenseRequest</code>, <code>CycleExpensesResponse</code></li>
+<li>Enums: <code>CurrencyCode</code>, <code>PaymentMethodType</code>, <code>ExpenseCategory</code>, <code>RecurrenceType</code>, <code>CycleStatus</code>, <code>ExpenseStatus</code></li>
+</ul>
+<p>Create <code>helpers/formatters.ts</code>:</p>
+<ul>
+<li><code>formatAmount(amount, currency)</code> — <code>Intl.NumberFormat</code> with locale currency symbol</li>
+<li><code>formatDate(dateStr)</code> — <code>date-fns format(parseISO(dateStr), "MMM d, yyyy")</code></li>
+<li><code>formatDateShort(dateStr)</code> — <code>date-fns format(parseISO(dateStr), "MMM d")</code></li>
+<li><code>computeCycleEndDate(startDate)</code> — <code>date-fns addDays(parseISO(startDate), 41)</code> (6 weeks = 42 days, end = start + 41)</li>
+</ul>
+<p>Create <code>lib/auth.api.ts</code>, <code>lib/payment-methods.api.ts</code>, <code>lib/expense-templates.api.ts</code>, <code>lib/cycles.api.ts</code> (see <a href="#feature-api-modules">Feature API Modules</a> above).</p>
+<p><strong>Verify</strong>: <code>npx tsc --noEmit</code> — zero type errors.</p>
+<hr />
+<h3 id="step-4-auth-server-actions-and-middleware">Step 4 — Auth Server Actions and Middleware</h3>
+<p><strong>Goal</strong>: Set up the <code>httpOnly</code> JWT cookie and route protection.</p>
+<p>Create <code>actions/auth.action.ts</code> (see <a href="#server-actions">Server Actions</a> above).</p>
+<p>Create <code>middleware.ts</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">NextResponse</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;next/server&quot;</span><span class="p">;</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="k">import</span><span class="w"> </span><span class="kr">type</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">NextRequest</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;next/server&quot;</span><span class="p">;</span>
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="kd">const</span><span class="w"> </span><span class="nx">AUTH_PAGES</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;/login&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;/register&quot;</span><span class="p">];</span>
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="kd">const</span><span class="w"> </span><span class="nx">PROTECTED</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;/payment-methods&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;/expense-templates&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;/cycles&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;/settings&quot;</span><span class="p">];</span>
+<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>
+<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="k">export</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">middleware</span><span class="p">(</span><span class="nx">request</span><span class="o">:</span><span class="w"> </span><span class="kt">NextRequest</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">request</span><span class="p">.</span><span class="nx">cookies</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;colony-token&quot;</span><span class="p">);</span>
+<a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">pathname</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">request</span><span class="p">.</span><span class="nx">nextUrl</span><span class="p">;</span>
+<a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a>
+<a id="__codelineno-25-11" name="__codelineno-25-11" href="#__codelineno-25-11"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">isAuthPage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">AUTH_PAGES</span><span class="p">.</span><span class="nx">some</span><span class="p">((</span><span class="nx">p</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">pathname</span><span class="p">.</span><span class="nx">startsWith</span><span class="p">(</span><span class="nx">p</span><span class="p">));</span>
+<a id="__codelineno-25-12" name="__codelineno-25-12" href="#__codelineno-25-12"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">isProtected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">PROTECTED</span><span class="p">.</span><span class="nx">some</span><span class="p">((</span><span class="nx">p</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">pathname</span><span class="p">.</span><span class="nx">startsWith</span><span class="p">(</span><span class="nx">p</span><span class="p">))</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nx">pathname</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s2">&quot;/&quot;</span><span class="p">;</span>
+<a id="__codelineno-25-13" name="__codelineno-25-13" href="#__codelineno-25-13"></a>
+<a id="__codelineno-25-14" name="__codelineno-25-14" href="#__codelineno-25-14"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">isAuthPage</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">token</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nx">NextResponse</span><span class="p">.</span><span class="nx">redirect</span><span class="p">(</span><span class="ow">new</span><span class="w"> </span><span class="nx">URL</span><span class="p">(</span><span class="s2">&quot;/cycles&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">request</span><span class="p">.</span><span class="nx">url</span><span class="p">));</span>
+<a id="__codelineno-25-15" name="__codelineno-25-15" href="#__codelineno-25-15"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">isProtected</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="nx">token</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nx">NextResponse</span><span class="p">.</span><span class="nx">redirect</span><span class="p">(</span><span class="ow">new</span><span class="w"> </span><span class="nx">URL</span><span class="p">(</span><span class="s2">&quot;/login&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">request</span><span class="p">.</span><span class="nx">url</span><span class="p">));</span>
+<a id="__codelineno-25-16" name="__codelineno-25-16" href="#__codelineno-25-16"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">NextResponse</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
+<a id="__codelineno-25-17" name="__codelineno-25-17" href="#__codelineno-25-17"></a><span class="p">}</span>
+<a id="__codelineno-25-18" name="__codelineno-25-18" href="#__codelineno-25-18"></a>
+<a id="__codelineno-25-19" name="__codelineno-25-19" href="#__codelineno-25-19"></a><span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-25-20" name="__codelineno-25-20" href="#__codelineno-25-20"></a><span class="w">  </span><span class="nx">matcher</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;/&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;/login&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;/register&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;/payment-methods/:path*&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;/expense-templates/:path*&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;/cycles/:path*&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;/settings/:path*&quot;</span><span class="p">],</span>
+<a id="__codelineno-25-21" name="__codelineno-25-21" href="#__codelineno-25-21"></a><span class="p">};</span>
+</code></pre></div>
+<p><strong>Verify</strong>: Visiting <code>/cycles</code> without a cookie redirects to <code>/login</code>.</p>
+<hr />
+<h3 id="step-5-auth-pages-login-register">Step 5 — Auth Pages (Login &amp; Register)</h3>
+<p><strong>Goal</strong>: Implement login and register pages to validate the full API → cookie → redirect flow.</p>
+<p>Create:</p>
+<ul>
+<li><code>app/(auth)/layout.tsx</code> — centered card layout, no sidebar</li>
+<li><code>app/(auth)/login/page.tsx</code> → renders <code>&lt;Login /&gt;</code></li>
+<li><code>app/(auth)/register/page.tsx</code> → renders <code>&lt;Register /&gt;</code></li>
+</ul>
+<p><code>components/auth/login.tsx</code>:</p>
+<ul>
+<li>Formik form with <code>LoginSchema</code> (email + password)</li>
+<li>On success: <code>createAuthCookie(token)</code> → <code>router.replace("/cycles")</code></li>
+<li>On error: inline error message below form</li>
+<li>HeroUI: <code>Card</code>, <code>CardBody</code>, <code>Input</code>, <code>Button</code></li>
+<li>Link to <code>/register</code></li>
+</ul>
+<p><code>components/auth/register.tsx</code>:</p>
+<ul>
+<li>Formik form with <code>RegisterSchema</code> (email, password, first_name, last_name)</li>
+<li>On success: auto-login → <code>createAuthCookie()</code> → redirect to <code>/cycles</code></li>
+<li>Link to <code>/login</code></li>
+</ul>
+<p>Create <code>helpers/schemas.ts</code> with <code>LoginSchema</code> and <code>RegisterSchema</code> (extended in later steps).</p>
+<p><strong>Verify</strong>: Login with seeded test user, confirm <code>colony-token</code> cookie is set in browser DevTools, confirm redirect to <code>/cycles</code>.</p>
+<hr />
+<h3 id="step-6-app-shell-layout-sidebar-navbar">Step 6 — App Shell (Layout, Sidebar, Navbar)</h3>
+<p><strong>Goal</strong>: Create the full dashboard shell that wraps all <code>(app)</code> routes.</p>
+<p>Create <code>components/layout/layout-context.ts</code> — <code>SidebarContext</code> with <code>collapsed</code> and <code>setCollapsed</code>.</p>
+<p>Create <code>components/layout/layout.tsx</code>:</p>
+<ul>
+<li><code>"use client"</code> component</li>
+<li>Provides <code>SidebarContext</code></li>
+<li>Renders <code>&lt;Sidebar /&gt;</code> (left) and <code>&lt;Navbar /&gt;</code> (top)</li>
+<li>Main content area fills remaining space</li>
+</ul>
+<p>Create <code>components/sidebar/sidebar.tsx</code>:</p>
+<ul>
+<li>Nav items: Cycles (<code>/cycles</code>), Payment Methods (<code>/payment-methods</code>), Expense Templates (<code>/expense-templates</code>), Settings (<code>/settings</code>)</li>
+<li>Active route highlighted via <code>usePathname()</code></li>
+<li>Collapses on mobile</li>
+</ul>
+<p>Create <code>components/navbar/navbar.tsx</code>:</p>
+<ul>
+<li>App title left, <code>&lt;UserDropdown /&gt;</code> right</li>
+<li>Logout: <code>deleteAuthCookie()</code> + <code>router.push("/login")</code></li>
+<li>Dark mode toggle using <code>useTheme()</code></li>
+</ul>
+<p>Create <code>app/(app)/layout.tsx</code> wrapping with <code>&lt;Layout&gt;</code>.</p>
+<p>Create <code>app/(app)/page.tsx</code> redirecting to <code>/cycles</code>.</p>
+<p>Create all <code>components/shared/</code> components (see <a href="#shared-components">Shared Components</a> above).</p>
+<p><strong>Verify</strong>: After login, <code>/cycles</code> (empty page) shows the full sidebar + navbar shell without layout errors.</p>
+<hr />
+<h3 id="step-7-payment-methods-feature">Step 7 — Payment Methods Feature</h3>
+<p><strong>Goal</strong>: Implement the simplest full CRUD feature — establishes and validates the table + modal + actions pattern.</p>
+<p>Create (following the <a href="#feature-folder-pattern">Feature Folder Pattern</a>):</p>
+<ul>
+<li><code>components/payment-methods/actions.ts</code> — fetch, create, update, deactivate</li>
+<li><code>components/payment-methods/table.tsx</code> — columns: Name, Type, Currency, Status, Actions</li>
+<li><code>components/payment-methods/render-cell.tsx</code> — renders each column type</li>
+<li><code>components/payment-methods/add-payment-method.tsx</code> — create modal with <code>PaymentMethodSchema</code></li>
+<li><code>components/payment-methods/edit-payment-method.tsx</code> — edit modal pre-populated from record</li>
+<li><code>components/payment-methods/index.tsx</code> — list root with <code>useEffect</code> fetch, empty/loading states</li>
+<li><code>app/(app)/payment-methods/page.tsx</code> → renders <code>&lt;PaymentMethods /&gt;</code></li>
+<li><code>app/(app)/payment-methods/[id]/page.tsx</code> → renders <code>&lt;EditPaymentMethod /&gt;</code></li>
+</ul>
+<p>Add <code>PaymentMethodSchema</code> to <code>helpers/schemas.ts</code>.</p>
+<p><strong>Verify</strong>: Create a payment method → appears in list. Edit it → changes persist. Deactivate it → shows as inactive. Backend returns 204 on deactivate.</p>
+<hr />
+<h3 id="step-8-expense-templates-feature">Step 8 — Expense Templates Feature</h3>
+<p><strong>Goal</strong>: Implement the most complex form — validates the dynamic recurrence config builder pattern.</p>
+<p>Create (following the <a href="#feature-folder-pattern">Feature Folder Pattern</a>):</p>
+<ul>
+<li><code>components/expense-templates/recurrence-config-builder.tsx</code> — dynamic sub-form using <code>useFormikContext()</code></li>
+<li><code>components/expense-templates/add-expense-template.tsx</code> — multi-field create modal</li>
+<li><code>components/expense-templates/edit-expense-template.tsx</code> — edit modal pre-populated from record</li>
+<li>All other standard feature files (table, render-cell, actions, index)</li>
+<li><code>app/(app)/expense-templates/page.tsx</code> and <code>[id]/page.tsx</code></li>
+</ul>
+<p>Add <code>ExpenseTemplateSchema</code> (with conditional <code>recurrence_config</code>) to <code>helpers/schemas.ts</code>.</p>
+<p><strong>Verify</strong>: Create a monthly "Rent" template (day_of_month=1) — verify recurrence config saved. Create a weekly "Groceries" template. Edit a template — verify recurrence builder pre-populates correctly.</p>
+<hr />
+<h3 id="step-9-cycles-feature">Step 9 — Cycles Feature</h3>
+<p><strong>Goal</strong>: Implement the multi-page cycles feature — cycle list, detail with filterable expenses, and expense CRUD.</p>
+<p><strong>9a — Cycle List</strong> (<code>/cycles</code>):</p>
+<ul>
+<li><code>components/cycles/cycle-card.tsx</code> — HeroUI <code>&lt;Card&gt;</code> with name, dates, status chip, income, expense count/balance</li>
+<li><code>components/cycles/create-cycle.tsx</code> — Formik modal with <code>CycleCreateSchema</code>; <code>end_date</code> auto-computed via <code>computeCycleEndDate()</code> and displayed read-only</li>
+<li><code>components/cycles/index.tsx</code> — responsive card grid, pagination (HeroUI <code>&lt;Pagination&gt;</code>), empty/loading states</li>
+</ul>
+<p><strong>9b — Cycle Detail</strong> (<code>/cycles/[id]</code>):</p>
+<ul>
+<li><code>cycle-header.tsx</code> — name, dates, status chip, income, link to summary; lock notice if completed</li>
+<li><code>expense-filters.tsx</code> — filter bar (status, category, currency, payment method); re-fetches on change</li>
+<li><code>expenses-table.tsx</code> — all columns including paid toggle (<code>&lt;Switch&gt;</code>) and actions; actions hidden if <code>status === "completed"</code></li>
+<li><code>add-expense.tsx</code> and <code>edit-expense.tsx</code> — Formik modals with <code>CycleExpenseSchema</code></li>
+<li><code>cycle-detail/index.tsx</code> — fetches cycle + expenses; passes <code>isReadOnly</code> to table</li>
+</ul>
+<p>Add <code>CycleCreateSchema</code> and <code>CycleExpenseSchema</code> to <code>helpers/schemas.ts</code>.</p>
+<p><strong>Verify</strong>: Create cycle with <code>generate_from_templates: true</code> → template expenses appear. Add manual expense. Mark one as paid. Filter by status. Edit an expense. Delete an expense. Confirm completed cycle is read-only.</p>
+<hr />
+<h3 id="step-10-cycle-summary-page">Step 10 — Cycle Summary Page</h3>
+<p><strong>Goal</strong>: Implement the read-only financial analytics view.</p>
+<p>Create:</p>
+<ul>
+<li><code>components/cycles/cycle-summary/financial-summary-cards.tsx</code> — Income, Total Expenses, Net Balance (green/red); Fixed, Variable; USA, Mexico rows</li>
+<li><code>components/cycles/cycle-summary/payment-method-breakdown.tsx</code> — table from <code>summary.by_payment_method[]</code></li>
+<li><code>components/cycles/cycle-summary/status-breakdown.tsx</code> — <code>&lt;Chip&gt;</code> row from <code>summary.status_breakdown</code></li>
+<li><code>components/cycles/cycle-summary/index.tsx</code> — fetches <code>getCycleSummary()</code>, composes sub-components, back button</li>
+<li><code>app/(app)/cycles/[id]/summary/page.tsx</code></li>
+</ul>
+<p><strong>Verify</strong>: Navigate to a cycle summary. All financial figures match the API response. Net Balance is green for surplus, red for deficit.</p>
+<hr />
+<h3 id="step-11-settings-page">Step 11 — Settings Page</h3>
+<p><strong>Goal</strong>: Allow users to update their profile and change their password.</p>
+<p>Create:</p>
+<ul>
+<li><code>components/settings/index.tsx</code> — <code>"use client"</code> component; fetches <code>getMe()</code> on mount; two HeroUI <code>&lt;Tabs&gt;</code>:<ul>
+<li><strong>Profile tab</strong>: pre-populated form (first_name, last_name, preferred_currency); uses <code>UpdateProfileSchema</code>; calls <code>updateMe()</code></li>
+<li><strong>Password tab</strong>: empty form (current_password, new_password, confirm_password); uses <code>UpdatePasswordSchema</code>; calls <code>updatePassword()</code></li>
+</ul>
+</li>
+<li>Success feedback via HeroUI <code>addToast()</code> on save; inline error messages on failure</li>
+<li><code>app/(app)/settings/page.tsx</code></li>
+</ul>
+<p>Add <code>UpdateProfileSchema</code> and <code>UpdatePasswordSchema</code> to <code>helpers/schemas.ts</code>.</p>
+<p><strong>Verify</strong>: Update first name → re-fetch confirms change persists. Change password → logout → login with new password succeeds.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "search.share", "toc.integrate", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@10.6.1/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>
