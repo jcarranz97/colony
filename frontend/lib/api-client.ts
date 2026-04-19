@@ -1,39 +1,33 @@
-"use client";
-import type { ApiResponse } from "@/helpers/types";
 import { deleteAuthCookie } from "@/actions/auth.action";
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-function getTokenFromCookie(): string | undefined {
-  if (typeof document === "undefined") return undefined;
-  const match = document.cookie.match(/(?:^|;\s*)colony-token=([^;]*)/);
-  return match ? match[1] : undefined;
-}
+export type ApiResponse<T> =
+  | { success: true; data: T }
+  | { success: false; error: { code: string; message: string } };
+
+type ApiClientOptions = {
+  token: string;
+  method?: string;
+  body?: string;
+};
 
 export async function apiClient<T>(
   path: string,
-  options: RequestInit & { token?: string } = {},
+  { token, method = "GET", body }: ApiClientOptions,
 ): Promise<ApiResponse<T>> {
-  const { token: explicitToken, ...fetchOptions } = options;
-  const token = explicitToken ?? getTokenFromCookie();
-
   const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    ...(fetchOptions.headers as Record<string, string>),
+    Authorization: `Bearer ${token}`,
   };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
+  if (body) headers["Content-Type"] = "application/json";
 
   let response: Response;
   try {
-    response = await fetch(`${API_URL}${path}`, { ...fetchOptions, headers });
+    response = await fetch(`${API_URL}${path}`, { method, headers, body });
   } catch {
     return {
       success: false,
-      error: {
-        code: "NETWORK_ERROR",
-        message: "Network error — check your connection",
-      },
+      error: { code: "NETWORK_ERROR", message: "Network error" },
     };
   }
 
@@ -46,27 +40,74 @@ export async function apiClient<T>(
     };
   }
 
-  if (!response.ok) {
-    try {
-      const body = await response.json();
-      const err = body?.error ?? {};
+  if (response.status === 204 || method === "DELETE") {
+    return { success: true, data: undefined as T };
+  }
+
+  try {
+    const data: any = await response.json();
+    if (!response.ok) {
       return {
         success: false,
         error: {
-          code: err.code ?? "API_ERROR",
-          message: err.message ?? "An error occurred",
+          code: "API_ERROR",
+          message: data?.detail || data?.error?.message || "Request failed",
         },
       };
-    } catch {
-      return {
-        success: false,
-        error: { code: "API_ERROR", message: response.statusText },
-      };
     }
+    return { success: true, data: data as T };
+  } catch {
+    return {
+      success: false,
+      error: { code: "API_ERROR", message: response.statusText },
+    };
+  }
+}
+
+export async function loginUser(
+  email: string,
+  password: string,
+): Promise<ApiResponse<any>> {
+  const payload = new URLSearchParams();
+  payload.append("username", email);
+  payload.append("password", password);
+
+  let response: Response;
+  try {
+    response = await fetch(`${API_URL}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: payload,
+    });
+  } catch {
+    return {
+      success: false,
+      error: { code: "NETWORK_ERROR", message: "Network error" },
+    };
   }
 
-  if (response.status === 204) return { success: true, data: undefined as T };
+  if (response.status === 401) {
+    await deleteAuthCookie();
+    if (typeof window !== "undefined") window.location.href = "/login";
+    return {
+      success: false,
+      error: { code: "UNAUTHORIZED", message: "Session expired" },
+    };
+  }
 
-  const data: T = await response.json();
-  return { success: true, data };
+  try {
+    const data: any = await response.json();
+    if (!response.ok) {
+      return {
+        success: false,
+        error: { code: "API_ERROR", message: data?.detail || "Login failed" },
+      };
+    }
+    return { success: true, data };
+  } catch {
+    return {
+      success: false,
+      error: { code: "API_ERROR", message: response.statusText },
+    };
+  }
 }
