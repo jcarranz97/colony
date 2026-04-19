@@ -45,12 +45,57 @@ Each use case references the functional requirements it satisfies (FR-###).
 
 ---
 
+## System Overview Diagram
+
+The following diagram shows all actors and the functional areas they interact
+with. Each area maps to the detailed sections below.
+
+```mermaid
+graph LR
+    Guest((Guest))
+    User((User))
+
+    subgraph Colony["Colony — System Boundary"]
+        direction TB
+        Auth(["Authentication\nUC-01 – UC-03"])
+        PM(["Payment Methods\nUC-04 – UC-07"])
+        ET(["Expense Templates\nUC-08 – UC-11"])
+        CM(["Cycle Management\nUC-12 – UC-15"])
+        CE(["Cycle Expenses\nUC-16 – UC-19"])
+    end
+
+    Guest --> Auth
+    User --> Auth
+    User --> PM
+    User --> ET
+    User --> CM
+    User --> CE
+```
+
+---
+
 ## Authentication
+
+```mermaid
+graph LR
+    Guest((Guest))
+    User((User))
+
+    UC01([UC-01: Register Account])
+    UC02([UC-02: Log In])
+    UC03([UC-03: Log Out])
+
+    Guest --> UC01
+    Guest --> UC02
+    User --> UC03
+```
 
 ### UC-01: Register Account
 
 **Actor:** Guest
+
 **Related Requirements:** FR-001
+
 **Preconditions:** The user does not have an existing account.
 
 **Main Flow:**
@@ -75,7 +120,9 @@ Each use case references the functional requirements it satisfies (FR-###).
 ### UC-02: Log In
 
 **Actor:** Guest
+
 **Related Requirements:** FR-002
+
 **Preconditions:** The user has a registered account.
 
 **Main Flow:**
@@ -98,7 +145,9 @@ use cases.
 ### UC-03: Log Out
 
 **Actor:** User
+
 **Related Requirements:** FR-002
+
 **Preconditions:** The user is logged in.
 
 **Main Flow:**
@@ -113,10 +162,27 @@ invalidation. Expiry is enforced by the token TTL.
 
 ## Payment Methods
 
+```mermaid
+graph LR
+    User((User))
+
+    UC04([UC-04: Create Payment Method])
+    UC05([UC-05: Edit Payment Method])
+    UC06([UC-06: Deactivate Payment Method])
+    UC07([UC-07: View Payment Methods])
+
+    User --> UC04
+    User --> UC05
+    User --> UC06
+    User --> UC07
+```
+
 ### UC-04: Create Payment Method
 
 **Actor:** User
+
 **Related Requirements:** FR-007, FR-012, FR-016
+
 **Preconditions:** User is authenticated.
 
 **Main Flow:**
@@ -140,7 +206,9 @@ creating expense templates and cycle expenses.
 ### UC-05: Edit Payment Method
 
 **Actor:** User
+
 **Related Requirements:** FR-008
+
 **Preconditions:** User is authenticated. The payment method exists and belongs to the user.
 
 **Main Flow:**
@@ -164,7 +232,9 @@ reference by ID).
 ### UC-06: Deactivate Payment Method
 
 **Actor:** User
+
 **Related Requirements:** FR-009, FR-013, FR-014
+
 **Preconditions:** User is authenticated. The payment method exists and belongs to the user.
 
 **Main Flow:**
@@ -185,7 +255,9 @@ expense creation but remains visible in historical expense data.
 ### UC-07: View Payment Methods
 
 **Actor:** User
+
 **Related Requirements:** FR-017
+
 **Preconditions:** User is authenticated.
 
 **Main Flow:**
@@ -201,10 +273,27 @@ and show all records in management screens.
 
 ## Expense Templates
 
+```mermaid
+graph LR
+    User((User))
+
+    UC08([UC-08: Create Expense Template])
+    UC09([UC-09: Edit Expense Template])
+    UC10([UC-10: Delete Expense Template])
+    UC11([UC-11: View Expense Templates])
+
+    User --> UC08
+    User --> UC09
+    User --> UC10
+    User --> UC11
+```
+
 ### UC-08: Create Expense Template
 
 **Actor:** User
+
 **Related Requirements:** FR-018, FR-019, FR-023
+
 **Preconditions:** User is authenticated. At least one payment method exists.
 
 **Main Flow:**
@@ -238,7 +327,9 @@ new cycle is created (UC-12).
 ### UC-09: Edit Expense Template
 
 **Actor:** User
+
 **Related Requirements:** FR-020
+
 **Preconditions:** User is authenticated. The template exists and belongs to the user.
 
 **Main Flow:**
@@ -262,7 +353,9 @@ template values.
 ### UC-10: Delete Expense Template
 
 **Actor:** User
+
 **Related Requirements:** FR-021
+
 **Preconditions:** User is authenticated. The template exists and belongs to the user.
 
 **Main Flow:**
@@ -283,7 +376,9 @@ Cycle expenses previously generated from this template are unaffected.
 ### UC-11: View Expense Templates
 
 **Actor:** User
+
 **Related Requirements:** FR-022
+
 **Preconditions:** User is authenticated.
 
 **Main Flow:**
@@ -296,10 +391,29 @@ Cycle expenses previously generated from this template are unaffected.
 
 ## Cycle Management
 
+```mermaid
+graph LR
+    User((User))
+    System((System))
+
+    UC12([UC-12: Create Cycle])
+    UC13([UC-13: View Cycle List])
+    UC14([UC-14: View Cycle Details])
+    UC15([UC-15: View Cycle Summary])
+
+    User --> UC12
+    User --> UC13
+    User --> UC14
+    User --> UC15
+    System -.->|auto-generates expenses| UC12
+```
+
 ### UC-12: Create Cycle
 
 **Actor:** User
+
 **Related Requirements:** FR-024, FR-025, FR-028
+
 **Preconditions:** User is authenticated.
 
 **Main Flow:**
@@ -328,7 +442,9 @@ ready for review and modification.
 ### UC-13: View Cycle List
 
 **Actor:** User
+
 **Related Requirements:** FR-029
+
 **Preconditions:** User is authenticated.
 
 **Main Flow:**
@@ -342,7 +458,9 @@ ready for review and modification.
 ### UC-14: View Cycle Details
 
 **Actor:** User
+
 **Related Requirements:** FR-026, FR-029
+
 **Preconditions:** User is authenticated. The cycle exists and belongs to the user.
 
 **Main Flow:**
@@ -356,7 +474,9 @@ ready for review and modification.
 ### UC-15: View Cycle Summary
 
 **Actor:** User
+
 **Related Requirements:** FR-039, FR-040, FR-041
+
 **Preconditions:** User is authenticated. The cycle exists and belongs to the user.
 
 **Main Flow:**
@@ -379,10 +499,27 @@ cycle period.
 
 ## Cycle Expenses
 
+```mermaid
+graph LR
+    User((User))
+
+    UC16([UC-16: Add Expense to Cycle])
+    UC17([UC-17: Edit Cycle Expense])
+    UC18([UC-18: Delete Cycle Expense])
+    UC19([UC-19: Mark Expense as Paid])
+
+    User --> UC16
+    User --> UC17
+    User --> UC18
+    User --> UC19
+```
+
 ### UC-16: Add Expense to Cycle
 
 **Actor:** User
+
 **Related Requirements:** FR-030, FR-023
+
 **Preconditions:** User is authenticated. The cycle exists and belongs to the user.
 
 **Main Flow:**
@@ -405,7 +542,9 @@ cycle period.
 ### UC-17: Edit Cycle Expense
 
 **Actor:** User
+
 **Related Requirements:** FR-031
+
 **Preconditions:** User is authenticated. The expense exists within a cycle belonging to the user.
 
 **Main Flow:**
@@ -426,7 +565,9 @@ cycle period.
 ### UC-18: Delete Cycle Expense
 
 **Actor:** User
+
 **Related Requirements:** FR-032
+
 **Preconditions:** User is authenticated. The expense exists within a cycle belonging to the user.
 
 **Main Flow:**
@@ -443,7 +584,9 @@ reports.
 ### UC-19: Mark Expense as Paid
 
 **Actor:** User
+
 **Related Requirements:** FR-033
+
 **Preconditions:** User is authenticated. The expense exists within a cycle belonging to the user.
 
 **Main Flow:**
