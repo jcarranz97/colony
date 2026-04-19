@@ -32,9 +32,12 @@ export function Login() {
           validationSchema={LoginSchema}
           onSubmit={async (values, { setSubmitting }) => {
             setError(null);
-            const result = await loginWithForm(values.email, values.password);
+            const result = await loginWithForm({
+              email: values.email,
+              password: values.password,
+            });
             if (result.success) {
-              await createAuthCookie(result.data.access_token);
+              await createAuthCookie((result.data as any).access_token);
               router.replace("/cycles");
             } else {
               setError(result.error.message);

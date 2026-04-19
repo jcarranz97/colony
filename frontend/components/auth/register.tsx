@@ -43,12 +43,12 @@ export function Register() {
               setSubmitting(false);
               return;
             }
-            const loginResult = await loginWithForm(
-              values.email,
-              values.password,
-            );
+            const loginResult = await loginWithForm({
+              email: values.email,
+              password: values.password,
+            });
             if (loginResult.success) {
-              await createAuthCookie(loginResult.data.access_token);
+              await createAuthCookie((loginResult.data as any).access_token);
               router.replace("/cycles");
             } else {
               router.replace("/login");
