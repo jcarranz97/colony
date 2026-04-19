@@ -37,7 +37,7 @@ nav:
   - Use Cases: use-cases.md
   - Architecture:
     # - Overview: architecture/index.md
-    # - Frontend: architecture/frontend.md
+    - Frontend: architecture/frontend.md
     - Database: architecture/database-schema.md
     - Backend: architecture/backend.md
     - API: architecture/api-specification.md
