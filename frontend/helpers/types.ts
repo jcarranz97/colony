@@ -62,6 +62,7 @@ export interface UpdatePaymentMethodRequest {
   name?: string;
   type?: PaymentMethodType;
   currency?: CurrencyCode;
+  active?: boolean;
 }
 
 // Recurrence Config
