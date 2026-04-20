@@ -6,13 +6,13 @@ import type {
 } from "@/helpers/types";
 
 export const fetchPaymentMethods = (token: string) =>
-  apiClient<PaymentMethod[]>("/payment-methods", { token });
+  apiClient<PaymentMethod[]>("/payment-methods/", { token });
 
 export const createPaymentMethod = (
   payload: CreatePaymentMethodRequest,
   token: string,
 ) =>
-  apiClient<PaymentMethod>("/payment-methods", {
+  apiClient<PaymentMethod>("/payment-methods/", {
     method: "POST",
     body: JSON.stringify(payload),
     token,

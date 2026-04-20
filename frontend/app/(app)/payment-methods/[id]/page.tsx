@@ -72,16 +72,14 @@ export default function EditPaymentMethodPage() {
       <Formik
         initialValues={{
           name: method.name,
-          type: method.type,
-          currency: method.currency,
+          method_type: method.method_type,
+          default_currency: method.default_currency,
         }}
         validationSchema={PaymentMethodSchema}
         onSubmit={async (values, { setSubmitting }) => {
           setError(null);
           const result = await editPaymentMethod(method.id, {
             name: values.name,
-            type: values.type as any,
-            currency: values.currency as any,
           });
           if (result.success) {
             router.push("/payment-methods");
@@ -113,9 +111,11 @@ export default function EditPaymentMethodPage() {
             </TextField>
 
             <Select.Root
-              selectedKey={values.type || null}
-              onSelectionChange={(key) => setFieldValue("type", String(key))}
-              isInvalid={!!errors.type && !!touched.type}
+              selectedKey={values.method_type || null}
+              onSelectionChange={(key) =>
+                setFieldValue("method_type", String(key))
+              }
+              isInvalid={!!errors.method_type && !!touched.method_type}
               fullWidth
             >
               <Label>Type</Label>
@@ -131,28 +131,35 @@ export default function EditPaymentMethodPage() {
                 </Select.Value>
                 <Select.Indicator />
               </Select.Trigger>
-              {touched.type && errors.type && (
-                <p className="text-xs text-danger">{errors.type}</p>
+              {touched.method_type && errors.method_type && (
+                <p className="text-xs text-danger">{errors.method_type}</p>
               )}
               <Select.Popover>
                 <ListBox>
-                  <ListBox.Item id="credit_card">Credit Card</ListBox.Item>
-                  <ListBox.Item id="debit_card">Debit Card</ListBox.Item>
-                  <ListBox.Item id="cash">Cash</ListBox.Item>
-                  <ListBox.Item id="bank_transfer">Bank Transfer</ListBox.Item>
-                  <ListBox.Item id="digital_wallet">
-                    Digital Wallet
+                  <ListBox.Item id="debit" textValue="Debit">
+                    Debit
+                  </ListBox.Item>
+                  <ListBox.Item id="credit" textValue="Credit">
+                    Credit
+                  </ListBox.Item>
+                  <ListBox.Item id="cash" textValue="Cash">
+                    Cash
+                  </ListBox.Item>
+                  <ListBox.Item id="transfer" textValue="Transfer">
+                    Transfer
                   </ListBox.Item>
                 </ListBox>
               </Select.Popover>
             </Select.Root>
 
             <Select.Root
-              selectedKey={values.currency || null}
+              selectedKey={values.default_currency || null}
               onSelectionChange={(key) =>
-                setFieldValue("currency", String(key))
+                setFieldValue("default_currency", String(key))
               }
-              isInvalid={!!errors.currency && !!touched.currency}
+              isInvalid={
+                !!errors.default_currency && !!touched.default_currency
+              }
               fullWidth
             >
               <Label>Currency</Label>
@@ -170,13 +177,17 @@ export default function EditPaymentMethodPage() {
                 </Select.Value>
                 <Select.Indicator />
               </Select.Trigger>
-              {touched.currency && errors.currency && (
-                <p className="text-xs text-danger">{errors.currency}</p>
+              {touched.default_currency && errors.default_currency && (
+                <p className="text-xs text-danger">{errors.default_currency}</p>
               )}
               <Select.Popover>
                 <ListBox>
-                  <ListBox.Item id="USD">USD</ListBox.Item>
-                  <ListBox.Item id="MXN">MXN</ListBox.Item>
+                  <ListBox.Item id="USD" textValue="USD">
+                    USD
+                  </ListBox.Item>
+                  <ListBox.Item id="MXN" textValue="MXN">
+                    MXN
+                  </ListBox.Item>
                 </ListBox>
               </Select.Popover>
             </Select.Root>

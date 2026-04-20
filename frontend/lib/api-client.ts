@@ -47,13 +47,13 @@ export async function apiClient<T>(
   try {
     const data: any = await response.json();
     if (!response.ok) {
-      return {
-        success: false,
-        error: {
-          code: "API_ERROR",
-          message: data?.detail || data?.error?.message || "Request failed",
-        },
-      };
+      const detail = data?.detail;
+      const message = Array.isArray(detail)
+        ? detail.map((e: any) => e.msg ?? e.message).join("; ")
+        : typeof detail === "string"
+          ? detail
+          : (data?.error?.message ?? "Request failed");
+      return { success: false, error: { code: "API_ERROR", message } };
     }
     return { success: true, data: data as T };
   } catch {

@@ -3,11 +3,10 @@ import { CurrencyBadge } from "@/components/shared/currency-badge";
 import type { PaymentMethod, PaymentMethodType } from "@/helpers/types";
 
 const TYPE_LABEL: Record<PaymentMethodType, string> = {
-  credit_card: "Credit Card",
-  debit_card: "Debit Card",
+  debit: "Debit",
+  credit: "Credit",
   cash: "Cash",
-  bank_transfer: "Bank Transfer",
-  digital_wallet: "Digital Wallet",
+  transfer: "Transfer",
 };
 
 interface RenderCellProps {
@@ -31,11 +30,11 @@ export function renderCell({
     case "type":
       return (
         <span className="text-sm text-default-600">
-          {TYPE_LABEL[method.type]}
+          {TYPE_LABEL[method.method_type]}
         </span>
       );
     case "currency":
-      return <CurrencyBadge currency={method.currency} />;
+      return <CurrencyBadge currency={method.default_currency} />;
     case "status":
       return (
         <Chip

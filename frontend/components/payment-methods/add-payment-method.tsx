@@ -40,14 +40,18 @@ export function AddPaymentMethod({
         <Modal.Container>
           <Modal.Dialog>
             <Formik
-              initialValues={{ name: "", type: "", currency: "" }}
+              initialValues={{
+                name: "",
+                method_type: "",
+                default_currency: "",
+              }}
               validationSchema={PaymentMethodSchema}
               onSubmit={async (values, { setSubmitting, resetForm }) => {
                 setError(null);
                 const result = await addPaymentMethod({
                   name: values.name,
-                  type: values.type as any,
-                  currency: values.currency as any,
+                  method_type: values.method_type as any,
+                  default_currency: values.default_currency as any,
                 });
                 if (result.success) {
                   onCreated(result.data);
@@ -85,11 +89,11 @@ export function AddPaymentMethod({
                     </TextField>
 
                     <Select.Root
-                      selectedKey={values.type || null}
+                      selectedKey={values.method_type || null}
                       onSelectionChange={(key) =>
-                        setFieldValue("type", String(key))
+                        setFieldValue("method_type", String(key))
                       }
-                      isInvalid={!!errors.type && !!touched.type}
+                      isInvalid={!!errors.method_type && !!touched.method_type}
                       fullWidth
                     >
                       <Label>Type</Label>
@@ -107,34 +111,37 @@ export function AddPaymentMethod({
                         </Select.Value>
                         <Select.Indicator />
                       </Select.Trigger>
-                      {touched.type && errors.type && (
-                        <p className="text-xs text-danger">{errors.type}</p>
+                      {touched.method_type && errors.method_type && (
+                        <p className="text-xs text-danger">
+                          {errors.method_type}
+                        </p>
                       )}
                       <Select.Popover>
                         <ListBox>
-                          <ListBox.Item id="credit_card">
-                            Credit Card
+                          <ListBox.Item id="debit" textValue="Debit">
+                            Debit
                           </ListBox.Item>
-                          <ListBox.Item id="debit_card">
-                            Debit Card
+                          <ListBox.Item id="credit" textValue="Credit">
+                            Credit
                           </ListBox.Item>
-                          <ListBox.Item id="cash">Cash</ListBox.Item>
-                          <ListBox.Item id="bank_transfer">
-                            Bank Transfer
+                          <ListBox.Item id="cash" textValue="Cash">
+                            Cash
                           </ListBox.Item>
-                          <ListBox.Item id="digital_wallet">
-                            Digital Wallet
+                          <ListBox.Item id="transfer" textValue="Transfer">
+                            Transfer
                           </ListBox.Item>
                         </ListBox>
                       </Select.Popover>
                     </Select.Root>
 
                     <Select.Root
-                      selectedKey={values.currency || null}
+                      selectedKey={values.default_currency || null}
                       onSelectionChange={(key) =>
-                        setFieldValue("currency", String(key))
+                        setFieldValue("default_currency", String(key))
                       }
-                      isInvalid={!!errors.currency && !!touched.currency}
+                      isInvalid={
+                        !!errors.default_currency && !!touched.default_currency
+                      }
                       fullWidth
                     >
                       <Label>Currency</Label>
@@ -152,13 +159,19 @@ export function AddPaymentMethod({
                         </Select.Value>
                         <Select.Indicator />
                       </Select.Trigger>
-                      {touched.currency && errors.currency && (
-                        <p className="text-xs text-danger">{errors.currency}</p>
+                      {touched.default_currency && errors.default_currency && (
+                        <p className="text-xs text-danger">
+                          {errors.default_currency}
+                        </p>
                       )}
                       <Select.Popover>
                         <ListBox>
-                          <ListBox.Item id="USD">USD</ListBox.Item>
-                          <ListBox.Item id="MXN">MXN</ListBox.Item>
+                          <ListBox.Item id="USD" textValue="USD">
+                            USD
+                          </ListBox.Item>
+                          <ListBox.Item id="MXN" textValue="MXN">
+                            MXN
+                          </ListBox.Item>
                         </ListBox>
                       </Select.Popover>
                     </Select.Root>
