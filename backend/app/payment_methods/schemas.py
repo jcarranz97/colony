@@ -50,6 +50,12 @@ class PaymentMethodUpdate(BaseModel):
     name: str | None = Field(
         None, min_length=1, max_length=100, description="Payment method name"
     )
+    method_type: PaymentMethodType | None = Field(
+        None, description="Type of payment method"
+    )
+    default_currency: CurrencyCode | None = Field(
+        None, description="Default currency for this payment method"
+    )
     description: str | None = Field(None, max_length=500, description="Description")
     active: bool | None = Field(
         None, description="Whether the payment method is active"
