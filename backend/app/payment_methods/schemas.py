@@ -3,10 +3,12 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, field_validator
 
+from app.schemas import AppBaseModel
+
 from .constants import CurrencyCode, PaymentMethodType
 
 
-class PaymentMethodBase(BaseModel):
+class PaymentMethodBase(AppBaseModel):
     """Base payment method schema with common fields."""
 
     name: str = Field(
@@ -44,7 +46,7 @@ class PaymentMethodCreate(PaymentMethodBase):
     """Payment method creation schema."""
 
 
-class PaymentMethodUpdate(BaseModel):
+class PaymentMethodUpdate(AppBaseModel):
     """Payment method update schema."""
 
     name: str | None = Field(

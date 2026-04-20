@@ -5,6 +5,8 @@ from typing import Any
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
+from app.schemas import AppBaseModel
+
 from app.payment_methods.schemas import PaymentMethodSummary
 
 from .constants import CurrencyCode, ExpenseCategory, RecurrenceType
@@ -114,7 +116,7 @@ _RECURRENCE_VALIDATORS: dict[RecurrenceType, Any] = {
 # ---------------------------------------------------------------------------
 
 
-class ExpenseTemplateBase(BaseModel):
+class ExpenseTemplateBase(AppBaseModel):
     """Base schema with all required expense template fields."""
 
     description: str = Field(..., min_length=1, max_length=255)
@@ -169,7 +171,7 @@ class ExpenseTemplateCreate(ExpenseTemplateBase):
     """Schema for creating a new expense template."""
 
 
-class ExpenseTemplateUpdate(BaseModel):
+class ExpenseTemplateUpdate(AppBaseModel):
     """Schema for updating an expense template (all fields optional)."""
 
     description: str | None = Field(default=None, min_length=1, max_length=255)

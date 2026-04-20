@@ -55,6 +55,8 @@ export interface CreatePaymentMethodRequest {
 
 export interface UpdatePaymentMethodRequest {
   name?: string;
+  method_type?: PaymentMethodType;
+  default_currency?: CurrencyCode;
   active?: boolean;
 }
 

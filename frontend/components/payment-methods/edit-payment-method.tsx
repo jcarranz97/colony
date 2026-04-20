@@ -55,6 +55,8 @@ export function EditPaymentMethod({
                 setError(null);
                 const result = await editPaymentMethod(method.id, {
                   name: values.name,
+                  method_type: values.method_type,
+                  default_currency: values.default_currency,
                 });
                 if (result.success) {
                   onUpdated(result.data);
