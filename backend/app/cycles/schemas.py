@@ -6,6 +6,7 @@ from typing import Annotated
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from app.payment_methods.schemas import PaymentMethodSummary
+from app.schemas import AppBaseModel
 
 from .constants import CurrencyCode, CycleStatus, ExpenseCategory, ExpenseStatus
 
@@ -47,7 +48,7 @@ class PaginationMeta(BaseModel):
 # ---------------------------------------------------------------------------
 
 
-class CycleCreate(BaseModel):
+class CycleCreate(AppBaseModel):
     """Schema for creating a new expense cycle."""
 
     name: str = Field(..., min_length=1, max_length=100, description="Cycle name")
@@ -95,7 +96,7 @@ class CycleCreate(BaseModel):
         return self
 
 
-class CycleUpdate(BaseModel):
+class CycleUpdate(AppBaseModel):
     """Schema for partially updating a cycle (all fields optional)."""
 
     name: str | None = Field(
@@ -160,7 +161,7 @@ class CyclesListResponse(BaseModel):
 # ---------------------------------------------------------------------------
 
 
-class CycleExpenseCreate(BaseModel):
+class CycleExpenseCreate(AppBaseModel):
     """Schema for manually adding an expense to a cycle."""
 
     description: str = Field(..., min_length=1, max_length=255)
@@ -192,7 +193,7 @@ class CycleExpenseCreate(BaseModel):
         return stripped
 
 
-class CycleExpenseUpdate(BaseModel):
+class CycleExpenseUpdate(AppBaseModel):
     """Schema for partially updating a cycle expense (all fields optional)."""
 
     description: str | None = Field(None, min_length=1, max_length=255)

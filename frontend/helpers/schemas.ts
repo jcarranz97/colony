@@ -16,16 +16,12 @@ export const RegisterSchema = Yup.object({
 
 export const PaymentMethodSchema = Yup.object({
   name: Yup.string().required("Name is required"),
-  type: Yup.string()
-    .oneOf([
-      "credit_card",
-      "debit_card",
-      "cash",
-      "bank_transfer",
-      "digital_wallet",
-    ])
+  method_type: Yup.string()
+    .oneOf(["debit", "credit", "cash", "transfer"])
     .required("Type is required"),
-  currency: Yup.string().oneOf(["USD", "MXN"]).required("Currency is required"),
+  default_currency: Yup.string()
+    .oneOf(["USD", "MXN"])
+    .required("Currency is required"),
 });
 
 export const ExpenseTemplateSchema = Yup.object({

@@ -1,12 +1,14 @@
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+from app.schemas import AppBaseModel
 
 from .constants import CurrencyCode, PaymentMethodType
 
 
-class PaymentMethodBase(BaseModel):
+class PaymentMethodBase(AppBaseModel):
     """Base payment method schema with common fields."""
 
     name: str = Field(
@@ -44,11 +46,17 @@ class PaymentMethodCreate(PaymentMethodBase):
     """Payment method creation schema."""
 
 
-class PaymentMethodUpdate(BaseModel):
+class PaymentMethodUpdate(AppBaseModel):
     """Payment method update schema."""
 
     name: str | None = Field(
         None, min_length=1, max_length=100, description="Payment method name"
+    )
+    method_type: PaymentMethodType | None = Field(
+        None, description="Type of payment method"
+    )
+    default_currency: CurrencyCode | None = Field(
+        None, description="Default currency for this payment method"
     )
     description: str | None = Field(None, max_length=500, description="Description")
     active: bool | None = Field(
@@ -84,7 +92,7 @@ class PaymentMethodResponse(PaymentMethodBase):
     created_at: datetime
     updated_at: datetime
 
-    model_config = {"from_attributes": True}
+    model_config = ConfigDict(from_attributes=True)
 
 
 class PaymentMethodSummary(BaseModel):
@@ -94,4 +102,4 @@ class PaymentMethodSummary(BaseModel):
     name: str
     method_type: PaymentMethodType
 
-    model_config = {"from_attributes": True}
+    model_config = ConfigDict(from_attributes=True)

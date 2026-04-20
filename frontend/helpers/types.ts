@@ -1,11 +1,6 @@
 // Enums
 export type CurrencyCode = "USD" | "MXN";
-export type PaymentMethodType =
-  | "credit_card"
-  | "debit_card"
-  | "cash"
-  | "bank_transfer"
-  | "digital_wallet";
+export type PaymentMethodType = "debit" | "credit" | "cash" | "transfer";
 export type ExpenseCategory = "fixed" | "variable";
 export type RecurrenceType = "weekly" | "bi_weekly" | "monthly" | "custom";
 export type CycleStatus = "draft" | "active" | "completed";
@@ -45,8 +40,8 @@ export interface UpdatePasswordRequest {
 export interface PaymentMethod {
   id: string;
   name: string;
-  type: PaymentMethodType;
-  currency: CurrencyCode;
+  method_type: PaymentMethodType;
+  default_currency: CurrencyCode;
   active: boolean;
   created_at: string;
   updated_at: string;
@@ -54,14 +49,15 @@ export interface PaymentMethod {
 
 export interface CreatePaymentMethodRequest {
   name: string;
-  type: PaymentMethodType;
-  currency: CurrencyCode;
+  method_type: PaymentMethodType;
+  default_currency: CurrencyCode;
 }
 
 export interface UpdatePaymentMethodRequest {
   name?: string;
-  type?: PaymentMethodType;
-  currency?: CurrencyCode;
+  method_type?: PaymentMethodType;
+  default_currency?: CurrencyCode;
+  active?: boolean;
 }
 
 // Recurrence Config

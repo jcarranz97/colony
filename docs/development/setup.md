@@ -45,6 +45,27 @@ changes you make locally are reflected immediately inside the container —
 no restart needed. FastAPI's development server (`fastapi dev`) watches for
 file changes and reloads automatically.
 
+### Frontend Changes Require a Forced Rebuild
+
+The frontend is built at image build time (not mounted as a volume), so Docker
+caches the compiled output. After editing any file under `frontend/`, you must
+force a rebuild — otherwise the container keeps serving the old build:
+
+```bash
+docker-compose up --build --force-recreate frontend
+```
+
+Or rebuild without the layer cache entirely:
+
+```bash
+docker-compose build --no-cache frontend
+docker-compose up frontend
+```
+
+Using `--build` alone is not enough — Docker may still reuse cached layers for
+unchanged steps. Always add `--force-recreate` (or `--no-cache` on the build
+step) when frontend changes are not reflected in the running app.
+
 ## Seed Data
 
 The repository ships with a `seed_data.yaml` file at the project root. When

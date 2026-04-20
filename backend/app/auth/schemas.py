@@ -4,6 +4,8 @@ from enum import Enum
 
 from pydantic import BaseModel, EmailStr, Field
 
+from app.schemas import AppBaseModel
+
 
 class CurrencyCode(str, Enum):
     """Supported currency codes."""
@@ -28,7 +30,7 @@ class TokenData(BaseModel):
 
 
 # User schemas
-class UserBase(BaseModel):
+class UserBase(AppBaseModel):
     """Base user model with common fields."""
 
     email: EmailStr
@@ -46,7 +48,7 @@ class UserCreate(UserBase):
     )
 
 
-class UserUpdate(BaseModel):
+class UserUpdate(AppBaseModel):
     """User update schema for modifying user information."""
 
     first_name: str | None = None
@@ -55,7 +57,7 @@ class UserUpdate(BaseModel):
     locale: str | None = None
 
 
-class UserUpdatePassword(BaseModel):
+class UserUpdatePassword(AppBaseModel):
     """Schema for updating user password."""
 
     current_password: str
