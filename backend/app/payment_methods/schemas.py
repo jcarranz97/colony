@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.schemas import AppBaseModel
 
@@ -92,7 +92,7 @@ class PaymentMethodResponse(PaymentMethodBase):
     created_at: datetime
     updated_at: datetime
 
-    model_config = {"from_attributes": True}
+    model_config = ConfigDict(from_attributes=True)
 
 
 class PaymentMethodSummary(BaseModel):
@@ -102,4 +102,4 @@ class PaymentMethodSummary(BaseModel):
     name: str
     method_type: PaymentMethodType
 
-    model_config = {"from_attributes": True}
+    model_config = ConfigDict(from_attributes=True)

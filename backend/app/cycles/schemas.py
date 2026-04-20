@@ -5,9 +5,8 @@ from typing import Annotated
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
-from app.schemas import AppBaseModel
-
 from app.payment_methods.schemas import PaymentMethodSummary
+from app.schemas import AppBaseModel
 
 from .constants import CurrencyCode, CycleStatus, ExpenseCategory, ExpenseStatus
 
