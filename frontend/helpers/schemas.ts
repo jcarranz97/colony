@@ -25,8 +25,8 @@ export const PaymentMethodSchema = Yup.object({
 });
 
 export const ExpenseTemplateSchema = Yup.object({
-  name: Yup.string().required("Name is required"),
-  amount: Yup.string().required("Amount is required"),
+  description: Yup.string().required("Name is required"),
+  base_amount: Yup.string().required("Amount is required"),
   currency: Yup.string().oneOf(["USD", "MXN"]).required("Currency is required"),
   category: Yup.string()
     .oneOf(["fixed", "variable"])
