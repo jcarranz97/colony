@@ -662,6 +662,8 @@ Get detailed cycle summary and analytics.
 }
 ```
 
+> **Note on `overdue` count:** The `overdue` value in `status_breakdown` is **derived at request time**, not read from the stored `status` column. Any expense whose stored status is `pending` and whose `due_date` is earlier than today is counted as `overdue` (and removed from `pending`). This matches the per-expense overdue derivation applied in individual expense responses.
+
 ### 5. Reports & Analytics
 
 #### GET /reports/cycles-comparison

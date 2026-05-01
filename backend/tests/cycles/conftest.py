@@ -138,7 +138,7 @@ def cycle_with_expenses(
             currency=CurrencyCode.USD,
             amount=Decimal("300.00"),
             amount_usd=Decimal("300.00"),
-            due_date=date(2025, 1, 15),
+            due_date=date(2099, 1, 15),
             category=ExpenseCategory.VARIABLE,
             status=ExpenseStatus.PENDING,
             paid=False,
@@ -152,7 +152,7 @@ def cycle_with_expenses(
             amount_usd=Decimal("100.00"),
             due_date=date(2025, 1, 20),
             category=ExpenseCategory.VARIABLE,
-            status=ExpenseStatus.OVERDUE,
+            status=ExpenseStatus.PENDING,
             paid=False,
         ),
         CycleExpense(

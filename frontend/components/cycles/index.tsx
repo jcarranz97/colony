@@ -64,6 +64,7 @@ function CycleCard({
   onOpen: (c: Cycle) => void;
 }) {
   const paid = summary?.status_breakdown.paid ?? 0;
+  const overdue = summary?.status_breakdown.overdue ?? 0;
   const total = summary
     ? (summary.status_breakdown.paid ?? 0) +
       (summary.status_breakdown.pending ?? 0) +
@@ -126,6 +127,9 @@ function CycleCard({
             <div className="nb-progress-fill" style={{ width: `${pct}%` }} />
           </div>
         </div>
+        {overdue > 0 && (
+          <div className="nb-overdue-badge">⚠ {overdue} overdue</div>
+        )}
       </div>
     </div>
   );
@@ -168,7 +172,7 @@ function ExpenseRow({
             ? "!"
             : ""}
       </div>
-      <div className="nb-expense-name">{expense.name}</div>
+      <div className="nb-expense-name">{expense.description}</div>
       {expense.payment_method && (
         <div className="nb-expense-method">{expense.payment_method.name}</div>
       )}
@@ -338,7 +342,7 @@ function AddCycleModal({
 // ── Add Expense Modal ─────────────────────────────────────────────────────────
 
 interface AddExpenseForm {
-  name: string;
+  description: string;
   amount: string;
   currency: CurrencyCode;
   category: ExpenseCategory;
@@ -360,7 +364,7 @@ function AddExpenseModal({
   onAdded: (e: CycleExpense) => void;
 }) {
   const [form, setForm] = useState<AddExpenseForm>({
-    name: "",
+    description: "",
     amount: "",
     currency: "USD",
     category: "fixed",
@@ -374,11 +378,11 @@ function AddExpenseModal({
     setForm((f) => ({ ...f, [k]: v }));
 
   const handleSubmit = async () => {
-    if (!form.name || !form.amount) return;
+    if (!form.description || !form.amount) return;
     setSaving(true);
     setError(null);
     const res = await addExpense(cycleId, {
-      name: form.name,
+      description: form.description,
       amount: form.amount,
       currency: form.currency,
       category: form.category,
@@ -388,7 +392,7 @@ function AddExpenseModal({
     if (res.success) {
       onAdded(res.data);
       setForm({
-        name: "",
+        description: "",
         amount: "",
         currency: "USD",
         category: "fixed",
@@ -420,8 +424,8 @@ function AddExpenseModal({
           <input
             className="nb-form-input"
             placeholder="e.g. Netflix subscription…"
-            value={form.name}
-            onChange={(e) => set("name", e.target.value)}
+            value={form.description}
+            onChange={(e) => set("description", e.target.value)}
           />
         </div>
 
@@ -699,7 +703,7 @@ export function Cycles() {
       async ([cyclesRes, methodsRes]) => {
         if (methodsRes.success) setPaymentMethods(methodsRes.data);
         if (cyclesRes.success) {
-          const loaded = cyclesRes.data;
+          const loaded = cyclesRes.data.cycles;
           setCycles(loaded);
           const summaryResults = await Promise.all(
             loaded.map((c) =>
@@ -721,7 +725,7 @@ export function Cycles() {
     if (!selectedCycle) return;
     setExpensesLoading(true);
     getExpenses(selectedCycle.id).then((res) => {
-      if (res.success) setCycleExpenses(res.data.items);
+      if (res.success) setCycleExpenses(res.data.expenses);
       setExpensesLoading(false);
     });
   }, [selectedCycle]);
@@ -736,6 +740,12 @@ export function Cycles() {
   };
 
   const handleBack = () => {
+    if (selectedCycle) {
+      fetchSummary(selectedCycle.id).then((r) => {
+        if (r.success)
+          setSummaries((prev) => ({ ...prev, [selectedCycle.id]: r.data }));
+      });
+    }
     setSelectedCycle(null);
     setCycleExpenses([]);
   };
@@ -746,7 +756,7 @@ export function Cycles() {
     if (!expense || expense.status === "cancelled") return;
 
     const nextStatus: ExpenseStatus =
-      expense.status === "pending"
+      expense.status === "pending" || expense.status === "overdue"
         ? "paid"
         : expense.status === "paid"
           ? "pending"

@@ -1,5 +1,5 @@
 import uuid
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from decimal import Decimal
 from typing import Annotated
 
@@ -246,6 +246,14 @@ class CycleExpenseResponse(BaseModel):
     payment_method: PaymentMethodSummary
     created_at: datetime
     updated_at: datetime
+
+    @model_validator(mode="after")
+    def compute_overdue(self) -> "CycleExpenseResponse":
+        """Reclassify pending expenses with a past due date as overdue."""
+        today = datetime.now(UTC).date()
+        if self.status == ExpenseStatus.PENDING and self.due_date < today:
+            self.status = ExpenseStatus.OVERDUE
+        return self
 
     model_config = {
         "from_attributes": True,

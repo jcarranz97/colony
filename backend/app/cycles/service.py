@@ -470,10 +470,26 @@ class CycleService:
             )
 
         # --- Status breakdown ------------------------------------------------
+        # Overdue is derived: a PENDING expense whose due_date is in the past.
+        # The DB never stores OVERDUE — it mirrors the compute_overdue validator
+        # in CycleExpenseResponse so counts match individual expense responses.
+        today = datetime.now(UTC).date()
+
+        def _is_overdue(e: models.CycleExpense) -> bool:
+            return (
+                e.status == ExpenseStatus.PENDING
+                and e.due_date is not None
+                and e.due_date < today
+            )
+
         status_breakdown = schemas.StatusBreakdown(
-            pending=sum(1 for e in active if e.status == ExpenseStatus.PENDING),
+            pending=sum(
+                1
+                for e in active
+                if e.status == ExpenseStatus.PENDING and not _is_overdue(e)
+            ),
             paid=sum(1 for e in active if e.status == ExpenseStatus.PAID),
-            overdue=sum(1 for e in active if e.status == ExpenseStatus.OVERDUE),
+            overdue=sum(1 for e in active if _is_overdue(e)),
             cancelled=sum(1 for e in active if e.status == ExpenseStatus.CANCELLED),
         )
 

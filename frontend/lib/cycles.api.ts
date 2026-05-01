@@ -1,6 +1,7 @@
 import { apiClient } from "./api-client";
 import type {
   Cycle,
+  CyclesListResponse,
   CreateCycleRequest,
   UpdateCycleRequest,
   CycleSummary,
@@ -11,7 +12,7 @@ import type {
 } from "@/helpers/types";
 
 export const fetchCycles = (token: string) =>
-  apiClient<Cycle[]>("/cycles", { token });
+  apiClient<CyclesListResponse>("/cycles", { token });
 
 export const createCycle = (payload: CreateCycleRequest, token: string) =>
   apiClient<Cycle>("/cycles", {

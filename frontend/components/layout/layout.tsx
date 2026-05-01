@@ -1,6 +1,8 @@
 "use client";
 import { usePathname, useRouter } from "next/navigation";
 import { deleteAuthCookie } from "@/actions/auth.action";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 const NAV_ITEMS = [
   { href: "/cycles", label: "Cycles", icon: "📅" },
@@ -14,10 +16,20 @@ const RING_COUNT = 16;
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleLogout = async () => {
     await deleteAuthCookie();
     router.push("/login");
+  };
+
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
   };
 
   return (
@@ -26,6 +38,15 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <div className="nb-cover">
         <span className="nb-logo">Colony</span>
         <span className="nb-subtitle">household budget tracker</span>
+        {mounted && (
+          <button
+            className="nb-theme-toggle"
+            onClick={toggleTheme}
+            title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+          >
+            {theme === "dark" ? "☀️" : "🌙"}
+          </button>
+        )}
         <button className="nb-signout" onClick={handleLogout}>
           Sign out
         </button>
