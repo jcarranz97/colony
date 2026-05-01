@@ -1,0 +1,408 @@
+/* ── Google Fonts ───────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Kalam:wght@300;400;700&display=swap');
+
+/* ── Notebook palette ───────────────────────────────────────────────────── */
+:root {
+  --nb-paper:       #fdf8f0;
+  --nb-paper-dark:  #f5eed8;
+  --nb-paper-lines: rgba(184, 196, 224, 0.45);
+  --nb-margin-line: rgba(200, 80, 80, 0.18);
+  --nb-cover:       #2c4a3e;
+  --nb-cover-dark:  #1e3328;
+  --nb-accent:      #c9a84c;
+  --nb-ink:         #2c1810;
+  --nb-ink-light:   #5a4030;
+  --nb-border:      #d0c4a8;
+  --nb-font-hand:   'Caveat', cursive;
+  --nb-font-title:  'Kalam', cursive;
+
+  /* Material primary overrides */
+  --md-primary-fg-color:        #2c4a3e;
+  --md-primary-fg-color--light: #3d6357;
+  --md-primary-fg-color--dark:  #1e3328;
+  --md-primary-bg-color:        #fdf8f0;
+  --md-accent-fg-color:         #c9a84c;
+  --md-accent-fg-color--transparent: rgba(201, 168, 76, 0.1);
+
+  /* Material typeset overrides */
+  --md-default-bg-color:           #fdf8f0;
+  --md-default-fg-color:           #2c1810;
+  --md-default-fg-color--light:    #5a4030;
+  --md-default-fg-color--lighter:  #8a7060;
+  --md-default-fg-color--lightest: #c0a890;
+  --md-typeset-a-color:            #2c4a3e;
+  --md-code-bg-color:              #ede4d0;
+  --md-code-fg-color:              #2c1810;
+}
+
+/* ── Global body ────────────────────────────────────────────────────────── */
+body {
+  font-family: var(--nb-font-hand) !important;
+  background-color: var(--nb-paper);
+  color: var(--nb-ink);
+}
+
+/* ── Header — notebook cover bar ────────────────────────────────────────── */
+.md-header {
+  background-color: var(--nb-cover) !important;
+  border-bottom: 3px solid var(--nb-accent);
+  box-shadow: 0 2px 8px rgba(44, 74, 62, 0.3);
+}
+
+.md-header__title {
+  font-family: var(--nb-font-title) !important;
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--nb-accent) !important;
+  letter-spacing: 0.04em;
+}
+
+.md-header__button {
+  color: var(--nb-accent) !important;
+}
+
+/* ── Navigation tabs ────────────────────────────────────────────────────── */
+.md-tabs {
+  background-color: var(--nb-cover) !important;
+  border-bottom: 2px solid rgba(201, 168, 76, 0.4);
+}
+
+.md-tabs__link {
+  font-family: var(--nb-font-hand) !important;
+  font-size: 1rem;
+  font-weight: 600;
+  opacity: 0.75;
+  color: var(--nb-paper) !important;
+}
+
+.md-tabs__link--active,
+.md-tabs__link:hover {
+  opacity: 1;
+  color: var(--nb-accent) !important;
+}
+
+/* ── Left sidebar ───────────────────────────────────────────────────────── */
+.md-sidebar {
+  background-color: var(--nb-paper-dark);
+}
+
+.md-sidebar__inner {
+  border-right: 1px solid var(--nb-border);
+}
+
+.md-nav__title {
+  font-family: var(--nb-font-title) !important;
+  font-weight: 700;
+  color: var(--nb-cover) !important;
+  background-color: var(--nb-paper-dark);
+  border-bottom: 2px solid var(--nb-accent);
+}
+
+.md-nav__link {
+  font-family: var(--nb-font-hand) !important;
+  font-size: 0.95rem;
+  color: var(--nb-ink-light) !important;
+}
+
+.md-nav__link:hover {
+  color: var(--nb-cover) !important;
+}
+
+.md-nav__link--active {
+  font-weight: 700;
+  color: var(--nb-cover) !important;
+  border-left: 3px solid var(--nb-accent);
+  padding-left: 0.4rem;
+}
+
+/* ── Right TOC sidebar ──────────────────────────────────────────────────── */
+.md-nav--secondary .md-nav__link {
+  font-family: var(--nb-font-hand) !important;
+  font-size: 0.88rem;
+  color: var(--nb-ink-light) !important;
+}
+
+.md-nav--secondary .md-nav__link--active {
+  color: var(--nb-cover) !important;
+  border-left: 2px solid var(--nb-accent);
+}
+
+/* ── Main content — ruled paper ─────────────────────────────────────────── */
+.md-content {
+  background-color: var(--nb-paper);
+}
+
+/* Ruled lines + red margin stripe */
+.md-content__inner {
+  background-image:
+    linear-gradient(90deg, var(--nb-margin-line) 1px, transparent 1px),
+    linear-gradient(var(--nb-paper-lines) 1px, transparent 1px);
+  background-size: 38px 100%, 100% 1.85rem;
+  background-position: 0 0, 0 0.6rem;
+  padding-left: 2.5rem !important;
+  position: relative;
+}
+
+/* ── Typeset — handwriting feel ─────────────────────────────────────────── */
+.md-typeset {
+  font-family: var(--nb-font-hand) !important;
+  font-size: 1.05rem;
+  line-height: 1.85;
+  color: var(--nb-ink);
+}
+
+/* ── Headings ───────────────────────────────────────────────────────────── */
+.md-typeset h1 {
+  font-family: var(--nb-font-title) !important;
+  font-weight: 700;
+  font-size: 2.1rem;
+  color: var(--nb-cover);
+  border-bottom: 3px solid var(--nb-accent);
+  padding-bottom: 0.3em;
+}
+
+.md-typeset h2 {
+  font-family: var(--nb-font-title) !important;
+  font-weight: 700;
+  font-size: 1.6rem;
+  color: var(--nb-cover);
+  border-bottom: 1.5px solid rgba(201, 168, 76, 0.55);
+  padding-bottom: 0.2em;
+}
+
+.md-typeset h3,
+.md-typeset h4,
+.md-typeset h5,
+.md-typeset h6 {
+  font-family: var(--nb-font-title) !important;
+  color: var(--nb-ink);
+}
+
+/* ── Links ──────────────────────────────────────────────────────────────── */
+.md-typeset a {
+  color: var(--nb-cover);
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+
+.md-typeset a:hover {
+  color: #b8860b;
+  text-decoration: underline solid;
+}
+
+/* ── Code ───────────────────────────────────────────────────────────────── */
+.md-typeset code {
+  font-family: 'Courier New', Courier, monospace !important;
+  background-color: var(--nb-code-bg, #ede4d0);
+  color: #4a2010;
+  border: 1px solid var(--nb-border);
+  border-radius: 3px;
+  padding: 0.08em 0.3em;
+  font-size: 0.88em;
+}
+
+.md-typeset pre {
+  background-color: #ede4d0;
+  border: 1px solid var(--nb-border);
+  border-left: 4px solid var(--nb-accent);
+  border-radius: 4px;
+  box-shadow: inset 0 1px 3px rgba(44, 24, 16, 0.07);
+}
+
+.md-typeset pre > code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-family: 'Courier New', Courier, monospace !important;
+  color: var(--nb-ink);
+}
+
+/* ── Tables ─────────────────────────────────────────────────────────────── */
+.md-typeset table:not([class]) {
+  font-family: var(--nb-font-hand) !important;
+  font-size: 1rem;
+  background-color: var(--nb-paper);
+  border: 1px solid var(--nb-border);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(44, 24, 16, 0.07);
+}
+
+.md-typeset table:not([class]) th {
+  font-family: var(--nb-font-title) !important;
+  background-color: var(--nb-cover);
+  color: var(--nb-accent);
+  border-color: rgba(201, 168, 76, 0.4);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.md-typeset table:not([class]) td {
+  border-color: var(--nb-border);
+  color: var(--nb-ink);
+}
+
+.md-typeset table:not([class]) tr:nth-child(even) td {
+  background-color: rgba(245, 238, 216, 0.55);
+}
+
+.md-typeset table:not([class]) tr:hover td {
+  background-color: rgba(201, 168, 76, 0.1);
+}
+
+/* ── Admonitions ────────────────────────────────────────────────────────── */
+.md-typeset .admonition,
+.md-typeset details {
+  font-family: var(--nb-font-hand) !important;
+  background-color: var(--nb-paper-dark);
+  border-color: var(--nb-border);
+  border-radius: 4px;
+}
+
+.md-typeset .admonition-title,
+.md-typeset summary {
+  font-family: var(--nb-font-title) !important;
+  font-weight: 700;
+}
+
+/* Note / info — ink blue */
+.md-typeset .admonition.note,
+.md-typeset .admonition.info {
+  border-left-color: var(--nb-cover);
+}
+
+.md-typeset .admonition.note > .admonition-title,
+.md-typeset .admonition.info > .admonition-title {
+  background-color: rgba(44, 74, 62, 0.12);
+  color: var(--nb-cover);
+}
+
+/* Tip — gold accent */
+.md-typeset .admonition.tip {
+  border-left-color: var(--nb-accent);
+}
+
+.md-typeset .admonition.tip > .admonition-title {
+  background-color: rgba(201, 168, 76, 0.15);
+  color: #7a5c00;
+}
+
+/* Warning — red margin */
+.md-typeset .admonition.warning {
+  border-left-color: #c04040;
+}
+
+.md-typeset .admonition.warning > .admonition-title {
+  background-color: rgba(192, 64, 64, 0.1);
+  color: #c04040;
+}
+
+/* ── Blockquotes ────────────────────────────────────────────────────────── */
+.md-typeset blockquote {
+  border-left: 4px solid var(--nb-accent);
+  background-color: var(--nb-paper-dark);
+  color: var(--nb-ink-light);
+  font-style: italic;
+  padding: 0.6em 1em;
+  border-radius: 0 4px 4px 0;
+}
+
+/* ── Search ─────────────────────────────────────────────────────────────── */
+.md-search__form {
+  background-color: rgba(253, 248, 240, 0.15);
+  border-radius: 4px;
+}
+
+.md-search__input {
+  font-family: var(--nb-font-hand) !important;
+  color: var(--nb-paper);
+}
+
+.md-search__input::placeholder {
+  color: rgba(253, 248, 240, 0.6);
+}
+
+.md-search-result__article {
+  font-family: var(--nb-font-hand) !important;
+  background-color: var(--nb-paper);
+}
+
+.md-search-result__title {
+  font-family: var(--nb-font-title) !important;
+  color: var(--nb-cover);
+}
+
+/* ── Footer ─────────────────────────────────────────────────────────────── */
+.md-footer {
+  background-color: var(--nb-cover);
+  border-top: 3px solid var(--nb-accent);
+  font-family: var(--nb-font-hand) !important;
+}
+
+.md-footer-meta {
+  background-color: var(--nb-cover-dark);
+}
+
+.md-footer__title {
+  font-family: var(--nb-font-title) !important;
+  color: var(--nb-accent) !important;
+}
+
+.md-footer__link {
+  color: rgba(253, 248, 240, 0.75) !important;
+}
+
+.md-footer__link:hover {
+  color: var(--nb-accent) !important;
+}
+
+/* ── Back-to-top button ─────────────────────────────────────────────────── */
+.md-top {
+  background-color: var(--nb-cover) !important;
+  color: var(--nb-accent) !important;
+  border: 2px solid var(--nb-accent);
+  font-family: var(--nb-font-hand) !important;
+  font-weight: 600;
+  border-radius: 4px;
+}
+
+/* ── Source / repo link ─────────────────────────────────────────────────── */
+.md-source {
+  font-family: var(--nb-font-hand) !important;
+  color: var(--nb-accent) !important;
+  opacity: 0.85;
+}
+
+.md-source:hover {
+  opacity: 1;
+}
+
+/* ── Horizontal rules ───────────────────────────────────────────────────── */
+.md-typeset hr {
+  border-bottom: 1.5px solid var(--nb-border);
+}
+
+/* ── Lists ──────────────────────────────────────────────────────────────── */
+.md-typeset ul li::marker {
+  color: var(--nb-accent);
+}
+
+.md-typeset ol li::marker {
+  color: var(--nb-cover);
+  font-family: var(--nb-font-title) !important;
+  font-weight: 700;
+}
+
+/* ── Mermaid diagrams ───────────────────────────────────────────────────── */
+.mermaid {
+  font-family: var(--nb-font-hand) !important;
+}
+
+/* ── Print ──────────────────────────────────────────────────────────────── */
+@media print {
+  :root {
+    --nb-paper: #fff;
+    --nb-paper-lines: rgba(0, 0, 0, 0.08);
+    --nb-margin-line: rgba(200, 80, 80, 0.12);
+  }
+}
