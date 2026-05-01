@@ -75,30 +75,35 @@ export type RecurrenceConfig =
 // Expense Templates
 export interface ExpenseTemplate {
   id: string;
-  name: string;
-  amount: string;
+  description: string;
+  base_amount: string;
   currency: CurrencyCode;
   category: ExpenseCategory;
   recurrence_type: RecurrenceType;
   recurrence_config: RecurrenceConfig;
-  payment_method_id: string | null;
-  payment_method?: PaymentMethod;
+  reference_date: string;
+  autopay_info: string | null;
+  payment_method: { id: string; name: string; method_type: string } | null;
   active: boolean;
   created_at: string;
   updated_at: string;
 }
 
 export interface CreateExpenseTemplateRequest {
-  name: string;
-  amount: string;
+  description: string;
+  base_amount: string;
   currency: CurrencyCode;
   category: ExpenseCategory;
   recurrence_type: RecurrenceType;
   recurrence_config: RecurrenceConfig;
+  reference_date?: string;
+  autopay_info?: string | null;
   payment_method_id?: string | null;
 }
 
-export interface UpdateExpenseTemplateRequest extends Partial<CreateExpenseTemplateRequest> {}
+export interface UpdateExpenseTemplateRequest extends Partial<CreateExpenseTemplateRequest> {
+  active?: boolean;
+}
 
 // Cycles
 export interface Cycle {

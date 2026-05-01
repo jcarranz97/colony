@@ -6,6 +6,7 @@ repo_url: https://github.com/jcarranz97/colony
 
 theme:
   name: material
+  font: false
   features:
     - navigation.tabs
     - navigation.sections
@@ -16,18 +17,12 @@ theme:
     - toc.integrate
     - content.code.copy
   palette:
-    - scheme: default
-      primary: indigo
-      accent: indigo
-      toggle:
-        icon: material/brightness-7
-        name: Switch to dark mode
-    - scheme: slate
-      primary: indigo
-      accent: indigo
-      toggle:
-        icon: material/brightness-4
-        name: Switch to light mode
+    scheme: default
+    primary: custom
+    accent: custom
+  icon:
+    logo: material/notebook-outline
+    repo: fontawesome/brands/github
 
 nav:
   - Home: index.md
@@ -76,6 +71,9 @@ markdown_extensions:
 
 plugins:
   - search
+
+extra_css:
+  - stylesheets/notebook.css
 
 extra_javascript:
   - https://unpkg.com/mermaid@10.6.1/dist/mermaid.min.js

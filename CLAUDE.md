@@ -1,7 +1,7 @@
 # Colony — CLAUDE.md
 
 Colony is a personal expense management web app replacing manual Excel tracking.
-It organizes expenses into **6-week cycles** aligned with bi-weekly pay periods,
+It organizes expenses into **billing cycles** aligned with pay periods,
 supports USD/MXN multi-currency, and provides financial analytics.
 
 ---
@@ -15,6 +15,7 @@ supports USD/MXN multi-currency, and provides financial analytics.
 | Validation | Pydantic 2.0+ |
 | Auth | JWT (PyJWT) + Argon2ID password hashing |
 | Frontend | Next.js 15 + HeroUI v3 (App Router, TypeScript) |
+| UI Theme | Notebook/handwriting aesthetic — custom CSS vars + Caveat/Kalam fonts |
 | Docs | MkDocs Material |
 | Infra | Docker Compose |
 | CI | GitHub Actions |
@@ -29,6 +30,8 @@ colony/
 │   ├── app/
 │   │   ├── auth/              # Auth domain
 │   │   ├── payment_methods/   # Payment methods domain
+│   │   ├── expense_templates/ # Expense templates domain
+│   │   ├── cycles/            # Cycles + expenses domain
 │   │   ├── config.py          # Settings (env-based)
 │   │   ├── database.py        # SQLAlchemy engine + sessions
 │   │   ├── models.py          # Base ORM models
@@ -192,7 +195,7 @@ stored as structured JSON in `recurrence_config`.
 
 - **Domain-Driven Design**: Each feature is a self-contained module
 - **Stateless auth**: JWT tokens, no server-side sessions
-- **6-week expense cycles**: Core business concept — expenses live inside cycles
+- **Billing cycles**: Core business concept — expenses live inside cycles
   aligned to pay periods
 - **Fixed vs Variable expenses**: Core categorization; location implicitly
   derived from currency (USD = US, MXN = Mexico)
@@ -211,6 +214,28 @@ stored as structured JSON in `recurrence_config`.
 The frontend lives in `frontend/` and is built with **Next.js 15 App Router**,
 **HeroUI v3**, **Tailwind CSS v4**, and **TypeScript**.
 
+### Notebook UI Theme
+
+The entire protected app is wrapped in a **notebook/handwriting aesthetic**:
+
+- **Cover bar** — dark green (`#2c4a3e`) top strip with "Colony" title in
+  Kalam font
+- **Spiral binding** — decorative ring strip on the far left
+- **Nav tabs** — cream paper tabs replacing a traditional sidebar
+- **Ruled page** — faint blue horizontal lines + red left margin on the
+  main content area
+- **Handwriting fonts** — Caveat (body) and Kalam (headings) from Google
+  Fonts
+- **Highlighter status colors** — expense rows use translucent marker colors:
+  - Paid → green (`rgba(80,200,100,0.35)`)
+  - Pending → yellow (`rgba(255,210,60,0.45)`)
+  - Overdue → red (`rgba(240,80,70,0.30)`)
+  - Cancelled → grey (`rgba(180,180,180,0.28)`)
+
+All notebook CSS lives in `frontend/app/globals.css` as `nb-*` prefixed classes
+and `:root` CSS variables. Do **not** use HeroUI components for the layout shell
+— the notebook uses plain HTML + custom CSS.
+
 ### Key Design Decisions
 
 - **Route groups**: `(auth)` for public pages (login, register);
@@ -223,69 +248,83 @@ The frontend lives in `frontend/` and is built with **Next.js 15 App Router**,
   injects `Authorization: Bearer` header, returns
   `{ success: true, data } | { success: false, error }`,
   intercepts 401 → redirects to `/login`
-- **State**: `useState` everywhere; no Redux/Zustand/SWR —
-  React Context only for sidebar collapsed state
-- **Forms**: Formik + Yup throughout — all schemas in
-  `helpers/schemas.ts`; all types in `helpers/types.ts`
+- **State**: `useState` everywhere; no Redux/Zustand/SWR
+- **Forms**: simple controlled `<input>` / `<select>` with `nb-form-*` CSS
+  classes; HeroUI form components (Formik/Yup) are **not** used inside the
+  notebook shell
 - **HeroUI v3 setup**: CSS imports only — `@import "tailwindcss"` then
   `@import "@heroui/styles"` in `globals.css`; no Tailwind plugin required
-- **Component pattern**: every feature follows
-  `components/{feature}/index.tsx` + `table.tsx` + `render-cell.tsx`
-  - `add-*.tsx` + `edit-*.tsx` + `actions.ts`
 - **Soft deletes**: never hard-delete — call the DELETE endpoint which sets
   `active: false`; completed cycles are fully read-only
+
+### Component Pattern
+
+Features follow a **single-file pattern** for the notebook UI:
+
+```text
+components/{feature}/
+├── index.tsx    # All UI: card list + modals + state management
+└── actions.ts   # Server-action wrappers around lib/*.api.ts
+```
+
+`table.tsx` and `render-cell.tsx` files exist in payment-methods and
+expense-templates from an earlier implementation — they are superseded by
+the inline notebook card rendering in `index.tsx` and can be ignored.
 
 ### Frontend Folder Structure
 
 ```text
 frontend/
 ├── app/
-│   ├── (auth)/         # /login, /register — no sidebar
-│   └── (app)/          # Protected: /cycles, /payment-methods,
-│                       #   /expense-templates, /settings
+│   ├── layout.tsx          # Root HTML — adds Google Fonts (Caveat, Kalam)
+│   ├── globals.css         # Tailwind + HeroUI imports + ALL nb-* notebook CSS
+│   ├── (auth)/             # /login, /register — plain centered layout
+│   └── (app)/              # Protected: /cycles, /payment-methods,
+│                           #   /expense-templates, /settings
 ├── components/
-│   ├── auth/           # Login + Register forms
-│   ├── payment-methods/
-│   ├── expense-templates/  # Includes recurrence-config-builder.tsx
-│   ├── cycles/
-│   │   ├── cycle-detail/   # Expenses table, filters, add/edit modals
-│   │   └── cycle-summary/  # Financial summary cards
-│   ├── layout/         # App shell + SidebarContext
-│   ├── sidebar/
-│   ├── navbar/
-│   └── shared/         # StatusChip, CurrencyBadge, CategoryBadge,
-│                       #   AmountDisplay, ConfirmModal, etc.
-├── lib/                # api-client.ts + per-domain *.api.ts modules
-├── actions/            # auth.action.ts (cookie helpers)
-├── helpers/            # types.ts, schemas.ts, formatters.ts
+│   ├── auth/               # Login + Register forms
+│   ├── payment-methods/    # Notebook card list + add/edit modals
+│   ├── expense-templates/  # Notebook card list + add/edit modals
+│   ├── cycles/             # Full cycles implementation — list, detail,
+│   │                       #   expense rows with highlighter, modals
+│   ├── layout/             # AppLayout — notebook shell (cover, spiral, nav)
+│   ├── navbar/             # Legacy — no longer rendered in AppLayout
+│   ├── sidebar/            # Legacy — no longer rendered in AppLayout
+│   └── shared/             # StatusChip, CurrencyBadge, etc. (HeroUI-based)
+├── lib/                    # api-client.ts + per-domain *.api.ts modules
+├── actions/                # auth.action.ts (cookie helpers)
+├── helpers/                # types.ts, schemas.ts, formatters.ts
 └── middleware.ts
 ```
 
 ### HeroUI Usage Rules
 
-- Use semantic color props: `color="primary"` / `color="danger"` /
-  `color="success"` — never raw Tailwind colors on HeroUI components
-- Use `classNames` prop for per-instance style overrides
-- Use compound components (e.g., `<Table>` + `<TableBody>` + `<TableRow>`)
-  — avoid config-only patterns
-- Wrap HeroUI in `components/shared/` only when Colony-specific color
-  logic must be centralized (e.g., `<StatusChip>`)
+HeroUI is still imported and available. Use it in `components/shared/` and
+`(auth)` pages. **Do not** use HeroUI Table, Modal, or form inputs inside the
+notebook shell — use plain HTML with `nb-*` CSS classes instead.
 
-### Status Color Conventions
+When HeroUI is appropriate:
 
-| Status / Value | HeroUI `color` |
-|---|---|
-| `draft` (cycle) | `default` |
-| `active` (cycle) | `primary` |
-| `completed` (cycle) | `success` |
-| `pending` (expense) | `warning` |
-| `paid` (expense) | `success` |
-| `overdue` (expense) | `danger` |
-| `cancelled` (expense) | `default` |
-| `USD` | `primary` |
-| `MXN` | `warning` |
-| `fixed` (category) | `secondary` |
-| `variable` (category) | `success` |
+- `color="primary"` / `color="danger"` / `color="success"` — semantic colors
+- Compound components (`<Table>` + `<TableBody>` + `<TableRow>`) in shared
+  components
+- `classNames` prop for per-instance overrides
+- Wrap in `components/shared/` only when Colony-specific logic is centralized
+
+### CSS Variable Reference
+
+| Variable | Value | Usage |
+|---|---|---|
+| `--paper` | `#fdf8f0` | Page background (cream) |
+| `--cover-bg` | `#2c4a3e` | Cover bar, active tab accent |
+| `--cover-accent` | `#c9a84c` | Gold border, logo color |
+| `--ink` | `#2c1810` | Primary text |
+| `--ink-light` | `#5a4030` | Secondary text |
+| `--font-hand` | `'Caveat', cursive` | Body handwriting font |
+| `--font-title` | `'Kalam', cursive` | Heading handwriting font |
+| `--hl-paid` | `rgba(80,200,100,0.35)` | Green highlighter |
+| `--hl-pending` | `rgba(255,210,60,0.45)` | Yellow highlighter |
+| `--hl-overdue` | `rgba(240,80,70,0.30)` | Red highlighter |
 
 ### Environment
 
@@ -299,7 +338,7 @@ Frontend dev server: `cd frontend && npm run dev` → <http://localhost:3000>
 
 ## Key Docs to Reference
 
-- `docs/architecture/frontend.md` — Frontend architecture + implementation plan
+- `docs/architecture/frontend.md` — Frontend architecture
 - `docs/architecture/backend.md` — Detailed backend architecture
 - `docs/architecture/database-schema.md` — DB design + recurrence patterns
 - `docs/architecture/api-specification.md` — Full API endpoint specs

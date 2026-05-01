@@ -24,9 +24,55 @@ export const PaymentMethodSchema = Yup.object({
     .required("Currency is required"),
 });
 
-export const ExpenseTemplateSchema = Yup.object({
-  name: Yup.string().required("Name is required"),
-  amount: Yup.string().required("Amount is required"),
+const recurrenceConfigShape = Yup.object()
+  .when("recurrence_type", {
+    is: "weekly",
+    then: (s) =>
+      s.shape({
+        day_of_week: Yup.number()
+          .min(0)
+          .max(6)
+          .required("Day of week is required"),
+      }),
+  })
+  .when("recurrence_type", {
+    is: "bi_weekly",
+    then: (s) =>
+      s.shape({
+        interval_days: Yup.number()
+          .positive()
+          .integer()
+          .required("Interval days is required"),
+      }),
+  })
+  .when("recurrence_type", {
+    is: "monthly",
+    then: (s) =>
+      s.shape({
+        day_of_month: Yup.number()
+          .min(1)
+          .max(31)
+          .required("Day of month is required"),
+        handle_month_end: Yup.boolean().optional(),
+      }),
+  })
+  .when("recurrence_type", {
+    is: "custom",
+    then: (s) =>
+      s.shape({
+        interval: Yup.number()
+          .positive()
+          .integer()
+          .required("Interval is required"),
+        unit: Yup.mixed()
+          .oneOf(["days", "weeks", "months"])
+          .required("Unit is required"),
+      }),
+  });
+
+export const ExpenseTemplateCreateSchema = Yup.object({
+  description: Yup.string().required("Name is required"),
+  base_amount: Yup.string().required("Amount is required"),
   currency: Yup.string().oneOf(["USD", "MXN"]).required("Currency is required"),
   category: Yup.string()
     .oneOf(["fixed", "variable"])
@@ -34,51 +80,25 @@ export const ExpenseTemplateSchema = Yup.object({
   recurrence_type: Yup.string()
     .oneOf(["weekly", "bi_weekly", "monthly", "custom"])
     .required("Recurrence type is required"),
-  recurrence_config: Yup.object()
-    .when("recurrence_type", {
-      is: "weekly",
-      then: (s) =>
-        s.shape({
-          day_of_week: Yup.number()
-            .min(0)
-            .max(6)
-            .required("Day of week is required"),
-        }),
-    })
-    .when("recurrence_type", {
-      is: "bi_weekly",
-      then: (s) =>
-        s.shape({
-          interval_days: Yup.number()
-            .positive()
-            .integer()
-            .required("Interval days is required"),
-        }),
-    })
-    .when("recurrence_type", {
-      is: "monthly",
-      then: (s) =>
-        s.shape({
-          day_of_month: Yup.number()
-            .min(1)
-            .max(31)
-            .required("Day of month is required"),
-          handle_month_end: Yup.boolean().optional(),
-        }),
-    })
-    .when("recurrence_type", {
-      is: "custom",
-      then: (s) =>
-        s.shape({
-          interval: Yup.number()
-            .positive()
-            .integer()
-            .required("Interval is required"),
-          unit: Yup.mixed()
-            .oneOf(["days", "weeks", "months"])
-            .required("Unit is required"),
-        }),
-    }),
+  recurrence_config: recurrenceConfigShape,
+  reference_date: Yup.string().required("Reference date is required"),
+  payment_method_id: Yup.string()
+    .nullable()
+    .required("Payment method is required"),
+});
+
+export const ExpenseTemplateSchema = Yup.object({
+  description: Yup.string().required("Name is required"),
+  base_amount: Yup.string().required("Amount is required"),
+  currency: Yup.string().oneOf(["USD", "MXN"]).required("Currency is required"),
+  category: Yup.string()
+    .oneOf(["fixed", "variable"])
+    .required("Category is required"),
+  recurrence_type: Yup.string()
+    .oneOf(["weekly", "bi_weekly", "monthly", "custom"])
+    .required("Recurrence type is required"),
+  recurrence_config: recurrenceConfigShape,
+  reference_date: Yup.string().optional(),
   payment_method_id: Yup.string().nullable().optional(),
 });
 
