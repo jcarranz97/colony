@@ -12,7 +12,7 @@ import {
   Spinner,
   TextField,
 } from "@heroui/react";
-import { ExpenseTemplateSchema } from "@/helpers/schemas";
+import { ExpenseTemplateCreateSchema } from "@/helpers/schemas";
 import { RecurrenceConfigBuilder } from "./recurrence-config-builder";
 import { addExpenseTemplate } from "./actions";
 import type { ExpenseTemplate, PaymentMethod } from "@/helpers/types";
@@ -57,9 +57,10 @@ export function AddExpenseTemplate({
                 category: "",
                 recurrence_type: "",
                 recurrence_config: {} as Record<string, unknown>,
-                payment_method_id: null as string | null,
+                reference_date: new Date().toISOString().split("T")[0],
+                payment_method_id: "" as string,
               }}
-              validationSchema={ExpenseTemplateSchema}
+              validationSchema={ExpenseTemplateCreateSchema}
               onSubmit={async (values, { setSubmitting, resetForm }) => {
                 setError(null);
                 const result = await addExpenseTemplate({
@@ -69,7 +70,8 @@ export function AddExpenseTemplate({
                   category: values.category as any,
                   recurrence_type: values.recurrence_type as any,
                   recurrence_config: values.recurrence_config as any,
-                  payment_method_id: values.payment_method_id,
+                  reference_date: values.reference_date,
+                  payment_method_id: values.payment_method_id || null,
                 });
                 if (result.success) {
                   onCreated(result.data);
@@ -249,22 +251,39 @@ export function AddExpenseTemplate({
 
                     {values.recurrence_type && <RecurrenceConfigBuilder />}
 
+                    <TextField
+                      isInvalid={
+                        !!errors.reference_date && !!touched.reference_date
+                      }
+                      value={values.reference_date}
+                      onChange={(v) => setFieldValue("reference_date", v)}
+                    >
+                      <Label>Reference Date</Label>
+                      <Input type="date" />
+                      {touched.reference_date && errors.reference_date && (
+                        <FieldError>{errors.reference_date}</FieldError>
+                      )}
+                    </TextField>
+
                     <Select.Root
-                      selectedKey={values.payment_method_id ?? null}
+                      selectedKey={values.payment_method_id || null}
                       onSelectionChange={(key) =>
-                        setFieldValue(
-                          "payment_method_id",
-                          key === "none" ? null : String(key),
-                        )
+                        setFieldValue("payment_method_id", String(key))
+                      }
+                      isInvalid={
+                        !!errors.payment_method_id &&
+                        !!touched.payment_method_id
                       }
                       fullWidth
                     >
-                      <Label>Payment Method (optional)</Label>
+                      <Label>Payment Method</Label>
                       <Select.Trigger>
                         <Select.Value>
                           {({ isPlaceholder, selectedText }: any) =>
                             isPlaceholder ? (
-                              <span className="text-default-400">None</span>
+                              <span className="text-default-400">
+                                Select payment method...
+                              </span>
                             ) : (
                               selectedText
                             )
@@ -272,11 +291,14 @@ export function AddExpenseTemplate({
                         </Select.Value>
                         <Select.Indicator />
                       </Select.Trigger>
+                      {touched.payment_method_id &&
+                        errors.payment_method_id && (
+                          <p className="text-xs text-danger">
+                            {errors.payment_method_id}
+                          </p>
+                        )}
                       <Select.Popover>
                         <ListBox>
-                          <ListBox.Item id="none" textValue="None">
-                            None
-                          </ListBox.Item>
                           {paymentMethods
                             .filter((m) => m.active)
                             .map((m) => (

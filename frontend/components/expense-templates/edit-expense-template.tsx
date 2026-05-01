@@ -65,6 +65,7 @@ export function EditExpenseTemplate({
                   string,
                   unknown
                 >,
+                reference_date: template.reference_date,
                 payment_method_id: template.payment_method?.id ?? null,
               }}
               validationSchema={ExpenseTemplateSchema}
@@ -77,6 +78,7 @@ export function EditExpenseTemplate({
                   category: values.category as any,
                   recurrence_type: values.recurrence_type as any,
                   recurrence_config: values.recurrence_config as any,
+                  reference_date: values.reference_date,
                   payment_method_id: values.payment_method_id,
                 });
                 if (result.success) {
@@ -255,6 +257,20 @@ export function EditExpenseTemplate({
                     </Select.Root>
 
                     {values.recurrence_type && <RecurrenceConfigBuilder />}
+
+                    <TextField
+                      isInvalid={
+                        !!errors.reference_date && !!touched.reference_date
+                      }
+                      value={values.reference_date}
+                      onChange={(v) => setFieldValue("reference_date", v)}
+                    >
+                      <Label>Reference Date</Label>
+                      <Input type="date" />
+                      {touched.reference_date && errors.reference_date && (
+                        <FieldError>{errors.reference_date}</FieldError>
+                      )}
+                    </TextField>
 
                     <Select.Root
                       selectedKey={values.payment_method_id ?? "none"}
