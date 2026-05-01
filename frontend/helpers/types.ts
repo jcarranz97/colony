@@ -161,6 +161,9 @@ export interface CreateCycleExpenseRequest {
 
 export interface UpdateCycleExpenseRequest extends Partial<CreateCycleExpenseRequest> {
   status?: ExpenseStatus;
+  paid?: boolean;
+  paid_at?: string | null;
+  comments?: string | null;
 }
 
 export interface CyclesListResponse {
