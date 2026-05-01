@@ -163,11 +163,19 @@ export interface UpdateCycleExpenseRequest extends Partial<CreateCycleExpenseReq
   status?: ExpenseStatus;
 }
 
+export interface CyclesListResponse {
+  cycles: Cycle[];
+  pagination: {
+    page: number;
+    per_page: number;
+    total: number;
+    pages: number;
+  };
+}
+
 export interface CycleExpensesResponse {
-  items: CycleExpense[];
-  total: number;
-  page: number;
-  size: number;
+  expenses: CycleExpense[];
+  summary: Record<string, unknown>;
 }
 
 // Cycle Summary

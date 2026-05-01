@@ -699,7 +699,7 @@ export function Cycles() {
       async ([cyclesRes, methodsRes]) => {
         if (methodsRes.success) setPaymentMethods(methodsRes.data);
         if (cyclesRes.success) {
-          const loaded = cyclesRes.data;
+          const loaded = cyclesRes.data.cycles;
           setCycles(loaded);
           const summaryResults = await Promise.all(
             loaded.map((c) =>
@@ -721,7 +721,7 @@ export function Cycles() {
     if (!selectedCycle) return;
     setExpensesLoading(true);
     getExpenses(selectedCycle.id).then((res) => {
-      if (res.success) setCycleExpenses(res.data.items);
+      if (res.success) setCycleExpenses(res.data.expenses);
       setExpensesLoading(false);
     });
   }, [selectedCycle]);
@@ -736,6 +736,12 @@ export function Cycles() {
   };
 
   const handleBack = () => {
+    if (selectedCycle) {
+      fetchSummary(selectedCycle.id).then((r) => {
+        if (r.success)
+          setSummaries((prev) => ({ ...prev, [selectedCycle.id]: r.data }));
+      });
+    }
     setSelectedCycle(null);
     setCycleExpenses([]);
   };
