@@ -72,7 +72,7 @@ function CycleCard({
       (summary.status_breakdown.cancelled ?? 0)
     : 0;
   const pct = total > 0 ? Math.round((paid / total) * 100) : 0;
-  const net = summary ? parseFloat(summary.net_balance) : 0;
+  const net = summary ? parseFloat(summary.financial.net_balance) : 0;
 
   return (
     <div
@@ -97,7 +97,7 @@ function CycleCard({
         <div className="nb-cycle-stat">
           <span className="nb-stat-label">Income</span>
           <span className="nb-stat-value">
-            {fmtAmount(cycle.income ?? "0", "USD")}
+            {fmtAmount(cycle.income_amount ?? "0", "USD")}
           </span>
         </div>
         {summary && (
@@ -105,7 +105,7 @@ function CycleCard({
             <div className="nb-cycle-stat">
               <span className="nb-stat-label">Expenses</span>
               <span className="nb-stat-value">
-                {fmtAmount(summary.total_expenses, "USD")}
+                {fmtAmount(summary.financial.total_expenses_usd, "USD")}
               </span>
             </div>
             <div className="nb-cycle-stat">
@@ -192,7 +192,7 @@ interface AddCycleForm {
   name: string;
   start_date: string;
   end_date: string;
-  income: string;
+  income_amount: string;
   generate_from_templates: boolean;
 }
 
@@ -209,7 +209,7 @@ function AddCycleModal({
     name: "",
     start_date: "",
     end_date: "",
-    income: "",
+    income_amount: "",
     generate_from_templates: true,
   });
   const [saving, setSaving] = useState(false);
@@ -219,14 +219,15 @@ function AddCycleModal({
     setForm((f) => ({ ...f, [k]: v }));
 
   const handleSubmit = async () => {
-    if (!form.name || !form.start_date || !form.end_date) return;
+    if (!form.name || !form.start_date || !form.end_date || !form.income_amount)
+      return;
     setSaving(true);
     setError(null);
     const res = await addCycle({
       name: form.name,
       start_date: form.start_date,
       end_date: form.end_date,
-      income: form.income || undefined,
+      income_amount: form.income_amount,
       generate_from_templates: form.generate_from_templates,
     });
     if (res.success) {
@@ -235,7 +236,7 @@ function AddCycleModal({
         name: "",
         start_date: "",
         end_date: "",
-        income: "",
+        income_amount: "",
         generate_from_templates: true,
       });
       onClose();
@@ -295,8 +296,9 @@ function AddCycleModal({
             className="nb-form-input"
             type="number"
             placeholder="0.00"
-            value={form.income}
-            onChange={(e) => set("income", e.target.value)}
+            required
+            value={form.income_amount}
+            onChange={(e) => set("income_amount", e.target.value)}
           />
         </div>
 
@@ -556,7 +558,7 @@ function CycleDetail({
   const pending = expenses.filter((e) => e.status === "pending").length;
   const overdue = expenses.filter((e) => e.status === "overdue").length;
 
-  const netBalance = summary ? parseFloat(summary.net_balance) : 0;
+  const netBalance = summary ? parseFloat(summary.financial.net_balance) : 0;
 
   return (
     <>
@@ -580,7 +582,7 @@ function CycleDetail({
         <div className="nb-summary-item">
           <span className="nb-summary-label">Income</span>
           <span className="nb-summary-value">
-            {fmtAmount(cycle.income ?? "0", "USD")}
+            {fmtAmount(cycle.income_amount ?? "0", "USD")}
           </span>
         </div>
         <div className="nb-summary-item">
@@ -730,8 +732,12 @@ export function Cycles() {
     });
   }, [selectedCycle]);
 
-  const handleCycleAdded = (cycle: Cycle) => {
+  const handleCycleAdded = async (cycle: Cycle) => {
     setCycles((prev) => [cycle, ...prev]);
+    const summaryRes = await fetchSummary(cycle.id);
+    if (summaryRes.success) {
+      setSummaries((prev) => ({ ...prev, [cycle.id]: summaryRes.data }));
+    }
   };
 
   const handleOpenCycle = (cycle: Cycle) => {

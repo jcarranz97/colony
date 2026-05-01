@@ -112,8 +112,8 @@ export interface Cycle {
   start_date: string;
   end_date: string;
   status: CycleStatus;
-  income: string;
-  active: boolean;
+  income_amount: string;
+  remaining_balance: string;
   created_at: string;
   updated_at: string;
 }
@@ -122,13 +122,13 @@ export interface CreateCycleRequest {
   name: string;
   start_date: string;
   end_date: string;
-  income?: string;
+  income_amount: string;
   generate_from_templates?: boolean;
 }
 
 export interface UpdateCycleRequest {
   name?: string;
-  income?: string;
+  income_amount?: string;
   status?: CycleStatus;
 }
 
@@ -179,15 +179,6 @@ export interface CycleExpensesResponse {
 }
 
 // Cycle Summary
-export interface PaymentMethodSummary {
-  payment_method_id: string;
-  payment_method_name: string;
-  total: string;
-  paid: string;
-  pending: string;
-  count: number;
-}
-
 export interface StatusBreakdown {
   pending: number;
   paid: number;
@@ -195,16 +186,26 @@ export interface StatusBreakdown {
   cancelled: number;
 }
 
-export interface CycleSummary {
-  cycle_id: string;
-  income: string;
-  total_expenses: string;
-  net_balance: string;
-  fixed_expenses: string;
-  variable_expenses: string;
+export interface CycleSummaryFinancial {
+  total_expenses_usd: string;
+  fixed_expenses_usd: string;
+  variable_expenses_usd: string;
   usa_expenses_usd: string;
-  mexico_expenses_mxn: string;
-  by_payment_method: PaymentMethodSummary[];
+  mexico_expenses_usd: string;
+  net_balance: string;
+}
+
+export interface CycleSummary {
+  cycle: {
+    id: string;
+    name: string;
+    start_date: string;
+    end_date: string;
+    income_amount: string;
+  };
+  financial: CycleSummaryFinancial;
+  by_payment_method: unknown[];
+  by_currency: Record<string, unknown>;
   status_breakdown: StatusBreakdown;
 }
 
