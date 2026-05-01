@@ -484,7 +484,8 @@ class CycleService:
 
         status_breakdown = schemas.StatusBreakdown(
             pending=sum(
-                1 for e in active
+                1
+                for e in active
                 if e.status == ExpenseStatus.PENDING and not _is_overdue(e)
             ),
             paid=sum(1 for e in active if e.status == ExpenseStatus.PAID),
