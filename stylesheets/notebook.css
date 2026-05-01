@@ -406,3 +406,156 @@ body {
     --nb-margin-line: rgba(200, 80, 80, 0.12);
   }
 }
+
+/* ── Dark mode overrides ──────────────────────────────────────────────── */
+[data-md-color-scheme="slate"] {
+  --nb-paper: #1a1a2e;
+  --nb-paper-dark: #16162a;
+  --nb-paper-lines: rgba(100, 100, 140, 0.25);
+  --nb-margin-line: rgba(200, 80, 80, 0.15);
+  --nb-ink: #e0d8c8;
+  --nb-ink-light: #a89880;
+  --nb-border: #2a2a44;
+  --md-default-bg-color: #1a1a2e;
+  --md-default-fg-color: #e0d8c8;
+  --md-default-fg-color--light: #a89880;
+  --md-default-fg-color--lighter: #7a6a58;
+  --md-default-fg-color--lightest: #4a4038;
+  --md-code-bg-color: #16162a;
+  --md-code-fg-color: #c8b89a;
+  --md-accent-fg-color: #c9a84c;
+}
+
+[data-md-color-scheme="slate"] body {
+  background-color: var(--nb-paper) !important;
+  color: var(--nb-ink);
+}
+
+[data-md-color-scheme="slate"] .md-header {
+  background-color: var(--nb-cover-dark) !important;
+}
+
+[data-md-color-scheme="slate"] .md-tabs {
+  background-color: var(--nb-cover-dark) !important;
+}
+
+[data-md-color-scheme="slate"] .md-sidebar {
+  background-color: var(--nb-paper-dark);
+}
+
+[data-md-color-scheme="slate"] .md-nav__link {
+  color: var(--nb-ink-light) !important;
+}
+
+[data-md-color-scheme="slate"] .md-nav__link:hover {
+  color: var(--nb-accent) !important;
+}
+
+[data-md-color-scheme="slate"] .md-nav__link--active {
+  color: var(--nb-accent) !important;
+}
+
+[data-md-color-scheme="slate"] .md-content {
+  background-color: var(--nb-paper);
+}
+
+[data-md-color-scheme="slate"] .md-content__inner {
+  background-image:
+    linear-gradient(90deg, var(--nb-margin-line) 1px, transparent 1px),
+    linear-gradient(var(--nb-paper-lines) 1px, transparent 1px);
+}
+
+[data-md-color-scheme="slate"] .md-typeset {
+  color: var(--nb-ink);
+}
+
+[data-md-color-scheme="slate"] .md-typeset h1 {
+  color: var(--nb-accent);
+  border-bottom-color: var(--nb-accent);
+}
+
+[data-md-color-scheme="slate"] .md-typeset h2 {
+  color: var(--nb-accent);
+}
+
+[data-md-color-scheme="slate"] .md-typeset a {
+  color: var(--nb-accent);
+}
+
+[data-md-color-scheme="slate"] .md-typeset code {
+  background-color: var(--md-code-bg-color);
+  color: var(--md-code-fg-color);
+  border-color: var(--nb-border);
+}
+
+[data-md-color-scheme="slate"] .md-typeset pre {
+  background-color: var(--md-code-bg-color);
+  border-color: var(--nb-border);
+  color: var(--nb-ink);
+}
+
+[data-md-color-scheme="slate"] .md-typeset pre > code {
+  color: var(--md-code-fg-color);
+}
+
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) {
+  background-color: var(--nb-paper);
+  border-color: var(--nb-border);
+}
+
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) th {
+  background-color: var(--nb-cover-dark);
+  color: var(--nb-accent);
+}
+
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) td {
+  color: var(--nb-ink);
+  border-color: var(--nb-border);
+}
+
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) tr:nth-child(even) td {
+  background-color: rgba(22, 22, 42, 0.6);
+}
+
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) tr:hover td {
+  background-color: rgba(201, 168, 76, 0.08);
+}
+
+[data-md-color-scheme="slate"] .md-typeset .admonition,
+[data-md-color-scheme="slate"] .md-typeset details {
+  background-color: var(--nb-paper-dark);
+  border-color: var(--nb-border);
+}
+
+[data-md-color-scheme="slate"] .md-typeset blockquote {
+  background-color: var(--nb-paper-dark);
+  color: var(--nb-ink-light);
+}
+
+[data-md-color-scheme="slate"] .md-search__form {
+  background-color: rgba(26, 26, 46, 0.3);
+}
+
+[data-md-color-scheme="slate"] .md-search__input {
+  color: var(--nb-paper);
+}
+
+[data-md-color-scheme="slate"] .md-search__input::placeholder {
+  color: rgba(26, 26, 46, 0.6);
+}
+
+[data-md-color-scheme="slate"] .md-search-result__article {
+  background-color: var(--nb-paper);
+}
+
+[data-md-color-scheme="slate"] .md-footer {
+  background-color: var(--nb-cover-dark);
+}
+
+[data-md-color-scheme="slate"] .md-footer-meta {
+  background-color: #0f0f1e;
+}
+
+[data-md-color-scheme="slate"] .md-typeset hr {
+  border-bottom-color: var(--nb-border);
+}
