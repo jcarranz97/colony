@@ -59,7 +59,7 @@ const iconBtn: React.CSSProperties = {
   fontSize: 12,
   fontWeight: 600,
   background: "transparent",
-  border: "1px solid #d0c4a8",
+  border: "1px solid var(--btn-cancel-border, #c0b090)",
   borderRadius: 4,
   padding: "3px 9px",
   cursor: "pointer",
@@ -97,7 +97,9 @@ function TemplateCard({
           justifyContent: "center",
           fontSize: 16,
           flexShrink: 0,
-          background: isFixed ? "rgba(44,74,62,0.10)" : "rgba(201,168,76,0.15)",
+          background: isFixed
+            ? "var(--stat-card-bg, rgba(44,74,62,0.10))"
+            : "var(--add-btn-hover, rgba(201,168,76,0.15))",
         }}
       >
         {isFixed ? "📌" : "🛒"}
@@ -185,7 +187,9 @@ function TemplateCard({
         <button
           style={{
             ...iconBtn,
-            ...(template.active ? { color: "#c04040" } : { color: "#276838" }),
+            ...(template.active
+              ? { color: "var(--hl-overdue-border)" }
+              : { color: "var(--hl-paid-border)" }),
           }}
           onClick={() => onToggle(template)}
           disabled={toggling}

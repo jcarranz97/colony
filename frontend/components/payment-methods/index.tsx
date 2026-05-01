@@ -36,7 +36,7 @@ const iconBtn: React.CSSProperties = {
   fontSize: 12,
   fontWeight: 600,
   background: "transparent",
-  border: "1px solid #d0c4a8",
+  border: "1px solid var(--btn-cancel-border, #c0b090)",
   borderRadius: 4,
   padding: "3px 9px",
   cursor: "pointer",
@@ -67,7 +67,7 @@ function PaymentCard({
           width: 44,
           height: 44,
           borderRadius: 10,
-          background: "rgba(44,74,62,0.08)",
+          background: "var(--stat-card-bg, rgba(44,74,62,0.08))",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -113,7 +113,9 @@ function PaymentCard({
         <button
           style={{
             ...iconBtn,
-            ...(method.active ? { color: "#c04040" } : { color: "#276838" }),
+            ...(method.active
+              ? { color: "var(--hl-overdue-border)" }
+              : { color: "var(--hl-paid-border)" }),
           }}
           onClick={() => onToggle(method)}
           disabled={toggling}
