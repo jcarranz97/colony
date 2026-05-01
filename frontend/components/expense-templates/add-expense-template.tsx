@@ -14,9 +14,11 @@ import {
   Select,
   Spinner,
   TextField,
+  Tooltip,
 } from "@heroui/react";
 import { parseDate } from "@internationalized/date";
 import type { DateValue } from "react-aria-components";
+import { FiInfo } from "react-icons/fi";
 import { ExpenseTemplateCreateSchema } from "@/helpers/schemas";
 import { RecurrenceConfigBuilder } from "./recurrence-config-builder";
 import { addExpenseTemplate } from "./actions";
@@ -171,7 +173,27 @@ export function AddExpenseTemplate({
                       isInvalid={!!errors.category && !!touched.category}
                       fullWidth
                     >
-                      <Label>Category</Label>
+                      <Label className="flex items-center gap-1.5">
+                        Category
+                        <Tooltip delay={0}>
+                          <Button
+                            isIconOnly
+                            variant="ghost"
+                            size="sm"
+                            aria-label="More information"
+                            className="h-4 w-4 min-w-0 p-0 text-default-400"
+                          >
+                            <FiInfo size={12} />
+                          </Button>
+                          <Tooltip.Content>
+                            <p className="text-xs max-w-56">
+                              <strong>Fixed</strong> — same amount every period
+                              (rent, subscriptions). <strong>Variable</strong> —
+                              amount changes each time (groceries, gas).
+                            </p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      </Label>
                       <Select.Trigger>
                         <Select.Value>
                           {({ isPlaceholder, selectedText }: any) =>
@@ -216,7 +238,28 @@ export function AddExpenseTemplate({
                       }
                       fullWidth
                     >
-                      <Label>Recurrence</Label>
+                      <Label className="flex items-center gap-1.5">
+                        Recurrence
+                        <Tooltip delay={0}>
+                          <Button
+                            isIconOnly
+                            variant="ghost"
+                            size="sm"
+                            aria-label="More information"
+                            className="h-4 w-4 min-w-0 p-0 text-default-400"
+                          >
+                            <FiInfo size={12} />
+                          </Button>
+                          <Tooltip.Content>
+                            <p className="text-xs max-w-56">
+                              How often this expense repeats.{" "}
+                              <strong>Bi-weekly</strong> uses a fixed interval
+                              of days. <strong>Custom</strong> lets you set any
+                              interval and unit.
+                            </p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      </Label>
                       <Select.Trigger>
                         <Select.Value>
                           {({ isPlaceholder, selectedText }: any) =>
@@ -276,7 +319,28 @@ export function AddExpenseTemplate({
                         !!errors.reference_date && !!touched.reference_date
                       }
                     >
-                      <Label>Reference Date</Label>
+                      <Label className="flex items-center gap-1.5">
+                        Reference Date
+                        <Tooltip delay={0}>
+                          <Button
+                            isIconOnly
+                            variant="ghost"
+                            size="sm"
+                            aria-label="More information"
+                            className="h-4 w-4 min-w-0 p-0 text-default-400"
+                          >
+                            <FiInfo size={12} />
+                          </Button>
+                          <Tooltip.Content>
+                            <p className="text-xs max-w-56">
+                              The most recent date this expense actually
+                              occurred. The system uses it as an anchor to
+                              calculate which dates fall inside each 6-week
+                              cycle. Use the first payment date if unsure.
+                            </p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      </Label>
                       <DateField.Group fullWidth>
                         <DateField.Input>
                           {(segment) => <DateField.Segment segment={segment} />}
