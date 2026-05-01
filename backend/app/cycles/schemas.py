@@ -247,6 +247,12 @@ class CycleExpenseResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
+    @model_validator(mode="after")
+    def compute_overdue(self) -> "CycleExpenseResponse":
+        if self.status == ExpenseStatus.PENDING and self.due_date < date.today():
+            self.status = ExpenseStatus.OVERDUE
+        return self
+
     model_config = {
         "from_attributes": True,
         "json_encoders": {Decimal: str},

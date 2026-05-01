@@ -136,7 +136,7 @@ export interface UpdateCycleRequest {
 export interface CycleExpense {
   id: string;
   cycle_id: string;
-  name: string;
+  description: string;
   amount: string;
   currency: CurrencyCode;
   category: ExpenseCategory;
@@ -151,7 +151,7 @@ export interface CycleExpense {
 }
 
 export interface CreateCycleExpenseRequest {
-  name: string;
+  description: string;
   amount: string;
   currency: CurrencyCode;
   category: ExpenseCategory;

@@ -428,6 +428,17 @@
   background: linear-gradient(to right, var(--cover-bg), #3aad55);
   transition: width 0.4s ease;
 }
+.nb-overdue-badge {
+  font-family: var(--font-hand);
+  font-size: 13px;
+  color: var(--hl-overdue-border);
+  background: var(--hl-overdue);
+  border: 1px solid var(--hl-overdue-border);
+  border-radius: 4px;
+  padding: 2px 8px;
+  white-space: nowrap;
+  align-self: center;
+}
 
 .nb-open-btn {
   font-family: var(--font-hand);
