@@ -140,9 +140,11 @@ function CycleCard({
 function ExpenseRow({
   expense,
   onToggle,
+  onEdit,
 }: {
   expense: CycleExpense;
   onToggle: (id: string) => void;
+  onEdit: (expense: CycleExpense) => void;
 }) {
   const statusCls =
     expense.status === "paid"
@@ -181,6 +183,164 @@ function ExpenseRow({
       )}
       <div className="nb-expense-amount">
         {fmtAmount(expense.amount, expense.currency)}
+      </div>
+      <button
+        className="nb-expense-edit-btn"
+        title="Edit expense"
+        onClick={(e) => {
+          e.stopPropagation();
+          onEdit(expense);
+        }}
+      >
+        ✎
+      </button>
+    </div>
+  );
+}
+
+// ── Edit Expense Modal ────────────────────────────────────────────────────────
+
+interface EditExpenseForm {
+  amount: string;
+  due_date: string;
+  comments: string;
+}
+
+function EditExpenseModal({
+  isOpen,
+  onClose,
+  expense,
+  cycleId,
+  onEdited,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  expense: CycleExpense | null;
+  cycleId: string;
+  onEdited: (updated: CycleExpense) => void;
+}) {
+  const [form, setForm] = useState<EditExpenseForm>({
+    amount: "",
+    due_date: "",
+    comments: "",
+  });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (expense) {
+      setForm({
+        amount: expense.amount,
+        due_date: expense.due_date ?? "",
+        comments: "",
+      });
+      setError(null);
+    }
+  }, [expense]);
+
+  const set = <K extends keyof EditExpenseForm>(k: K, v: EditExpenseForm[K]) =>
+    setForm((f) => ({ ...f, [k]: v }));
+
+  const handleSubmit = async () => {
+    if (!expense || !form.amount) return;
+    setSaving(true);
+    setError(null);
+    const res = await editExpense(cycleId, expense.id, {
+      amount: form.amount,
+      due_date: form.due_date || null,
+      comments: form.comments || null,
+    });
+    if (res.success) {
+      onEdited(res.data);
+      onClose();
+    } else {
+      setError(res.error.message);
+    }
+    setSaving(false);
+  };
+
+  if (!isOpen || !expense) return null;
+
+  return (
+    <div
+      className="nb-modal-backdrop"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div className="nb-modal">
+        <button className="nb-modal-close" onClick={onClose}>
+          ✕
+        </button>
+        <div className="nb-modal-title">Edit Expense</div>
+        <div
+          style={{
+            fontFamily: "var(--font-hand)",
+            color: "var(--ink-light)",
+            fontSize: 14,
+            marginBottom: 12,
+          }}
+        >
+          {expense.description}
+        </div>
+
+        <div className="nb-form-row">
+          <div className="nb-form-group">
+            <label className="nb-form-label">Amount ({expense.currency})</label>
+            <input
+              className="nb-form-input"
+              type="number"
+              placeholder="0.00"
+              value={form.amount}
+              onChange={(e) => set("amount", e.target.value)}
+            />
+          </div>
+          <div className="nb-form-group">
+            <label className="nb-form-label">Due date</label>
+            <input
+              className="nb-form-input"
+              type="date"
+              value={form.due_date}
+              onChange={(e) => set("due_date", e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="nb-form-group">
+          <label className="nb-form-label">Comments</label>
+          <textarea
+            className="nb-form-input"
+            placeholder="e.g. price increase this month…"
+            rows={2}
+            value={form.comments}
+            onChange={(e) => set("comments", e.target.value)}
+            style={{ resize: "vertical" }}
+          />
+        </div>
+
+        {error && (
+          <p
+            style={{
+              fontFamily: "var(--font-hand)",
+              color: "var(--hl-overdue-border)",
+              fontSize: 14,
+              marginBottom: 8,
+            }}
+          >
+            {error}
+          </p>
+        )}
+
+        <div className="nb-modal-actions">
+          <button className="nb-btn-cancel" onClick={onClose}>
+            Cancel
+          </button>
+          <button
+            className="nb-btn-primary"
+            onClick={handleSubmit}
+            disabled={saving}
+          >
+            {saving ? "Saving…" : "Save ✓"}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -540,6 +700,7 @@ function CycleDetail({
   onBack,
   onToggleExpense,
   onExpenseAdded,
+  onExpenseEdited,
 }: {
   cycle: Cycle;
   expenses: CycleExpense[];
@@ -548,8 +709,18 @@ function CycleDetail({
   onBack: () => void;
   onToggleExpense: (id: string) => void;
   onExpenseAdded: (e: CycleExpense) => void;
+  onExpenseEdited: (updated: CycleExpense) => void;
 }) {
   const [addExpenseOpen, setAddExpenseOpen] = useState(false);
+  const [editExpenseOpen, setEditExpenseOpen] = useState(false);
+  const [editingExpense, setEditingExpense] = useState<CycleExpense | null>(
+    null,
+  );
+
+  const handleEditExpense = (expense: CycleExpense) => {
+    setEditingExpense(expense);
+    setEditExpenseOpen(true);
+  };
 
   const fixedExp = expenses.filter((e) => e.category === "fixed");
   const varExp = expenses.filter((e) => e.category === "variable");
@@ -648,7 +819,12 @@ function CycleDetail({
         <>
           <div className="nb-section-title">📌 Fixed</div>
           {fixedExp.map((e) => (
-            <ExpenseRow key={e.id} expense={e} onToggle={onToggleExpense} />
+            <ExpenseRow
+              key={e.id}
+              expense={e}
+              onToggle={onToggleExpense}
+              onEdit={handleEditExpense}
+            />
           ))}
         </>
       )}
@@ -657,7 +833,12 @@ function CycleDetail({
         <>
           <div className="nb-section-title">🛒 Variable</div>
           {varExp.map((e) => (
-            <ExpenseRow key={e.id} expense={e} onToggle={onToggleExpense} />
+            <ExpenseRow
+              key={e.id}
+              expense={e}
+              onToggle={onToggleExpense}
+              onEdit={handleEditExpense}
+            />
           ))}
         </>
       )}
@@ -683,6 +864,21 @@ function CycleDetail({
         cycleId={cycle.id}
         paymentMethods={paymentMethods}
         onAdded={onExpenseAdded}
+      />
+
+      <EditExpenseModal
+        isOpen={editExpenseOpen}
+        onClose={() => {
+          setEditExpenseOpen(false);
+          setEditingExpense(null);
+        }}
+        expense={editingExpense}
+        cycleId={cycle.id}
+        onEdited={(updated) => {
+          onExpenseEdited(updated);
+          setEditExpenseOpen(false);
+          setEditingExpense(null);
+        }}
       />
     </>
   );
@@ -788,6 +984,21 @@ export function Cycles() {
     setCycleExpenses((prev) => [...prev, expense]);
   };
 
+  const handleExpenseEdited = async (updated: CycleExpense) => {
+    setCycleExpenses((prev) =>
+      prev.map((e) => (e.id === updated.id ? updated : e)),
+    );
+    if (selectedCycle) {
+      const summaryRes = await fetchSummary(selectedCycle.id);
+      if (summaryRes.success) {
+        setSummaries((prev) => ({
+          ...prev,
+          [selectedCycle.id]: summaryRes.data,
+        }));
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="nb-empty">
@@ -812,6 +1023,7 @@ export function Cycles() {
         onBack={handleBack}
         onToggleExpense={handleToggleExpense}
         onExpenseAdded={handleExpenseAdded}
+        onExpenseEdited={handleExpenseEdited}
       />
     );
   }
