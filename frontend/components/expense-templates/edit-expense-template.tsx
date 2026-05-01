@@ -3,6 +3,9 @@ import { useState } from "react";
 import { Formik } from "formik";
 import {
   Button,
+  Calendar,
+  DateField,
+  DatePicker,
   FieldError,
   Input,
   Label,
@@ -12,6 +15,8 @@ import {
   Spinner,
   TextField,
 } from "@heroui/react";
+import { parseDate } from "@internationalized/date";
+import type { DateValue } from "react-aria-components";
 import { ExpenseTemplateSchema } from "@/helpers/schemas";
 import { RecurrenceConfigBuilder } from "./recurrence-config-builder";
 import { editExpenseTemplate } from "./actions";
@@ -258,19 +263,70 @@ export function EditExpenseTemplate({
 
                     {values.recurrence_type && <RecurrenceConfigBuilder />}
 
-                    <TextField
+                    <DatePicker
+                      value={
+                        values.reference_date
+                          ? parseDate(values.reference_date)
+                          : null
+                      }
+                      onChange={(date: DateValue | null) => {
+                        if (date) {
+                          const y = date.year;
+                          const m = String(date.month).padStart(2, "0");
+                          const d = String(date.day).padStart(2, "0");
+                          setFieldValue("reference_date", `${y}-${m}-${d}`);
+                        } else {
+                          setFieldValue("reference_date", "");
+                        }
+                      }}
                       isInvalid={
                         !!errors.reference_date && !!touched.reference_date
                       }
-                      value={values.reference_date}
-                      onChange={(v) => setFieldValue("reference_date", v)}
                     >
                       <Label>Reference Date</Label>
-                      <Input type="date" />
+                      <DateField.Group fullWidth>
+                        <DateField.Input>
+                          {(segment) => <DateField.Segment segment={segment} />}
+                        </DateField.Input>
+                        <DateField.Suffix>
+                          <DatePicker.Trigger>
+                            <DatePicker.TriggerIndicator />
+                          </DatePicker.Trigger>
+                        </DateField.Suffix>
+                      </DateField.Group>
                       {touched.reference_date && errors.reference_date && (
                         <FieldError>{errors.reference_date}</FieldError>
                       )}
-                    </TextField>
+                      <DatePicker.Popover>
+                        <Calendar aria-label="Reference date">
+                          <Calendar.Header>
+                            <Calendar.YearPickerTrigger>
+                              <Calendar.YearPickerTriggerHeading />
+                              <Calendar.YearPickerTriggerIndicator />
+                            </Calendar.YearPickerTrigger>
+                            <Calendar.NavButton slot="previous" />
+                            <Calendar.NavButton slot="next" />
+                          </Calendar.Header>
+                          <Calendar.Grid>
+                            <Calendar.GridHeader>
+                              {(day) => (
+                                <Calendar.HeaderCell>{day}</Calendar.HeaderCell>
+                              )}
+                            </Calendar.GridHeader>
+                            <Calendar.GridBody>
+                              {(date) => <Calendar.Cell date={date} />}
+                            </Calendar.GridBody>
+                          </Calendar.Grid>
+                          <Calendar.YearPickerGrid>
+                            <Calendar.YearPickerGridBody>
+                              {({ year }) => (
+                                <Calendar.YearPickerCell year={year} />
+                              )}
+                            </Calendar.YearPickerGridBody>
+                          </Calendar.YearPickerGrid>
+                        </Calendar>
+                      </DatePicker.Popover>
+                    </DatePicker>
 
                     <Select.Root
                       selectedKey={values.payment_method_id ?? "none"}

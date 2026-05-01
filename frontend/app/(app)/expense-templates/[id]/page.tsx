@@ -4,6 +4,9 @@ import { useParams, useRouter } from "next/navigation";
 import { Formik } from "formik";
 import {
   Button,
+  Calendar,
+  DateField,
+  DatePicker,
   FieldError,
   Input,
   Label,
@@ -12,6 +15,8 @@ import {
   Spinner,
   TextField,
 } from "@heroui/react";
+import { parseDate } from "@internationalized/date";
+import type { DateValue } from "react-aria-components";
 import { ExpenseTemplateSchema } from "@/helpers/schemas";
 import { RecurrenceConfigBuilder } from "@/components/expense-templates/recurrence-config-builder";
 import {
@@ -96,6 +101,7 @@ export default function EditExpenseTemplatePage() {
             string,
             unknown
           >,
+          reference_date: template.reference_date,
           payment_method_id: template.payment_method?.id ?? null,
         }}
         validationSchema={ExpenseTemplateSchema}
@@ -108,6 +114,7 @@ export default function EditExpenseTemplatePage() {
             category: values.category as any,
             recurrence_type: values.recurrence_type as any,
             recurrence_config: values.recurrence_config as any,
+            reference_date: values.reference_date,
             payment_method_id: values.payment_method_id,
           });
           if (result.success) {
@@ -277,6 +284,65 @@ export default function EditExpenseTemplatePage() {
             </Select.Root>
 
             {values.recurrence_type && <RecurrenceConfigBuilder />}
+
+            <DatePicker
+              value={
+                values.reference_date ? parseDate(values.reference_date) : null
+              }
+              onChange={(date: DateValue | null) => {
+                if (date) {
+                  const y = date.year;
+                  const m = String(date.month).padStart(2, "0");
+                  const d = String(date.day).padStart(2, "0");
+                  setFieldValue("reference_date", `${y}-${m}-${d}`);
+                } else {
+                  setFieldValue("reference_date", "");
+                }
+              }}
+              isInvalid={!!errors.reference_date && !!touched.reference_date}
+            >
+              <Label>Reference Date</Label>
+              <DateField.Group fullWidth>
+                <DateField.Input>
+                  {(segment) => <DateField.Segment segment={segment} />}
+                </DateField.Input>
+                <DateField.Suffix>
+                  <DatePicker.Trigger>
+                    <DatePicker.TriggerIndicator />
+                  </DatePicker.Trigger>
+                </DateField.Suffix>
+              </DateField.Group>
+              {touched.reference_date && errors.reference_date && (
+                <FieldError>{errors.reference_date}</FieldError>
+              )}
+              <DatePicker.Popover>
+                <Calendar aria-label="Reference date">
+                  <Calendar.Header>
+                    <Calendar.YearPickerTrigger>
+                      <Calendar.YearPickerTriggerHeading />
+                      <Calendar.YearPickerTriggerIndicator />
+                    </Calendar.YearPickerTrigger>
+                    <Calendar.NavButton slot="previous" />
+                    <Calendar.NavButton slot="next" />
+                  </Calendar.Header>
+                  <Calendar.Grid>
+                    <Calendar.GridHeader>
+                      {(day) => (
+                        <Calendar.HeaderCell>{day}</Calendar.HeaderCell>
+                      )}
+                    </Calendar.GridHeader>
+                    <Calendar.GridBody>
+                      {(date) => <Calendar.Cell date={date} />}
+                    </Calendar.GridBody>
+                  </Calendar.Grid>
+                  <Calendar.YearPickerGrid>
+                    <Calendar.YearPickerGridBody>
+                      {({ year }) => <Calendar.YearPickerCell year={year} />}
+                    </Calendar.YearPickerGridBody>
+                  </Calendar.YearPickerGrid>
+                </Calendar>
+              </DatePicker.Popover>
+            </DatePicker>
 
             <Select.Root
               selectedKey={values.payment_method_id ?? "none"}
