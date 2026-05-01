@@ -1,7 +1,7 @@
 """Business logic for expense cycles and cycle expenses."""
 
 import logging
-from datetime import UTC, date, datetime
+from datetime import UTC, datetime
 from decimal import Decimal
 from uuid import UUID
 
@@ -470,10 +470,10 @@ class CycleService:
             )
 
         # --- Status breakdown ------------------------------------------------
-        # Overdue is derived: a pending expense whose due_date is in the past.
-        # This mirrors the CycleExpenseResponse.compute_overdue validator so
-        # the counts here always match what individual expense responses return.
-        today = date.today()
+        # Overdue is derived: a PENDING expense whose due_date is in the past.
+        # The DB never stores OVERDUE — it mirrors the compute_overdue validator
+        # in CycleExpenseResponse so counts match individual expense responses.
+        today = datetime.now(UTC).date()
 
         def _is_overdue(e: models.CycleExpense) -> bool:
             return (
