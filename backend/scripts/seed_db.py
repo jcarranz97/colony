@@ -265,7 +265,6 @@ def seed_cycle(db: Session, user: User, cycle_data: dict[str, Any]) -> None:
         name=name,
         start_date=date.fromisoformat(cycle_data["start_date"]),
         end_date=date.fromisoformat(cycle_data["end_date"]),
-        income_amount=Decimal(str(cycle_data["income_amount"])),
         generate_from_templates=cycle_data.get("generate_from_templates", False),
     )
 

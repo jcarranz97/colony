@@ -99,14 +99,14 @@ function CycleCard({
       </div>
 
       <div className="nb-cycle-footer">
-        <div className="nb-cycle-stat">
-          <span className="nb-stat-label">Income</span>
-          <span className="nb-stat-value">
-            {fmtAmount(cycle.income_amount ?? "0", "USD")}
-          </span>
-        </div>
         {summary && (
           <>
+            <div className="nb-cycle-stat">
+              <span className="nb-stat-label">Income</span>
+              <span className="nb-stat-value nb-stat-positive">
+                {fmtAmount(summary.financial.total_incomes_usd, "USD")}
+              </span>
+            </div>
             <div className="nb-cycle-stat">
               <span className="nb-stat-label">Expenses</span>
               <span className="nb-stat-value">
@@ -483,7 +483,6 @@ interface AddCycleForm {
   name: string;
   start_date: string;
   end_date: string;
-  income_amount: string;
   generate_from_templates: boolean;
 }
 
@@ -500,7 +499,6 @@ function AddCycleModal({
     name: "",
     start_date: "",
     end_date: "",
-    income_amount: "",
     generate_from_templates: true,
   });
   const [saving, setSaving] = useState(false);
@@ -510,15 +508,13 @@ function AddCycleModal({
     setForm((f) => ({ ...f, [k]: v }));
 
   const handleSubmit = async () => {
-    if (!form.name || !form.start_date || !form.end_date || !form.income_amount)
-      return;
+    if (!form.name || !form.start_date || !form.end_date) return;
     setSaving(true);
     setError(null);
     const res = await addCycle({
       name: form.name,
       start_date: form.start_date,
       end_date: form.end_date,
-      income_amount: form.income_amount,
       generate_from_templates: form.generate_from_templates,
     });
     if (res.success) {
@@ -527,7 +523,6 @@ function AddCycleModal({
         name: "",
         start_date: "",
         end_date: "",
-        income_amount: "",
         generate_from_templates: true,
       });
       onClose();
@@ -579,18 +574,6 @@ function AddCycleModal({
               onChange={(e) => set("end_date", e.target.value)}
             />
           </div>
-        </div>
-
-        <div className="nb-form-group">
-          <label className="nb-form-label">Expected income (USD)</label>
-          <input
-            className="nb-form-input"
-            type="number"
-            placeholder="0.00"
-            required
-            value={form.income_amount}
-            onChange={(e) => set("income_amount", e.target.value)}
-          />
         </div>
 
         <label className="nb-form-checkbox">
@@ -1040,7 +1023,6 @@ function CycleDetail({
   const totalIncomes = summary
     ? parseFloat(summary.financial.total_incomes_usd ?? "0")
     : 0;
-  const baseIncome = parseFloat(cycle.income_amount ?? "0");
 
   return (
     <>
@@ -1061,17 +1043,11 @@ function CycleDetail({
 
       {/* Summary strip */}
       <div className="nb-summary-strip">
-        <div className="nb-summary-item">
-          <span className="nb-summary-label">Base income</span>
-          <span className="nb-summary-value">
-            {fmtAmount(cycle.income_amount ?? "0", "USD")}
-          </span>
-        </div>
         {summary && (
           <div className="nb-summary-item">
             <span className="nb-summary-label">Total income</span>
             <span className="nb-summary-value nb-stat-positive">
-              {fmtAmount((baseIncome + totalIncomes).toString(), "USD")}
+              {fmtAmount(summary.financial.total_incomes_usd, "USD")}
             </span>
           </div>
         )}

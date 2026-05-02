@@ -115,13 +115,12 @@ Colony is a standalone web application consisting of:
 
 ### 3.8 Financial Reporting and Analytics
 - **FR-039**: System must generate cycle summaries showing:
-    - Base income for the period (`income_amount`)
-    - Total incomes USD (base + all `CycleIncome` entries)
+    - Total incomes USD (sum of all `CycleIncome` entries)
     - Fixed expenses total
     - Variable expenses total
     - Mexico expenses total (MXN currency expenses converted to USD)
     - USA expenses total (USD currency expenses)
-    - Net balance (Total Income − Total Expenses)
+    - Net balance (Total Incomes − Total Expenses)
 - **FR-040**: System must generate payment method summaries showing:
     - Amount needed per payment method
     - Amount paid per payment method
@@ -168,14 +167,12 @@ Colony is a standalone web application consisting of:
   auto-generated (from a template) or added manually
 - **FR-058**: The cycle's `remaining_balance` must be recalculated on
   every income write:
-  `remaining_balance = income_amount`
-  `+ Σ(cycle_incomes.amount_usd)`
+  `remaining_balance = Σ(cycle_incomes.amount_usd)`
   `− Σ(active non-cancelled cycle_expenses.amount_usd)`
 - **FR-059**: Cycle summaries must include `total_incomes_usd` showing
   the sum of all cycle income entries converted to USD
 - **FR-060**: The cycle detail view must show a Total Income figure
-  combining the base `income_amount` and the sum of all
-  `CycleIncome.amount_usd` entries
+  equal to the sum of all `CycleIncome.amount_usd` entries
 
 ### 3.11 Navigation Updates
 
@@ -253,7 +250,6 @@ Colony is a standalone web application consisting of:
 - start_date: Date
 - end_date: Date
 - remaining_balance: Decimal
-- income_amount: Decimal
 - status: Enum (active, completed, draft)
 - created_at: DateTime
 - user_id: UUID (FK)

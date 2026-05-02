@@ -89,7 +89,6 @@ erDiagram
         uuid user_id FK
         date start_date
         date end_date
-        decimal income_amount
         decimal remaining_balance
         string status
         string name
@@ -287,7 +286,6 @@ CREATE TABLE cycles (
     name VARCHAR(100) NOT NULL,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
-    income_amount DECIMAL(10,2) NOT NULL DEFAULT 0,
     remaining_balance DECIMAL(10,2) NOT NULL DEFAULT 0,
     status cycle_status DEFAULT 'draft',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -415,7 +413,7 @@ CREATE INDEX idx_exchange_rates_date ON exchange_rates(rate_date);
 - Income entries can be auto-generated from recurrent income templates
   or added manually as one-off incomes for that cycle
 - The cycle's `remaining_balance` is recalculated on every income write:
-  `remaining_balance = income_amount + Σ(cycle_incomes.amount_usd)`
+  `remaining_balance = Σ(cycle_incomes.amount_usd)`
   `- Σ(active non-cancelled cycle_expenses.amount_usd)`
 
 ### Recurrent Income → Cycle Incomes (1:N)
@@ -863,16 +861,16 @@ class CustomConfig(BaseModel):
 ```sql
 SELECT
     c.name,
-    c.income_amount,
     COUNT(ce.id) as total_expenses,
     SUM(ce.amount_usd) as total_amount_usd,
     SUM(CASE WHEN ce.category = 'fixed' THEN ce.amount_usd ELSE 0 END) as fixed_expenses,
     SUM(CASE WHEN ce.category = 'variable' THEN ce.amount_usd ELSE 0 END) as variable_expenses,
-    c.income_amount - SUM(ce.amount_usd) as net_balance
+    COALESCE((SELECT SUM(ci.amount_usd) FROM cycle_incomes ci WHERE ci.cycle_id = c.id), 0)
+        - SUM(ce.amount_usd) as net_balance
 FROM cycles c
 LEFT JOIN cycle_expenses ce ON c.id = ce.cycle_id
 WHERE c.user_id = $1 AND c.id = $2
-GROUP BY c.id, c.name, c.income_amount;
+GROUP BY c.id, c.name;
 ```
 
 ### Payment Method Summary

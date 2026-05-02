@@ -54,9 +54,6 @@ class CycleCreate(AppBaseModel):
     name: str = Field(..., min_length=1, max_length=100, description="Cycle name")
     start_date: date = Field(..., description="Cycle start date (YYYY-MM-DD)")
     end_date: date = Field(..., description="Cycle end date (YYYY-MM-DD)")
-    income_amount: Decimal = Field(
-        ..., gt=0, decimal_places=2, description="Expected income for this cycle"
-    )
     generate_from_templates: bool = Field(
         False,
         description="When true, automatically generate expenses from active templates",
@@ -102,9 +99,6 @@ class CycleUpdate(AppBaseModel):
     name: str | None = Field(
         None, min_length=1, max_length=100, description="Cycle name"
     )
-    income_amount: Decimal | None = Field(
-        None, gt=0, decimal_places=2, description="Expected income for this cycle"
-    )
     status: CycleStatus | None = Field(None, description="Cycle lifecycle status")
 
     @field_validator("name")
@@ -136,7 +130,6 @@ class CycleResponse(BaseModel):
     name: str
     start_date: date
     end_date: date
-    income_amount: Decimal
     remaining_balance: Decimal
     status: CycleStatus
     summary: CycleSummary
@@ -380,7 +373,6 @@ class CycleInfo(BaseModel):
     name: str
     start_date: date
     end_date: date
-    income_amount: Decimal
 
     model_config = {
         "from_attributes": True,

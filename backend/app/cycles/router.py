@@ -110,7 +110,7 @@ async def get_cycle(cycle: CycleDep) -> schemas.CycleResponse:
     "/{cycle_id}",
     response_model=schemas.CycleResponse,
     summary="Update a cycle",
-    description="Partially update a cycle's name, income amount, or status.",
+    description="Partially update a cycle's name or status.",
 )
 async def update_cycle(
     data: schemas.CycleUpdate,

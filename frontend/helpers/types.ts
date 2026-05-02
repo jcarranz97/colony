@@ -168,7 +168,6 @@ export interface Cycle {
   start_date: string;
   end_date: string;
   status: CycleStatus;
-  income_amount: string;
   remaining_balance: string;
   created_at: string;
   updated_at: string;
@@ -178,13 +177,11 @@ export interface CreateCycleRequest {
   name: string;
   start_date: string;
   end_date: string;
-  income_amount: string;
   generate_from_templates?: boolean;
 }
 
 export interface UpdateCycleRequest {
   name?: string;
-  income_amount?: string;
   status?: CycleStatus;
 }
 
@@ -261,7 +258,6 @@ export interface CycleSummary {
     name: string;
     start_date: string;
     end_date: string;
-    income_amount: string;
   };
   financial: CycleSummaryFinancial;
   by_payment_method: unknown[];

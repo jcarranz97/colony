@@ -481,7 +481,6 @@ Get all user's cycles with pagination.
       "name": "January 2025 Cycle",
       "start_date": "2025-01-01",
       "end_date": "2025-02-11",
-      "income_amount": "5000.00",
       "remaining_balance": "500.00",
       "status": "active",
       "summary": {
@@ -514,8 +513,6 @@ Create a new cycle.
   "name": "February 2025 Cycle",
   "start_date": "2025-02-12",
   "end_date": "2025-03-25",
-  "income_amount": "5200.00",
-  "remaining_balance": "0.00",
   "generate_from_templates": true
 }
 ```
@@ -527,8 +524,7 @@ Create a new cycle.
   "name": "February 2025 Cycle",
   "start_date": "2025-02-12",
   "end_date": "2025-03-25",
-  "income_amount": "5200.00",
-  "remaining_balance": "5200.00",
+  "remaining_balance": "0.00",
   "status": "draft",
   "summary": {
     "total_expenses": "0.00",
@@ -553,7 +549,6 @@ Get a specific cycle with detailed information.
   "name": "January 2025 Cycle",
   "start_date": "2025-01-01",
   "end_date": "2025-02-11",
-  "income_amount": "5000.00",
   "remaining_balance": "500.00",
   "status": "active",
   "summary": {
@@ -576,7 +571,6 @@ Update a cycle.
 ```json
 {
   "name": "January 2025 Cycle Updated",
-  "income_amount": "5500.00",
   "status": "active"
 }
 ```
@@ -789,8 +783,7 @@ Get detailed cycle summary and analytics.
     "id": "123e4567-e89b-12d3-a456-426614174004",
     "name": "January 2025 Cycle",
     "start_date": "2025-01-01",
-    "end_date": "2025-02-11",
-    "income_amount": "5000.00"
+    "end_date": "2025-02-11"
   },
   "financial": {
     "total_expenses_usd": "4500.00",
@@ -857,7 +850,7 @@ Get detailed cycle summary and analytics.
 > applied in individual expense responses.
 >
 > **Note on `net_balance`:**
-> `net_balance = income_amount + total_incomes_usd − total_expenses_usd`
+> `net_balance = total_incomes_usd − total_expenses_usd`
 
 ### 6. Reports & Analytics
 
@@ -1101,7 +1094,6 @@ const cycleResponse = await fetch('/api/v1/cycles', {
     name: 'February 2025 Cycle',
     start_date: '2025-02-01',
     end_date: '2025-03-14',
-    income_amount: '5000.00',
     generate_from_templates: true
   })
 });

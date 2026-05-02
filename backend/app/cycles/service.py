@@ -75,20 +75,22 @@ def _recalculate_remaining_balance(
 ) -> None:
     """Recalculate and persist ``remaining_balance`` on *cycle*.
 
-    The balance is ``income_amount`` plus all active cycle income amounts,
+    The balance is the sum of all active cycle income amounts,
     minus the sum of ``amount_usd`` for all active non-cancelled expenses.
 
     Args:
         db: Active database session.
         cycle: The Cycle ORM instance to update.
     """
-    income_total = sum(i.amount_usd for i in cycle.incomes if i.active) or Decimal("0")
+    income_total = sum(
+        (i.amount_usd for i in cycle.incomes if i.active),
+        Decimal("0"),
+    )
     expense_total = sum(
-        e.amount_usd
-        for e in cycle.expenses
-        if e.active and e.status != ExpenseStatus.CANCELLED
-    ) or Decimal("0")
-    cycle.remaining_balance = cycle.income_amount + income_total - expense_total
+        (e.amount_usd for e in cycle.expenses if e.active and e.status != ExpenseStatus.CANCELLED),
+        Decimal("0"),
+    )
+    cycle.remaining_balance = income_total - expense_total
     db.flush()
 
 
@@ -242,8 +244,7 @@ class CycleService:
             name=data.name,
             start_date=data.start_date,
             end_date=data.end_date,
-            income_amount=data.income_amount,
-            remaining_balance=data.income_amount,
+            remaining_balance=Decimal("0"),
             status="draft",
         )
 
@@ -431,8 +432,7 @@ class CycleService:
     ) -> models.Cycle:
         """Apply a partial update to *cycle*.
 
-        When ``income_amount`` changes, ``remaining_balance`` is recalculated
-        to keep it consistent with the new income figure.
+        ``remaining_balance`` is always recalculated after the update.
 
         Args:
             db: Active database session.
@@ -457,8 +457,7 @@ class CycleService:
             db.rollback()
             raise CycleNameExistsExceptionError(data.name or cycle.name) from exc
 
-        if "income_amount" in update_data:
-            _recalculate_remaining_balance(db, cycle)
+        _recalculate_remaining_balance(db, cycle)
 
         db.commit()
         db.refresh(cycle)
@@ -513,7 +512,7 @@ class CycleService:
             usa_expenses_usd=usa_usd,
             mexico_expenses_usd=mexico_usd,
             total_incomes_usd=total_incomes_usd,
-            net_balance=cycle.income_amount + total_incomes_usd - total_usd,
+            net_balance=total_incomes_usd - total_usd,
         )
 
         # --- By payment method -----------------------------------------------

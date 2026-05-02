@@ -150,7 +150,6 @@ class CycleCreate(BaseModel):
     name: str
     start_date: date
     end_date: date
-    income_amount: Decimal
     generate_from_templates: bool = True
 
 class CycleResponse(BaseModel):
@@ -158,7 +157,6 @@ class CycleResponse(BaseModel):
     name: str
     start_date: date
     end_date: date
-    income_amount: Decimal
     status: str
     created_at: datetime
 
@@ -184,7 +182,6 @@ class Cycle(BaseModel):
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
-    income_amount = Column(DECIMAL(10, 2), default=0)
     status = Column(ENUM(CycleStatus), default=CycleStatus.DRAFT)
 
     # Relationships
@@ -216,8 +213,7 @@ async def create_cycle(
         name=cycle_data.name,
         user_id=user_id,
         start_date=cycle_data.start_date,
-        end_date=cycle_data.end_date,
-        income_amount=cycle_data.income_amount
+        end_date=cycle_data.end_date
     )
 
     db.add(cycle)
