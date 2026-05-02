@@ -357,11 +357,26 @@ function TemplateModal({
     setForm((f) => ({ ...f, [k]: v }));
 
   const handleRecurrenceTypeChange = (rt: RecurrenceType) => {
-    setForm((f) => ({
-      ...f,
-      recurrence_type: rt,
-      recurrence_config: DEFAULT_CONFIG[rt] ?? {},
-    }));
+    setForm((f) => {
+      const config =
+        rt === "monthly"
+          ? { day_of_month: new Date(f.reference_date).getUTCDate() }
+          : (DEFAULT_CONFIG[rt] ?? {});
+      return { ...f, recurrence_type: rt, recurrence_config: config };
+    });
+  };
+
+  const handleReferenceDateChange = (dateStr: string) => {
+    setForm((f) => {
+      const updated: TemplateForm = { ...f, reference_date: dateStr };
+      if (f.recurrence_type === "monthly") {
+        updated.recurrence_config = {
+          ...f.recurrence_config,
+          day_of_month: new Date(dateStr).getUTCDate(),
+        };
+      }
+      return updated;
+    });
   };
 
   const handleSubmit = async () => {
@@ -454,12 +469,6 @@ function TemplateModal({
           </div>
         </div>
 
-        <RecurrenceFields
-          type={form.recurrence_type}
-          config={form.recurrence_config}
-          onChange={(c) => set("recurrence_config", c)}
-        />
-
         <div className="nb-form-row">
           <div className="nb-form-group">
             <label className="nb-form-label">Start date</label>
@@ -467,7 +476,7 @@ function TemplateModal({
               className="nb-form-input"
               type="date"
               value={form.reference_date}
-              onChange={(e) => set("reference_date", e.target.value)}
+              onChange={(e) => handleReferenceDateChange(e.target.value)}
             />
           </div>
           <div className="nb-form-group">
@@ -488,6 +497,12 @@ function TemplateModal({
             </select>
           </div>
         </div>
+
+        <RecurrenceFields
+          type={form.recurrence_type}
+          config={form.recurrence_config}
+          onChange={(c) => set("recurrence_config", c)}
+        />
 
         <div className="nb-form-group">
           <label className="nb-form-label">Autopay</label>
