@@ -87,7 +87,11 @@ def _recalculate_remaining_balance(
         Decimal("0"),
     )
     expense_total = sum(
-        (e.amount_usd for e in cycle.expenses if e.active and e.status != ExpenseStatus.CANCELLED),
+        (
+            e.amount_usd
+            for e in cycle.expenses
+            if e.active and e.status != ExpenseStatus.CANCELLED
+        ),
         Decimal("0"),
     )
     cycle.remaining_balance = income_total - expense_total
