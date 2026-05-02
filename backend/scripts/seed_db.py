@@ -246,9 +246,7 @@ def seed_cycle(db: Session, user: User, cycle_data: dict[str, Any]) -> None:
     )
 
 
-def _seed_user_full_data(
-    db: Session, user: User, user_data: dict[str, Any]
-) -> None:
+def _seed_user_full_data(db: Session, user: User, user_data: dict[str, Any]) -> None:
     """Seed payment methods, expense templates, and cycles for one user."""
     payment_methods: dict[str, PaymentMethod] = {}
     for pm_data in user_data.get("payment_methods", []):
