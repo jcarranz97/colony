@@ -473,7 +473,7 @@ function TemplateModal({
                 .filter((m) => m.active)
                 .map((m) => (
                   <option key={m.id} value={m.id}>
-                    {m.name}
+                    {m.name} — {m.method_type}
                   </option>
                 ))}
             </select>

@@ -17,6 +17,7 @@ from .constants import CurrencyCode, ExpenseCategory, ExpenseStatus
 from .exceptions import (
     CycleGenerationExceptionError,
     CycleNameExistsExceptionError,
+    ExchangeRateDateExistsExceptionError,
     ExchangeRateNotFoundExceptionError,
     PaymentMethodNotFoundExceptionError,
 )
@@ -771,6 +772,113 @@ class CycleExpenseService:
         )
 
 
+class ExchangeRateService:
+    """Service for managing currency exchange rates."""
+
+    @staticmethod
+    def get_exchange_rates(db: Session) -> list[models.ExchangeRate]:
+        """Return all exchange rates ordered by date descending.
+
+        Args:
+            db: Active database session.
+
+        Returns:
+            List of ExchangeRate ORM instances.
+        """
+        return (
+            db.query(models.ExchangeRate)
+            .order_by(models.ExchangeRate.rate_date.desc())
+            .all()
+        )
+
+    @staticmethod
+    def get_exchange_rate_by_id(
+        db: Session, rate_id: UUID
+    ) -> models.ExchangeRate | None:
+        """Return a single exchange rate by its UUID, or None if not found.
+
+        Args:
+            db: Active database session.
+            rate_id: UUID of the exchange rate record.
+
+        Returns:
+            ExchangeRate ORM instance or None.
+        """
+        return (
+            db.query(models.ExchangeRate)
+            .filter(models.ExchangeRate.id == rate_id)
+            .first()
+        )
+
+    @staticmethod
+    def create_exchange_rate(
+        db: Session, data: schemas.ExchangeRateCreate
+    ) -> models.ExchangeRate:
+        """Create a new exchange rate record.
+
+        Args:
+            db: Active database session.
+            data: Validated creation payload.
+
+        Returns:
+            Newly created ExchangeRate ORM instance.
+
+        Raises:
+            ExchangeRateDateExistsExceptionError: If a rate for the same
+                currency pair and date already exists.
+        """
+        existing = (
+            db.query(models.ExchangeRate)
+            .filter(
+                and_(
+                    models.ExchangeRate.from_currency == data.from_currency.value,
+                    models.ExchangeRate.to_currency == data.to_currency.value,
+                    models.ExchangeRate.rate_date == data.rate_date,
+                )
+            )
+            .first()
+        )
+        if existing:
+            raise ExchangeRateDateExistsExceptionError(
+                data.from_currency.value,
+                data.to_currency.value,
+                str(data.rate_date),
+            )
+
+        rate = models.ExchangeRate(
+            from_currency=data.from_currency.value,
+            to_currency=data.to_currency.value,
+            rate=data.rate,
+            rate_date=data.rate_date,
+        )
+        db.add(rate)
+        db.commit()
+        db.refresh(rate)
+        return rate
+
+    @staticmethod
+    def update_exchange_rate(
+        db: Session,
+        rate: models.ExchangeRate,
+        data: schemas.ExchangeRateUpdate,
+    ) -> models.ExchangeRate:
+        """Update the rate value of an existing exchange rate record.
+
+        Args:
+            db: Active database session.
+            rate: ExchangeRate ORM instance to update.
+            data: Validated update payload.
+
+        Returns:
+            Updated ExchangeRate ORM instance.
+        """
+        rate.rate = data.rate
+        db.commit()
+        db.refresh(rate)
+        return rate
+
+
 # Singleton service instances
 cycle_service = CycleService()
 cycle_expense_service = CycleExpenseService()
+exchange_rate_service = ExchangeRateService()

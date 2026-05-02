@@ -715,27 +715,69 @@ Get all system enums for form validation.
 }
 ```
 
-#### GET /exchange-rates
-Get current exchange rates.
+#### GET /exchange-rates/
 
-**Query Parameters:**
-- `from` (string, optional): Source currency
-- `to` (string, optional): Target currency
-- `date` (string, optional): Specific date (YYYY-MM-DD)
+List all exchange rates ordered by date descending.
+
+**Auth required:** Yes
 
 **Response:** `200 OK`
+
+```json
+[
+  {
+    "id": "uuid",
+    "from_currency": "MXN",
+    "to_currency": "USD",
+    "rate": "0.052000",
+    "rate_date": "2025-01-15",
+    "created_at": "2025-01-15T10:00:00Z"
+  }
+]
+```
+
+#### POST /exchange-rates/
+
+Create a new exchange rate record.
+
+**Auth required:** Yes
+
+**Request Body:**
+
 ```json
 {
-  "rates": [
-    {
-      "from_currency": "MXN",
-      "to_currency": "USD",
-      "rate": "0.050000",
-      "rate_date": "2025-01-01"
-    }
-  ]
+  "from_currency": "MXN",
+  "to_currency": "USD",
+  "rate": 0.052,
+  "rate_date": "2025-01-15"
 }
 ```
+
+**Response:** `201 Created` — the created exchange rate object.
+
+**Errors:**
+
+- `409 EXCHANGE_RATE_DATE_EXISTS` — a rate for this currency pair and date
+  already exists.
+
+#### PUT /exchange-rates/{rate_id}
+
+Update the rate value of an existing exchange rate record.
+Only the `rate` field is mutable; the date is immutable.
+
+**Auth required:** Yes
+
+**Request Body:**
+
+```json
+{ "rate": 0.053 }
+```
+
+**Response:** `200 OK` — the updated exchange rate object.
+
+**Errors:**
+
+- `404` — exchange rate not found.
 
 #### GET /health
 System health check.
@@ -765,6 +807,8 @@ System health check.
 | `RESOURCE_CONFLICT` | 409 | Resource conflict (e.g., duplicate name) |
 | `CURRENCY_CONVERSION_ERROR` | 422 | Failed to convert currency |
 | `CYCLE_GENERATION_ERROR` | 422 | Failed to generate cycle expenses |
+| `EXCHANGE_RATE_NOT_FOUND` | 422 | No exchange rate available for the currency pair |
+| `EXCHANGE_RATE_DATE_EXISTS` | 409 | Rate for that currency pair and date already exists |
 | `INTERNAL_SERVER_ERROR` | 500 | Server error |
 
 ## HTTP Status Codes
