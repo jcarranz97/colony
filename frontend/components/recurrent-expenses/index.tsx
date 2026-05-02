@@ -462,7 +462,7 @@ function TemplateModal({
 
         <div className="nb-form-row">
           <div className="nb-form-group">
-            <label className="nb-form-label">Reference date</label>
+            <label className="nb-form-label">Start date</label>
             <input
               className="nb-form-input"
               type="date"

@@ -81,7 +81,7 @@ export const RecurrentExpenseCreateSchema = Yup.object({
     .oneOf(["weekly", "bi_weekly", "monthly", "custom"])
     .required("Recurrence type is required"),
   recurrence_config: recurrenceConfigShape,
-  reference_date: Yup.string().required("Reference date is required"),
+  reference_date: Yup.string().required("Start date is required"),
   payment_method_id: Yup.string()
     .nullable()
     .required("Payment method is required"),

@@ -88,4 +88,22 @@ Apply as extra class on `.nb-expense-row`:
 - `middleware.ts` blocks unauthenticated access to `(app)` routes server-side
 - 401 from API → `apiClient` clears cookie and redirects to `/login`
 
+## Naming Conventions: UI vs Backend
+
+The recurring expenses domain uses different names for the **start date** field
+between the UI and the backend/database:
+
+| Layer                           | Field name       |
+| ------------------------------- | ---------------- |
+| UI labels / validation messages | "Start Date"     |
+| Internal TS field names         | `reference_date` |
+| API request/response body       | `reference_date` |
+| Database column                 | `reference_date` |
+| Backend models / schemas        | `reference_date` |
+
+The frontend keeps the internal field name as `reference_date` to match the
+API contract. Only the **visible text** (form labels, validation messages)
+uses "Start Date" for user clarity. Do not rename the internal `reference_date`
+field in TypeScript — it must stay aligned with the backend API.
+
 <!-- END:nextjs-agent-rules -->
