@@ -53,7 +53,7 @@ users:
         recurrence_config:
           day_of_month: 1
         reference_date: "2025-01-01"
-        autopay_info: Auto-pay via bank portal
+        autopay: true
 
       - description: Internet
         currency: USD
@@ -64,7 +64,7 @@ users:
         recurrence_config:
           day_of_month: 15
         reference_date: "2025-01-15"
-        autopay_info: Auto-pay enabled
+        autopay: true
 
       - description: Netflix
         currency: USD

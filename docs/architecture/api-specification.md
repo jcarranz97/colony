@@ -302,7 +302,7 @@ Get all user's recurrent expenses.
       "day_of_month": 1
     },
     "reference_date": "2024-12-01",
-    "autopay_info": "Auto-pay enabled",
+    "autopay": true,
     "active": true,
     "payment_method": {
       "id": "123e4567-e89b-12d3-a456-426614174001",
@@ -331,7 +331,7 @@ Create a new recurrent expense.
     "day_of_week": 6
   },
   "reference_date": "2024-12-21",
-  "autopay_info": null
+  "autopay": false
 }
 ```
 
@@ -348,7 +348,7 @@ Create a new recurrent expense.
     "day_of_week": 6
   },
   "reference_date": "2024-12-21",
-  "autopay_info": null,
+  "autopay": false,
   "active": true,
   "payment_method": {
     "id": "123e4567-e89b-12d3-a456-426614174001",
@@ -522,8 +522,8 @@ Get all expenses for a specific cycle.
       "paid": true,
       "paid_at": "2025-01-01T08:00:00Z",
       "comments": "Paid on time",
-      "autopay_info": "Auto-pay enabled",
-      "template_id": "123e4567-e89b-12d3-a456-426614174003",
+    "autopay": true,
+    "template_id": "123e4567-e89b-12d3-a456-426614174003",
       "payment_method": {
         "id": "123e4567-e89b-12d3-a456-426614174001",
         "name": "Chase Debit",
@@ -573,8 +573,7 @@ Add a manual expense to a cycle.
   "status": "pending",
   "paid": false,
   "paid_at": null,
-  "comments": "Unexpected expense",
-  "autopay_info": null,
+  "autopay": false,
   "template_id": null,
   "payment_method": {
     "id": "123e4567-e89b-12d3-a456-426614174002",

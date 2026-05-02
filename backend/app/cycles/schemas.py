@@ -171,7 +171,7 @@ class CycleExpenseCreate(AppBaseModel):
     due_date: date
     category: ExpenseCategory
     comments: str | None = Field(None, max_length=1000)
-    autopay_info: str | None = None
+    autopay: bool = False
 
     @field_validator("description")
     @classmethod
@@ -203,7 +203,7 @@ class CycleExpenseUpdate(AppBaseModel):
     paid: bool | None = None
     paid_at: datetime | None = None
     comments: str | None = Field(None, max_length=1000)
-    autopay_info: str | None = None
+    autopay: bool = False
 
     @field_validator("description")
     @classmethod
@@ -211,18 +211,18 @@ class CycleExpenseUpdate(AppBaseModel):
         """Strip whitespace from description when provided.
 
         Args:
-            v: Raw description value or None.
+            v: Raw name value or None.
 
         Returns:
-            Stripped description or None.
+            Stripped name or None.
 
         Raises:
-            ValueError: If description is empty after stripping.
+            ValueError: If name is empty after stripping.
         """
         if v is not None:
             stripped = v.strip()
             if not stripped:
-                raise ValueError("description cannot be empty or whitespace")
+                raise ValueError("name cannot be empty or whitespace")
             return stripped
         return v
 
@@ -241,7 +241,7 @@ class CycleExpenseResponse(BaseModel):
     paid: bool
     paid_at: datetime | None
     comments: str | None
-    autopay_info: str | None
+    autopay: bool
     template_id: uuid.UUID | None
     payment_method: PaymentMethodSummary
     created_at: datetime

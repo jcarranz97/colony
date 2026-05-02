@@ -58,7 +58,7 @@ erDiagram
         string recurrence_type
         json recurrence_config
         date reference_date
-        string autopay_info
+        boolean autopay
         boolean active
         timestamp created_at
         timestamp updated_at
@@ -88,7 +88,7 @@ erDiagram
         decimal amount_usd
         date due_date
         string category
-        string autopay_info
+        boolean autopay
         string status
         string comments
         boolean paid
@@ -206,7 +206,7 @@ CREATE TABLE recurrent_expenses (
     recurrence_type recurrence_type NOT NULL,
     recurrence_config JSONB NOT NULL DEFAULT '{}',
     reference_date DATE NOT NULL,  -- Last known occurrence (e.g., "1/12/2025 - last insurance bill")
-    autopay_info TEXT,
+    autopay BOOLEAN DEFAULT false,
     active BOOLEAN DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -257,7 +257,7 @@ CREATE TABLE cycle_expenses (
     amount_usd DECIMAL(10,2) NOT NULL CHECK (amount_usd > 0),
     due_date DATE NOT NULL,
     category expense_category NOT NULL,
-    autopay_info TEXT,
+    autopay BOOLEAN DEFAULT false,
     status expense_status DEFAULT 'pending',
     comments TEXT,
     paid BOOLEAN DEFAULT false,
