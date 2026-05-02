@@ -301,7 +301,7 @@ export default function EditRecurrentExpensePage() {
               }}
               isInvalid={!!errors.reference_date && !!touched.reference_date}
             >
-              <Label>Reference Date</Label>
+              <Label>Start Date</Label>
               <DateField.Group fullWidth>
                 <DateField.Input>
                   {(segment) => <DateField.Segment segment={segment} />}
@@ -316,7 +316,7 @@ export default function EditRecurrentExpensePage() {
                 <FieldError>{errors.reference_date}</FieldError>
               )}
               <DatePicker.Popover>
-                <Calendar aria-label="Reference date">
+                <Calendar aria-label="Start date">
                   <Calendar.Header>
                     <Calendar.YearPickerTrigger>
                       <Calendar.YearPickerTriggerHeading />

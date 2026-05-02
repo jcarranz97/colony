@@ -327,7 +327,7 @@ export function EditRecurrentExpense({
                       }
                     >
                       <Label className="flex items-center gap-1.5">
-                        Reference Date
+                        Start Date
                         <Tooltip delay={0}>
                           <Button
                             isIconOnly
@@ -362,7 +362,7 @@ export function EditRecurrentExpense({
                         <FieldError>{errors.reference_date}</FieldError>
                       )}
                       <DatePicker.Popover>
-                        <Calendar aria-label="Reference date">
+                        <Calendar aria-label="Start date">
                           <Calendar.Header>
                             <Calendar.YearPickerTrigger>
                               <Calendar.YearPickerTriggerHeading />
