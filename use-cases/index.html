@@ -673,22 +673,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#expense-templates" class="md-nav__link">
+  <a href="#recurrent-expenses" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Expense Templates
+        Recurrent Expenses
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Expense Templates">
+    <nav class="md-nav" aria-label="Recurrent Expenses">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#uc-08-create-expense-template" class="md-nav__link">
+  <a href="#uc-08-create-recurrent-expense" class="md-nav__link">
     <span class="md-ellipsis">
       
-        UC-08: Create Expense Template
+        UC-08: Create Recurrent Expense
       
     </span>
   </a>
@@ -696,10 +696,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#uc-09-edit-expense-template" class="md-nav__link">
+  <a href="#uc-09-edit-recurrent-expense" class="md-nav__link">
     <span class="md-ellipsis">
       
-        UC-09: Edit Expense Template
+        UC-09: Edit Recurrent Expense
       
     </span>
   </a>
@@ -707,10 +707,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#uc-10-delete-expense-template" class="md-nav__link">
+  <a href="#uc-10-delete-recurrent-expense" class="md-nav__link">
     <span class="md-ellipsis">
       
-        UC-10: Delete Expense Template
+        UC-10: Delete Recurrent Expense
       
     </span>
   </a>
@@ -718,10 +718,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#uc-11-view-expense-templates" class="md-nav__link">
+  <a href="#uc-11-view-recurrent-expenses" class="md-nav__link">
     <span class="md-ellipsis">
       
-        UC-11: View Expense Templates
+        UC-11: View Recurrent Expenses
       
     </span>
   </a>
@@ -1317,23 +1317,23 @@ by describing the <em>how</em>, not just the <em>what</em>.</p>
 <td>User</td>
 </tr>
 <tr>
-<td><a href="#uc-08-create-expense-template">UC-08</a></td>
-<td>Create Expense Template</td>
+<td><a href="#uc-08-create-recurrent-expense">UC-08</a></td>
+<td>Create Recurrent Expense</td>
 <td>User</td>
 </tr>
 <tr>
-<td><a href="#uc-09-edit-expense-template">UC-09</a></td>
-<td>Edit Expense Template</td>
+<td><a href="#uc-09-edit-recurrent-expense">UC-09</a></td>
+<td>Edit Recurrent Expense</td>
 <td>User</td>
 </tr>
 <tr>
-<td><a href="#uc-10-delete-expense-template">UC-10</a></td>
-<td>Delete Expense Template</td>
+<td><a href="#uc-10-delete-recurrent-expense">UC-10</a></td>
+<td>Delete Recurrent Expense</td>
 <td>User</td>
 </tr>
 <tr>
-<td><a href="#uc-11-view-expense-templates">UC-11</a></td>
-<td>View Expense Templates</td>
+<td><a href="#uc-11-view-recurrent-expenses">UC-11</a></td>
+<td>View Recurrent Expenses</td>
 <td>User</td>
 </tr>
 <tr>
@@ -1390,7 +1390,7 @@ with. Each area maps to the detailed sections below.</p>
         direction TB
         Auth(["Authentication\nUC-01 – UC-03"])
         PM(["Payment Methods\nUC-04 – UC-07"])
-        ET(["Expense Templates\nUC-08 – UC-11"])
+        ET(["Recurrent Expenses\nUC-08 – UC-11"])
         CM(["Cycle Management\nUC-12 – UC-15"])
         CE(["Cycle Expenses\nUC-16 – UC-19"])
     end
@@ -1497,7 +1497,7 @@ invalidation. Expiry is enforced by the token TTL.</p>
 <li><strong>A2 — Invalid type/currency combination:</strong> System returns a 422 error.</li>
 </ul>
 <p><strong>Postconditions:</strong> The new payment method is available for selection when
-creating expense templates and cycle expenses.</p>
+creating recurrent expenses and cycle expenses.</p>
 <hr />
 <h3 id="uc-05-edit-payment-method">UC-05: Edit Payment Method</h3>
 <p><strong>Actor:</strong> User</p>
@@ -1549,20 +1549,20 @@ expense creation but remains visible in historical expense data.</p>
 <p><strong>Notes:</strong> The frontend may filter by <code>active: true</code> to populate form dropdowns,
 and show all records in management screens.</p>
 <hr />
-<h2 id="expense-templates">Expense Templates</h2>
+<h2 id="recurrent-expenses">Recurrent Expenses</h2>
 <pre class="mermaid"><code>graph LR
     User((User))
 
-    UC08([UC-08: Create Expense Template])
-    UC09([UC-09: Edit Expense Template])
-    UC10([UC-10: Delete Expense Template])
-    UC11([UC-11: View Expense Templates])
+    UC08([UC-08: Create Recurrent Expense])
+    UC09([UC-09: Edit Recurrent Expense])
+    UC10([UC-10: Delete Recurrent Expense])
+    UC11([UC-11: View Recurrent Expenses])
 
     User --&gt; UC08
     User --&gt; UC09
     User --&gt; UC10
     User --&gt; UC11</code></pre>
-<h3 id="uc-08-create-expense-template">UC-08: Create Expense Template</h3>
+<h3 id="uc-08-create-recurrent-expense">UC-08: Create Recurrent Expense</h3>
 <p><strong>Actor:</strong> User</p>
 <p><strong>Related Requirements:</strong> FR-018, FR-019, FR-023</p>
 <p><strong>Preconditions:</strong> User is authenticated. At least one payment method exists.</p>
@@ -1610,7 +1610,7 @@ and show all records in management screens.</p>
 <p><strong>Postconditions:</strong> The template will be used to auto-generate expenses when a
 new cycle is created (UC-12).</p>
 <hr />
-<h3 id="uc-09-edit-expense-template">UC-09: Edit Expense Template</h3>
+<h3 id="uc-09-edit-recurrent-expense">UC-09: Edit Recurrent Expense</h3>
 <p><strong>Actor:</strong> User</p>
 <p><strong>Related Requirements:</strong> FR-020</p>
 <p><strong>Preconditions:</strong> User is authenticated. The template exists and belongs to the user.</p>
@@ -1629,7 +1629,7 @@ generated in past cycles. It only affects future cycle generation.</p>
 <p><strong>Postconditions:</strong> Future cycles created after this edit will use the new
 template values.</p>
 <hr />
-<h3 id="uc-10-delete-expense-template">UC-10: Delete Expense Template</h3>
+<h3 id="uc-10-delete-recurrent-expense">UC-10: Delete Recurrent Expense</h3>
 <p><strong>Actor:</strong> User</p>
 <p><strong>Related Requirements:</strong> FR-021</p>
 <p><strong>Preconditions:</strong> User is authenticated. The template exists and belongs to the user.</p>
@@ -1646,15 +1646,15 @@ template values.</p>
 <p><strong>Postconditions:</strong> The template is excluded from future cycle generation.
 Cycle expenses previously generated from this template are unaffected.</p>
 <hr />
-<h3 id="uc-11-view-expense-templates">UC-11: View Expense Templates</h3>
+<h3 id="uc-11-view-recurrent-expenses">UC-11: View Recurrent Expenses</h3>
 <p><strong>Actor:</strong> User</p>
 <p><strong>Related Requirements:</strong> FR-022</p>
 <p><strong>Preconditions:</strong> User is authenticated.</p>
 <p><strong>Main Flow:</strong></p>
 <ol>
-<li>User requests the list of expense templates.</li>
-<li>System returns all templates belonging to the user, including recurrence
-   pattern details and linked payment method info.</li>
+<li>User requests the list of recurrent expenses.</li>
+<li>System returns all recurrent expenses belonging to the user, including
+   recurrence pattern details and linked payment method info.</li>
 </ol>
 <hr />
 <h2 id="cycle-management">Cycle Management</h2>
@@ -1682,7 +1682,7 @@ Cycle expenses previously generated from this template are unaffected.</p>
    balance).</li>
 <li>System calculates the end date as <code>start_date + 6 weeks - 1 day</code>.</li>
 <li>System creates the cycle record.</li>
-<li>System queries all active expense templates for the user.</li>
+<li>System queries all active recurrent expenses for the user.</li>
 <li>System generates cycle expenses from each template, computing the expense
    date based on the template's recurrence config and the cycle's start date.</li>
 <li>System returns the created cycle along with the count of generated expenses.</li>
@@ -1845,7 +1845,7 @@ implemented and are excluded from the initial frontend build:</p>
 <td>FR-042, FR-043</td>
 </tr>
 <tr>
-<td>Expense Template Recurrence Config via UI Wizard</td>
+<td>Recurrent Expense Recurrence Config via UI Wizard</td>
 <td>FR-019</td>
 </tr>
 </tbody>

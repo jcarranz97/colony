@@ -725,10 +725,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#expense-templates" class="md-nav__link">
+  <a href="#recurrent-expenses" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Expense Templates
+        Recurrent Expenses
       
     </span>
   </a>
@@ -797,10 +797,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#user-expense-templates-1n" class="md-nav__link">
+  <a href="#user-recurrent-expenses-1n" class="md-nav__link">
     <span class="md-ellipsis">
       
-        User → Expense Templates (1:N)
+        User → Recurrent Expenses (1:N)
       
     </span>
   </a>
@@ -1334,11 +1334,11 @@
 <h2 id="schema-overview">Schema Overview</h2>
 <pre class="mermaid"><code>erDiagram
     users ||--o{ payment_methods : owns
-    users ||--o{ expense_templates : creates
+    users ||--o{ recurrent_expenses : creates
     users ||--o{ cycles : manages
     cycles ||--o{ cycle_expenses : contains
-    expense_templates ||--o{ cycle_expenses : generates
-    payment_methods ||--o{ expense_templates : uses
+    recurrent_expenses ||--o{ cycle_expenses : generates
+    payment_methods ||--o{ recurrent_expenses : uses
     payment_methods ||--o{ cycle_expenses : uses
 
     users {
@@ -1366,7 +1366,7 @@
         timestamp updated_at
     }
 
-    expense_templates {
+    recurrent_expenses {
         uuid id PK
         uuid user_id FK
         uuid payment_method_id FK
@@ -1528,9 +1528,9 @@
 <a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_payment_methods_user_id</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">payment_methods</span><span class="p">(</span><span class="n">user_id</span><span class="p">);</span>
 <a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_payment_methods_active</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">payment_methods</span><span class="p">(</span><span class="n">active</span><span class="p">);</span>
 </code></pre></div>
-<h3 id="expense-templates">Expense Templates</h3>
+<h3 id="recurrent-expenses">Recurrent Expenses</h3>
 <p>Reusable templates for recurring expenses.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">expense_templates</span><span class="w"> </span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">recurrent_expenses</span><span class="w"> </span><span class="p">(</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">gen_random_uuid</span><span class="p">(),</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="n">user_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">CASCADE</span><span class="p">,</span>
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="n">payment_method_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">payment_methods</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
@@ -1547,9 +1547,9 @@
 <a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">    </span><span class="n">updated_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="k">TIME</span><span class="w"> </span><span class="k">ZONE</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">()</span>
 <a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="p">);</span>
 <a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>
-<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_expense_templates_user_id</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">expense_templates</span><span class="p">(</span><span class="n">user_id</span><span class="p">);</span>
-<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_expense_templates_active</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">expense_templates</span><span class="p">(</span><span class="n">active</span><span class="p">);</span>
-<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_expense_templates_category</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">expense_templates</span><span class="p">(</span><span class="n">category</span><span class="p">);</span>
+<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_recurrent_expenses_user_id</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">recurrent_expenses</span><span class="p">(</span><span class="n">user_id</span><span class="p">);</span>
+<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_recurrent_expenses_active</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">recurrent_expenses</span><span class="p">(</span><span class="n">active</span><span class="p">);</span>
+<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_recurrent_expenses_category</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">recurrent_expenses</span><span class="p">(</span><span class="n">category</span><span class="p">);</span>
 </code></pre></div>
 <h3 id="cycles">Cycles</h3>
 <p>6-week expense management periods.</p>
@@ -1578,7 +1578,7 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">cycle_expenses</span><span class="w"> </span><span class="p">(</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">gen_random_uuid</span><span class="p">(),</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="n">cycle_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">cycles</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">CASCADE</span><span class="p">,</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="n">template_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">expense_templates</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="n">template_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">recurrent_expenses</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
 <a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="n">payment_method_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">payment_methods</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
 <a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="n">description</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="n">currency</span><span class="w"> </span><span class="n">currency_code</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
@@ -1624,11 +1624,11 @@
 <li>Payment methods belong to one user</li>
 <li>Soft delete preserves historical data</li>
 </ul>
-<h3 id="user-expense-templates-1n">User → Expense Templates (1:N)</h3>
+<h3 id="user-recurrent-expenses-1n">User → Recurrent Expenses (1:N)</h3>
 <ul>
-<li>Users create multiple templates</li>
-<li>Templates define recurring expense patterns</li>
-<li>Templates reference payment methods</li>
+<li>Users create multiple recurrent expenses</li>
+<li>Recurrent expenses define recurring expense patterns</li>
+<li>Recurrent expenses reference payment methods</li>
 </ul>
 <h3 id="user-cycles-1n">User → Cycles (1:N)</h3>
 <ul>

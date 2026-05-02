@@ -636,10 +636,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#34-expense-template-management" class="md-nav__link">
+  <a href="#34-recurrent-expense-management" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3.4 Expense Template Management
+        3.4 Recurrent Expense Management
       
     </span>
   </a>
@@ -802,10 +802,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#61-expense-template-schema" class="md-nav__link">
+  <a href="#61-recurrent-expense-schema" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6.1 Expense Template Schema
+        6.1 Recurrent Expense Schema
       
     </span>
   </a>
@@ -1360,9 +1360,9 @@
 <li><strong>FR-016</strong>: System must validate that payment method and currency combinations are logical</li>
 <li><strong>FR-017</strong>: Users must be able to view all payment methods (active and inactive)</li>
 </ul>
-<h3 id="34-expense-template-management">3.4 Expense Template Management</h3>
+<h3 id="34-recurrent-expense-management">3.4 Recurrent Expense Management</h3>
 <ul>
-<li><strong>FR-018</strong>: Users must be able to create expense templates with the following fields:<ul>
+<li><strong>FR-018</strong>: Users must be able to create recurrent expenses with the following fields:<ul>
 <li>Description</li>
 <li>Currency (USD/MXN)</li>
 <li>Payment Method</li>
@@ -1381,9 +1381,9 @@
 <li><strong>Custom</strong>: User-defined intervals</li>
 </ul>
 </li>
-<li><strong>FR-020</strong>: Users must be able to edit expense templates</li>
-<li><strong>FR-021</strong>: Users must be able to delete expense templates</li>
-<li><strong>FR-022</strong>: Users must be able to view all expense templates</li>
+<li><strong>FR-020</strong>: Users must be able to edit recurrent expenses</li>
+<li><strong>FR-021</strong>: Users must be able to delete recurrent expenses</li>
+<li><strong>FR-022</strong>: Users must be able to view all recurrent expenses</li>
 <li><strong>FR-023</strong>: Each expense must specify currency and payment method</li>
 </ul>
 <h3 id="35-cycle-management">3.5 Cycle Management</h3>
@@ -1454,12 +1454,12 @@
 <ul>
 <li><strong>FR-045</strong>: Users must be able to import existing expense data from Excel/CSV</li>
 <li><strong>FR-046</strong>: Users must be able to export cycle data to Excel/CSV</li>
-<li><strong>FR-047</strong>: System must support bulk expense template creation</li>
+<li><strong>FR-047</strong>: System must support bulk recurrent expense creation</li>
 </ul>
 <h2 id="4-non-functional-requirements">4. Non-Functional Requirements</h2>
 <h3 id="41-performance">4.1 Performance</h3>
 <ul>
-<li><strong>NFR-001</strong>: Cycle generation must complete within 5 seconds for 50+ expense templates</li>
+<li><strong>NFR-001</strong>: Cycle generation must complete within 5 seconds for 50+ recurrent expenses</li>
 <li><strong>NFR-002</strong>: Currency conversion must be real-time or cached for same-day accuracy</li>
 <li><strong>NFR-003</strong>: Financial reports must generate within 3 seconds</li>
 </ul>
@@ -1499,7 +1499,7 @@
 <li>Must integrate with currency exchange rate APIs</li>
 </ul>
 <h2 id="6-data-requirements">6. Data Requirements</h2>
-<h3 id="61-expense-template-schema">6.1 Expense Template Schema</h3>
+<h3 id="61-recurrent-expense-schema">6.1 Recurrent Expense Schema</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>- id: UUID
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>- description: String (required)
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>- currency: Enum (USD, MXN)

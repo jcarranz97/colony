@@ -914,22 +914,22 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#3-expense-templates" class="md-nav__link">
+  <a href="#3-recurrent-expenses" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Expense Templates
+        3. Recurrent Expenses
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="3. Expense Templates">
+    <nav class="md-nav" aria-label="3. Recurrent Expenses">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#get-expense-templates" class="md-nav__link">
+  <a href="#get-recurrent-expenses" class="md-nav__link">
     <span class="md-ellipsis">
       
-        GET /expense-templates
+        GET /recurrent-expenses
       
     </span>
   </a>
@@ -937,10 +937,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#post-expense-templates" class="md-nav__link">
+  <a href="#post-recurrent-expenses" class="md-nav__link">
     <span class="md-ellipsis">
       
-        POST /expense-templates
+        POST /recurrent-expenses
       
     </span>
   </a>
@@ -948,10 +948,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#get-expense-templatesid" class="md-nav__link">
+  <a href="#get-recurrent-expensesid" class="md-nav__link">
     <span class="md-ellipsis">
       
-        GET /expense-templates/{id}
+        GET /recurrent-expenses/{id}
       
     </span>
   </a>
@@ -959,10 +959,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#put-expense-templatesid" class="md-nav__link">
+  <a href="#put-recurrent-expensesid" class="md-nav__link">
     <span class="md-ellipsis">
       
-        PUT /expense-templates/{id}
+        PUT /recurrent-expenses/{id}
       
     </span>
   </a>
@@ -970,10 +970,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#delete-expense-templatesid" class="md-nav__link">
+  <a href="#delete-recurrent-expensesid" class="md-nav__link">
     <span class="md-ellipsis">
       
-        DELETE /expense-templates/{id}
+        DELETE /recurrent-expenses/{id}
       
     </span>
   </a>
@@ -1784,9 +1784,9 @@
 <h4 id="delete-payment-methodsid">DELETE /payment-methods/{id}</h4>
 <p>Deactivate a payment method (soft delete).</p>
 <p><strong>Response:</strong> <code>204 No Content</code></p>
-<h3 id="3-expense-templates">3. Expense Templates</h3>
-<h4 id="get-expense-templates">GET /expense-templates</h4>
-<p>Get all user's expense templates.</p>
+<h3 id="3-recurrent-expenses">3. Recurrent Expenses</h3>
+<h4 id="get-recurrent-expenses">GET /recurrent-expenses</h4>
+<p>Get all user's recurrent expenses.</p>
 <p><strong>Query Parameters:</strong>
 - <code>active</code> (boolean, optional): Filter by active status
 - <code>category</code> (string, optional): Filter by category (fixed/variable)
@@ -1816,8 +1816,8 @@
 <a id="__codelineno-17-22" name="__codelineno-17-22" href="#__codelineno-17-22"></a><span class="w">  </span><span class="p">}</span>
 <a id="__codelineno-17-23" name="__codelineno-17-23" href="#__codelineno-17-23"></a><span class="p">]</span>
 </code></pre></div></p>
-<h4 id="post-expense-templates">POST /expense-templates</h4>
-<p>Create a new expense template.</p>
+<h4 id="post-recurrent-expenses">POST /recurrent-expenses</h4>
+<p>Create a new recurrent expense.</p>
 <p><strong>Request Body:</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="p">{</span>
 <a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Groceries&quot;</span><span class="p">,</span>
@@ -1856,12 +1856,12 @@
 <a id="__codelineno-19-20" name="__codelineno-19-20" href="#__codelineno-19-20"></a><span class="w">  </span><span class="nt">&quot;updated_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span>
 <a id="__codelineno-19-21" name="__codelineno-19-21" href="#__codelineno-19-21"></a><span class="p">}</span>
 </code></pre></div></p>
-<h4 id="get-expense-templatesid">GET /expense-templates/{id}</h4>
-<p>Get a specific expense template.</p>
-<h4 id="put-expense-templatesid">PUT /expense-templates/{id}</h4>
-<p>Update an expense template.</p>
-<h4 id="delete-expense-templatesid">DELETE /expense-templates/{id}</h4>
-<p>Delete an expense template.</p>
+<h4 id="get-recurrent-expensesid">GET /recurrent-expenses/{id}</h4>
+<p>Get a specific recurrent expense.</p>
+<h4 id="put-recurrent-expensesid">PUT /recurrent-expenses/{id}</h4>
+<p>Update a recurrent expense.</p>
+<h4 id="delete-recurrent-expensesid">DELETE /recurrent-expenses/{id}</h4>
+<p>Delete a recurrent expense.</p>
 <p><strong>Response:</strong> <code>204 No Content</code></p>
 <h3 id="4-cycles">4. Cycles</h3>
 <h4 id="get-cycles">GET /cycles</h4>
@@ -2339,7 +2339,7 @@ Only the <code>rate</code> field is mutable; the date is immutable.</p>
 <h3 id="creating-a-complete-expense-cycle">Creating a Complete Expense Cycle</h3>
 <ol>
 <li><strong>Create Payment Methods</strong> (if not exists)</li>
-<li><strong>Create Expense Templates</strong></li>
+<li><strong>Create Recurrent Expenses</strong></li>
 <li><strong>Create Cycle</strong> with automatic template generation</li>
 <li><strong>Modify Generated Expenses</strong> as needed</li>
 <li><strong>Track Payment Status</strong> throughout the cycle</li>
@@ -2361,8 +2361,8 @@ Only the <code>rate</code> field is mutable; the date is immutable.</p>
 <a id="__codelineno-36-13" name="__codelineno-36-13" href="#__codelineno-36-13"></a><span class="p">});</span>
 <a id="__codelineno-36-14" name="__codelineno-36-14" href="#__codelineno-36-14"></a><span class="kd">const</span><span class="w"> </span><span class="nx">paymentMethod</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">paymentMethodResponse</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
 <a id="__codelineno-36-15" name="__codelineno-36-15" href="#__codelineno-36-15"></a>
-<a id="__codelineno-36-16" name="__codelineno-36-16" href="#__codelineno-36-16"></a><span class="c1">// 2. Create expense template</span>
-<a id="__codelineno-36-17" name="__codelineno-36-17" href="#__codelineno-36-17"></a><span class="kd">const</span><span class="w"> </span><span class="nx">templateResponse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;/api/v1/expense-templates&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-36-16" name="__codelineno-36-16" href="#__codelineno-36-16"></a><span class="c1">// 2. Create recurrent expense</span>
+<a id="__codelineno-36-17" name="__codelineno-36-17" href="#__codelineno-36-17"></a><span class="kd">const</span><span class="w"> </span><span class="nx">templateResponse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;/api/v1/recurrent-expenses&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-36-18" name="__codelineno-36-18" href="#__codelineno-36-18"></a><span class="w">  </span><span class="nx">method</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;POST&#39;</span><span class="p">,</span>
 <a id="__codelineno-36-19" name="__codelineno-36-19" href="#__codelineno-36-19"></a><span class="w">  </span><span class="nx">headers</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-36-20" name="__codelineno-36-20" href="#__codelineno-36-20"></a><span class="w">    </span><span class="s1">&#39;Content-Type&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
