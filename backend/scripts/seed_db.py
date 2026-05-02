@@ -246,6 +246,32 @@ def seed_cycle(db: Session, user: User, cycle_data: dict[str, Any]) -> None:
     )
 
 
+def _seed_user_full_data(
+    db: Session, user: User, user_data: dict[str, Any]
+) -> None:
+    """Seed payment methods, expense templates, and cycles for one user."""
+    payment_methods: dict[str, PaymentMethod] = {}
+    for pm_data in user_data.get("payment_methods", []):
+        pm = seed_payment_method(db, user, pm_data)
+        payment_methods[pm.name] = pm
+
+    for tmpl_data in user_data.get("expense_templates", []):
+        pm_name = tmpl_data.pop("payment_method_name")
+        pm = payment_methods.get(pm_name)
+        if pm is None:
+            print(
+                f"      ⚠️  Payment method '{pm_name}' not found for "
+                f"template '{tmpl_data.get('description')}', skipping."
+            )
+            continue
+        seed_expense_template(db, user, pm, tmpl_data)
+
+    db.commit()  # commit templates before generating cycle expenses
+
+    for cycle_data in user_data.get("cycles", []):
+        seed_cycle(db, user, cycle_data)
+
+
 def seed_database(seed_file: Path, auth_only: bool = False) -> None:
     """Seed the database with initial development data from a YAML file.
 
@@ -270,7 +296,6 @@ def seed_database(seed_file: Path, auth_only: bool = False) -> None:
 
     with SessionLocal() as db:
         if not auth_only:
-            # Seed top-level exchange rates first (required for MXN→USD conversions)
             rates_data = data.get("exchange_rates", [])
             if rates_data:
                 print(f"Processing {len(rates_data)} exchange rate(s)...")
@@ -283,32 +308,10 @@ def seed_database(seed_file: Path, auth_only: bool = False) -> None:
 
         for user_data in users_data:
             user = seed_user(db, user_data)
-
             if auth_only:
                 db.commit()
                 continue
-
-            # Build a name→PaymentMethod lookup for template cross-referencing
-            payment_methods: dict[str, PaymentMethod] = {}
-            for pm_data in user_data.get("payment_methods", []):
-                pm = seed_payment_method(db, user, pm_data)
-                payment_methods[pm.name] = pm
-
-            for tmpl_data in user_data.get("expense_templates", []):
-                pm_name = tmpl_data.pop("payment_method_name")
-                pm = payment_methods.get(pm_name)
-                if pm is None:
-                    print(
-                        f"      ⚠️  Payment method '{pm_name}' not found for "
-                        f"template '{tmpl_data.get('description')}', skipping."
-                    )
-                    continue
-                seed_expense_template(db, user, pm, tmpl_data)
-
-            db.commit()  # commit templates before generating cycle expenses
-
-            for cycle_data in user_data.get("cycles", []):
-                seed_cycle(db, user, cycle_data)
+            _seed_user_full_data(db, user, user_data)
 
         db.commit()
 
