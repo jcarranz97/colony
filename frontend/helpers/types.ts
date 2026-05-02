@@ -212,6 +212,27 @@ export interface CycleSummary {
   status_breakdown: StatusBreakdown;
 }
 
+// Exchange rates
+export interface ExchangeRate {
+  id: string;
+  from_currency: CurrencyCode;
+  to_currency: CurrencyCode;
+  rate: number;
+  rate_date: string;
+  created_at: string;
+}
+
+export interface CreateExchangeRateRequest {
+  from_currency: CurrencyCode;
+  to_currency: CurrencyCode;
+  rate: number;
+  rate_date: string;
+}
+
+export interface UpdateExchangeRateRequest {
+  rate: number;
+}
+
 // API response wrapper
 export type ApiResponse<T> =
   | { success: true; data: T }

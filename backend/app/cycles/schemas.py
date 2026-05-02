@@ -3,7 +3,7 @@ from datetime import UTC, date, datetime
 from decimal import Decimal
 from typing import Annotated
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.payment_methods.schemas import PaymentMethodSummary
 from app.schemas import AppBaseModel
@@ -355,6 +355,39 @@ class CycleSummaryResponse(BaseModel):
     status_breakdown: StatusBreakdown
 
     model_config = {"json_encoders": {Decimal: str}}
+
+
+# ---------------------------------------------------------------------------
+# Exchange rate schemas
+# ---------------------------------------------------------------------------
+
+
+class ExchangeRateCreate(AppBaseModel):
+    """Request body for creating a new exchange rate."""
+
+    from_currency: CurrencyCode
+    to_currency: CurrencyCode
+    rate: Decimal = Field(..., gt=0, decimal_places=6)
+    rate_date: date
+
+
+class ExchangeRateUpdate(AppBaseModel):
+    """Request body for updating an existing exchange rate's value."""
+
+    rate: Decimal = Field(..., gt=0, decimal_places=6)
+
+
+class ExchangeRateResponse(AppBaseModel):
+    """Exchange rate resource returned by the API."""
+
+    id: uuid.UUID
+    from_currency: str
+    to_currency: str
+    rate: Decimal
+    rate_date: date
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 # ---------------------------------------------------------------------------

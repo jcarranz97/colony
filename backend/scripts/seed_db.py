@@ -246,34 +246,47 @@ def seed_cycle(db: Session, user: User, cycle_data: dict[str, Any]) -> None:
     )
 
 
-def seed_database(seed_file: Path) -> None:
+def seed_database(seed_file: Path, auth_only: bool = False) -> None:
     """Seed the database with initial development data from a YAML file.
 
     The operation is idempotent: records that already exist are skipped.
 
     Args:
         seed_file: Path to the YAML seed file.
+        auth_only: When True, only user accounts are created — payment
+            methods, expense templates, cycles, and exchange rates are
+            skipped.
     """
     create_tables()
+
+    if auth_only:
+        print("Seed mode: auth_only — only user credentials will be created.")
+    else:
+        print("Seed mode: full — all example data will be created.")
 
     print(f"Loading seed data from {seed_file}...")
     with seed_file.open() as f:
         data = yaml.safe_load(f)
 
     with SessionLocal() as db:
-        # Seed top-level exchange rates first (required for MXN→USD conversions)
-        rates_data = data.get("exchange_rates", [])
-        if rates_data:
-            print(f"Processing {len(rates_data)} exchange rate(s)...")
-            for rate_data in rates_data:
-                seed_exchange_rate(db, rate_data)
-            db.commit()
+        if not auth_only:
+            # Seed top-level exchange rates first (required for MXN→USD conversions)
+            rates_data = data.get("exchange_rates", [])
+            if rates_data:
+                print(f"Processing {len(rates_data)} exchange rate(s)...")
+                for rate_data in rates_data:
+                    seed_exchange_rate(db, rate_data)
+                db.commit()
 
         users_data = data.get("users", [])
         print(f"Processing {len(users_data)} user(s)...")
 
         for user_data in users_data:
             user = seed_user(db, user_data)
+
+            if auth_only:
+                db.commit()
+                continue
 
             # Build a name→PaymentMethod lookup for template cross-referencing
             payment_methods: dict[str, PaymentMethod] = {}
@@ -304,4 +317,5 @@ def seed_database(seed_file: Path) -> None:
 
 if __name__ == "__main__":
     seed_file_path = Path(os.getenv("SEED_FILE", "../seed_data.yaml"))
-    seed_database(seed_file_path)
+    seed_mode = os.getenv("SEED_MODE", "full").strip().lower()
+    seed_database(seed_file_path, auth_only=(seed_mode == "auth_only"))

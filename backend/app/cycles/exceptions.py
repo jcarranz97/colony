@@ -95,6 +95,32 @@ class PaymentMethodNotFoundExceptionError(CycleExceptionError):
         )
 
 
+class ExchangeRateDateExistsExceptionError(CycleExceptionError):
+    """Raised when a rate for the same currency pair and date already exists."""
+
+    def __init__(self, from_currency: str, to_currency: str, rate_date: str) -> None:
+        """Initialize ExchangeRateDateExistsExceptionError.
+
+        Args:
+            from_currency: Source currency code.
+            to_currency: Target currency code.
+            rate_date: The date that already has a rate.
+        """
+        super().__init__(
+            error_code=ErrorCode.EXCHANGE_RATE_DATE_EXISTS,
+            message=(
+                f"An exchange rate for {from_currency} → {to_currency} "
+                f"on {rate_date} already exists"
+            ),
+            status_code=status.HTTP_409_CONFLICT,
+            details={
+                "from_currency": from_currency,
+                "to_currency": to_currency,
+                "rate_date": rate_date,
+            },
+        )
+
+
 class ExchangeRateNotFoundExceptionError(CycleExceptionError):
     """Raised when no exchange rate is available for the requested currency pair."""
 

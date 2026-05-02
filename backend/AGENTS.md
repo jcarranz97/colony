@@ -410,6 +410,16 @@ Pyright is strict — add type annotations to every function you write or
 touch, including return types. Never use `Any` unless there is no alternative
 and you add a comment explaining why.
 
+### API Documentation
+
+Whenever you add, remove, or change an API endpoint (path, method, request
+body, response shape, or error codes), update
+`docs/architecture/api-specification.md` in the same change. Specifically:
+
+- Add a new subsection under the relevant domain heading for new endpoints.
+- Update the request/response JSON examples to match the actual schema.
+- Add any new error codes to the Error Codes table.
+
 ### Markdown Files
 
 Pre-commit runs `markdownlint` on all `.md` files outside `docs/`. When you
