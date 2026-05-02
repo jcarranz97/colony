@@ -50,7 +50,7 @@ backend/
 │   ├── dependencies.py  # Re-exports: CurrentActiveUser, CurrentUser, get_db
 │   ├── models.py        # BaseModel (id UUID, created_at, updated_at, active bool)
 │   ├── schemas.py       # Global Pydantic schemas
-│   └── <domain>/        # auth | payment_methods | expense_templates | cycles
+│   └── <domain>/        # auth | payment_methods | recurrent_expenses | cycles
 ├── alembic/             # DB migrations
 ├── tests/               # pytest suite (mirrors domain layout)
 └── pyproject.toml
@@ -58,7 +58,7 @@ backend/
 
 ### Domain Module Layout
 
-Every domain (`auth`, `payment_methods`, `expense_templates`, `cycles`) has
+Every domain (`auth`, `payment_methods`, `recurrent_expenses`, `cycles`) has
 exactly this structure — follow it when adding a new domain:
 
 ```text
@@ -207,7 +207,7 @@ Stored in `recurrence_config` JSONB column. Structure by type:
 | `monthly` | `day_of_month` (1–31), `handle_month_end` (bool) |
 | `custom` | `interval` (int), `unit` (days/weeks/months/years) |
 
-Validation lives in `expense_templates/schemas.py` (`_validate_*_config`
+Validation lives in `recurrent_expenses/schemas.py` (`_validate_*_config`
 helpers). Calculation logic lives in `cycles/utils.py`.
 
 ### Multi-Currency
@@ -301,7 +301,7 @@ All routes prefixed `/api/v1/`. Success responses return data directly
 |---|---|
 | Auth | `/api/v1/auth/` |
 | Payment Methods | `/api/v1/payment-methods/` |
-| Expense Templates | `/api/v1/expense-templates/` |
+| Recurrent Expenses | `/api/v1/recurrent-expenses/` |
 | Cycles + Expenses | `/api/v1/cycles/` |
 
 Pagination (cycles list): `?page=1&per_page=20` query params; response
@@ -318,9 +318,9 @@ Health checks at `/<domain>/health` and root `/health`.
    once `status == "completed"`.
 2. **Remaining balance** is recalculated automatically on every expense
    write (`_recalculate_remaining_balance`).
-3. **Generate from templates** — `CycleCreate.generate_from_templates=true`
+3. **Generate from recurrent expenses** — `CycleCreate.generate_from_templates=true`
    triggers recurrence calculation via `cycles/utils.py` and bulk-creates
-   `CycleExpense` rows from matching `ExpenseTemplate` records.
+   `CycleExpense` rows from matching `RecurrentExpense` records.
 4. **Overdue reclassification** — `CycleExpenseResponse` marks an expense
    overdue at serialization time if `due_date < today` and status is still
    `pending`.
@@ -388,7 +388,7 @@ Follow this checklist in order:
 
 Domains do not import from each other's `service.py`. The only sanctioned
 cross-domain dependency is a local `_verify_payment_method` helper that
-`cycles/service.py` and `expense_templates/service.py` each define
+`cycles/service.py` and `recurrent_expenses/service.py` each define
 independently. If you need shared logic, add a local `_helper` function in
 the calling domain's `service.py`.
 

@@ -2,9 +2,9 @@ from enum import Enum
 
 
 class ErrorCode(str, Enum):
-    """Expense templates error codes."""
+    """Recurrent expenses error codes."""
 
-    EXPENSE_TEMPLATE_NOT_FOUND = "EXPENSE_TEMPLATE_NOT_FOUND"
+    RECURRENT_EXPENSE_NOT_FOUND = "RECURRENT_EXPENSE_NOT_FOUND"
     PAYMENT_METHOD_NOT_FOUND = "PAYMENT_METHOD_NOT_FOUND"
     INVALID_RECURRENCE_CONFIG = "INVALID_RECURRENCE_CONFIG"
 

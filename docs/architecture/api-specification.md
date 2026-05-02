@@ -278,10 +278,10 @@ Deactivate a payment method (soft delete).
 
 **Response:** `204 No Content`
 
-### 3. Expense Templates
+### 3. Recurrent Expenses
 
-#### GET /expense-templates
-Get all user's expense templates.
+#### GET /recurrent-expenses
+Get all user's recurrent expenses.
 
 **Query Parameters:**
 - `active` (boolean, optional): Filter by active status
@@ -315,8 +315,8 @@ Get all user's expense templates.
 ]
 ```
 
-#### POST /expense-templates
-Create a new expense template.
+#### POST /recurrent-expenses
+Create a new recurrent expense.
 
 **Request Body:**
 ```json
@@ -360,14 +360,14 @@ Create a new expense template.
 }
 ```
 
-#### GET /expense-templates/{id}
-Get a specific expense template.
+#### GET /recurrent-expenses/{id}
+Get a specific recurrent expense.
 
-#### PUT /expense-templates/{id}
-Update an expense template.
+#### PUT /recurrent-expenses/{id}
+Update a recurrent expense.
 
-#### DELETE /expense-templates/{id}
-Delete an expense template.
+#### DELETE /recurrent-expenses/{id}
+Delete a recurrent expense.
 
 **Response:** `204 No Content`
 
@@ -852,7 +852,7 @@ System health check.
 ### Creating a Complete Expense Cycle
 
 1. **Create Payment Methods** (if not exists)
-2. **Create Expense Templates**
+2. **Create Recurrent Expenses**
 3. **Create Cycle** with automatic template generation
 4. **Modify Generated Expenses** as needed
 5. **Track Payment Status** throughout the cycle
@@ -876,8 +876,8 @@ const paymentMethodResponse = await fetch('/api/v1/payment-methods', {
 });
 const paymentMethod = await paymentMethodResponse.json();
 
-// 2. Create expense template
-const templateResponse = await fetch('/api/v1/expense-templates', {
+// 2. Create recurrent expense
+const templateResponse = await fetch('/api/v1/recurrent-expenses', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',

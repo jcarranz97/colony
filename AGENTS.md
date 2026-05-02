@@ -30,7 +30,7 @@ colony/
 │   ├── app/
 │   │   ├── auth/              # Auth domain
 │   │   ├── payment_methods/   # Payment methods domain
-│   │   ├── expense_templates/ # Expense templates domain
+│   │   ├── recurrent_expenses/ # Recurrent expenses domain
 │   │   ├── cycles/            # Cycles + expenses domain
 │   │   ├── config.py          # Settings (env-based)
 │   │   ├── database.py        # SQLAlchemy engine + sessions
@@ -79,7 +79,7 @@ app/<domain>/
 ```
 
 Currently implemented domains: `auth`, `payment_methods`,
-`expense_templates`, `cycles`.
+`recurrent_expenses`, `cycles`.
 
 ---
 
@@ -248,7 +248,7 @@ components/{feature}/
 ```
 
 `table.tsx` and `render-cell.tsx` files exist in payment-methods and
-expense-templates from an earlier implementation — they are superseded by
+recurrent-expenses from an earlier implementation — they are superseded by
 the inline notebook card rendering in `index.tsx` and can be ignored.
 
 ### Frontend Folder Structure
@@ -260,11 +260,11 @@ frontend/
 │   ├── globals.css         # Tailwind + HeroUI imports + ALL nb-* CSS
 │   ├── (auth)/             # /login, /register — plain centered layout
 │   └── (app)/              # Protected: /cycles, /payment-methods,
-│                           #   /expense-templates, /settings
+│                           #   /recurrent-expenses, /settings
 ├── components/
 │   ├── auth/               # Login + Register forms
 │   ├── payment-methods/    # Notebook card list + add/edit modals
-│   ├── expense-templates/  # Notebook card list + add/edit modals
+│   ├── recurrent-expenses/  # Notebook card list + add/edit modals
 │   ├── cycles/             # Full cycles implementation — list, detail,
 │   │                       #   expense rows with highlighter, modals
 │   ├── layout/             # AppLayout — notebook shell (cover, spiral, nav)

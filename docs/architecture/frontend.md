@@ -87,7 +87,7 @@ frontend/
 │       ├── layout.tsx          # Uses AppLayout (notebook shell)
 │       ├── cycles/page.tsx
 │       ├── payment-methods/page.tsx
-│       ├── expense-templates/page.tsx
+│       ├── recurrent-expenses/page.tsx
 │       └── settings/page.tsx
 │
 ├── components/
@@ -99,7 +99,7 @@ frontend/
 │   │   ├── index.tsx           # Notebook card list + modals
 │   │   ├── actions.ts          # Server-action wrappers
 │   │   └── (legacy)            # table.tsx, render-cell.tsx — superseded
-│   ├── expense-templates/      # Expense templates feature
+│   ├── recurrent-expenses/     # Recurrent expenses feature
 │   │   ├── index.tsx           # Notebook card list + modals
 │   │   ├── actions.ts          # Server-action wrappers
 │   │   └── (legacy)            # table.tsx, render-cell.tsx — superseded
@@ -121,7 +121,7 @@ frontend/
 │   ├── api-client.ts           # Generic fetch wrapper with auth + 401 handling
 │   ├── auth.api.ts
 │   ├── cycles.api.ts
-│   ├── expense-templates.api.ts
+│   ├── recurrent-expenses.api.ts
 │   └── payment-methods.api.ts
 │
 ├── actions/

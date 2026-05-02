@@ -17,14 +17,14 @@ import {
 } from "@heroui/react";
 import { parseDate } from "@internationalized/date";
 import type { DateValue } from "react-aria-components";
-import { ExpenseTemplateSchema } from "@/helpers/schemas";
-import { RecurrenceConfigBuilder } from "@/components/expense-templates/recurrence-config-builder";
+import { RecurrentExpenseSchema } from "@/helpers/schemas";
+import { RecurrenceConfigBuilder } from "@/components/recurrent-expenses/recurrence-config-builder";
 import {
-  getExpenseTemplates,
-  editExpenseTemplate,
-} from "@/components/expense-templates/actions";
+  getRecurrentExpenses,
+  editRecurrentExpense,
+} from "@/components/recurrent-expenses/actions";
 import { getPaymentMethods } from "@/components/payment-methods/actions";
-import type { ExpenseTemplate, PaymentMethod } from "@/helpers/types";
+import type { RecurrentExpense, PaymentMethod } from "@/helpers/types";
 
 const RECURRENCE_DEFAULT: Record<string, Record<string, unknown>> = {
   weekly: {},
@@ -33,18 +33,18 @@ const RECURRENCE_DEFAULT: Record<string, Record<string, unknown>> = {
   custom: {},
 };
 
-export default function EditExpenseTemplatePage() {
+export default function EditRecurrentExpensePage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
 
-  const [template, setTemplate] = useState<ExpenseTemplate | null>(null);
+  const [template, setTemplate] = useState<RecurrentExpense | null>(null);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([getExpenseTemplates(), getPaymentMethods()]).then(
+    Promise.all([getRecurrentExpenses(), getPaymentMethods()]).then(
       ([templatesRes, methodsRes]) => {
         if (templatesRes.success) {
           setTemplate(templatesRes.data.find((t) => t.id === id) ?? null);
@@ -66,10 +66,10 @@ export default function EditExpenseTemplatePage() {
   if (!template) {
     return (
       <div className="flex flex-col items-center gap-4 py-16">
-        <p className="text-default-500">Expense template not found.</p>
+        <p className="text-default-500">Recurrent expense not found.</p>
         <Button
           variant="ghost"
-          onPress={() => router.push("/expense-templates")}
+          onPress={() => router.push("/recurrent-expenses")}
         >
           Back
         </Button>
@@ -83,11 +83,11 @@ export default function EditExpenseTemplatePage() {
         <Button
           size="sm"
           variant="ghost"
-          onPress={() => router.push("/expense-templates")}
+          onPress={() => router.push("/recurrent-expenses")}
         >
           ← Back
         </Button>
-        <h1 className="text-2xl font-bold">Edit Expense Template</h1>
+        <h1 className="text-2xl font-bold">Edit Recurrent Expense</h1>
       </div>
 
       <Formik
@@ -104,10 +104,10 @@ export default function EditExpenseTemplatePage() {
           reference_date: template.reference_date,
           payment_method_id: template.payment_method?.id ?? null,
         }}
-        validationSchema={ExpenseTemplateSchema}
+        validationSchema={RecurrentExpenseSchema}
         onSubmit={async (values, { setSubmitting }) => {
           setError(null);
-          const result = await editExpenseTemplate(template.id, {
+          const result = await editRecurrentExpense(template.id, {
             description: values.description,
             base_amount: values.base_amount,
             currency: values.currency as any,
@@ -118,7 +118,7 @@ export default function EditExpenseTemplatePage() {
             payment_method_id: values.payment_method_id,
           });
           if (result.success) {
-            router.push("/expense-templates");
+            router.push("/recurrent-expenses");
           } else {
             setError(result.error.message);
           }
@@ -388,7 +388,7 @@ export default function EditExpenseTemplatePage() {
             <div className="flex gap-2">
               <Button
                 variant="ghost"
-                onPress={() => router.push("/expense-templates")}
+                onPress={() => router.push("/recurrent-expenses")}
               >
                 Cancel
               </Button>

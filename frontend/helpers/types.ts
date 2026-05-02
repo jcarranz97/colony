@@ -72,8 +72,8 @@ export type RecurrenceConfig =
     }
   | Record<string, never>;
 
-// Expense Templates
-export interface ExpenseTemplate {
+// Recurrent Expenses
+export interface RecurrentExpense {
   id: string;
   description: string;
   base_amount: string;
@@ -89,7 +89,7 @@ export interface ExpenseTemplate {
   updated_at: string;
 }
 
-export interface CreateExpenseTemplateRequest {
+export interface CreateRecurrentExpenseRequest {
   description: string;
   base_amount: string;
   currency: CurrencyCode;
@@ -101,7 +101,7 @@ export interface CreateExpenseTemplateRequest {
   payment_method_id?: string | null;
 }
 
-export interface UpdateExpenseTemplateRequest extends Partial<CreateExpenseTemplateRequest> {
+export interface UpdateRecurrentExpenseRequest extends Partial<CreateRecurrentExpenseRequest> {
   active?: boolean;
 }
 

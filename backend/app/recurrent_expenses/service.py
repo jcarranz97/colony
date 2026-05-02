@@ -16,8 +16,8 @@ from .schemas import _RECURRENCE_VALIDATORS
 logger = logging.getLogger(__name__)
 
 
-class ExpenseTemplateService:
-    """Expense template business logic service."""
+class RecurrentExpenseService:
+    """Recurrent expense business logic service."""
 
     @staticmethod
     def _verify_payment_method(
@@ -55,14 +55,14 @@ class ExpenseTemplateService:
         return pm
 
     @staticmethod
-    def get_expense_templates(
+    def get_recurrent_expenses(
         db: Session,
         user_id: str,
         active: bool | None = None,
         category: str | None = None,
         currency: str | None = None,
-    ) -> list[models.ExpenseTemplate]:
-        """List expense templates for a user with optional filters.
+    ) -> list[models.RecurrentExpense]:
+        """List recurrent expenses for a user with optional filters.
 
         Args:
             db: Active database session.
@@ -72,57 +72,57 @@ class ExpenseTemplateService:
             currency: Optional filter by currency code.
 
         Returns:
-            List of matching expense templates ordered by created_at descending.
+            List of matching recurrent expenses ordered by created_at descending.
         """
-        query = db.query(models.ExpenseTemplate).filter(
-            models.ExpenseTemplate.user_id == user_id
+        query = db.query(models.RecurrentExpense).filter(
+            models.RecurrentExpense.user_id == user_id
         )
 
         if active is not None:
-            query = query.filter(models.ExpenseTemplate.active == active)
+            query = query.filter(models.RecurrentExpense.active == active)
 
         if category:
-            query = query.filter(models.ExpenseTemplate.category == category)
+            query = query.filter(models.RecurrentExpense.category == category)
 
         if currency:
-            query = query.filter(models.ExpenseTemplate.currency == currency)
+            query = query.filter(models.RecurrentExpense.currency == currency)
 
-        return query.order_by(models.ExpenseTemplate.created_at.desc()).all()
+        return query.order_by(models.RecurrentExpense.created_at.desc()).all()
 
     @staticmethod
-    def get_expense_template_by_id(
+    def get_recurrent_expense_by_id(
         db: Session,
-        template_id: str,
+        recurrent_expense_id: str,
         user_id: str,
-    ) -> models.ExpenseTemplate | None:
-        """Get a single expense template verifying ownership.
+    ) -> models.RecurrentExpense | None:
+        """Get a single recurrent expense verifying ownership.
 
         Args:
             db: Active database session.
-            template_id: The template UUID as a string.
+            recurrent_expense_id: The recurrent expense UUID as a string.
             user_id: The authenticated user's ID.
 
         Returns:
-            The ExpenseTemplate if found and owned by user, else None.
+            The RecurrentExpense if found and owned by user, else None.
         """
         return (
-            db.query(models.ExpenseTemplate)
+            db.query(models.RecurrentExpense)
             .filter(
                 and_(
-                    models.ExpenseTemplate.id == template_id,
-                    models.ExpenseTemplate.user_id == user_id,
+                    models.RecurrentExpense.id == recurrent_expense_id,
+                    models.RecurrentExpense.user_id == user_id,
                 )
             )
             .first()
         )
 
     @staticmethod
-    def create_expense_template(
+    def create_recurrent_expense(
         db: Session,
-        data: schemas.ExpenseTemplateCreate,
+        data: schemas.RecurrentExpenseCreate,
         user_id: str,
-    ) -> models.ExpenseTemplate:
-        """Create a new expense template.
+    ) -> models.RecurrentExpense:
+        """Create a new recurrent expense.
 
         Args:
             db: Active database session.
@@ -130,22 +130,22 @@ class ExpenseTemplateService:
             user_id: The authenticated user's ID.
 
         Returns:
-            The newly created ExpenseTemplate.
+            The newly created RecurrentExpense.
 
         Raises:
             PaymentMethodNotFoundExceptionError: If the payment method does not
                 exist or does not belong to the user.
         """
         logger.info(
-            "Creating expense template",
+            "Creating recurrent expense",
             extra={"user_id": user_id, "description": data.description},
         )
 
-        ExpenseTemplateService._verify_payment_method(
+        RecurrentExpenseService._verify_payment_method(
             db, data.payment_method_id, user_id
         )
 
-        template = models.ExpenseTemplate(
+        recurrent_expense = models.RecurrentExpense(
             user_id=user_id,
             payment_method_id=data.payment_method_id,
             description=data.description,
@@ -158,34 +158,37 @@ class ExpenseTemplateService:
             autopay_info=data.autopay_info,
         )
 
-        db.add(template)
+        db.add(recurrent_expense)
         db.commit()
-        db.refresh(template)
+        db.refresh(recurrent_expense)
 
         logger.info(
-            "Expense template created successfully",
-            extra={"user_id": user_id, "template_id": str(template.id)},
+            "Recurrent expense created successfully",
+            extra={
+                "user_id": user_id,
+                "recurrent_expense_id": str(recurrent_expense.id),
+            },
         )
 
-        return template
+        return recurrent_expense
 
     @staticmethod
-    def update_expense_template(
+    def update_recurrent_expense(
         db: Session,
-        template: models.ExpenseTemplate,
-        data: schemas.ExpenseTemplateUpdate,
+        recurrent_expense: models.RecurrentExpense,
+        data: schemas.RecurrentExpenseUpdate,
         user_id: str,
-    ) -> models.ExpenseTemplate:
-        """Update an existing expense template.
+    ) -> models.RecurrentExpense:
+        """Update an existing recurrent expense.
 
         Args:
             db: Active database session.
-            template: The existing template ORM instance.
+            recurrent_expense: The existing recurrent expense ORM instance.
             data: Validated update schema (partial).
             user_id: The authenticated user's ID.
 
         Returns:
-            The updated ExpenseTemplate.
+            The updated RecurrentExpense.
 
         Raises:
             PaymentMethodNotFoundExceptionError: If the new payment method does not
@@ -194,21 +197,21 @@ class ExpenseTemplateService:
                 without recurrence_type and is invalid for the existing type.
         """
         logger.info(
-            "Updating expense template",
-            extra={"template_id": str(template.id)},
+            "Updating recurrent expense",
+            extra={"recurrent_expense_id": str(recurrent_expense.id)},
         )
 
         update_data = data.model_dump(exclude_unset=True)
 
         if "payment_method_id" in update_data:
-            ExpenseTemplateService._verify_payment_method(
+            RecurrentExpenseService._verify_payment_method(
                 db, update_data["payment_method_id"], user_id
             )
 
         # When only recurrence_config is updated (no recurrence_type change),
-        # validate the new config against the template's existing recurrence_type.
+        # validate the new config against the existing recurrence_type.
         if "recurrence_config" in update_data and "recurrence_type" not in update_data:
-            validator = _RECURRENCE_VALIDATORS.get(template.recurrence_type)
+            validator = _RECURRENCE_VALIDATORS.get(recurrent_expense.recurrence_type)
             if validator:
                 try:
                     validator(update_data["recurrence_config"])
@@ -216,42 +219,42 @@ class ExpenseTemplateService:
                     raise InvalidRecurrenceConfigExceptionError(str(exc)) from exc
 
         for field, value in update_data.items():
-            setattr(template, field, value)
+            setattr(recurrent_expense, field, value)
 
         db.commit()
-        db.refresh(template)
+        db.refresh(recurrent_expense)
 
         logger.info(
-            "Expense template updated successfully",
-            extra={"template_id": str(template.id)},
+            "Recurrent expense updated successfully",
+            extra={"recurrent_expense_id": str(recurrent_expense.id)},
         )
 
-        return template
+        return recurrent_expense
 
     @staticmethod
-    def delete_expense_template(
+    def delete_recurrent_expense(
         db: Session,
-        template: models.ExpenseTemplate,
+        recurrent_expense: models.RecurrentExpense,
     ) -> None:
-        """Soft delete an expense template by setting active to False.
+        """Soft delete a recurrent expense by setting active to False.
 
         Args:
             db: Active database session.
-            template: The template ORM instance to deactivate.
+            recurrent_expense: The recurrent expense ORM instance to deactivate.
         """
         logger.info(
-            "Deactivating expense template",
-            extra={"template_id": str(template.id)},
+            "Deactivating recurrent expense",
+            extra={"recurrent_expense_id": str(recurrent_expense.id)},
         )
 
-        template.active = False
+        recurrent_expense.active = False
         db.commit()
 
         logger.info(
-            "Expense template deactivated successfully",
-            extra={"template_id": str(template.id)},
+            "Recurrent expense deactivated successfully",
+            extra={"recurrent_expense_id": str(recurrent_expense.id)},
         )
 
 
 # Singleton service instance
-expense_template_service = ExpenseTemplateService()
+recurrent_expense_service = RecurrentExpenseService()

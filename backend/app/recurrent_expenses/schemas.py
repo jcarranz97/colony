@@ -115,8 +115,8 @@ _RECURRENCE_VALIDATORS: dict[RecurrenceType, Any] = {
 # ---------------------------------------------------------------------------
 
 
-class ExpenseTemplateBase(AppBaseModel):
-    """Base schema with all required expense template fields."""
+class RecurrentExpenseBase(AppBaseModel):
+    """Base schema with all required recurrent expense fields."""
 
     description: str = Field(..., min_length=1, max_length=255)
     currency: CurrencyCode
@@ -148,7 +148,7 @@ class ExpenseTemplateBase(AppBaseModel):
         return stripped
 
     @model_validator(mode="after")
-    def validate_recurrence_config(self) -> "ExpenseTemplateBase":
+    def validate_recurrence_config(self) -> "RecurrentExpenseBase":
         """Validate recurrence_config shape matches recurrence_type.
 
         Returns:
@@ -166,12 +166,12 @@ class ExpenseTemplateBase(AppBaseModel):
         return self
 
 
-class ExpenseTemplateCreate(ExpenseTemplateBase):
-    """Schema for creating a new expense template."""
+class RecurrentExpenseCreate(RecurrentExpenseBase):
+    """Schema for creating a new recurrent expense."""
 
 
-class ExpenseTemplateUpdate(AppBaseModel):
-    """Schema for updating an expense template (all fields optional)."""
+class RecurrentExpenseUpdate(AppBaseModel):
+    """Schema for updating a recurrent expense (all fields optional)."""
 
     description: str | None = Field(default=None, min_length=1, max_length=255)
     currency: CurrencyCode | None = None
@@ -205,7 +205,7 @@ class ExpenseTemplateUpdate(AppBaseModel):
         return v
 
     @model_validator(mode="after")
-    def validate_recurrence_config(self) -> "ExpenseTemplateUpdate":
+    def validate_recurrence_config(self) -> "RecurrentExpenseUpdate":
         """Validate recurrence_config only when both fields are provided together.
 
         When only recurrence_config is updated (not recurrence_type), validation
@@ -228,8 +228,8 @@ class ExpenseTemplateUpdate(AppBaseModel):
         return self
 
 
-class ExpenseTemplateResponse(BaseModel):
-    """Response schema for an expense template."""
+class RecurrentExpenseResponse(BaseModel):
+    """Response schema for a recurrent expense."""
 
     id: uuid.UUID
     description: str

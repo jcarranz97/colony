@@ -15,7 +15,7 @@ const NAV_ITEMS = [
     label: "Payment Methods",
     icon: <MdCreditCard />,
   },
-  { href: "/expense-templates", label: "Templates", icon: <MdListAlt /> },
+  { href: "/recurrent-expenses", label: "Recurrent", icon: <MdListAlt /> },
   { href: "/settings", label: "Settings", icon: <MdSettings /> },
 ];
 

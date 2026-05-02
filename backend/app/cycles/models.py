@@ -147,7 +147,7 @@ class CycleExpense(BaseModel):
     )
     template_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
-        ForeignKey("expense_templates.id"),
+        ForeignKey("recurrent_expenses.id"),
         nullable=True,
     )
     payment_method_id: Mapped[uuid.UUID] = mapped_column(
@@ -181,7 +181,7 @@ class CycleExpense(BaseModel):
 
     # Relationships
     cycle = relationship("Cycle", back_populates="expenses")
-    template = relationship("ExpenseTemplate", foreign_keys=[template_id])
+    template = relationship("RecurrentExpense", foreign_keys=[template_id])
     payment_method = relationship(
         "PaymentMethod",
         foreign_keys=[payment_method_id],

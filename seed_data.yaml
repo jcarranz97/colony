@@ -42,7 +42,7 @@ users:
         method_type: cash
         default_currency: MXN
 
-    expense_templates:
+    recurrent_expenses:
       # --- Fixed USD expenses ---
       - description: Rent
         currency: USD

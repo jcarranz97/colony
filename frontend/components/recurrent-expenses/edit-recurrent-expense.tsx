@@ -19,15 +19,16 @@ import {
 import { parseDate } from "@internationalized/date";
 import type { DateValue } from "react-aria-components";
 import { FiInfo } from "react-icons/fi";
-import { ExpenseTemplateCreateSchema } from "@/helpers/schemas";
+import { RecurrentExpenseSchema } from "@/helpers/schemas";
 import { RecurrenceConfigBuilder } from "./recurrence-config-builder";
-import { addExpenseTemplate } from "./actions";
-import type { ExpenseTemplate, PaymentMethod } from "@/helpers/types";
+import { editRecurrentExpense } from "./actions";
+import type { RecurrentExpense, PaymentMethod } from "@/helpers/types";
 
-interface AddExpenseTemplateProps {
+interface EditRecurrentExpenseProps {
+  template: RecurrentExpense | null;
   isOpen: boolean;
   onClose: () => void;
-  onCreated: (template: ExpenseTemplate) => void;
+  onUpdated: (template: RecurrentExpense) => void;
   paymentMethods: PaymentMethod[];
 }
 
@@ -38,13 +39,16 @@ const RECURRENCE_DEFAULT: Record<string, Record<string, unknown>> = {
   custom: {},
 };
 
-export function AddExpenseTemplate({
+export function EditRecurrentExpense({
+  template,
   isOpen,
   onClose,
-  onCreated,
+  onUpdated,
   paymentMethods,
-}: AddExpenseTemplateProps) {
+}: EditRecurrentExpenseProps) {
   const [error, setError] = useState<string | null>(null);
+
+  if (!template) return null;
 
   return (
     <Modal.Root
@@ -57,20 +61,24 @@ export function AddExpenseTemplate({
         <Modal.Container>
           <Modal.Dialog>
             <Formik
+              key={template.id}
               initialValues={{
-                description: "",
-                base_amount: "",
-                currency: "",
-                category: "",
-                recurrence_type: "",
-                recurrence_config: {} as Record<string, unknown>,
-                reference_date: new Date().toISOString().split("T")[0],
-                payment_method_id: "" as string,
+                description: template.description,
+                base_amount: template.base_amount,
+                currency: template.currency,
+                category: template.category,
+                recurrence_type: template.recurrence_type,
+                recurrence_config: template.recurrence_config as Record<
+                  string,
+                  unknown
+                >,
+                reference_date: template.reference_date,
+                payment_method_id: template.payment_method?.id ?? null,
               }}
-              validationSchema={ExpenseTemplateCreateSchema}
-              onSubmit={async (values, { setSubmitting, resetForm }) => {
+              validationSchema={RecurrentExpenseSchema}
+              onSubmit={async (values, { setSubmitting }) => {
                 setError(null);
-                const result = await addExpenseTemplate({
+                const result = await editRecurrentExpense(template.id, {
                   description: values.description,
                   base_amount: values.base_amount,
                   currency: values.currency as any,
@@ -78,11 +86,10 @@ export function AddExpenseTemplate({
                   recurrence_type: values.recurrence_type as any,
                   recurrence_config: values.recurrence_config as any,
                   reference_date: values.reference_date,
-                  payment_method_id: values.payment_method_id || null,
+                  payment_method_id: values.payment_method_id,
                 });
                 if (result.success) {
-                  onCreated(result.data);
-                  resetForm();
+                  onUpdated(result.data);
                   onClose();
                 } else {
                   setError(result.error.message);
@@ -100,7 +107,7 @@ export function AddExpenseTemplate({
               }) => (
                 <form onSubmit={handleSubmit}>
                   <Modal.Header>
-                    <Modal.Heading>Add Expense Template</Modal.Heading>
+                    <Modal.Heading>Edit Recurrent Expense</Modal.Heading>
                   </Modal.Header>
                   <Modal.Body className="flex flex-col gap-4">
                     <TextField
@@ -109,7 +116,7 @@ export function AddExpenseTemplate({
                       onChange={(v) => setFieldValue("description", v)}
                     >
                       <Label>Name</Label>
-                      <Input placeholder="e.g. Rent" />
+                      <Input />
                       {touched.description && errors.description && (
                         <FieldError>{errors.description}</FieldError>
                       )}
@@ -121,7 +128,7 @@ export function AddExpenseTemplate({
                       onChange={(v) => setFieldValue("base_amount", v)}
                     >
                       <Label>Amount</Label>
-                      <Input type="number" placeholder="0.00" />
+                      <Input type="number" />
                       {touched.base_amount && errors.base_amount && (
                         <FieldError>{errors.base_amount}</FieldError>
                       )}
@@ -386,24 +393,21 @@ export function AddExpenseTemplate({
                     </DatePicker>
 
                     <Select.Root
-                      selectedKey={values.payment_method_id || null}
+                      selectedKey={values.payment_method_id ?? "none"}
                       onSelectionChange={(key) =>
-                        setFieldValue("payment_method_id", String(key))
-                      }
-                      isInvalid={
-                        !!errors.payment_method_id &&
-                        !!touched.payment_method_id
+                        setFieldValue(
+                          "payment_method_id",
+                          key === "none" ? null : String(key),
+                        )
                       }
                       fullWidth
                     >
-                      <Label>Payment Method</Label>
+                      <Label>Payment Method (optional)</Label>
                       <Select.Trigger>
                         <Select.Value>
                           {({ isPlaceholder, selectedText }: any) =>
                             isPlaceholder ? (
-                              <span className="text-default-400">
-                                Select payment method...
-                              </span>
+                              <span className="text-default-400">None</span>
                             ) : (
                               selectedText
                             )
@@ -411,14 +415,11 @@ export function AddExpenseTemplate({
                         </Select.Value>
                         <Select.Indicator />
                       </Select.Trigger>
-                      {touched.payment_method_id &&
-                        errors.payment_method_id && (
-                          <p className="text-xs text-danger">
-                            {errors.payment_method_id}
-                          </p>
-                        )}
                       <Select.Popover>
                         <ListBox>
+                          <ListBox.Item id="none" textValue="None">
+                            None
+                          </ListBox.Item>
                           {paymentMethods
                             .filter((m) => m.active)
                             .map((m) => (
@@ -445,7 +446,7 @@ export function AddExpenseTemplate({
                       variant="primary"
                       isDisabled={isSubmitting}
                     >
-                      {isSubmitting ? <Spinner size="sm" /> : "Add"}
+                      {isSubmitting ? <Spinner size="sm" /> : "Save"}
                     </Button>
                   </Modal.Footer>
                 </form>

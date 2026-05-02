@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 const NAV_ITEMS = [
   { href: "/cycles", label: "Cycles", icon: "📅" },
   { href: "/payment-methods", label: "Payments", icon: "💳" },
-  { href: "/expense-templates", label: "Templates", icon: "📋" },
+  { href: "/recurrent-expenses", label: "Recurrent", icon: "📋" },
   { href: "/settings", label: "Settings", icon: "⚙️" },
 ];
 

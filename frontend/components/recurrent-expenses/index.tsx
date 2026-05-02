@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import type {
-  ExpenseTemplate,
+  RecurrentExpense,
   PaymentMethod,
   CurrencyCode,
   ExpenseCategory,
@@ -9,11 +9,11 @@ import type {
   RecurrenceConfig,
 } from "@/helpers/types";
 import {
-  getExpenseTemplates,
-  addExpenseTemplate,
-  editExpenseTemplate,
-  deactivateExpenseTemplate,
-  activateExpenseTemplate,
+  getRecurrentExpenses,
+  addRecurrentExpense,
+  editRecurrentExpense,
+  deactivateRecurrentExpense,
+  activateRecurrentExpense,
 } from "./actions";
 import { getPaymentMethods } from "@/components/payment-methods/actions";
 
@@ -75,9 +75,9 @@ function TemplateCard({
   onToggle,
   toggling,
 }: {
-  template: ExpenseTemplate;
-  onEdit: (t: ExpenseTemplate) => void;
-  onToggle: (t: ExpenseTemplate) => void;
+  template: RecurrentExpense;
+  onEdit: (t: RecurrentExpense) => void;
+  onToggle: (t: RecurrentExpense) => void;
   toggling: boolean;
 }) {
   const isFixed = template.category === "fixed";
@@ -536,7 +536,7 @@ const BLANK_FORM: TemplateForm = {
   payment_method_id: "",
 };
 
-function templateToForm(t: ExpenseTemplate): TemplateForm {
+function templateToForm(t: RecurrentExpense): TemplateForm {
   return {
     description: t.description,
     base_amount: t.base_amount,
@@ -550,17 +550,17 @@ function templateToForm(t: ExpenseTemplate): TemplateForm {
   };
 }
 
-export function ExpenseTemplates() {
-  const [templates, setTemplates] = useState<ExpenseTemplate[]>([]);
+export function RecurrentExpenses() {
+  const [templates, setTemplates] = useState<RecurrentExpense[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<FilterType>("all");
   const [addOpen, setAddOpen] = useState(false);
-  const [editTarget, setEditTarget] = useState<ExpenseTemplate | null>(null);
+  const [editTarget, setEditTarget] = useState<RecurrentExpense | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([getExpenseTemplates(), getPaymentMethods()]).then(
+    Promise.all([getRecurrentExpenses(), getPaymentMethods()]).then(
       ([tRes, mRes]) => {
         if (tRes.success) setTemplates(tRes.data);
         if (mRes.success) setPaymentMethods(mRes.data);
@@ -569,7 +569,7 @@ export function ExpenseTemplates() {
     );
   }, []);
 
-  const applyFilter = (list: ExpenseTemplate[]) =>
+  const applyFilter = (list: RecurrentExpense[]) =>
     filter === "all" ? list : list.filter((t) => t.category === filter);
 
   const active = applyFilter(templates.filter((t) => t.active));
@@ -577,11 +577,11 @@ export function ExpenseTemplates() {
   const allActive = templates.filter((t) => t.active);
   const allInactive = templates.filter((t) => !t.active);
 
-  const handleToggle = async (template: ExpenseTemplate) => {
+  const handleToggle = async (template: RecurrentExpense) => {
     setTogglingId(template.id);
     const res = template.active
-      ? await deactivateExpenseTemplate(template.id)
-      : await activateExpenseTemplate(template.id);
+      ? await deactivateRecurrentExpense(template.id)
+      : await activateRecurrentExpense(template.id);
     if (res.success) {
       setTemplates((prev) =>
         prev.map((t) =>
@@ -593,7 +593,7 @@ export function ExpenseTemplates() {
   };
 
   const handleAdd = async (form: TemplateForm): Promise<string | null> => {
-    const res = await addExpenseTemplate({
+    const res = await addRecurrentExpense({
       description: form.description,
       base_amount: form.base_amount,
       currency: form.currency,
@@ -614,7 +614,7 @@ export function ExpenseTemplates() {
 
   const handleEdit = async (form: TemplateForm): Promise<string | null> => {
     if (!editTarget) return null;
-    const res = await editExpenseTemplate(editTarget.id, {
+    const res = await editRecurrentExpense(editTarget.id, {
       description: form.description,
       base_amount: form.base_amount,
       currency: form.currency,
@@ -646,7 +646,7 @@ export function ExpenseTemplates() {
 
   return (
     <>
-      <div className="nb-page-title">Expense Templates</div>
+      <div className="nb-page-title">Recurrent Expenses</div>
       <div className="nb-page-subtitle">
         Recurring expenses that auto-populate new cycles
       </div>

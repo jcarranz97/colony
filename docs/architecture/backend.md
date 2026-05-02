@@ -41,7 +41,7 @@ backend/
 │   │   ├── constants.py
 │   │   ├── exceptions.py
 │   │   └── utils.py
-│   ├── expense_templates/      # Expense templates domain
+│   ├── recurrent_expenses/     # Recurrent expenses domain
 │   │   ├── router.py
 │   │   ├── schemas.py
 │   │   ├── models.py
@@ -94,7 +94,7 @@ backend/
 ├── tests/                      # Test suite organized by domain
 │   ├── auth/
 │   ├── payment_methods/
-│   ├── expense_templates/
+│   ├── recurrent_expenses/
 │   ├── cycles/
 │   ├── expenses/
 │   ├── reports/
@@ -201,7 +201,7 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from . import models, schemas
-from ..expense_templates import service as template_service
+from ..recurrent_expenses import service as template_service
 from ..expenses import service as expense_service
 
 async def create_cycle(
@@ -445,7 +445,7 @@ When domains need to interact, they import services explicitly:
 
 ```python
 # In app/cycles/service.py
-from app.expense_templates import service as template_service
+from app.recurrent_expenses import service as template_service
 from app.expenses import service as expense_service
 from app.exchange_rates import service as exchange_service
 

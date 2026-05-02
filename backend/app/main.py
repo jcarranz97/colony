@@ -12,8 +12,8 @@ from app.exceptions import (
     http_exception_handler,
     validation_exception_handler,
 )
-from app.expense_templates.router import router as expense_templates_router
 from app.payment_methods.router import router as payment_methods_router
+from app.recurrent_expenses.router import router as recurrent_expenses_router
 
 
 def create_app() -> FastAPI:
@@ -44,7 +44,7 @@ def create_app() -> FastAPI:
     # Include routers
     app.include_router(auth_router, prefix="/api/v1")
     app.include_router(payment_methods_router, prefix="/api/v1")
-    app.include_router(expense_templates_router, prefix="/api/v1")
+    app.include_router(recurrent_expenses_router, prefix="/api/v1")
     app.include_router(cycles_router, prefix="/api/v1")
     app.include_router(exchange_rates_router, prefix="/api/v1")
 

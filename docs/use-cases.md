@@ -30,10 +30,10 @@ Each use case references the functional requirements it satisfies (FR-###).
 | [UC-05](#uc-05-edit-payment-method) | Edit Payment Method | User |
 | [UC-06](#uc-06-deactivate-payment-method) | Deactivate Payment Method | User |
 | [UC-07](#uc-07-view-payment-methods) | View Payment Methods | User |
-| [UC-08](#uc-08-create-expense-template) | Create Expense Template | User |
-| [UC-09](#uc-09-edit-expense-template) | Edit Expense Template | User |
-| [UC-10](#uc-10-delete-expense-template) | Delete Expense Template | User |
-| [UC-11](#uc-11-view-expense-templates) | View Expense Templates | User |
+| [UC-08](#uc-08-create-recurrent-expense) | Create Recurrent Expense | User |
+| [UC-09](#uc-09-edit-recurrent-expense) | Edit Recurrent Expense | User |
+| [UC-10](#uc-10-delete-recurrent-expense) | Delete Recurrent Expense | User |
+| [UC-11](#uc-11-view-recurrent-expenses) | View Recurrent Expenses | User |
 | [UC-12](#uc-12-create-cycle) | Create Cycle | User |
 | [UC-13](#uc-13-view-cycle-list) | View Cycle List | User |
 | [UC-14](#uc-14-view-cycle-details) | View Cycle Details | User |
@@ -59,7 +59,7 @@ graph LR
         direction TB
         Auth(["Authentication\nUC-01 – UC-03"])
         PM(["Payment Methods\nUC-04 – UC-07"])
-        ET(["Expense Templates\nUC-08 – UC-11"])
+        ET(["Recurrent Expenses\nUC-08 – UC-11"])
         CM(["Cycle Management\nUC-12 – UC-15"])
         CE(["Cycle Expenses\nUC-16 – UC-19"])
     end
@@ -199,7 +199,7 @@ graph LR
 - **A2 — Invalid type/currency combination:** System returns a 422 error.
 
 **Postconditions:** The new payment method is available for selection when
-creating expense templates and cycle expenses.
+creating recurrent expenses and cycle expenses.
 
 ---
 
@@ -271,16 +271,16 @@ and show all records in management screens.
 
 ---
 
-## Expense Templates
+## Recurrent Expenses
 
 ```mermaid
 graph LR
     User((User))
 
-    UC08([UC-08: Create Expense Template])
-    UC09([UC-09: Edit Expense Template])
-    UC10([UC-10: Delete Expense Template])
-    UC11([UC-11: View Expense Templates])
+    UC08([UC-08: Create Recurrent Expense])
+    UC09([UC-09: Edit Recurrent Expense])
+    UC10([UC-10: Delete Recurrent Expense])
+    UC11([UC-11: View Recurrent Expenses])
 
     User --> UC08
     User --> UC09
@@ -288,7 +288,7 @@ graph LR
     User --> UC11
 ```
 
-### UC-08: Create Expense Template
+### UC-08: Create Recurrent Expense
 
 **Actor:** User
 
@@ -324,7 +324,7 @@ new cycle is created (UC-12).
 
 ---
 
-### UC-09: Edit Expense Template
+### UC-09: Edit Recurrent Expense
 
 **Actor:** User
 
@@ -350,7 +350,7 @@ template values.
 
 ---
 
-### UC-10: Delete Expense Template
+### UC-10: Delete Recurrent Expense
 
 **Actor:** User
 
@@ -373,7 +373,7 @@ Cycle expenses previously generated from this template are unaffected.
 
 ---
 
-### UC-11: View Expense Templates
+### UC-11: View Recurrent Expenses
 
 **Actor:** User
 
@@ -383,9 +383,9 @@ Cycle expenses previously generated from this template are unaffected.
 
 **Main Flow:**
 
-1. User requests the list of expense templates.
-2. System returns all templates belonging to the user, including recurrence
-   pattern details and linked payment method info.
+1. User requests the list of recurrent expenses.
+2. System returns all recurrent expenses belonging to the user, including
+   recurrence pattern details and linked payment method info.
 
 ---
 
@@ -422,7 +422,7 @@ graph LR
    balance).
 2. System calculates the end date as `start_date + 6 weeks - 1 day`.
 3. System creates the cycle record.
-4. System queries all active expense templates for the user.
+4. System queries all active recurrent expenses for the user.
 5. System generates cycle expenses from each template, computing the expense
    date based on the template's recurrence config and the cycle's start date.
 6. System returns the created cycle along with the count of generated expenses.
@@ -611,4 +611,4 @@ implemented and are excluded from the initial frontend build:
 | Import from Excel/CSV | FR-045, FR-046 |
 | Currency Exchange Rate Management | FR-004, FR-005, FR-006 |
 | Multi-period Summary / Period Comparison | FR-042, FR-043 |
-| Expense Template Recurrence Config via UI Wizard | FR-019 |
+| Recurrent Expense Recurrence Config via UI Wizard | FR-019 |
