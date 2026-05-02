@@ -19,6 +19,7 @@ import {
   editExpense,
   getIncomes,
   addIncome,
+  editIncome,
   removeIncome,
 } from "./actions";
 import { getPaymentMethods } from "@/components/payment-methods/actions";
@@ -333,6 +334,132 @@ function EditExpenseModal({
           </p>
         )}
 
+        <div className="nb-modal-actions">
+          <button className="nb-btn-cancel" onClick={onClose}>
+            Cancel
+          </button>
+          <button
+            className="nb-btn-primary"
+            onClick={handleSubmit}
+            disabled={saving}
+          >
+            {saving ? "Saving…" : "Save ✓"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Edit Income Modal ─────────────────────────────────────────────────────────
+
+interface EditIncomeForm {
+  amount: string;
+  income_date: string;
+}
+
+function EditIncomeModal({
+  isOpen,
+  onClose,
+  income,
+  cycleId,
+  onEdited,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  income: CycleIncome | null;
+  cycleId: string;
+  onEdited: (updated: CycleIncome) => void;
+}) {
+  const [form, setForm] = useState<EditIncomeForm>({
+    amount: "",
+    income_date: "",
+  });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (income) {
+      setForm({ amount: income.amount, income_date: income.income_date ?? "" });
+      setError(null);
+    }
+  }, [income]);
+
+  const set = <K extends keyof EditIncomeForm>(k: K, v: EditIncomeForm[K]) =>
+    setForm((f) => ({ ...f, [k]: v }));
+
+  const handleSubmit = async () => {
+    if (!income || !form.amount) return;
+    setSaving(true);
+    setError(null);
+    const res = await editIncome(cycleId, income.id, {
+      amount: form.amount,
+      income_date: form.income_date || undefined,
+    });
+    if (res.success) {
+      onEdited(res.data);
+      onClose();
+    } else {
+      setError(res.error.message);
+    }
+    setSaving(false);
+  };
+
+  if (!isOpen || !income) return null;
+
+  return (
+    <div
+      className="nb-modal-backdrop"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div className="nb-modal">
+        <button className="nb-modal-close" onClick={onClose}>
+          ✕
+        </button>
+        <div className="nb-modal-title">Edit Income</div>
+        <div
+          style={{
+            fontFamily: "var(--font-hand)",
+            color: "var(--ink-light)",
+            fontSize: 14,
+            marginBottom: 12,
+          }}
+        >
+          {income.description}
+        </div>
+        <div className="nb-form-row">
+          <div className="nb-form-group">
+            <label className="nb-form-label">Amount ({income.currency})</label>
+            <input
+              className="nb-form-input"
+              type="number"
+              placeholder="0.00"
+              value={form.amount}
+              onChange={(e) => set("amount", e.target.value)}
+            />
+          </div>
+          <div className="nb-form-group">
+            <label className="nb-form-label">Income date</label>
+            <input
+              className="nb-form-input"
+              type="date"
+              value={form.income_date}
+              onChange={(e) => set("income_date", e.target.value)}
+            />
+          </div>
+        </div>
+        {error && (
+          <p
+            style={{
+              fontFamily: "var(--font-hand)",
+              color: "var(--hl-overdue-border)",
+              fontSize: 14,
+              marginBottom: 8,
+            }}
+          >
+            {error}
+          </p>
+        )}
         <div className="nb-modal-actions">
           <button className="nb-btn-cancel" onClick={onClose}>
             Cancel
@@ -868,6 +995,7 @@ function CycleDetail({
   onExpenseEdited,
   onIncomeAdded,
   onIncomeRemoved,
+  onIncomeEdited,
 }: {
   cycle: Cycle;
   expenses: CycleExpense[];
@@ -880,6 +1008,7 @@ function CycleDetail({
   onExpenseEdited: (updated: CycleExpense) => void;
   onIncomeAdded: (i: CycleIncome) => void;
   onIncomeRemoved: (id: string) => void;
+  onIncomeEdited: (updated: CycleIncome) => void;
 }) {
   const [addExpenseOpen, setAddExpenseOpen] = useState(false);
   const [editExpenseOpen, setEditExpenseOpen] = useState(false);
@@ -887,10 +1016,17 @@ function CycleDetail({
     null,
   );
   const [addIncomeOpen, setAddIncomeOpen] = useState(false);
+  const [editIncomeOpen, setEditIncomeOpen] = useState(false);
+  const [editingIncome, setEditingIncome] = useState<CycleIncome | null>(null);
 
   const handleEditExpense = (expense: CycleExpense) => {
     setEditingExpense(expense);
     setEditExpenseOpen(true);
+  };
+
+  const handleEditIncome = (income: CycleIncome) => {
+    setEditingIncome(income);
+    setEditIncomeOpen(true);
   };
 
   const fixedExp = expenses.filter((e) => e.category === "fixed");
@@ -1071,21 +1207,38 @@ function CycleDetail({
               {fmtDate(income.income_date)}
             </span>
             {cycle.status !== "completed" && (
-              <button
-                style={{
-                  background: "transparent",
-                  border: "none",
-                  cursor: "pointer",
-                  color: "var(--ink-light)",
-                  fontSize: 14,
-                  padding: "0 4px",
-                  opacity: 0.5,
-                }}
-                title="Remove income"
-                onClick={() => onIncomeRemoved(income.id)}
-              >
-                ✕
-              </button>
+              <>
+                <button
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    color: "var(--ink-light)",
+                    fontSize: 14,
+                    padding: "0 4px",
+                    opacity: 0.5,
+                  }}
+                  title="Edit income"
+                  onClick={() => handleEditIncome(income)}
+                >
+                  ✎
+                </button>
+                <button
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    color: "var(--ink-light)",
+                    fontSize: 14,
+                    padding: "0 4px",
+                    opacity: 0.5,
+                  }}
+                  title="Remove income"
+                  onClick={() => onIncomeRemoved(income.id)}
+                >
+                  ✕
+                </button>
+              </>
             )}
           </div>
         ))
@@ -1189,6 +1342,21 @@ function CycleDetail({
           onExpenseEdited(updated);
           setEditExpenseOpen(false);
           setEditingExpense(null);
+        }}
+      />
+
+      <EditIncomeModal
+        isOpen={editIncomeOpen}
+        onClose={() => {
+          setEditIncomeOpen(false);
+          setEditingIncome(null);
+        }}
+        income={editingIncome}
+        cycleId={cycle.id}
+        onEdited={(updated) => {
+          onIncomeEdited(updated);
+          setEditIncomeOpen(false);
+          setEditingIncome(null);
         }}
       />
     </>
@@ -1317,6 +1485,21 @@ export function Cycles() {
     }
   };
 
+  const handleIncomeEdited = async (updated: CycleIncome) => {
+    setCycleIncomes((prev) =>
+      prev.map((i) => (i.id === updated.id ? updated : i)),
+    );
+    if (selectedCycle) {
+      const summaryRes = await fetchSummary(selectedCycle.id);
+      if (summaryRes.success) {
+        setSummaries((prev) => ({
+          ...prev,
+          [selectedCycle.id]: summaryRes.data,
+        }));
+      }
+    }
+  };
+
   const handleIncomeAdded = async (income: CycleIncome) => {
     setCycleIncomes((prev) => [...prev, income]);
     if (selectedCycle) {
@@ -1373,6 +1556,7 @@ export function Cycles() {
         onExpenseEdited={handleExpenseEdited}
         onIncomeAdded={handleIncomeAdded}
         onIncomeRemoved={handleIncomeRemoved}
+        onIncomeEdited={handleIncomeEdited}
       />
     );
   }
