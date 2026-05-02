@@ -19,6 +19,7 @@ from app.cycles.models import Cycle, CycleExpense, ExchangeRate  # noqa: F401
 from app.database import Base, SessionLocal, engine
 from app.payment_methods.models import PaymentMethod
 from app.recurrent_expenses.models import RecurrentExpense
+from app.recurrent_incomes.models import RecurrentIncome
 
 
 def create_tables() -> None:
@@ -146,6 +147,50 @@ def seed_recurrent_expense(
     print(f"      ✅ Created recurrent expense '{description}'.")
 
 
+def seed_recurrent_income(
+    db: Session,
+    user: User,
+    payment_method: PaymentMethod,
+    tmpl_data: dict[str, Any],
+) -> None:
+    """Create a recurrent income for the user if it does not already exist.
+
+    Args:
+        db: Active SQLAlchemy session.
+        user: The User instance to associate the recurrent income with.
+        payment_method: The PaymentMethod instance to use.
+        tmpl_data: Dictionary of recurrent income fields from the seed YAML.
+    """
+    description = tmpl_data["description"]
+    existing = (
+        db.query(RecurrentIncome)
+        .filter(
+            RecurrentIncome.user_id == user.id,
+            RecurrentIncome.description == description,
+            RecurrentIncome.active,
+        )
+        .first()
+    )
+
+    if existing:
+        print(f"      ⏭️  Recurrent income '{description}' already exists, skipping.")
+        return
+
+    db.add(
+        RecurrentIncome(
+            user_id=user.id,
+            payment_method_id=payment_method.id,
+            description=description,
+            currency=tmpl_data["currency"],
+            base_amount=Decimal(str(tmpl_data["base_amount"])),
+            recurrence_type=tmpl_data["recurrence_type"],
+            recurrence_config=tmpl_data.get("recurrence_config", {}),
+            reference_date=date.fromisoformat(tmpl_data["reference_date"]),
+        )
+    )
+    print(f"      ✅ Created recurrent income '{description}'.")
+
+
 def seed_exchange_rate(db: Session, rate_data: dict[str, Any]) -> None:
     """Create an exchange rate record if one does not already exist for the date.
 
@@ -263,6 +308,17 @@ def _seed_user_full_data(db: Session, user: User, user_data: dict[str, Any]) -> 
             )
             continue
         seed_recurrent_expense(db, user, pm, tmpl_data)
+
+    for tmpl_data in user_data.get("recurrent_incomes", []):
+        pm_name = tmpl_data.pop("payment_method_name")
+        pm = payment_methods.get(pm_name)
+        if pm is None:
+            print(
+                f"      ⚠️  Payment method '{pm_name}' not found for "
+                f"recurrent income '{tmpl_data.get('description')}', skipping."
+            )
+            continue
+        seed_recurrent_income(db, user, pm, tmpl_data)
 
     db.commit()  # commit templates before generating cycle expenses
 
