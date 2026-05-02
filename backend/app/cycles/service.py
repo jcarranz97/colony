@@ -639,7 +639,7 @@ class CycleExpenseService:
             due_date=data.due_date,
             category=data.category,
             comments=data.comments,
-            autopay_info=data.autopay_info,
+            autopay=data.autopay,
             status=ExpenseStatus.PENDING,
         )
 
