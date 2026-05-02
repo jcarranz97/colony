@@ -140,7 +140,7 @@ def seed_recurrent_expense(
             recurrence_type=tmpl_data["recurrence_type"],
             recurrence_config=tmpl_data.get("recurrence_config", {}),
             reference_date=date.fromisoformat(tmpl_data["reference_date"]),
-            autopay_info=tmpl_data.get("autopay_info"),
+            autopay=tmpl_data.get("autopay", False),
         )
     )
     print(f"      ✅ Created recurrent expense '{description}'.")

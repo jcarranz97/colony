@@ -155,7 +155,7 @@ class RecurrentExpenseService:
             recurrence_type=data.recurrence_type,
             recurrence_config=data.recurrence_config,
             reference_date=data.reference_date,
-            autopay_info=data.autopay_info,
+            autopay=data.autopay,
         )
 
         db.add(recurrent_expense)

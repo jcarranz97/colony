@@ -525,7 +525,7 @@ graph LR
 **Main Flow:**
 
 1. User submits an expense with: description, currency, payment method ID,
-   amount, date, category, and optionally autopay info and comments.
+   amount, date, category, autopay status, and optionally comments.
 2. System validates that the date falls within the cycle's start/end range.
 3. System creates the expense and associates it with the cycle.
 4. System returns the created expense.

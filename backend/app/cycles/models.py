@@ -167,7 +167,7 @@ class CycleExpense(BaseModel):
         ENUM(ExpenseCategory, name="expense_category", create_type=False),
         nullable=False,
     )
-    autopay_info: Mapped[str | None] = mapped_column(Text, nullable=True)
+    autopay: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     status: Mapped[ExpenseStatus] = mapped_column(
         ENUM(ExpenseStatus, name="expense_status"),
         nullable=False,

@@ -158,13 +158,15 @@ class TestRecurrentExpenseUpdate:
         schema = RecurrentExpenseUpdate(recurrence_type=RecurrenceType.MONTHLY)
         assert schema.recurrence_type is not None
 
-    def test_clear_autopay_info(self):
-        # Setting autopay_info=None explicitly means the field IS set and should
-        # appear in the dump with None, so a PATCH request can clear the field.
-        schema = RecurrentExpenseUpdate(autopay_info=None)
+    def test_default_autopay_false(self):
+        schema = RecurrentExpenseUpdate()
+        assert schema.autopay is False
+
+    def test_set_autopay_true(self):
+        schema = RecurrentExpenseUpdate(autopay=True)
+        assert schema.autopay is True
         dumped = schema.model_dump(exclude_unset=True)
-        assert "autopay_info" in dumped
-        assert dumped["autopay_info"] is None
+        assert dumped["autopay"] is True
 
     def test_base_amount_zero_raises(self):
         with pytest.raises(ValidationError):

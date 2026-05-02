@@ -82,7 +82,7 @@ export interface RecurrentExpense {
   recurrence_type: RecurrenceType;
   recurrence_config: RecurrenceConfig;
   reference_date: string;
-  autopay_info: string | null;
+  autopay: boolean;
   payment_method: { id: string; name: string; method_type: string } | null;
   active: boolean;
   created_at: string;
@@ -97,7 +97,7 @@ export interface CreateRecurrentExpenseRequest {
   recurrence_type: RecurrenceType;
   recurrence_config: RecurrenceConfig;
   reference_date?: string;
-  autopay_info?: string | null;
+  autopay?: boolean;
   payment_method_id?: string | null;
 }
 

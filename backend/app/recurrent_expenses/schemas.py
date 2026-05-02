@@ -126,7 +126,7 @@ class RecurrentExpenseBase(AppBaseModel):
     recurrence_type: RecurrenceType
     recurrence_config: dict[str, Any] = Field(default_factory=dict)
     reference_date: date
-    autopay_info: str | None = None
+    autopay: bool = False
 
     @field_validator("description")
     @classmethod
@@ -181,7 +181,7 @@ class RecurrentExpenseUpdate(AppBaseModel):
     recurrence_type: RecurrenceType | None = None
     recurrence_config: dict[str, Any] | None = None
     reference_date: date | None = None
-    autopay_info: str | None = None
+    autopay: bool = False
 
     @field_validator("description")
     @classmethod
@@ -239,7 +239,7 @@ class RecurrentExpenseResponse(BaseModel):
     recurrence_type: RecurrenceType
     recurrence_config: dict[str, Any]
     reference_date: date
-    autopay_info: str | None
+    autopay: bool
     active: bool
     payment_method: PaymentMethodSummary
     created_at: datetime

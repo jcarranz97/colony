@@ -143,8 +143,8 @@ function TemplateCard({
           {template.payment_method && (
             <span>{template.payment_method.name}</span>
           )}
-          {template.autopay_info && (
-            <span style={{ color: "#276838" }}>⚡ {template.autopay_info}</span>
+          {template.autopay && (
+            <span style={{ color: "#276838" }}>⚡ Auto-pay enabled</span>
           )}
         </div>
       </div>
@@ -175,7 +175,7 @@ function TemplateCard({
           >
             {template.category}
           </span>
-          {template.autopay_info && (
+          {template.autopay && (
             <span className="nb-template-badge nb-badge-autopay">autopay</span>
           )}
         </div>
@@ -316,7 +316,7 @@ interface TemplateForm {
   recurrence_type: RecurrenceType;
   recurrence_config: Record<string, unknown>;
   reference_date: string;
-  autopay_info: string;
+  autopay: boolean;
   payment_method_id: string;
 }
 
@@ -490,13 +490,29 @@ function TemplateModal({
         </div>
 
         <div className="nb-form-group">
-          <label className="nb-form-label">Autopay info (optional)</label>
-          <input
-            className="nb-form-input"
-            placeholder="e.g. Auto-debit on the 1st"
-            value={form.autopay_info}
-            onChange={(e) => set("autopay_info", e.target.value)}
-          />
+          <label className="nb-form-label">Autopay</label>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <input
+              type="checkbox"
+              checked={form.autopay}
+              onChange={(e) => set("autopay", e.target.checked)}
+              style={{
+                width: 18,
+                height: 18,
+                cursor: "pointer",
+                accentColor: "var(--cover-bg)",
+              }}
+            />
+            <span
+              style={{
+                fontFamily: "var(--font-hand)",
+                fontSize: 14,
+                color: "var(--ink-light)",
+              }}
+            >
+              Enable automatic payment for this expense
+            </span>
+          </div>
         </div>
 
         {error && (
@@ -541,7 +557,7 @@ const BLANK_FORM: TemplateForm = {
   recurrence_type: "monthly",
   recurrence_config: { day_of_month: 1 },
   reference_date: new Date().toISOString().split("T")[0],
-  autopay_info: "",
+  autopay: false,
   payment_method_id: "",
 };
 
@@ -554,7 +570,7 @@ function templateToForm(t: RecurrentExpense): TemplateForm {
     recurrence_type: t.recurrence_type,
     recurrence_config: t.recurrence_config as Record<string, unknown>,
     reference_date: t.reference_date,
-    autopay_info: t.autopay_info ?? "",
+    autopay: t.autopay,
     payment_method_id: t.payment_method?.id ?? "",
   };
 }
@@ -619,7 +635,7 @@ export function RecurrentExpenses() {
       recurrence_type: form.recurrence_type,
       recurrence_config: form.recurrence_config as RecurrenceConfig,
       reference_date: form.reference_date,
-      autopay_info: form.autopay_info || null,
+      autopay: form.autopay,
       payment_method_id: form.payment_method_id || null,
     });
     if (res.success) {
@@ -640,7 +656,7 @@ export function RecurrentExpenses() {
       recurrence_type: form.recurrence_type,
       recurrence_config: form.recurrence_config as RecurrenceConfig,
       reference_date: form.reference_date,
-      autopay_info: form.autopay_info || null,
+      autopay: form.autopay,
       payment_method_id: form.payment_method_id || null,
     });
     if (res.success) {

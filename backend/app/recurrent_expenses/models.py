@@ -2,7 +2,7 @@ import uuid
 from datetime import date
 from decimal import Decimal
 
-from sqlalchemy import CheckConstraint, Date, ForeignKey, Numeric, String, Text
+from sqlalchemy import Boolean, CheckConstraint, Date, ForeignKey, Numeric, String
 from sqlalchemy.dialects.postgresql import ENUM, JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -43,7 +43,7 @@ class RecurrentExpense(BaseModel):
     )
     recurrence_config: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
     reference_date: Mapped[date] = mapped_column(Date, nullable=False)
-    autopay_info: Mapped[str | None] = mapped_column(Text, nullable=True)
+    autopay: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     # Relationships
     user = relationship("User", back_populates="recurrent_expenses")

@@ -190,7 +190,7 @@ Colony is a standalone web application consisting of:
 - base_amount: Decimal
 - recurrence_type: Enum (weekly, monthly, custom)
 - recurrence_config: JSON (day_of_week, day_of_month, interval)
-- autopay_info: String (optional)
+- autopay: Boolean
 - category: Enum (fixed, variable)
 - active: Boolean
 - created_at: DateTime
@@ -221,7 +221,7 @@ Colony is a standalone web application consisting of:
 - amount: Decimal
 - amount_usd: Decimal (calculated)
 - date: Date
-- autopay_info: String
+- autopay: Boolean
 - status: String
 - comments: String
 - category: Enum (fixed, variable)

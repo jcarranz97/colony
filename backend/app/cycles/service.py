@@ -337,7 +337,7 @@ class CycleService:
                     amount_usd=amount_usd,
                     due_date=occurrence_date,
                     category=template.category,
-                    autopay_info=template.autopay_info,
+                    autopay=template.autopay,
                     status=ExpenseStatus.PENDING,
                 )
                 db.add(expense)
