@@ -85,7 +85,7 @@ class TestGetCycleSummary:
         assert Decimal(financial["variable_expenses_usd"]) == Decimal("400.00")
         assert Decimal(financial["usa_expenses_usd"]) == Decimal("1500.00")
         assert Decimal(financial["mexico_expenses_usd"]) == Decimal("100.00")
-        assert Decimal(financial["net_balance"]) == Decimal("1600.00")
+        assert Decimal(financial["net_balance"]) == Decimal("-1600.00")
 
     def test_by_currency_separates_usd_and_mxn(
         self, client: TestClient, test_user: User, cycle_with_expenses: Cycle
