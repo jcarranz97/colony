@@ -1,7 +1,7 @@
 "use client";
 import { Table } from "@heroui/react";
 import { renderCell } from "./render-cell";
-import type { ExpenseTemplate } from "@/helpers/types";
+import type { RecurrentExpense } from "@/helpers/types";
 
 const COLUMNS = [
   { key: "name", label: "Name" },
@@ -13,19 +13,19 @@ const COLUMNS = [
   { key: "actions", label: "Actions" },
 ];
 
-interface ExpenseTemplatesTableProps {
-  templates: ExpenseTemplate[];
-  onEdit: (template: ExpenseTemplate) => void;
-  onDeactivate: (template: ExpenseTemplate) => void;
-  onActivate: (template: ExpenseTemplate) => void;
+interface RecurrentExpensesTableProps {
+  templates: RecurrentExpense[];
+  onEdit: (template: RecurrentExpense) => void;
+  onDeactivate: (template: RecurrentExpense) => void;
+  onActivate: (template: RecurrentExpense) => void;
 }
 
-export function ExpenseTemplatesTable({
+export function RecurrentExpensesTable({
   templates,
   onEdit,
   onDeactivate,
   onActivate,
-}: ExpenseTemplatesTableProps) {
+}: RecurrentExpensesTableProps) {
   return (
     <Table.Root>
       <Table.ScrollContainer>

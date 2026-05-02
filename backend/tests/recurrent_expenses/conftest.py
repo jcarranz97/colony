@@ -7,17 +7,17 @@ from sqlalchemy.orm import Session
 
 from app.auth.models import User
 from app.auth.utils import get_password_hash
-from app.expense_templates.constants import (
-    CurrencyCode,
-    ExpenseCategory,
-    RecurrenceType,
-)
-from app.expense_templates.models import ExpenseTemplate
 from app.payment_methods.constants import (
     CurrencyCode as PMCurrencyCode,
     PaymentMethodType,
 )
 from app.payment_methods.models import PaymentMethod
+from app.recurrent_expenses.constants import (
+    CurrencyCode,
+    ExpenseCategory,
+    RecurrenceType,
+)
+from app.recurrent_expenses.models import RecurrentExpense
 
 
 @pytest.fixture
@@ -83,8 +83,8 @@ def test_template(
     db: Session,
     test_user: User,
     test_payment_method: PaymentMethod,
-) -> ExpenseTemplate:
-    template = ExpenseTemplate(
+) -> RecurrentExpense:
+    recurrent_expense = RecurrentExpense(
         user_id=test_user.id,
         payment_method_id=test_payment_method.id,
         description="Groceries",
@@ -95,7 +95,7 @@ def test_template(
         recurrence_config={"day_of_week": 6},
         reference_date=date(2024, 12, 21),
     )
-    db.add(template)
+    db.add(recurrent_expense)
     db.commit()
-    db.refresh(template)
-    return template
+    db.refresh(recurrent_expense)
+    return recurrent_expense

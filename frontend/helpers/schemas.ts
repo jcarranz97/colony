@@ -70,7 +70,7 @@ const recurrenceConfigShape = Yup.object()
       }),
   });
 
-export const ExpenseTemplateCreateSchema = Yup.object({
+export const RecurrentExpenseCreateSchema = Yup.object({
   description: Yup.string().required("Name is required"),
   base_amount: Yup.string().required("Amount is required"),
   currency: Yup.string().oneOf(["USD", "MXN"]).required("Currency is required"),
@@ -87,7 +87,7 @@ export const ExpenseTemplateCreateSchema = Yup.object({
     .required("Payment method is required"),
 });
 
-export const ExpenseTemplateSchema = Yup.object({
+export const RecurrentExpenseSchema = Yup.object({
   description: Yup.string().required("Name is required"),
   base_amount: Yup.string().required("Amount is required"),
   currency: Yup.string().oneOf(["USD", "MXN"]).required("Currency is required"),

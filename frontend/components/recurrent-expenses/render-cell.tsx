@@ -3,7 +3,7 @@ import { AmountDisplay } from "@/components/shared/amount-display";
 import { CategoryBadge } from "@/components/shared/category-badge";
 import { CurrencyBadge } from "@/components/shared/currency-badge";
 import type {
-  ExpenseTemplate,
+  RecurrentExpense,
   RecurrenceConfig,
   RecurrenceType,
 } from "@/helpers/types";
@@ -37,11 +37,11 @@ function formatRecurrence(
 }
 
 interface RenderCellProps {
-  template: ExpenseTemplate;
+  template: RecurrentExpense;
   columnKey: string;
-  onEdit: (template: ExpenseTemplate) => void;
-  onDeactivate: (template: ExpenseTemplate) => void;
-  onActivate: (template: ExpenseTemplate) => void;
+  onEdit: (template: RecurrentExpense) => void;
+  onDeactivate: (template: RecurrentExpense) => void;
+  onActivate: (template: RecurrentExpense) => void;
 }
 
 export function renderCell({

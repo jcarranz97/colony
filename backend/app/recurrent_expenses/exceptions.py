@@ -5,29 +5,33 @@ from app.exceptions import AppExceptionError
 from .constants import ErrorCode
 
 
-class ExpenseTemplateExceptionError(AppExceptionError):
-    """Base expense template exception."""
+class RecurrentExpenseExceptionError(AppExceptionError):
+    """Base recurrent expense exception."""
 
 
-class ExpenseTemplateNotFoundExceptionError(ExpenseTemplateExceptionError):
-    """Raised when an expense template is not found or not owned by the user."""
+class RecurrentExpenseNotFoundExceptionError(RecurrentExpenseExceptionError):
+    """Raised when a recurrent expense is not found or not owned by the user."""
 
-    def __init__(self, template_id: str | None = None) -> None:
+    def __init__(self, recurrent_expense_id: str | None = None) -> None:
         """Initialize the exception.
 
         Args:
-            template_id: The ID of the template that was not found.
+            recurrent_expense_id: The ID of the recurrent expense that was not found.
         """
-        details = {"template_id": template_id} if template_id else {}
+        details = (
+            {"recurrent_expense_id": recurrent_expense_id}
+            if recurrent_expense_id
+            else {}
+        )
         super().__init__(
-            error_code=ErrorCode.EXPENSE_TEMPLATE_NOT_FOUND,
-            message="Expense template not found",
+            error_code=ErrorCode.RECURRENT_EXPENSE_NOT_FOUND,
+            message="Recurrent expense not found",
             status_code=status.HTTP_404_NOT_FOUND,
             details=details,
         )
 
 
-class PaymentMethodNotFoundExceptionError(ExpenseTemplateExceptionError):
+class PaymentMethodNotFoundExceptionError(RecurrentExpenseExceptionError):
     """Raised when the referenced payment method is not found or not owned by user."""
 
     def __init__(self, payment_method_id: str | None = None) -> None:
@@ -45,7 +49,7 @@ class PaymentMethodNotFoundExceptionError(ExpenseTemplateExceptionError):
         )
 
 
-class InvalidRecurrenceConfigExceptionError(ExpenseTemplateExceptionError):
+class InvalidRecurrenceConfigExceptionError(RecurrentExpenseExceptionError):
     """Raised when recurrence_config does not match the recurrence_type."""
 
     def __init__(self, message: str) -> None:

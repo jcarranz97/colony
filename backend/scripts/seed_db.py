@@ -17,8 +17,8 @@ from app.cycles import schemas as cycle_schemas, service as cycle_service_module
 # before any query runs, and that create_all creates every table.
 from app.cycles.models import Cycle, CycleExpense, ExchangeRate  # noqa: F401
 from app.database import Base, SessionLocal, engine
-from app.expense_templates.models import ExpenseTemplate
 from app.payment_methods.models import PaymentMethod
+from app.recurrent_expenses.models import RecurrentExpense
 
 
 def create_tables() -> None:
@@ -100,37 +100,37 @@ def seed_payment_method(
     return pm
 
 
-def seed_expense_template(
+def seed_recurrent_expense(
     db: Session,
     user: User,
     payment_method: PaymentMethod,
     tmpl_data: dict[str, Any],
 ) -> None:
-    """Create an expense template for the user if it does not already exist.
+    """Create a recurrent expense for the user if it does not already exist.
 
     Args:
         db: Active SQLAlchemy session.
-        user: The User instance to associate the template with.
+        user: The User instance to associate the recurrent expense with.
         payment_method: The PaymentMethod instance to use.
-        tmpl_data: Dictionary of template fields from the seed YAML.
+        tmpl_data: Dictionary of recurrent expense fields from the seed YAML.
     """
     description = tmpl_data["description"]
     existing = (
-        db.query(ExpenseTemplate)
+        db.query(RecurrentExpense)
         .filter(
-            ExpenseTemplate.user_id == user.id,
-            ExpenseTemplate.description == description,
-            ExpenseTemplate.active,
+            RecurrentExpense.user_id == user.id,
+            RecurrentExpense.description == description,
+            RecurrentExpense.active,
         )
         .first()
     )
 
     if existing:
-        print(f"      ⏭️  Expense template '{description}' already exists, skipping.")
+        print(f"      ⏭️  Recurrent expense '{description}' already exists, skipping.")
         return
 
     db.add(
-        ExpenseTemplate(
+        RecurrentExpense(
             user_id=user.id,
             payment_method_id=payment_method.id,
             description=description,
@@ -143,7 +143,7 @@ def seed_expense_template(
             autopay_info=tmpl_data.get("autopay_info"),
         )
     )
-    print(f"      ✅ Created expense template '{description}'.")
+    print(f"      ✅ Created recurrent expense '{description}'.")
 
 
 def seed_exchange_rate(db: Session, rate_data: dict[str, Any]) -> None:
@@ -247,22 +247,22 @@ def seed_cycle(db: Session, user: User, cycle_data: dict[str, Any]) -> None:
 
 
 def _seed_user_full_data(db: Session, user: User, user_data: dict[str, Any]) -> None:
-    """Seed payment methods, expense templates, and cycles for one user."""
+    """Seed payment methods, recurrent expenses, and cycles for one user."""
     payment_methods: dict[str, PaymentMethod] = {}
     for pm_data in user_data.get("payment_methods", []):
         pm = seed_payment_method(db, user, pm_data)
         payment_methods[pm.name] = pm
 
-    for tmpl_data in user_data.get("expense_templates", []):
+    for tmpl_data in user_data.get("recurrent_expenses", []):
         pm_name = tmpl_data.pop("payment_method_name")
         pm = payment_methods.get(pm_name)
         if pm is None:
             print(
                 f"      ⚠️  Payment method '{pm_name}' not found for "
-                f"template '{tmpl_data.get('description')}', skipping."
+                f"recurrent expense '{tmpl_data.get('description')}', skipping."
             )
             continue
-        seed_expense_template(db, user, pm, tmpl_data)
+        seed_recurrent_expense(db, user, pm, tmpl_data)
 
     db.commit()  # commit templates before generating cycle expenses
 
@@ -278,7 +278,7 @@ def seed_database(seed_file: Path, auth_only: bool = False) -> None:
     Args:
         seed_file: Path to the YAML seed file.
         auth_only: When True, only user accounts are created — payment
-            methods, expense templates, cycles, and exchange rates are
+            methods, recurrent expenses, cycles, and exchange rates are
             skipped.
     """
     create_tables()

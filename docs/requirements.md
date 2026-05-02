@@ -67,8 +67,8 @@ Colony is a standalone web application consisting of:
 - **FR-016**: System must validate that payment method and currency combinations are logical
 - **FR-017**: Users must be able to view all payment methods (active and inactive)
 
-### 3.4 Expense Template Management
-- **FR-018**: Users must be able to create expense templates with the following fields:
+### 3.4 Recurrent Expense Management
+- **FR-018**: Users must be able to create recurrent expenses with the following fields:
     - Description
     - Currency (USD/MXN)
     - Payment Method
@@ -83,9 +83,9 @@ Colony is a standalone web application consisting of:
     - **Bi-weekly**: Every 14 days from start date
     - **Monthly**: Same date each month
     - **Custom**: User-defined intervals
-- **FR-020**: Users must be able to edit expense templates
-- **FR-021**: Users must be able to delete expense templates
-- **FR-022**: Users must be able to view all expense templates
+- **FR-020**: Users must be able to edit recurrent expenses
+- **FR-021**: Users must be able to delete recurrent expenses
+- **FR-022**: Users must be able to view all recurrent expenses
 - **FR-023**: Each expense must specify currency and payment method
 
 ### 3.5 Cycle Management
@@ -139,12 +139,12 @@ Colony is a standalone web application consisting of:
 ### 3.9 Data Import/Export
 - **FR-045**: Users must be able to import existing expense data from Excel/CSV
 - **FR-046**: Users must be able to export cycle data to Excel/CSV
-- **FR-047**: System must support bulk expense template creation
+- **FR-047**: System must support bulk recurrent expense creation
 
 ## 4. Non-Functional Requirements
 
 ### 4.1 Performance
-- **NFR-001**: Cycle generation must complete within 5 seconds for 50+ expense templates
+- **NFR-001**: Cycle generation must complete within 5 seconds for 50+ recurrent expenses
 - **NFR-002**: Currency conversion must be real-time or cached for same-day accuracy
 - **NFR-003**: Financial reports must generate within 3 seconds
 
@@ -181,7 +181,7 @@ Colony is a standalone web application consisting of:
 
 ## 6. Data Requirements
 
-### 6.1 Expense Template Schema
+### 6.1 Recurrent Expense Schema
 ```
 - id: UUID
 - description: String (required)

@@ -25,8 +25,8 @@ class User(BaseModel):
     payment_methods = relationship(
         "PaymentMethod", back_populates="user", cascade="all, delete-orphan"
     )
-    expense_templates = relationship(
-        "ExpenseTemplate", back_populates="user", cascade="all, delete-orphan"
+    recurrent_expenses = relationship(
+        "RecurrentExpense", back_populates="user", cascade="all, delete-orphan"
     )
     cycles = relationship("Cycle", back_populates="user", cascade="all, delete-orphan")
 

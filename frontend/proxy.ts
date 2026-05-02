@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 const AUTH_PAGES = ["/login", "/register"];
 const PROTECTED = [
   "/payment-methods",
-  "/expense-templates",
+  "/recurrent-expenses",
   "/cycles",
   "/settings",
 ];
@@ -30,7 +30,7 @@ export const config = {
     "/login",
     "/register",
     "/payment-methods/:path*",
-    "/expense-templates/:path*",
+    "/recurrent-expenses/:path*",
     "/cycles/:path*",
     "/settings/:path*",
   ],

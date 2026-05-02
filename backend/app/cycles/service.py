@@ -9,8 +9,8 @@ from sqlalchemy import and_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
-from app.expense_templates import models as template_models
 from app.payment_methods import models as pm_models
+from app.recurrent_expenses import models as recurrent_expense_models
 
 from . import models, schemas
 from .constants import CurrencyCode, ExpenseCategory, ExpenseStatus
@@ -288,11 +288,11 @@ class CycleService:
             CycleGenerationExceptionError: If an exchange rate is unavailable.
         """
         templates = (
-            db.query(template_models.ExpenseTemplate)
+            db.query(recurrent_expense_models.RecurrentExpense)
             .filter(
                 and_(
-                    template_models.ExpenseTemplate.user_id == user_id,
-                    template_models.ExpenseTemplate.active.is_(True),
+                    recurrent_expense_models.RecurrentExpense.user_id == user_id,
+                    recurrent_expense_models.RecurrentExpense.active.is_(True),
                 )
             )
             .all()

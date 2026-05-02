@@ -15,11 +15,11 @@ Colony uses PostgreSQL for reliable financial data management with ACID transact
 ```mermaid
 erDiagram
     users ||--o{ payment_methods : owns
-    users ||--o{ expense_templates : creates
+    users ||--o{ recurrent_expenses : creates
     users ||--o{ cycles : manages
     cycles ||--o{ cycle_expenses : contains
-    expense_templates ||--o{ cycle_expenses : generates
-    payment_methods ||--o{ expense_templates : uses
+    recurrent_expenses ||--o{ cycle_expenses : generates
+    payment_methods ||--o{ recurrent_expenses : uses
     payment_methods ||--o{ cycle_expenses : uses
 
     users {
@@ -47,7 +47,7 @@ erDiagram
         timestamp updated_at
     }
 
-    expense_templates {
+    recurrent_expenses {
         uuid id PK
         uuid user_id FK
         uuid payment_method_id FK
@@ -191,11 +191,11 @@ CREATE INDEX idx_payment_methods_user_id ON payment_methods(user_id);
 CREATE INDEX idx_payment_methods_active ON payment_methods(active);
 ```
 
-### Expense Templates
+### Recurrent Expenses
 Reusable templates for recurring expenses.
 
 ```sql
-CREATE TABLE expense_templates (
+CREATE TABLE recurrent_expenses (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     payment_method_id UUID NOT NULL REFERENCES payment_methods(id),
@@ -212,9 +212,9 @@ CREATE TABLE expense_templates (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_expense_templates_user_id ON expense_templates(user_id);
-CREATE INDEX idx_expense_templates_active ON expense_templates(active);
-CREATE INDEX idx_expense_templates_category ON expense_templates(category);
+CREATE INDEX idx_recurrent_expenses_user_id ON recurrent_expenses(user_id);
+CREATE INDEX idx_recurrent_expenses_active ON recurrent_expenses(active);
+CREATE INDEX idx_recurrent_expenses_category ON recurrent_expenses(category);
 ```
 
 ### Cycles
@@ -249,7 +249,7 @@ Individual expenses within a cycle.
 CREATE TABLE cycle_expenses (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     cycle_id UUID NOT NULL REFERENCES cycles(id) ON DELETE CASCADE,
-    template_id UUID REFERENCES expense_templates(id),
+    template_id UUID REFERENCES recurrent_expenses(id),
     payment_method_id UUID NOT NULL REFERENCES payment_methods(id),
     description VARCHAR(255) NOT NULL,
     currency currency_code NOT NULL,
@@ -299,10 +299,10 @@ CREATE INDEX idx_exchange_rates_date ON exchange_rates(rate_date);
 - Payment methods belong to one user
 - Soft delete preserves historical data
 
-### User → Expense Templates (1:N)
-- Users create multiple templates
-- Templates define recurring expense patterns
-- Templates reference payment methods
+### User → Recurrent Expenses (1:N)
+- Users create multiple recurrent expenses
+- Recurrent expenses define recurring expense patterns
+- Recurrent expenses reference payment methods
 
 ### User → Cycles (1:N)
 - Users manage multiple 6-week cycles

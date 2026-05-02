@@ -11,10 +11,10 @@ from app.models import BaseModel
 from .constants import CurrencyCode, ExpenseCategory, RecurrenceType
 
 
-class ExpenseTemplate(BaseModel):
-    """Expense template model representing a recurring expense definition."""
+class RecurrentExpense(BaseModel):
+    """Recurrent expense model representing a recurring expense definition."""
 
-    __tablename__ = "expense_templates"
+    __tablename__ = "recurrent_expenses"
 
     user_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
@@ -46,11 +46,11 @@ class ExpenseTemplate(BaseModel):
     autopay_info: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # Relationships
-    user = relationship("User", back_populates="expense_templates")
+    user = relationship("User", back_populates="recurrent_expenses")
     # lazy="joined" avoids N+1 queries when serializing nested PaymentMethodSummary
     payment_method = relationship(
         "PaymentMethod",
-        back_populates="expense_templates",
+        back_populates="recurrent_expenses",
         lazy="joined",
     )
 
@@ -59,5 +59,5 @@ class ExpenseTemplate(BaseModel):
     )
 
     def __repr__(self) -> str:
-        """String representation of ExpenseTemplate."""
-        return f"<ExpenseTemplate(id={self.id}, description='{self.description}')>"
+        """String representation of RecurrentExpense."""
+        return f"<RecurrentExpense(id={self.id}, description='{self.description}')>"

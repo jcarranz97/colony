@@ -35,7 +35,7 @@ components/{feature}/
 ```
 
 `table.tsx` and `render-cell.tsx` exist in payment-methods and
-expense-templates as legacy artifacts — do not add new ones.
+recurrent-expenses as legacy artifacts — do not add new ones.
 
 ## Notebook CSS Classes (quick reference)
 
