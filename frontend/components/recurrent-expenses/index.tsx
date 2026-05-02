@@ -72,11 +72,13 @@ const iconBtn: React.CSSProperties = {
 function TemplateCard({
   template,
   onEdit,
+  onDuplicate,
   onToggle,
   toggling,
 }: {
   template: RecurrentExpense;
   onEdit: (t: RecurrentExpense) => void;
+  onDuplicate: (t: RecurrentExpense) => void;
   onToggle: (t: RecurrentExpense) => void;
   toggling: boolean;
 }) {
@@ -183,6 +185,13 @@ function TemplateCard({
       <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
         <button style={iconBtn} onClick={() => onEdit(template)}>
           Edit
+        </button>
+        <button
+          style={{ ...iconBtn, color: "var(--cover-bg)" }}
+          onClick={() => onDuplicate(template)}
+          title="Duplicate this template"
+        >
+          Duplicate
         </button>
         <button
           style={{
@@ -556,6 +565,7 @@ export function RecurrentExpenses() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<FilterType>("all");
   const [addOpen, setAddOpen] = useState(false);
+  const [addInitial, setAddInitial] = useState<TemplateForm>(BLANK_FORM);
   const [editTarget, setEditTarget] = useState<RecurrentExpense | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
@@ -590,6 +600,14 @@ export function RecurrentExpenses() {
       );
     }
     setTogglingId(null);
+  };
+
+  const handleDuplicate = (template: RecurrentExpense) => {
+    setAddInitial({
+      ...templateToForm(template),
+      description: `Copy of ${template.description}`,
+    });
+    setAddOpen(true);
   };
 
   const handleAdd = async (form: TemplateForm): Promise<string | null> => {
@@ -691,6 +709,7 @@ export function RecurrentExpenses() {
               key={t.id}
               template={t}
               onEdit={setEditTarget}
+              onDuplicate={handleDuplicate}
               onToggle={handleToggle}
               toggling={togglingId === t.id}
             />
@@ -709,6 +728,7 @@ export function RecurrentExpenses() {
               key={t.id}
               template={t}
               onEdit={setEditTarget}
+              onDuplicate={handleDuplicate}
               onToggle={handleToggle}
               toggling={togglingId === t.id}
             />
@@ -725,15 +745,25 @@ export function RecurrentExpenses() {
         </div>
       )}
 
-      <button className="nb-add-btn" onClick={() => setAddOpen(true)}>
+      <button
+        className="nb-add-btn"
+        onClick={() => {
+          setAddInitial(BLANK_FORM);
+          setAddOpen(true);
+        }}
+      >
         + New Template
       </button>
 
       {/* Add modal */}
       <TemplateModal
         isOpen={addOpen}
-        title="New Template"
-        initial={BLANK_FORM}
+        title={
+          addInitial.description && addInitial.description.startsWith("Copy of")
+            ? "Duplicate Template"
+            : "New Template"
+        }
+        initial={addInitial}
         paymentMethods={paymentMethods}
         onClose={() => setAddOpen(false)}
         onSave={handleAdd}
