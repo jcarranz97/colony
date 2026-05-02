@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import type {
   Cycle,
   CycleExpense,
+  CycleIncome,
   CycleSummary,
   PaymentMethod,
   ExpenseStatus,
@@ -16,6 +17,9 @@ import {
   getExpenses,
   addExpense,
   editExpense,
+  getIncomes,
+  addIncome,
+  removeIncome,
 } from "./actions";
 import { getPaymentMethods } from "@/components/payment-methods/actions";
 
@@ -690,32 +694,199 @@ function AddExpenseModal({
   );
 }
 
+// ── Add Income Modal ──────────────────────────────────────────────────────────
+
+interface AddIncomeForm {
+  description: string;
+  amount: string;
+  currency: CurrencyCode;
+  income_date: string;
+  comments: string;
+}
+
+function AddIncomeModal({
+  isOpen,
+  onClose,
+  cycleId,
+  onAdded,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  cycleId: string;
+  onAdded: (i: CycleIncome) => void;
+}) {
+  const [form, setForm] = useState<AddIncomeForm>({
+    description: "",
+    amount: "",
+    currency: "USD",
+    income_date: "",
+    comments: "",
+  });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const set = <K extends keyof AddIncomeForm>(k: K, v: AddIncomeForm[K]) =>
+    setForm((f) => ({ ...f, [k]: v }));
+
+  const handleSubmit = async () => {
+    if (!form.description || !form.amount || !form.income_date) return;
+    setSaving(true);
+    setError(null);
+    const res = await addIncome(cycleId, {
+      description: form.description,
+      amount: form.amount,
+      currency: form.currency,
+      income_date: form.income_date,
+      comments: form.comments || null,
+    });
+    if (res.success) {
+      onAdded(res.data);
+      setForm({
+        description: "",
+        amount: "",
+        currency: "USD",
+        income_date: "",
+        comments: "",
+      });
+      onClose();
+    } else {
+      setError(res.error.message);
+    }
+    setSaving(false);
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div
+      className="nb-modal-backdrop"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div className="nb-modal">
+        <button className="nb-modal-close" onClick={onClose}>
+          ✕
+        </button>
+        <div className="nb-modal-title">Add Income</div>
+
+        <div className="nb-form-group">
+          <label className="nb-form-label">Description</label>
+          <input
+            className="nb-form-input"
+            placeholder="e.g. Freelance project…"
+            value={form.description}
+            onChange={(e) => set("description", e.target.value)}
+          />
+        </div>
+
+        <div className="nb-form-row">
+          <div className="nb-form-group">
+            <label className="nb-form-label">Amount</label>
+            <input
+              className="nb-form-input"
+              type="number"
+              placeholder="0.00"
+              value={form.amount}
+              onChange={(e) => set("amount", e.target.value)}
+            />
+          </div>
+          <div className="nb-form-group">
+            <label className="nb-form-label">Currency</label>
+            <select
+              className="nb-form-select"
+              value={form.currency}
+              onChange={(e) => set("currency", e.target.value as CurrencyCode)}
+            >
+              <option value="USD">USD</option>
+              <option value="MXN">MXN</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="nb-form-group">
+          <label className="nb-form-label">Income date</label>
+          <input
+            className="nb-form-input"
+            type="date"
+            value={form.income_date}
+            onChange={(e) => set("income_date", e.target.value)}
+          />
+        </div>
+
+        <div className="nb-form-group">
+          <label className="nb-form-label">Comments (optional)</label>
+          <textarea
+            className="nb-form-input"
+            placeholder="Any notes…"
+            rows={2}
+            value={form.comments}
+            onChange={(e) => set("comments", e.target.value)}
+            style={{ resize: "vertical" }}
+          />
+        </div>
+
+        {error && (
+          <p
+            style={{
+              fontFamily: "var(--font-hand)",
+              color: "var(--hl-overdue-border)",
+              fontSize: 14,
+              marginBottom: 8,
+            }}
+          >
+            {error}
+          </p>
+        )}
+
+        <div className="nb-modal-actions">
+          <button className="nb-btn-cancel" onClick={onClose}>
+            Cancel
+          </button>
+          <button
+            className="nb-btn-primary"
+            onClick={handleSubmit}
+            disabled={saving}
+          >
+            {saving ? "Adding…" : "Add ✓"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Cycle Detail View ─────────────────────────────────────────────────────────
 
 function CycleDetail({
   cycle,
   expenses,
+  incomes,
   summary,
   paymentMethods,
   onBack,
   onToggleExpense,
   onExpenseAdded,
   onExpenseEdited,
+  onIncomeAdded,
+  onIncomeRemoved,
 }: {
   cycle: Cycle;
   expenses: CycleExpense[];
+  incomes: CycleIncome[];
   summary: CycleSummary | null;
   paymentMethods: PaymentMethod[];
   onBack: () => void;
   onToggleExpense: (id: string) => void;
   onExpenseAdded: (e: CycleExpense) => void;
   onExpenseEdited: (updated: CycleExpense) => void;
+  onIncomeAdded: (i: CycleIncome) => void;
+  onIncomeRemoved: (id: string) => void;
 }) {
   const [addExpenseOpen, setAddExpenseOpen] = useState(false);
   const [editExpenseOpen, setEditExpenseOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<CycleExpense | null>(
     null,
   );
+  const [addIncomeOpen, setAddIncomeOpen] = useState(false);
 
   const handleEditExpense = (expense: CycleExpense) => {
     setEditingExpense(expense);
@@ -730,6 +901,10 @@ function CycleDetail({
   const overdue = expenses.filter((e) => e.status === "overdue").length;
 
   const netBalance = summary ? parseFloat(summary.financial.net_balance) : 0;
+  const totalIncomes = summary
+    ? parseFloat(summary.financial.total_incomes_usd ?? "0")
+    : 0;
+  const baseIncome = parseFloat(cycle.income_amount ?? "0");
 
   return (
     <>
@@ -751,11 +926,19 @@ function CycleDetail({
       {/* Summary strip */}
       <div className="nb-summary-strip">
         <div className="nb-summary-item">
-          <span className="nb-summary-label">Income</span>
+          <span className="nb-summary-label">Base income</span>
           <span className="nb-summary-value">
             {fmtAmount(cycle.income_amount ?? "0", "USD")}
           </span>
         </div>
+        {summary && (
+          <div className="nb-summary-item">
+            <span className="nb-summary-label">Total income</span>
+            <span className="nb-summary-value nb-stat-positive">
+              {fmtAmount((baseIncome + totalIncomes).toString(), "USD")}
+            </span>
+          </div>
+        )}
         <div className="nb-summary-item">
           <span className="nb-summary-label">Net balance</span>
           <span
@@ -799,8 +982,129 @@ function CycleDetail({
         </div>
       </div>
 
+      {/* Incomes section */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: 8,
+          marginTop: 16,
+        }}
+      >
+        <div className="nb-section-title" style={{ margin: 0 }}>
+          💰 Incomes
+        </div>
+        {cycle.status !== "completed" && (
+          <button
+            style={{
+              fontFamily: "var(--font-hand)",
+              fontSize: 13,
+              background: "transparent",
+              border: "1px dashed var(--cover-bg)",
+              borderRadius: 4,
+              padding: "3px 10px",
+              cursor: "pointer",
+              color: "var(--cover-bg)",
+            }}
+            onClick={() => setAddIncomeOpen(true)}
+          >
+            + Add income
+          </button>
+        )}
+      </div>
+
+      {incomes.length > 0 ? (
+        incomes.map((income) => (
+          <div
+            key={income.id}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: "6px 10px",
+              marginBottom: 4,
+              borderRadius: 4,
+              background: "rgba(80,200,100,0.10)",
+              border: "1px solid rgba(80,200,100,0.25)",
+              fontFamily: "var(--font-hand)",
+            }}
+          >
+            <span style={{ fontSize: 14, color: "var(--ink)", flex: 1 }}>
+              {income.description}
+            </span>
+            {income.template_id ? (
+              <span
+                style={{
+                  fontSize: 11,
+                  color: "var(--ink-light)",
+                  opacity: 0.6,
+                  background: "rgba(44,74,62,0.08)",
+                  borderRadius: 3,
+                  padding: "1px 5px",
+                }}
+              >
+                recurring
+              </span>
+            ) : (
+              <span
+                style={{
+                  fontSize: 11,
+                  color: "var(--ink-light)",
+                  opacity: 0.6,
+                  background: "rgba(201,168,76,0.12)",
+                  borderRadius: 3,
+                  padding: "1px 5px",
+                }}
+              >
+                manual
+              </span>
+            )}
+            <span
+              style={{ fontSize: 13, color: "var(--ink)", fontWeight: 700 }}
+            >
+              {fmtAmount(income.amount, income.currency)}
+            </span>
+            <span
+              style={{ fontSize: 12, color: "var(--ink-light)", opacity: 0.55 }}
+            >
+              {fmtDate(income.income_date)}
+            </span>
+            {cycle.status !== "completed" && (
+              <button
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "var(--ink-light)",
+                  fontSize: 14,
+                  padding: "0 4px",
+                  opacity: 0.5,
+                }}
+                title="Remove income"
+                onClick={() => onIncomeRemoved(income.id)}
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        ))
+      ) : (
+        <div
+          style={{
+            fontFamily: "var(--font-hand)",
+            fontSize: 13,
+            color: "var(--ink-light)",
+            opacity: 0.5,
+            marginBottom: 12,
+          }}
+        >
+          No incomes yet for this cycle
+        </div>
+      )}
+
       {/* Legend */}
-      <div className="nb-legend">
+      <div className="nb-legend" style={{ marginTop: 16 }}>
         <div className="nb-legend-item">
           <div className="nb-legend-swatch nb-swatch-paid" />
           Paid
@@ -858,6 +1162,13 @@ function CycleDetail({
         </button>
       )}
 
+      <AddIncomeModal
+        isOpen={addIncomeOpen}
+        onClose={() => setAddIncomeOpen(false)}
+        cycleId={cycle.id}
+        onAdded={onIncomeAdded}
+      />
+
       <AddExpenseModal
         isOpen={addExpenseOpen}
         onClose={() => setAddExpenseOpen(false)}
@@ -891,6 +1202,7 @@ export function Cycles() {
   const [summaries, setSummaries] = useState<Record<string, CycleSummary>>({});
   const [selectedCycle, setSelectedCycle] = useState<Cycle | null>(null);
   const [cycleExpenses, setCycleExpenses] = useState<CycleExpense[]>([]);
+  const [cycleIncomes, setCycleIncomes] = useState<CycleIncome[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [loading, setLoading] = useState(true);
   const [expensesLoading, setExpensesLoading] = useState(false);
@@ -922,8 +1234,12 @@ export function Cycles() {
   useEffect(() => {
     if (!selectedCycle) return;
     setExpensesLoading(true);
-    getExpenses(selectedCycle.id).then((res) => {
-      if (res.success) setCycleExpenses(res.data.expenses);
+    Promise.all([
+      getExpenses(selectedCycle.id),
+      getIncomes(selectedCycle.id),
+    ]).then(([expRes, incRes]) => {
+      if (expRes.success) setCycleExpenses(expRes.data.expenses);
+      if (incRes.success) setCycleIncomes(incRes.data);
       setExpensesLoading(false);
     });
   }, [selectedCycle]);
@@ -939,6 +1255,7 @@ export function Cycles() {
   const handleOpenCycle = (cycle: Cycle) => {
     setSelectedCycle(cycle);
     setCycleExpenses([]);
+    setCycleIncomes([]);
   };
 
   const handleBack = () => {
@@ -950,6 +1267,7 @@ export function Cycles() {
     }
     setSelectedCycle(null);
     setCycleExpenses([]);
+    setCycleIncomes([]);
   };
 
   const handleToggleExpense = async (expenseId: string) => {
@@ -999,6 +1317,34 @@ export function Cycles() {
     }
   };
 
+  const handleIncomeAdded = async (income: CycleIncome) => {
+    setCycleIncomes((prev) => [...prev, income]);
+    if (selectedCycle) {
+      const summaryRes = await fetchSummary(selectedCycle.id);
+      if (summaryRes.success) {
+        setSummaries((prev) => ({
+          ...prev,
+          [selectedCycle.id]: summaryRes.data,
+        }));
+      }
+    }
+  };
+
+  const handleIncomeRemoved = async (incomeId: string) => {
+    if (!selectedCycle) return;
+    const res = await removeIncome(selectedCycle.id, incomeId);
+    if (res.success) {
+      setCycleIncomes((prev) => prev.filter((i) => i.id !== incomeId));
+      const summaryRes = await fetchSummary(selectedCycle.id);
+      if (summaryRes.success) {
+        setSummaries((prev) => ({
+          ...prev,
+          [selectedCycle.id]: summaryRes.data,
+        }));
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="nb-empty">
@@ -1018,12 +1364,15 @@ export function Cycles() {
       <CycleDetail
         cycle={selectedCycle}
         expenses={cycleExpenses}
+        incomes={cycleIncomes}
         summary={summaries[selectedCycle.id] ?? null}
         paymentMethods={paymentMethods}
         onBack={handleBack}
         onToggleExpense={handleToggleExpense}
         onExpenseAdded={handleExpenseAdded}
         onExpenseEdited={handleExpenseEdited}
+        onIncomeAdded={handleIncomeAdded}
+        onIncomeRemoved={handleIncomeRemoved}
       />
     );
   }

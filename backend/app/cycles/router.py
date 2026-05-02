@@ -8,9 +8,10 @@ from app.auth.dependencies import CurrentActiveUser
 from app.dependencies import get_db
 
 from . import schemas, service
-from .dependencies import CycleDep, CycleExpenseDep
+from .dependencies import CycleDep, CycleExpenseDep, CycleIncomeDep
 from .exceptions import (
     CycleGenerationExceptionError,
+    CycleIncomeNotFoundExceptionError,
     CycleNameExistsExceptionError,
     ExchangeRateNotFoundExceptionError,
     PaymentMethodNotFoundExceptionError,
@@ -295,3 +296,128 @@ async def delete_cycle_expense(
         )
 
     service.cycle_expense_service.delete_expense(db, cycle, expense)
+
+
+# ---------------------------------------------------------------------------
+# Cycle income endpoints
+# ---------------------------------------------------------------------------
+
+
+@router.get(
+    "/{cycle_id}/incomes",
+    response_model=list[schemas.CycleIncomeResponse],
+    summary="List cycle incomes",
+    description="Return all incomes for a cycle.",
+)
+async def list_cycle_incomes(
+    cycle_id: str,
+    current_user: CurrentActiveUser,
+    db: DatabaseDep,
+) -> list[schemas.CycleIncomeResponse]:
+    """List all incomes for a specific cycle."""
+    cycle = service.cycle_service.get_cycle_by_id(db, cycle_id, str(current_user.id))
+    if not cycle:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Cycle not found"
+        )
+
+    incomes = service.cycle_income_service.get_incomes(db, cycle_id=cycle_id)
+    return [schemas.CycleIncomeResponse.model_validate(i) for i in incomes]
+
+
+@router.post(
+    "/{cycle_id}/incomes",
+    response_model=schemas.CycleIncomeResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Add a manual income",
+    description="Manually add a new income to an existing cycle.",
+)
+async def create_cycle_income(
+    data: schemas.CycleIncomeCreate,
+    current_user: CurrentActiveUser,
+    db: DatabaseDep,
+    cycle_id: str,
+) -> schemas.CycleIncomeResponse:
+    """Add a manual income to a cycle."""
+    cycle = service.cycle_service.get_cycle_by_id(db, cycle_id, str(current_user.id))
+    if not cycle:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Cycle not found"
+        )
+
+    try:
+        income = service.cycle_income_service.create_income(
+            db, cycle, data, str(current_user.id)
+        )
+        return schemas.CycleIncomeResponse.model_validate(income)
+    except PaymentMethodNotFoundExceptionError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
+    except ExchangeRateNotFoundExceptionError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
+
+
+@router.get(
+    "/{cycle_id}/incomes/{income_id}",
+    response_model=schemas.CycleIncomeResponse,
+    summary="Get a cycle income",
+    description="Retrieve a specific income from a cycle.",
+)
+async def get_cycle_income(income: CycleIncomeDep) -> schemas.CycleIncomeResponse:
+    """Retrieve a specific cycle income."""
+    return schemas.CycleIncomeResponse.model_validate(income)
+
+
+@router.put(
+    "/{cycle_id}/incomes/{income_id}",
+    response_model=schemas.CycleIncomeResponse,
+    summary="Update a cycle income",
+    description="Partially update a cycle income.",
+)
+async def update_cycle_income(
+    data: schemas.CycleIncomeUpdate,
+    income: CycleIncomeDep,
+    cycle_id: str,
+    current_user: CurrentActiveUser,
+    db: DatabaseDep,
+) -> schemas.CycleIncomeResponse:
+    """Partially update a cycle income."""
+    cycle = service.cycle_service.get_cycle_by_id(db, cycle_id, str(current_user.id))
+    if not cycle:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Cycle not found"
+        )
+
+    try:
+        updated = service.cycle_income_service.update_income(
+            db, cycle, income, data, str(current_user.id)
+        )
+        return schemas.CycleIncomeResponse.model_validate(updated)
+    except PaymentMethodNotFoundExceptionError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
+    except ExchangeRateNotFoundExceptionError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
+
+
+@router.delete(
+    "/{cycle_id}/incomes/{income_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete a cycle income",
+    description="Soft-delete an income from a cycle.",
+)
+async def delete_cycle_income(
+    income: CycleIncomeDep,
+    cycle_id: str,
+    current_user: CurrentActiveUser,
+    db: DatabaseDep,
+) -> None:
+    """Soft-delete a cycle income."""
+    cycle = service.cycle_service.get_cycle_by_id(db, cycle_id, str(current_user.id))
+    if not cycle:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Cycle not found"
+        )
+
+    try:
+        service.cycle_income_service.delete_income(db, cycle, income)
+    except CycleIncomeNotFoundExceptionError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc

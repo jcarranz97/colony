@@ -94,6 +94,11 @@ class Cycle(BaseModel):
         back_populates="cycle",
         cascade="all, delete-orphan",
     )
+    incomes = relationship(
+        "CycleIncome",
+        back_populates="cycle",
+        cascade="all, delete-orphan",
+    )
 
     __table_args__ = (
         CheckConstraint("end_date > start_date", name="valid_cycle_dates"),
@@ -197,5 +202,59 @@ class CycleExpense(BaseModel):
         """String representation of CycleExpense."""
         return (
             f"<CycleExpense(id={self.id}, description='{self.description}', "
+            f"amount={self.amount} {self.currency})>"
+        )
+
+
+class CycleIncome(BaseModel):
+    """Individual income entry within a cycle (auto-generated or manual)."""
+
+    __tablename__ = "cycle_incomes"
+
+    cycle_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("cycles.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    # Null when income is entered manually (not from a template)
+    template_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("recurrent_incomes.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    # Optional — required for template-generated incomes, optional for manual
+    payment_method_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("payment_methods.id"),
+        nullable=True,
+    )
+    description: Mapped[str] = mapped_column(String(255), nullable=False)
+    currency: Mapped[CurrencyCode] = mapped_column(
+        ENUM(CurrencyCode, name="currency_code", create_type=False),
+        nullable=False,
+    )
+    amount: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
+    amount_usd: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
+    income_date: Mapped[date] = mapped_column(Date, nullable=False)
+    comments: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    # Relationships
+    cycle = relationship("Cycle", back_populates="incomes")
+    template = relationship("RecurrentIncome", foreign_keys=[template_id])
+    payment_method = relationship(
+        "PaymentMethod",
+        foreign_keys=[payment_method_id],
+        lazy="joined",
+    )
+
+    __table_args__ = (
+        CheckConstraint("amount > 0", name="check_income_amount_positive"),
+        CheckConstraint("amount_usd > 0", name="check_income_amount_usd_positive"),
+    )
+
+    def __repr__(self) -> str:
+        """String representation of CycleIncome."""
+        return (
+            f"<CycleIncome(id={self.id}, description='{self.description}', "
             f"amount={self.amount} {self.currency})>"
         )

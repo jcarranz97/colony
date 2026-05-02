@@ -7,8 +7,12 @@ from app.auth.dependencies import CurrentActiveUser
 from app.dependencies import get_db
 
 from . import service
-from .exceptions import CycleExpenseNotFoundExceptionError, CycleNotFoundExceptionError
-from .models import Cycle, CycleExpense
+from .exceptions import (
+    CycleExpenseNotFoundExceptionError,
+    CycleIncomeNotFoundExceptionError,
+    CycleNotFoundExceptionError,
+)
+from .models import Cycle, CycleExpense, CycleIncome
 
 
 async def get_cycle_by_id(
@@ -71,6 +75,42 @@ async def get_cycle_expense_by_id(
     return expense
 
 
+async def get_cycle_income_by_id(
+    cycle_id: str,
+    income_id: str,
+    current_user: CurrentActiveUser,
+    db: Annotated[Session, Depends(get_db)],
+) -> CycleIncome:
+    """Dependency that resolves and verifies a cycle income by ID.
+
+    Also ensures the parent cycle exists and belongs to the current user before
+    looking up the income, preventing information leakage.
+
+    Args:
+        cycle_id: Path parameter — UUID of the parent cycle.
+        income_id: Path parameter — UUID of the income.
+        current_user: Injected authenticated user.
+        db: Injected database session.
+
+    Returns:
+        The active CycleIncome instance belonging to the cycle.
+
+    Raises:
+        CycleNotFoundExceptionError: If the parent cycle is not found.
+        CycleIncomeNotFoundExceptionError: If the income is not found.
+    """
+    cycle = service.cycle_service.get_cycle_by_id(db, cycle_id, str(current_user.id))
+    if not cycle:
+        raise CycleNotFoundExceptionError(cycle_id)
+
+    income = service.cycle_income_service.get_income_by_id(db, income_id, cycle_id)
+    if not income:
+        raise CycleIncomeNotFoundExceptionError(income_id)
+
+    return income
+
+
 # Type aliases for dependency injection
 CycleDep = Annotated[Cycle, Depends(get_cycle_by_id)]
 CycleExpenseDep = Annotated[CycleExpense, Depends(get_cycle_expense_by_id)]
+CycleIncomeDep = Annotated[CycleIncome, Depends(get_cycle_income_by_id)]

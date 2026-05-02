@@ -30,6 +30,7 @@ class PaymentMethod(BaseModel):
     recurrent_expenses = relationship(
         "RecurrentExpense", back_populates="payment_method"
     )
+    recurrent_incomes = relationship("RecurrentIncome", back_populates="payment_method")
     cycle_expenses = relationship("CycleExpense", back_populates="payment_method")
 
     # Table constraints

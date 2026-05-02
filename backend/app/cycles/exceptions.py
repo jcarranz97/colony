@@ -62,6 +62,24 @@ class CycleExpenseNotFoundExceptionError(CycleExceptionError):
         )
 
 
+class CycleIncomeNotFoundExceptionError(CycleExceptionError):
+    """Raised when a cycle income cannot be found."""
+
+    def __init__(self, income_id: str | None = None) -> None:
+        """Initialize CycleIncomeNotFoundExceptionError.
+
+        Args:
+            income_id: Optional income UUID for context in the error details.
+        """
+        details = {"income_id": income_id} if income_id else {}
+        super().__init__(
+            error_code=ErrorCode.CYCLE_INCOME_NOT_FOUND,
+            message="Cycle income not found",
+            status_code=status.HTTP_404_NOT_FOUND,
+            details=details,
+        )
+
+
 class CycleGenerationExceptionError(CycleExceptionError):
     """Raised when automatic expense generation from templates fails."""
 

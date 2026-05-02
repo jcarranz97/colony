@@ -72,6 +72,62 @@ export type RecurrenceConfig =
     }
   | Record<string, never>;
 
+// Recurrent Incomes
+export interface RecurrentIncome {
+  id: string;
+  description: string;
+  base_amount: string;
+  currency: CurrencyCode;
+  recurrence_type: RecurrenceType;
+  recurrence_config: RecurrenceConfig;
+  reference_date: string;
+  payment_method: { id: string; name: string; method_type: string };
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateRecurrentIncomeRequest {
+  description: string;
+  base_amount: string;
+  currency: CurrencyCode;
+  recurrence_type: RecurrenceType;
+  recurrence_config: RecurrenceConfig;
+  reference_date: string;
+  payment_method_id: string;
+}
+
+export interface UpdateRecurrentIncomeRequest extends Partial<CreateRecurrentIncomeRequest> {
+  active?: boolean;
+}
+
+// Cycle Incomes
+export interface CycleIncome {
+  id: string;
+  template_id: string | null;
+  description: string;
+  amount: string;
+  amount_usd: string;
+  currency: CurrencyCode;
+  income_date: string;
+  payment_method: { id: string; name: string; method_type: string } | null;
+  comments: string | null;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateCycleIncomeRequest {
+  description: string;
+  amount: string;
+  currency: CurrencyCode;
+  income_date: string;
+  payment_method_id?: string | null;
+  comments?: string | null;
+}
+
+export interface UpdateCycleIncomeRequest extends Partial<CreateCycleIncomeRequest> {}
+
 // Recurrent Expenses
 export interface RecurrentExpense {
   id: string;
@@ -195,6 +251,7 @@ export interface CycleSummaryFinancial {
   variable_expenses_usd: string;
   usa_expenses_usd: string;
   mexico_expenses_usd: string;
+  total_incomes_usd: string;
   net_balance: string;
 }
 
@@ -210,6 +267,7 @@ export interface CycleSummary {
   by_payment_method: unknown[];
   by_currency: Record<string, unknown>;
   status_breakdown: StatusBreakdown;
+  incomes: CycleIncome[];
 }
 
 // Exchange rates
