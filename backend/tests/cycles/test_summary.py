@@ -58,7 +58,7 @@ class TestGetCycleSummary:
         assert data["cycle"]["id"] == str(test_cycle.id)
         assert data["cycle"]["name"] == test_cycle.name
         assert Decimal(data["financial"]["total_expenses_usd"]) == Decimal("0")
-        assert Decimal(data["financial"]["net_balance"]) == Decimal("5000.00")
+        assert Decimal(data["financial"]["net_balance"]) == Decimal("0.00")
         assert data["by_payment_method"] == []
         assert data["by_currency"] == {}
         assert data["status_breakdown"] == {
@@ -85,7 +85,7 @@ class TestGetCycleSummary:
         assert Decimal(financial["variable_expenses_usd"]) == Decimal("400.00")
         assert Decimal(financial["usa_expenses_usd"]) == Decimal("1500.00")
         assert Decimal(financial["mexico_expenses_usd"]) == Decimal("100.00")
-        assert Decimal(financial["net_balance"]) == Decimal("3400.00")
+        assert Decimal(financial["net_balance"]) == Decimal("-1600.00")
 
     def test_by_currency_separates_usd_and_mxn(
         self, client: TestClient, test_user: User, cycle_with_expenses: Cycle
@@ -169,4 +169,3 @@ class TestGetCycleSummary:
         assert cycle_info["name"] == "January 2025"
         assert cycle_info["start_date"] == "2025-01-01"
         assert cycle_info["end_date"] == "2025-02-11"
-        assert Decimal(cycle_info["income_amount"]) == Decimal("5000.00")

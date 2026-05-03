@@ -16,11 +16,16 @@ Colony uses PostgreSQL for reliable financial data management with ACID transact
 erDiagram
     users ||--o{ payment_methods : owns
     users ||--o{ recurrent_expenses : creates
+    users ||--o{ recurrent_incomes : creates
     users ||--o{ cycles : manages
     cycles ||--o{ cycle_expenses : contains
+    cycles ||--o{ cycle_incomes : contains
     recurrent_expenses ||--o{ cycle_expenses : generates
+    recurrent_incomes ||--o{ cycle_incomes : generates
     payment_methods ||--o{ recurrent_expenses : uses
+    payment_methods ||--o{ recurrent_incomes : uses
     payment_methods ||--o{ cycle_expenses : uses
+    payment_methods ||--o{ cycle_incomes : uses
 
     users {
         uuid id PK
@@ -64,12 +69,26 @@ erDiagram
         timestamp updated_at
     }
 
+    recurrent_incomes {
+        uuid id PK
+        uuid user_id FK
+        uuid payment_method_id FK
+        string description
+        string currency
+        decimal base_amount
+        string recurrence_type
+        json recurrence_config
+        date reference_date
+        boolean active
+        timestamp created_at
+        timestamp updated_at
+    }
+
     cycles {
         uuid id PK
         uuid user_id FK
         date start_date
         date end_date
-        decimal income_amount
         decimal remaining_balance
         string status
         string name
@@ -93,6 +112,22 @@ erDiagram
         string comments
         boolean paid
         timestamp paid_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    cycle_incomes {
+        uuid id PK
+        uuid cycle_id FK
+        uuid template_id FK
+        uuid payment_method_id FK
+        string description
+        string currency
+        decimal amount
+        decimal amount_usd
+        date income_date
+        string comments
+        boolean active
         timestamp created_at
         timestamp updated_at
     }
@@ -217,6 +252,30 @@ CREATE INDEX idx_recurrent_expenses_active ON recurrent_expenses(active);
 CREATE INDEX idx_recurrent_expenses_category ON recurrent_expenses(category);
 ```
 
+### Recurrent Incomes
+
+Reusable templates for recurring income sources (salary, freelance, etc.).
+
+```sql
+CREATE TABLE recurrent_incomes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    payment_method_id UUID NOT NULL REFERENCES payment_methods(id),
+    description VARCHAR(255) NOT NULL,
+    currency currency_code NOT NULL,
+    base_amount DECIMAL(10,2) NOT NULL CHECK (base_amount > 0),
+    recurrence_type recurrence_type NOT NULL,
+    recurrence_config JSONB NOT NULL DEFAULT '{}',
+    reference_date DATE NOT NULL,
+    active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX idx_recurrent_incomes_user_id ON recurrent_incomes(user_id);
+CREATE INDEX idx_recurrent_incomes_active ON recurrent_incomes(active);
+```
+
 ### Cycles
 6-week expense management periods.
 
@@ -227,7 +286,6 @@ CREATE TABLE cycles (
     name VARCHAR(100) NOT NULL,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
-    income_amount DECIMAL(10,2) NOT NULL DEFAULT 0,
     remaining_balance DECIMAL(10,2) NOT NULL DEFAULT 0,
     status cycle_status DEFAULT 'draft',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -271,6 +329,32 @@ CREATE INDEX idx_cycle_expenses_template_id ON cycle_expenses(template_id);
 CREATE INDEX idx_cycle_expenses_due_date ON cycle_expenses(due_date);
 CREATE INDEX idx_cycle_expenses_status ON cycle_expenses(status);
 CREATE INDEX idx_cycle_expenses_paid ON cycle_expenses(paid);
+```
+
+### Cycle Incomes
+
+Individual income entries within a cycle. Can be auto-generated from a
+recurrent income template or added manually as a one-off.
+
+```sql
+CREATE TABLE cycle_incomes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    cycle_id UUID NOT NULL REFERENCES cycles(id) ON DELETE CASCADE,
+    template_id UUID REFERENCES recurrent_incomes(id) ON DELETE SET NULL,
+    payment_method_id UUID REFERENCES payment_methods(id),
+    description VARCHAR(255) NOT NULL,
+    currency currency_code NOT NULL,
+    amount DECIMAL(10,2) NOT NULL CHECK (amount > 0),
+    amount_usd DECIMAL(10,2) NOT NULL CHECK (amount_usd > 0),
+    income_date DATE NOT NULL,
+    comments TEXT,
+    active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX idx_cycle_incomes_cycle_id ON cycle_incomes(cycle_id);
+CREATE INDEX idx_cycle_incomes_template_id ON cycle_incomes(template_id);
 ```
 
 ### Exchange Rates
@@ -318,6 +402,25 @@ CREATE INDEX idx_exchange_rates_date ON exchange_rates(rate_date);
 - Templates can generate multiple expenses across cycles
 - Relationship tracks which template generated each expense
 - Optional relationship (manual expenses have NULL template_id)
+
+### User → Recurrent Incomes (1:N)
+- Users create multiple recurrent income templates
+- Templates define repeating income sources (salary, freelance)
+- Each template requires a linked payment method
+
+### Cycle → Cycle Incomes (1:N)
+- Each cycle contains multiple income entries
+- Income entries can be auto-generated from recurrent income templates
+  or added manually as one-off incomes for that cycle
+- The cycle's `remaining_balance` is recalculated on every income write:
+  `remaining_balance = Σ(cycle_incomes.amount_usd)`
+  `- Σ(active non-cancelled cycle_expenses.amount_usd)`
+
+### Recurrent Income → Cycle Incomes (1:N)
+- Templates generate income rows when a cycle is created with
+  `generate_from_templates=true`
+- `template_id` is SET NULL when the template is soft-deleted, so
+  historical cycle income rows are preserved
 
 ## Recurrence Configuration Schema
 
@@ -758,16 +861,16 @@ class CustomConfig(BaseModel):
 ```sql
 SELECT
     c.name,
-    c.income_amount,
     COUNT(ce.id) as total_expenses,
     SUM(ce.amount_usd) as total_amount_usd,
     SUM(CASE WHEN ce.category = 'fixed' THEN ce.amount_usd ELSE 0 END) as fixed_expenses,
     SUM(CASE WHEN ce.category = 'variable' THEN ce.amount_usd ELSE 0 END) as variable_expenses,
-    c.income_amount - SUM(ce.amount_usd) as net_balance
+    COALESCE((SELECT SUM(ci.amount_usd) FROM cycle_incomes ci WHERE ci.cycle_id = c.id), 0)
+        - SUM(ce.amount_usd) as net_balance
 FROM cycles c
 LEFT JOIN cycle_expenses ce ON c.id = ce.cycle_id
 WHERE c.user_id = $1 AND c.id = $2
-GROUP BY c.id, c.name, c.income_amount;
+GROUP BY c.id, c.name;
 ```
 
 ### Payment Method Summary

@@ -9,6 +9,9 @@ import type {
   CycleExpensesResponse,
   CreateCycleExpenseRequest,
   UpdateCycleExpenseRequest,
+  CycleIncome,
+  CreateCycleIncomeRequest,
+  UpdateCycleIncomeRequest,
 } from "@/helpers/types";
 
 export const fetchCycles = (token: string) =>
@@ -82,6 +85,42 @@ export const deleteCycleExpense = (
   token: string,
 ) =>
   apiClient<void>(`/cycles/${cycleId}/expenses/${expenseId}`, {
+    method: "DELETE",
+    token,
+  });
+
+export const fetchCycleIncomes = (cycleId: string, token: string) =>
+  apiClient<CycleIncome[]>(`/cycles/${cycleId}/incomes`, { token });
+
+export const createCycleIncome = (
+  cycleId: string,
+  payload: CreateCycleIncomeRequest,
+  token: string,
+) =>
+  apiClient<CycleIncome>(`/cycles/${cycleId}/incomes`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+    token,
+  });
+
+export const updateCycleIncome = (
+  cycleId: string,
+  incomeId: string,
+  payload: UpdateCycleIncomeRequest,
+  token: string,
+) =>
+  apiClient<CycleIncome>(`/cycles/${cycleId}/incomes/${incomeId}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+    token,
+  });
+
+export const deleteCycleIncome = (
+  cycleId: string,
+  incomeId: string,
+  token: string,
+) =>
+  apiClient<void>(`/cycles/${cycleId}/incomes/${incomeId}`, {
     method: "DELETE",
     token,
   });

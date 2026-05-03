@@ -28,6 +28,9 @@ class User(BaseModel):
     recurrent_expenses = relationship(
         "RecurrentExpense", back_populates="user", cascade="all, delete-orphan"
     )
+    recurrent_incomes = relationship(
+        "RecurrentIncome", back_populates="user", cascade="all, delete-orphan"
+    )
     cycles = relationship("Cycle", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:

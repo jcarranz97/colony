@@ -172,7 +172,7 @@
 
 /* Nav tabs */
 .nb-nav {
-  width: 130px;
+  width: 170px;
   background: var(--paper-dark);
   display: flex;
   flex-direction: column;

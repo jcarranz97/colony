@@ -14,6 +14,7 @@ from app.exceptions import (
 )
 from app.payment_methods.router import router as payment_methods_router
 from app.recurrent_expenses.router import router as recurrent_expenses_router
+from app.recurrent_incomes.router import router as recurrent_incomes_router
 
 
 def create_app() -> FastAPI:
@@ -45,6 +46,7 @@ def create_app() -> FastAPI:
     app.include_router(auth_router, prefix="/api/v1")
     app.include_router(payment_methods_router, prefix="/api/v1")
     app.include_router(recurrent_expenses_router, prefix="/api/v1")
+    app.include_router(recurrent_incomes_router, prefix="/api/v1")
     app.include_router(cycles_router, prefix="/api/v1")
     app.include_router(exchange_rates_router, prefix="/api/v1")
 

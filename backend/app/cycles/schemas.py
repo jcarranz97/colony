@@ -54,9 +54,6 @@ class CycleCreate(AppBaseModel):
     name: str = Field(..., min_length=1, max_length=100, description="Cycle name")
     start_date: date = Field(..., description="Cycle start date (YYYY-MM-DD)")
     end_date: date = Field(..., description="Cycle end date (YYYY-MM-DD)")
-    income_amount: Decimal = Field(
-        ..., gt=0, decimal_places=2, description="Expected income for this cycle"
-    )
     generate_from_templates: bool = Field(
         False,
         description="When true, automatically generate expenses from active templates",
@@ -102,9 +99,6 @@ class CycleUpdate(AppBaseModel):
     name: str | None = Field(
         None, min_length=1, max_length=100, description="Cycle name"
     )
-    income_amount: Decimal | None = Field(
-        None, gt=0, decimal_places=2, description="Expected income for this cycle"
-    )
     status: CycleStatus | None = Field(None, description="Cycle lifecycle status")
 
     @field_validator("name")
@@ -136,7 +130,6 @@ class CycleResponse(BaseModel):
     name: str
     start_date: date
     end_date: date
-    income_amount: Decimal
     remaining_balance: Decimal
     status: CycleStatus
     summary: CycleSummary
@@ -282,6 +275,93 @@ class CycleExpensesListResponse(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# Cycle income schemas
+# ---------------------------------------------------------------------------
+
+
+class CycleIncomeCreate(AppBaseModel):
+    """Schema for manually adding an income to a cycle."""
+
+    description: str = Field(..., min_length=1, max_length=255)
+    currency: CurrencyCode
+    amount: Decimal = Field(..., gt=0, decimal_places=2)
+    income_date: date
+    payment_method_id: uuid.UUID | None = None
+    comments: str | None = Field(None, max_length=1000)
+
+    @field_validator("description")
+    @classmethod
+    def strip_description(cls, v: str) -> str:
+        """Strip whitespace from description.
+
+        Args:
+            v: Raw description value.
+
+        Returns:
+            Stripped description.
+
+        Raises:
+            ValueError: If description is empty after stripping.
+        """
+        stripped = v.strip()
+        if not stripped:
+            raise ValueError("description cannot be empty or whitespace")
+        return stripped
+
+
+class CycleIncomeUpdate(AppBaseModel):
+    """Schema for partially updating a cycle income (all fields optional)."""
+
+    description: str | None = Field(None, min_length=1, max_length=255)
+    amount: Decimal | None = Field(None, gt=0, decimal_places=2)
+    income_date: date | None = None
+    payment_method_id: uuid.UUID | None = None
+    comments: str | None = Field(None, max_length=1000)
+
+    @field_validator("description")
+    @classmethod
+    def strip_description(cls, v: str | None) -> str | None:
+        """Strip whitespace from description when provided.
+
+        Args:
+            v: Raw description value or None.
+
+        Returns:
+            Stripped description or None.
+
+        Raises:
+            ValueError: If description is empty after stripping.
+        """
+        if v is not None:
+            stripped = v.strip()
+            if not stripped:
+                raise ValueError("description cannot be empty or whitespace")
+            return stripped
+        return v
+
+
+class CycleIncomeResponse(BaseModel):
+    """Full cycle income response."""
+
+    id: uuid.UUID
+    description: str
+    currency: CurrencyCode
+    amount: Decimal
+    amount_usd: Decimal
+    income_date: date
+    comments: str | None
+    template_id: uuid.UUID | None
+    payment_method: PaymentMethodSummary | None
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {
+        "from_attributes": True,
+        "json_encoders": {Decimal: str},
+    }
+
+
+# ---------------------------------------------------------------------------
 # Cycle summary schemas
 # ---------------------------------------------------------------------------
 
@@ -293,7 +373,6 @@ class CycleInfo(BaseModel):
     name: str
     start_date: date
     end_date: date
-    income_amount: Decimal
 
     model_config = {
         "from_attributes": True,
@@ -309,6 +388,7 @@ class FinancialSummary(BaseModel):
     variable_expenses_usd: Decimal
     usa_expenses_usd: Decimal
     mexico_expenses_usd: Decimal
+    total_incomes_usd: Decimal
     net_balance: Decimal
 
     model_config = {"json_encoders": {Decimal: str}}
@@ -353,6 +433,7 @@ class CycleSummaryResponse(BaseModel):
     by_payment_method: list[PaymentMethodBreakdown]
     by_currency: dict[str, CurrencyStats]
     status_breakdown: StatusBreakdown
+    incomes: list[CycleIncomeResponse]
 
     model_config = {"json_encoders": {Decimal: str}}
 

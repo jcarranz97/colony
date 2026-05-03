@@ -115,12 +115,12 @@ Colony is a standalone web application consisting of:
 
 ### 3.8 Financial Reporting and Analytics
 - **FR-039**: System must generate cycle summaries showing:
-    - Income for the period
+    - Total incomes USD (sum of all `CycleIncome` entries)
     - Fixed expenses total
     - Variable expenses total
     - Mexico expenses total (MXN currency expenses converted to USD)
     - USA expenses total (USD currency expenses)
-    - Net balance (Income - Total Expenses)
+    - Net balance (Total Incomes − Total Expenses)
 - **FR-040**: System must generate payment method summaries showing:
     - Amount needed per payment method
     - Amount paid per payment method
@@ -136,10 +136,56 @@ Colony is a standalone web application consisting of:
     - Payment Method
     - Time period
 
-### 3.9 Data Import/Export
-- **FR-045**: Users must be able to import existing expense data from Excel/CSV
-- **FR-046**: Users must be able to export cycle data to Excel/CSV
-- **FR-047**: System must support bulk recurrent expense creation
+### 3.9 Recurrent Income Management
+
+- **FR-048**: Users must be able to create recurrent income sources with:
+    - Description
+    - Currency (USD/MXN)
+    - Base amount
+    - Recurrence pattern (same types as recurrent expenses)
+    - Start date
+    - Payment method (required for future reporting use)
+    - Active/Inactive status
+- **FR-049**: System must support the same recurrence patterns for incomes
+  as for expenses (weekly, bi-weekly, monthly, custom)
+- **FR-050**: Users must be able to edit recurrent income templates
+- **FR-051**: Users must be able to deactivate/reactivate recurrent
+  income templates
+- **FR-052**: Users must be able to duplicate recurrent income templates
+- **FR-053**: Recurrent income templates must appear in the Incomes tab
+  of the navigation
+
+### 3.10 Cycle Income Tracking
+
+- **FR-054**: When a cycle is created with `generate_from_templates=true`,
+  the system must auto-generate `CycleIncome` rows from all active
+  recurrent income templates that fall within the cycle date range
+- **FR-055**: Users must be able to add one-off manual income entries
+  directly to a cycle (without a recurrent template)
+- **FR-056**: Users must be able to remove income entries from a cycle
+- **FR-057**: Cycle income entries must display whether they were
+  auto-generated (from a template) or added manually
+- **FR-058**: The cycle's `remaining_balance` must be recalculated on
+  every income write:
+  `remaining_balance = Σ(cycle_incomes.amount_usd)`
+  `− Σ(active non-cancelled cycle_expenses.amount_usd)`
+- **FR-059**: Cycle summaries must include `total_incomes_usd` showing
+  the sum of all cycle income entries converted to USD
+- **FR-060**: The cycle detail view must show a Total Income figure
+  equal to the sum of all `CycleIncome.amount_usd` entries
+
+### 3.11 Navigation Updates
+
+- **FR-061**: The application navigation must have exactly 5 tabs:
+  Cycles, Payment Methods, Recurrent Expenses, Incomes, Settings
+- **FR-062**: The Incomes tab manages recurrent income templates and
+  does not replace the Recurrent Expenses tab
+
+### 3.12 Data Import/Export
+- **FR-063**: Users must be able to import existing expense data from
+  Excel/CSV
+- **FR-064**: Users must be able to export cycle data to Excel/CSV
+- **FR-065**: System must support bulk recurrent expense creation
 
 ## 4. Non-Functional Requirements
 
@@ -204,7 +250,6 @@ Colony is a standalone web application consisting of:
 - start_date: Date
 - end_date: Date
 - remaining_balance: Decimal
-- income_amount: Decimal
 - status: Enum (active, completed, draft)
 - created_at: DateTime
 - user_id: UUID (FK)

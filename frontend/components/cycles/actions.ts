@@ -6,11 +6,17 @@ import {
   fetchCycleExpenses,
   createCycleExpense,
   updateCycleExpense,
+  fetchCycleIncomes,
+  createCycleIncome,
+  updateCycleIncome,
+  deleteCycleIncome,
 } from "@/lib/cycles.api";
 import type {
   CreateCycleRequest,
   CreateCycleExpenseRequest,
   UpdateCycleExpenseRequest,
+  CreateCycleIncomeRequest,
+  UpdateCycleIncomeRequest,
 } from "@/helpers/types";
 
 async function token() {
@@ -38,3 +44,20 @@ export const editExpense = async (
   expenseId: string,
   payload: UpdateCycleExpenseRequest,
 ) => updateCycleExpense(cycleId, expenseId, payload, await token());
+
+export const getIncomes = async (cycleId: string) =>
+  fetchCycleIncomes(cycleId, await token());
+
+export const addIncome = async (
+  cycleId: string,
+  payload: CreateCycleIncomeRequest,
+) => createCycleIncome(cycleId, payload, await token());
+
+export const editIncome = async (
+  cycleId: string,
+  incomeId: string,
+  payload: UpdateCycleIncomeRequest,
+) => updateCycleIncome(cycleId, incomeId, payload, await token());
+
+export const removeIncome = async (cycleId: string, incomeId: string) =>
+  deleteCycleIncome(cycleId, incomeId, await token());

@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.payment_methods import models as pm_models
 from app.recurrent_expenses import models as recurrent_expense_models
+from app.recurrent_incomes import models as recurrent_income_models
 
 from . import models, schemas
 from .constants import CurrencyCode, ExpenseCategory, ExpenseStatus
@@ -74,19 +75,26 @@ def _recalculate_remaining_balance(
 ) -> None:
     """Recalculate and persist ``remaining_balance`` on *cycle*.
 
-    The balance is ``income_amount`` minus the sum of ``amount_usd`` for all
-    active, non-cancelled expenses in the cycle.
+    The balance is the sum of all active cycle income amounts,
+    minus the sum of ``amount_usd`` for all active non-cancelled expenses.
 
     Args:
         db: Active database session.
         cycle: The Cycle ORM instance to update.
     """
-    total_usd = sum(
-        e.amount_usd
-        for e in cycle.expenses
-        if e.active and e.status != ExpenseStatus.CANCELLED
-    ) or Decimal("0")
-    cycle.remaining_balance = cycle.income_amount - total_usd
+    income_total = sum(
+        (i.amount_usd for i in cycle.incomes if i.active),
+        Decimal("0"),
+    )
+    expense_total = sum(
+        (
+            e.amount_usd
+            for e in cycle.expenses
+            if e.active and e.status != ExpenseStatus.CANCELLED
+        ),
+        Decimal("0"),
+    )
+    cycle.remaining_balance = income_total - expense_total
     db.flush()
 
 
@@ -158,7 +166,10 @@ class CycleService:
                     models.Cycle.active.is_(True),
                 )
             )
-            .options(selectinload(models.Cycle.expenses))
+            .options(
+                selectinload(models.Cycle.expenses),
+                selectinload(models.Cycle.incomes),
+            )
         )
 
         if status:
@@ -196,7 +207,10 @@ class CycleService:
                     models.Cycle.active.is_(True),
                 )
             )
-            .options(selectinload(models.Cycle.expenses))
+            .options(
+                selectinload(models.Cycle.expenses),
+                selectinload(models.Cycle.incomes),
+            )
             .first()
         )
 
@@ -234,8 +248,7 @@ class CycleService:
             name=data.name,
             start_date=data.start_date,
             end_date=data.end_date,
-            income_amount=data.income_amount,
-            remaining_balance=data.income_amount,
+            remaining_balance=Decimal("0"),
             status="draft",
         )
 
@@ -252,15 +265,17 @@ class CycleService:
 
         if data.generate_from_templates:
             CycleService._generate_expenses_from_templates(db, cycle, user_id)
+            CycleService._generate_incomes_from_templates(db, cycle, user_id)
 
         _recalculate_remaining_balance(db, cycle)
         db.commit()
         db.refresh(cycle)
 
-        # Ensure expenses relationship is loaded after commit
-        db.query(models.Cycle).options(selectinload(models.Cycle.expenses)).filter(
-            models.Cycle.id == cycle.id
-        ).first()
+        # Ensure expenses and incomes relationships are loaded after commit
+        db.query(models.Cycle).options(
+            selectinload(models.Cycle.expenses),
+            selectinload(models.Cycle.incomes),
+        ).filter(models.Cycle.id == cycle.id).first()
 
         logger.info(
             "Cycle created",
@@ -343,6 +358,77 @@ class CycleService:
                 db.add(expense)
 
     @staticmethod
+    def _generate_incomes_from_templates(
+        db: Session,
+        cycle: models.Cycle,
+        user_id: str,
+    ) -> None:
+        """Generate CycleIncome rows from the user's active income templates.
+
+        For each active template, calculates all recurrence dates within the
+        cycle period and inserts a CycleIncome for each occurrence.
+
+        Args:
+            db: Active database session.
+            cycle: The Cycle instance to attach incomes to.
+            user_id: The authenticated user's ID.
+
+        Raises:
+            CycleGenerationExceptionError: If an exchange rate is unavailable.
+        """
+        templates = (
+            db.query(recurrent_income_models.RecurrentIncome)
+            .filter(
+                and_(
+                    recurrent_income_models.RecurrentIncome.user_id == user_id,
+                    recurrent_income_models.RecurrentIncome.active.is_(True),
+                )
+            )
+            .all()
+        )
+
+        for template in templates:
+            try:
+                occurrence_dates = calculate_occurrences(
+                    recurrence_type=template.recurrence_type.value,
+                    recurrence_config=template.recurrence_config,
+                    reference_date=template.reference_date,
+                    cycle_start=cycle.start_date,
+                    cycle_end=cycle.end_date,
+                )
+            except (ValueError, KeyError) as exc:
+                logger.warning(
+                    "Skipping income template due to recurrence error",
+                    extra={
+                        "template_id": str(template.id),
+                        "error": str(exc),
+                    },
+                )
+                continue
+
+            for occurrence_date in occurrence_dates:
+                try:
+                    rate = _get_usd_rate(db, str(template.currency.value))
+                except ExchangeRateNotFoundExceptionError as exc:
+                    raise CycleGenerationExceptionError(
+                        f"Cannot generate incomes: {exc.message}"
+                    ) from exc
+
+                amount_usd = (template.base_amount * rate).quantize(Decimal("0.01"))
+
+                income = models.CycleIncome(
+                    cycle_id=cycle.id,
+                    template_id=template.id,
+                    payment_method_id=template.payment_method_id,
+                    description=template.description,
+                    currency=template.currency,
+                    amount=template.base_amount,
+                    amount_usd=amount_usd,
+                    income_date=occurrence_date,
+                )
+                db.add(income)
+
+    @staticmethod
     def update_cycle(
         db: Session,
         cycle: models.Cycle,
@@ -350,8 +436,7 @@ class CycleService:
     ) -> models.Cycle:
         """Apply a partial update to *cycle*.
 
-        When ``income_amount`` changes, ``remaining_balance`` is recalculated
-        to keep it consistent with the new income figure.
+        ``remaining_balance`` is always recalculated after the update.
 
         Args:
             db: Active database session.
@@ -376,8 +461,7 @@ class CycleService:
             db.rollback()
             raise CycleNameExistsExceptionError(data.name or cycle.name) from exc
 
-        if "income_amount" in update_data:
-            _recalculate_remaining_balance(db, cycle)
+        _recalculate_remaining_balance(db, cycle)
 
         db.commit()
         db.refresh(cycle)
@@ -421,13 +505,18 @@ class CycleService:
             (e.amount_usd for e in countable if e.currency == CurrencyCode.MXN),
             Decimal("0"),
         )
+        # --- Income totals ---------------------------------------------------
+        active_incomes = [i for i in cycle.incomes if i.active]
+        total_incomes_usd = sum((i.amount_usd for i in active_incomes), Decimal("0"))
+
         financial = schemas.FinancialSummary(
             total_expenses_usd=total_usd,
             fixed_expenses_usd=fixed_usd,
             variable_expenses_usd=variable_usd,
             usa_expenses_usd=usa_usd,
             mexico_expenses_usd=mexico_usd,
-            net_balance=cycle.income_amount - total_usd,
+            total_incomes_usd=total_incomes_usd,
+            net_balance=total_incomes_usd - total_usd,
         )
 
         # --- By payment method -----------------------------------------------
@@ -494,12 +583,17 @@ class CycleService:
             cancelled=sum(1 for e in active if e.status == ExpenseStatus.CANCELLED),
         )
 
+        income_responses = [
+            schemas.CycleIncomeResponse.model_validate(i) for i in active_incomes
+        ]
+
         return schemas.CycleSummaryResponse(
             cycle=schemas.CycleInfo.model_validate(cycle),
             financial=financial,
             by_payment_method=by_payment_method,
             by_currency=by_currency,
             status_breakdown=status_breakdown,
+            incomes=income_responses,
         )
 
     @staticmethod
@@ -514,6 +608,9 @@ class CycleService:
 
         for expense in cycle.expenses:
             expense.active = False
+
+        for income in cycle.incomes:
+            income.active = False
 
         cycle.active = False
         db.commit()
@@ -878,7 +975,191 @@ class ExchangeRateService:
         return rate
 
 
+# ---------------------------------------------------------------------------
+# Cycle income service
+# ---------------------------------------------------------------------------
+
+
+class CycleIncomeService:
+    """CRUD and business logic for individual incomes within a cycle."""
+
+    @staticmethod
+    def get_incomes(
+        db: Session,
+        cycle_id: str,
+    ) -> list[models.CycleIncome]:
+        """Return all active incomes for a cycle.
+
+        Args:
+            db: Active database session.
+            cycle_id: UUID string of the parent cycle.
+
+        Returns:
+            List of active CycleIncome instances ordered by income_date.
+        """
+        return (
+            db.query(models.CycleIncome)
+            .filter(
+                and_(
+                    models.CycleIncome.cycle_id == cycle_id,
+                    models.CycleIncome.active.is_(True),
+                )
+            )
+            .order_by(models.CycleIncome.income_date.asc())
+            .all()
+        )
+
+    @staticmethod
+    def get_income_by_id(
+        db: Session, income_id: str, cycle_id: str
+    ) -> models.CycleIncome | None:
+        """Return a single active income that belongs to *cycle_id*.
+
+        Args:
+            db: Active database session.
+            income_id: UUID string of the income.
+            cycle_id: UUID string of the parent cycle.
+
+        Returns:
+            The CycleIncome instance, or None if not found.
+        """
+        return (
+            db.query(models.CycleIncome)
+            .filter(
+                and_(
+                    models.CycleIncome.id == income_id,
+                    models.CycleIncome.cycle_id == cycle_id,
+                    models.CycleIncome.active.is_(True),
+                )
+            )
+            .first()
+        )
+
+    @staticmethod
+    def create_income(
+        db: Session,
+        cycle: models.Cycle,
+        data: schemas.CycleIncomeCreate,
+        user_id: str,
+    ) -> models.CycleIncome:
+        """Add a manual income to *cycle*.
+
+        Args:
+            db: Active database session.
+            cycle: The parent Cycle ORM instance.
+            data: Validated income creation schema.
+            user_id: The authenticated user's ID.
+
+        Returns:
+            The newly created CycleIncome instance.
+
+        Raises:
+            PaymentMethodNotFoundExceptionError: If payment_method_id is provided
+                but invalid.
+            ExchangeRateNotFoundExceptionError: If no MXN→USD rate is available.
+        """
+        logger.info(
+            "Creating cycle income",
+            extra={"cycle_id": str(cycle.id), "description": data.description},
+        )
+
+        if data.payment_method_id is not None:
+            _verify_payment_method(db, data.payment_method_id, user_id)
+
+        rate = _get_usd_rate(db, data.currency.value)
+        amount_usd = (data.amount * rate).quantize(Decimal("0.01"))
+
+        income = models.CycleIncome(
+            cycle_id=cycle.id,
+            payment_method_id=data.payment_method_id,
+            description=data.description,
+            currency=data.currency,
+            amount=data.amount,
+            amount_usd=amount_usd,
+            income_date=data.income_date,
+            comments=data.comments,
+        )
+
+        db.add(income)
+        db.flush()
+
+        _recalculate_remaining_balance(db, cycle)
+        db.commit()
+        db.refresh(income)
+
+        logger.info(
+            "Cycle income created",
+            extra={"cycle_id": str(cycle.id), "income_id": str(income.id)},
+        )
+        return income
+
+    @staticmethod
+    def update_income(
+        db: Session,
+        cycle: models.Cycle,
+        income: models.CycleIncome,
+        data: schemas.CycleIncomeUpdate,
+        user_id: str,
+    ) -> models.CycleIncome:
+        """Apply a partial update to *income*.
+
+        Args:
+            db: Active database session.
+            cycle: Parent Cycle ORM instance (used for balance recalculation).
+            income: The CycleIncome ORM instance to update.
+            data: Validated partial update schema.
+            user_id: The authenticated user's ID.
+
+        Returns:
+            The updated CycleIncome instance.
+        """
+        logger.info("Updating cycle income", extra={"income_id": str(income.id)})
+
+        update_data = data.model_dump(exclude_unset=True)
+
+        if update_data.get("payment_method_id"):
+            _verify_payment_method(db, update_data["payment_method_id"], user_id)
+
+        for field, value in update_data.items():
+            setattr(income, field, value)
+
+        if "amount" in update_data:
+            rate = _get_usd_rate(db, str(income.currency.value))
+            income.amount_usd = (income.amount * rate).quantize(Decimal("0.01"))
+            _recalculate_remaining_balance(db, cycle)
+
+        db.commit()
+        db.refresh(income)
+
+        logger.info("Cycle income updated", extra={"income_id": str(income.id)})
+        return income
+
+    @staticmethod
+    def delete_income(
+        db: Session,
+        cycle: models.Cycle,
+        income: models.CycleIncome,
+    ) -> None:
+        """Soft-delete an income and update the cycle's remaining balance.
+
+        Args:
+            db: Active database session.
+            cycle: Parent Cycle ORM instance.
+            income: The CycleIncome ORM instance to deactivate.
+        """
+        logger.info("Deleting cycle income", extra={"income_id": str(income.id)})
+
+        income.active = False
+        db.flush()
+
+        _recalculate_remaining_balance(db, cycle)
+        db.commit()
+
+        logger.info("Cycle income deleted", extra={"income_id": str(income.id)})
+
+
 # Singleton service instances
 cycle_service = CycleService()
 cycle_expense_service = CycleExpenseService()
+cycle_income_service = CycleIncomeService()
 exchange_rate_service = ExchangeRateService()

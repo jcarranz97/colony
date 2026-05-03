@@ -100,8 +100,7 @@ def test_cycle(db: Session, test_user: User) -> Cycle:
         name="January 2025",
         start_date=date(2025, 1, 1),
         end_date=date(2025, 2, 11),
-        income_amount=Decimal("5000.00"),
-        remaining_balance=Decimal("5000.00"),
+        remaining_balance=Decimal("0"),
         status=CycleStatus.ACTIVE,
     )
     db.add(cycle)

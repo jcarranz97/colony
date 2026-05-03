@@ -1,3 +1,8 @@
+import app.auth.models
+import app.cycles.models
+import app.payment_methods.models
+import app.recurrent_expenses.models
+import app.recurrent_incomes.models  # noqa: F401
 from app.database import Base, engine
 
 

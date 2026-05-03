@@ -371,7 +371,98 @@ Delete a recurrent expense.
 
 **Response:** `204 No Content`
 
-### 4. Cycles
+### 4. Recurrent Incomes
+
+#### GET /recurrent-incomes
+Get all recurrent income templates for the current user.
+
+**Query Parameters:**
+
+- `active` (boolean, optional): Filter by active status
+- `currency` (string, optional): Filter by currency
+
+**Response:** `200 OK`
+
+```json
+[
+  {
+    "id": "aaa11111-e89b-12d3-a456-426614174001",
+    "description": "Monthly Salary",
+    "base_amount": "3500.00",
+    "currency": "USD",
+    "recurrence_type": "monthly",
+    "recurrence_config": { "day_of_month": 15 },
+    "reference_date": "2025-01-15",
+    "payment_method": {
+      "id": "123e4567-e89b-12d3-a456-426614174001",
+      "name": "Chase Debit",
+      "method_type": "debit"
+    },
+    "active": true,
+    "created_at": "2025-01-01T00:00:00Z",
+    "updated_at": "2025-01-01T00:00:00Z"
+  }
+]
+```
+
+#### POST /recurrent-incomes
+Create a new recurrent income template.
+
+**Request Body:**
+
+```json
+{
+  "description": "Monthly Salary",
+  "base_amount": "3500.00",
+  "currency": "USD",
+  "recurrence_type": "monthly",
+  "recurrence_config": { "day_of_month": 15 },
+  "reference_date": "2025-01-15",
+  "payment_method_id": "123e4567-e89b-12d3-a456-426614174001"
+}
+```
+
+**Response:** `201 Created` — same shape as list item above.
+
+**Error Codes:**
+
+| Code | Status | Description |
+| ---- | ------ | ----------- |
+| `PAYMENT_METHOD_NOT_FOUND` | 404 | Payment method not found or not owned |
+| `INVALID_RECURRENCE_CONFIG` | 422 | Config does not match recurrence type |
+
+#### GET /recurrent-incomes/{id}
+Get a specific recurrent income template.
+
+**Response:** `200 OK` — same shape as list item.
+
+**Error Codes:**
+
+| Code | Status | Description |
+| ---- | ------ | ----------- |
+| `RECURRENT_INCOME_NOT_FOUND` | 404 | Income template not found |
+
+#### PUT /recurrent-incomes/{id}
+Update a recurrent income template. All fields optional.
+
+**Request Body:**
+
+```json
+{
+  "description": "Updated Salary",
+  "base_amount": "3800.00",
+  "active": false
+}
+```
+
+**Response:** `200 OK` — updated template.
+
+#### DELETE /recurrent-incomes/{id}
+Soft-delete (deactivate) a recurrent income template.
+
+**Response:** `204 No Content`
+
+### 5. Cycles
 
 #### GET /cycles
 Get all user's cycles with pagination.
@@ -390,7 +481,6 @@ Get all user's cycles with pagination.
       "name": "January 2025 Cycle",
       "start_date": "2025-01-01",
       "end_date": "2025-02-11",
-      "income_amount": "5000.00",
       "remaining_balance": "500.00",
       "status": "active",
       "summary": {
@@ -423,8 +513,6 @@ Create a new cycle.
   "name": "February 2025 Cycle",
   "start_date": "2025-02-12",
   "end_date": "2025-03-25",
-  "income_amount": "5200.00",
-  "remaining_balance": "0.00",
   "generate_from_templates": true
 }
 ```
@@ -436,8 +524,7 @@ Create a new cycle.
   "name": "February 2025 Cycle",
   "start_date": "2025-02-12",
   "end_date": "2025-03-25",
-  "income_amount": "5200.00",
-  "remaining_balance": "5200.00",
+  "remaining_balance": "0.00",
   "status": "draft",
   "summary": {
     "total_expenses": "0.00",
@@ -462,7 +549,6 @@ Get a specific cycle with detailed information.
   "name": "January 2025 Cycle",
   "start_date": "2025-01-01",
   "end_date": "2025-02-11",
-  "income_amount": "5000.00",
   "remaining_balance": "500.00",
   "status": "active",
   "summary": {
@@ -485,7 +571,6 @@ Update a cycle.
 ```json
 {
   "name": "January 2025 Cycle Updated",
-  "income_amount": "5500.00",
   "status": "active"
 }
 ```
@@ -608,18 +693,97 @@ Delete an expense from a cycle.
 
 **Response:** `204 No Content`
 
+#### GET /cycles/{cycle_id}/incomes
+List all income entries for a cycle (auto-generated + manual).
+
+**Response:** `200 OK`
+
+```json
+[
+  {
+    "id": "bbb22222-e89b-12d3-a456-426614174001",
+    "cycle_id": "123e4567-e89b-12d3-a456-426614174004",
+    "template_id": "aaa11111-e89b-12d3-a456-426614174001",
+    "description": "Monthly Salary",
+    "amount": "3500.00",
+    "amount_usd": "3500.00",
+    "currency": "USD",
+    "income_date": "2025-01-15",
+    "payment_method": {
+      "id": "123e4567-e89b-12d3-a456-426614174001",
+      "name": "Chase Debit",
+      "method_type": "debit"
+    },
+    "comments": null,
+    "active": true,
+    "created_at": "2025-01-01T00:00:00Z",
+    "updated_at": "2025-01-01T00:00:00Z"
+  },
+  {
+    "id": "bbb33333-e89b-12d3-a456-426614174002",
+    "cycle_id": "123e4567-e89b-12d3-a456-426614174004",
+    "template_id": null,
+    "description": "Freelance bonus",
+    "amount": "500.00",
+    "amount_usd": "500.00",
+    "currency": "USD",
+    "income_date": "2025-01-20",
+    "payment_method": null,
+    "comments": "One-time project",
+    "active": true,
+    "created_at": "2025-01-20T00:00:00Z",
+    "updated_at": "2025-01-20T00:00:00Z"
+  }
+]
+```
+
+#### POST /cycles/{cycle_id}/incomes
+Add a manual income entry to a cycle.
+
+**Request Body:**
+
+```json
+{
+  "description": "Freelance bonus",
+  "amount": "500.00",
+  "currency": "USD",
+  "income_date": "2025-01-20",
+  "payment_method_id": null,
+  "comments": "One-time project"
+}
+```
+
+**Response:** `201 Created` — same shape as list item above.
+
+**Error Codes:**
+
+| Code | Status | Description |
+| ---- | ------ | ----------- |
+| `CYCLE_NOT_FOUND` | 404 | Cycle not found |
+| `CYCLE_INCOME_NOT_FOUND` | 404 | Income entry not found |
+
+#### PUT /cycles/{cycle_id}/incomes/{income_id}
+Update a cycle income entry. All fields optional.
+
+**Response:** `200 OK` — updated income entry.
+
+#### DELETE /cycles/{cycle_id}/incomes/{income_id}
+Soft-delete an income entry from a cycle. Recalculates `remaining_balance`.
+
+**Response:** `204 No Content`
+
 #### GET /cycles/{cycle_id}/summary
 Get detailed cycle summary and analytics.
 
 **Response:** `200 OK`
+
 ```json
 {
   "cycle": {
     "id": "123e4567-e89b-12d3-a456-426614174004",
     "name": "January 2025 Cycle",
     "start_date": "2025-01-01",
-    "end_date": "2025-02-11",
-    "income_amount": "5000.00"
+    "end_date": "2025-02-11"
   },
   "financial": {
     "total_expenses_usd": "4500.00",
@@ -627,8 +791,25 @@ Get detailed cycle summary and analytics.
     "variable_expenses_usd": "1500.00",
     "usa_expenses_usd": "3800.00",
     "mexico_expenses_usd": "700.00",
-    "net_balance": "500.00"
+    "total_incomes_usd": "4000.00",
+    "net_balance": "4500.00"
   },
+  "incomes": [
+    {
+      "id": "bbb22222-e89b-12d3-a456-426614174001",
+      "template_id": "aaa11111-e89b-12d3-a456-426614174001",
+      "description": "Monthly Salary",
+      "amount": "3500.00",
+      "amount_usd": "3500.00",
+      "currency": "USD",
+      "income_date": "2025-01-15",
+      "payment_method": null,
+      "comments": null,
+      "active": true,
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  ],
   "by_payment_method": [
     {
       "payment_method": {
@@ -661,9 +842,17 @@ Get detailed cycle summary and analytics.
 }
 ```
 
-> **Note on `overdue` count:** The `overdue` value in `status_breakdown` is **derived at request time**, not read from the stored `status` column. Any expense whose stored status is `pending` and whose `due_date` is earlier than today is counted as `overdue` (and removed from `pending`). This matches the per-expense overdue derivation applied in individual expense responses.
+> **Note on `overdue` count:** The `overdue` value in `status_breakdown`
+> is **derived at request time**, not read from the stored `status`
+> column. Any expense whose stored status is `pending` and whose
+> `due_date` is earlier than today is counted as `overdue` (and removed
+> from `pending`). This matches the per-expense overdue derivation
+> applied in individual expense responses.
+>
+> **Note on `net_balance`:**
+> `net_balance = total_incomes_usd − total_expenses_usd`
 
-### 5. Reports & Analytics
+### 6. Reports & Analytics
 
 #### GET /reports/cycles-comparison
 Compare multiple cycles.
@@ -697,7 +886,7 @@ Compare multiple cycles.
 }
 ```
 
-### 6. System Endpoints
+### 7. System Endpoints
 
 #### GET /enums
 Get all system enums for form validation.
@@ -905,7 +1094,6 @@ const cycleResponse = await fetch('/api/v1/cycles', {
     name: 'February 2025 Cycle',
     start_date: '2025-02-01',
     end_date: '2025-03-14',
-    income_amount: '5000.00',
     generate_from_templates: true
   })
 });
