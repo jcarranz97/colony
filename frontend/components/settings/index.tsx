@@ -1,7 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
-import type { ExchangeRate } from "@/helpers/types";
-import { getExchangeRates, addExchangeRate, editExchangeRate } from "./actions";
+import type { ExchangeRate, HouseholdResponse } from "@/helpers/types";
+import {
+  getExchangeRates,
+  addExchangeRate,
+  editExchangeRate,
+  getCurrentUserAction,
+  getMyHouseholdsAction,
+  setActiveHouseholdAction,
+} from "./actions";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -339,6 +346,159 @@ function EditRateModal({
   );
 }
 
+// ── Household selector ────────────────────────────────────────────────────────
+
+function HouseholdSelector() {
+  const [households, setHouseholds] = useState<HouseholdResponse[]>([]);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState<string>("");
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const load = async () => {
+      const [userRes, hhRes] = await Promise.all([
+        getCurrentUserAction(),
+        getMyHouseholdsAction(),
+      ]);
+      if (userRes.success) setActiveId(userRes.data.active_household_id);
+      if (hhRes.success) setHouseholds(hhRes.data);
+    };
+    load();
+  }, []);
+
+  const activeName = households.find((h) => h.id === activeId)?.name ?? "—";
+  const canChange = households.length > 1;
+
+  const openModal = () => {
+    setSelectedId(activeId ?? "");
+    setSaveError(null);
+    setModalOpen(true);
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedId || selectedId === activeId) {
+      setModalOpen(false);
+      return;
+    }
+    setSaving(true);
+    setSaveError(null);
+    const res = await setActiveHouseholdAction(selectedId);
+    setSaving(false);
+    if (res.success) {
+      window.location.reload();
+    } else {
+      setSaveError(res.error.message);
+    }
+  };
+
+  return (
+    <>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          padding: "6px 0 4px",
+        }}
+      >
+        <div
+          style={{
+            fontFamily: "var(--font-hand)",
+            fontSize: 16,
+            color: "var(--ink)",
+          }}
+        >
+          🏠 {activeName}
+        </div>
+        {/* Wrapper span carries the tooltip — disabled buttons suppress hover events */}
+        <span
+          title={
+            canChange
+              ? undefined
+              : "You only have one household. Ask your admin to create a new household or add you to an existing one."
+          }
+          style={{ cursor: canChange ? "auto" : "not-allowed" }}
+        >
+          <button
+            className="nb-btn-cancel"
+            onClick={canChange ? openModal : undefined}
+            disabled={!canChange}
+            style={{
+              fontSize: "0.85em",
+              opacity: canChange ? 1 : 0.4,
+              cursor: canChange ? "pointer" : "not-allowed",
+              pointerEvents: canChange ? "auto" : "none",
+            }}
+          >
+            Change
+          </button>
+        </span>
+      </div>
+      {!canChange && households.length > 0 && (
+        <p
+          style={{
+            fontFamily: "var(--font-hand)",
+            fontSize: 13,
+            color: "var(--ink-light)",
+            marginBottom: 12,
+          }}
+        >
+          You are assigned to one household. Ask your admin to add you to
+          another one if needed.
+        </p>
+      )}
+
+      {modalOpen && (
+        <div className="nb-modal-backdrop">
+          <div className="nb-modal">
+            <h2 className="nb-modal-title">Change Household</h2>
+            <form onSubmit={handleSave}>
+              <div className="nb-form-group">
+                <label className="nb-form-label">Select Household</label>
+                <select
+                  className="nb-form-select"
+                  value={selectedId}
+                  onChange={(e) => setSelectedId(e.target.value)}
+                >
+                  {households.map((h) => (
+                    <option key={h.id} value={h.id}>
+                      {h.name}
+                      {h.id === activeId ? " (current)" : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {saveError && (
+                <p style={{ color: "red", fontSize: "0.85em" }}>{saveError}</p>
+              )}
+              <div className="nb-modal-actions">
+                <button
+                  type="button"
+                  className="nb-btn-cancel"
+                  onClick={() => setModalOpen(false)}
+                  disabled={saving}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="nb-btn-primary"
+                  disabled={saving}
+                >
+                  {saving ? "Saving…" : "Save"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function Settings() {
@@ -402,6 +562,9 @@ export function Settings() {
     <>
       <div className="nb-page-title">Settings</div>
       <div className="nb-page-subtitle">Application configuration</div>
+
+      <div className="nb-section-title">🏠 Household</div>
+      <HouseholdSelector />
 
       <div className="nb-section-title">💱 Exchange Rates</div>
       <div

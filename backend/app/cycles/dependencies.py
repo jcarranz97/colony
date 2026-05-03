@@ -3,8 +3,8 @@ from typing import Annotated
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
-from app.auth.dependencies import CurrentActiveUser
 from app.dependencies import get_db
+from app.households.dependencies import CurrentActiveHousehold
 
 from . import service
 from .exceptions import (
@@ -17,24 +17,26 @@ from .models import Cycle, CycleExpense, CycleIncome
 
 async def get_cycle_by_id(
     cycle_id: str,
-    current_user: CurrentActiveUser,
+    current_household: CurrentActiveHousehold,
     db: Annotated[Session, Depends(get_db)],
 ) -> Cycle:
     """Dependency that resolves and verifies a cycle by ID.
 
     Args:
         cycle_id: Path parameter — UUID of the cycle.
-        current_user: Injected authenticated user.
+        current_household: Injected active household.
         db: Injected database session.
 
     Returns:
-        The active Cycle instance owned by the current user.
+        The active Cycle instance belonging to the current household.
 
     Raises:
-        CycleNotFoundExceptionError: If the cycle does not exist or the user
-            does not own it.
+        CycleNotFoundExceptionError: If the cycle does not exist or the
+            household does not own it.
     """
-    cycle = service.cycle_service.get_cycle_by_id(db, cycle_id, str(current_user.id))
+    cycle = service.cycle_service.get_cycle_by_id(
+        db, cycle_id, str(current_household.id)
+    )
     if not cycle:
         raise CycleNotFoundExceptionError(cycle_id)
     return cycle
@@ -43,18 +45,18 @@ async def get_cycle_by_id(
 async def get_cycle_expense_by_id(
     cycle_id: str,
     expense_id: str,
-    current_user: CurrentActiveUser,
+    current_household: CurrentActiveHousehold,
     db: Annotated[Session, Depends(get_db)],
 ) -> CycleExpense:
     """Dependency that resolves and verifies a cycle expense by ID.
 
-    Also ensures the parent cycle exists and belongs to the current user before
-    looking up the expense, preventing information leakage.
+    Also ensures the parent cycle exists and belongs to the current household
+    before looking up the expense, preventing information leakage.
 
     Args:
         cycle_id: Path parameter — UUID of the parent cycle.
         expense_id: Path parameter — UUID of the expense.
-        current_user: Injected authenticated user.
+        current_household: Injected active household.
         db: Injected database session.
 
     Returns:
@@ -64,7 +66,9 @@ async def get_cycle_expense_by_id(
         CycleNotFoundExceptionError: If the parent cycle is not found.
         CycleExpenseNotFoundExceptionError: If the expense is not found.
     """
-    cycle = service.cycle_service.get_cycle_by_id(db, cycle_id, str(current_user.id))
+    cycle = service.cycle_service.get_cycle_by_id(
+        db, cycle_id, str(current_household.id)
+    )
     if not cycle:
         raise CycleNotFoundExceptionError(cycle_id)
 
@@ -78,18 +82,18 @@ async def get_cycle_expense_by_id(
 async def get_cycle_income_by_id(
     cycle_id: str,
     income_id: str,
-    current_user: CurrentActiveUser,
+    current_household: CurrentActiveHousehold,
     db: Annotated[Session, Depends(get_db)],
 ) -> CycleIncome:
     """Dependency that resolves and verifies a cycle income by ID.
 
-    Also ensures the parent cycle exists and belongs to the current user before
-    looking up the income, preventing information leakage.
+    Also ensures the parent cycle exists and belongs to the current household
+    before looking up the income, preventing information leakage.
 
     Args:
         cycle_id: Path parameter — UUID of the parent cycle.
         income_id: Path parameter — UUID of the income.
-        current_user: Injected authenticated user.
+        current_household: Injected active household.
         db: Injected database session.
 
     Returns:
@@ -99,7 +103,9 @@ async def get_cycle_income_by_id(
         CycleNotFoundExceptionError: If the parent cycle is not found.
         CycleIncomeNotFoundExceptionError: If the income is not found.
     """
-    cycle = service.cycle_service.get_cycle_by_id(db, cycle_id, str(current_user.id))
+    cycle = service.cycle_service.get_cycle_by_id(
+        db, cycle_id, str(current_household.id)
+    )
     if not cycle:
         raise CycleNotFoundExceptionError(cycle_id)
 

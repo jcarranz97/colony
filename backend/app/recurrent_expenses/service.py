@@ -23,28 +23,27 @@ class RecurrentExpenseService:
     def _verify_payment_method(
         db: Session,
         payment_method_id: UUID,
-        user_id: str,
+        household_id: str,
     ) -> pm_models.PaymentMethod:
-        """Verify a payment method exists and belongs to the user.
+        """Verify a payment method exists and belongs to the household.
 
         Args:
             db: Active database session.
             payment_method_id: UUID of the payment method to verify.
-            user_id: The authenticated user's ID.
+            household_id: The active household's ID.
 
         Returns:
             The PaymentMethod instance.
 
         Raises:
-            PaymentMethodNotFoundExceptionError: If the payment method does not
-                exist or does not belong to the user.
+            PaymentMethodNotFoundExceptionError: If not found or not in household.
         """
         pm = (
             db.query(pm_models.PaymentMethod)
             .filter(
                 and_(
                     pm_models.PaymentMethod.id == payment_method_id,
-                    pm_models.PaymentMethod.user_id == user_id,
+                    pm_models.PaymentMethod.household_id == household_id,
                     pm_models.PaymentMethod.active.is_(True),
                 )
             )
@@ -57,16 +56,16 @@ class RecurrentExpenseService:
     @staticmethod
     def get_recurrent_expenses(
         db: Session,
-        user_id: str,
+        household_id: str,
         active: bool | None = None,
         category: str | None = None,
         currency: str | None = None,
     ) -> list[models.RecurrentExpense]:
-        """List recurrent expenses for a user with optional filters.
+        """List recurrent expenses for a household with optional filters.
 
         Args:
             db: Active database session.
-            user_id: The authenticated user's ID.
+            household_id: The active household's ID.
             active: Optional filter by active status.
             category: Optional filter by expense category.
             currency: Optional filter by currency code.
@@ -75,7 +74,7 @@ class RecurrentExpenseService:
             List of matching recurrent expenses ordered by created_at descending.
         """
         query = db.query(models.RecurrentExpense).filter(
-            models.RecurrentExpense.user_id == user_id
+            models.RecurrentExpense.household_id == household_id
         )
 
         if active is not None:
@@ -93,24 +92,24 @@ class RecurrentExpenseService:
     def get_recurrent_expense_by_id(
         db: Session,
         recurrent_expense_id: str,
-        user_id: str,
+        household_id: str,
     ) -> models.RecurrentExpense | None:
-        """Get a single recurrent expense verifying ownership.
+        """Get a single recurrent expense verifying it belongs to the household.
 
         Args:
             db: Active database session.
             recurrent_expense_id: The recurrent expense UUID as a string.
-            user_id: The authenticated user's ID.
+            household_id: The active household's ID.
 
         Returns:
-            The RecurrentExpense if found and owned by user, else None.
+            The RecurrentExpense if found and in household, else None.
         """
         return (
             db.query(models.RecurrentExpense)
             .filter(
                 and_(
                     models.RecurrentExpense.id == recurrent_expense_id,
-                    models.RecurrentExpense.user_id == user_id,
+                    models.RecurrentExpense.household_id == household_id,
                 )
             )
             .first()
@@ -120,33 +119,35 @@ class RecurrentExpenseService:
     def create_recurrent_expense(
         db: Session,
         data: schemas.RecurrentExpenseCreate,
-        user_id: str,
+        household_id: str,
     ) -> models.RecurrentExpense:
-        """Create a new recurrent expense.
+        """Create a new recurrent expense for a household.
 
         Args:
             db: Active database session.
             data: Validated creation schema.
-            user_id: The authenticated user's ID.
+            household_id: The active household's ID.
 
         Returns:
             The newly created RecurrentExpense.
 
         Raises:
-            PaymentMethodNotFoundExceptionError: If the payment method does not
-                exist or does not belong to the user.
+            PaymentMethodNotFoundExceptionError: If the payment method is invalid.
         """
         logger.info(
             "Creating recurrent expense",
-            extra={"user_id": user_id, "description": data.description},
+            extra={
+                "household_id": household_id,
+                "description": data.description,
+            },
         )
 
         RecurrentExpenseService._verify_payment_method(
-            db, data.payment_method_id, user_id
+            db, data.payment_method_id, household_id
         )
 
         recurrent_expense = models.RecurrentExpense(
-            user_id=user_id,
+            household_id=household_id,
             payment_method_id=data.payment_method_id,
             description=data.description,
             currency=data.currency,
@@ -163,9 +164,9 @@ class RecurrentExpenseService:
         db.refresh(recurrent_expense)
 
         logger.info(
-            "Recurrent expense created successfully",
+            "Recurrent expense created",
             extra={
-                "user_id": user_id,
+                "household_id": household_id,
                 "recurrent_expense_id": str(recurrent_expense.id),
             },
         )
@@ -177,7 +178,7 @@ class RecurrentExpenseService:
         db: Session,
         recurrent_expense: models.RecurrentExpense,
         data: schemas.RecurrentExpenseUpdate,
-        user_id: str,
+        household_id: str,
     ) -> models.RecurrentExpense:
         """Update an existing recurrent expense.
 
@@ -185,16 +186,14 @@ class RecurrentExpenseService:
             db: Active database session.
             recurrent_expense: The existing recurrent expense ORM instance.
             data: Validated update schema (partial).
-            user_id: The authenticated user's ID.
+            household_id: The active household's ID.
 
         Returns:
             The updated RecurrentExpense.
 
         Raises:
-            PaymentMethodNotFoundExceptionError: If the new payment method does not
-                exist or does not belong to the user.
-            InvalidRecurrenceConfigExceptionError: If recurrence_config is updated
-                without recurrence_type and is invalid for the existing type.
+            PaymentMethodNotFoundExceptionError: If the new payment method is invalid.
+            InvalidRecurrenceConfigExceptionError: If recurrence_config is invalid.
         """
         logger.info(
             "Updating recurrent expense",
@@ -205,11 +204,9 @@ class RecurrentExpenseService:
 
         if "payment_method_id" in update_data:
             RecurrentExpenseService._verify_payment_method(
-                db, update_data["payment_method_id"], user_id
+                db, update_data["payment_method_id"], household_id
             )
 
-        # When only recurrence_config is updated (no recurrence_type change),
-        # validate the new config against the existing recurrence_type.
         if "recurrence_config" in update_data and "recurrence_type" not in update_data:
             validator = _RECURRENCE_VALIDATORS.get(recurrent_expense.recurrence_type)
             if validator:
@@ -225,7 +222,7 @@ class RecurrentExpenseService:
         db.refresh(recurrent_expense)
 
         logger.info(
-            "Recurrent expense updated successfully",
+            "Recurrent expense updated",
             extra={"recurrent_expense_id": str(recurrent_expense.id)},
         )
 
@@ -251,10 +248,9 @@ class RecurrentExpenseService:
         db.commit()
 
         logger.info(
-            "Recurrent expense deactivated successfully",
+            "Recurrent expense deactivated",
             extra={"recurrent_expense_id": str(recurrent_expense.id)},
         )
 
 
-# Singleton service instance
 recurrent_expense_service = RecurrentExpenseService()

@@ -37,6 +37,17 @@ components/{feature}/
 `table.tsx` and `render-cell.tsx` exist in payment-methods and
 recurrent-expenses as legacy artifacts — do not add new ones.
 
+Implemented components: `auth`, `cycles`, `households` (admin-only),
+`incomes`, `layout`, `payment-methods`, `recurrent-expenses`, `settings`,
+`users` (admin-only).
+
+### Household Selector (Settings)
+
+`components/settings/index.tsx` renders a household selector when
+`getMyHouseholdsAction()` returns more than one household. With only one
+household it shows the name as read-only text. Switching calls
+`setActiveHouseholdAction(id)` which hits `PUT /households/me/active`.
+
 ## Notebook CSS Classes (quick reference)
 
 | Class               | Purpose                                              |
@@ -81,6 +92,19 @@ Apply as extra class on `.nb-expense-row`:
   via `getAuthToken()` from `@/actions/auth.action`
 - Components call the `actions.ts` functions directly from `useEffect` or
   event handlers
+
+### CRITICAL: Do NOT add `"use server"` to `components/*/actions.ts`
+
+`actions/auth.action.ts` has `"use server"` because it reads `httpOnly`
+cookies (a server-only API). The `components/*/actions.ts` files do **not**
+have `"use server"` — they are plain async functions called from client
+components.
+
+If you add `"use server"` to a component actions file, the `apiClient` fetch
+runs inside the Next.js server container, which cannot reach
+`http://localhost:8000` (the backend container). The request never hits the
+backend and returns "Network error". The browser calls the backend directly
+via the Docker-exposed port, so `apiClient` must run on the client.
 
 ## Auth
 

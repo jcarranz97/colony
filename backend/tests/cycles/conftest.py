@@ -14,6 +14,7 @@ from app.cycles.constants import (
     ExpenseStatus,
 )
 from app.cycles.models import Cycle, CycleExpense, ExchangeRate
+from app.households.models import Household, UserHouseholdMembership
 from app.payment_methods.constants import (
     CurrencyCode as PMCurrencyCode,
     PaymentMethodType,
@@ -22,39 +23,63 @@ from app.payment_methods.models import PaymentMethod
 
 
 @pytest.fixture
-def test_user(db: Session) -> User:
+def test_household(db: Session) -> Household:
+    household = Household(name=f"Test Household {uuid.uuid4().hex[:8]}")
+    db.add(household)
+    db.commit()
+    db.refresh(household)
+    return household
+
+
+@pytest.fixture
+def other_household(db: Session) -> Household:
+    household = Household(name=f"Other Household {uuid.uuid4().hex[:8]}")
+    db.add(household)
+    db.commit()
+    db.refresh(household)
+    return household
+
+
+@pytest.fixture
+def test_user(db: Session, test_household: Household) -> User:
     user = User(
         username=f"test_{uuid.uuid4().hex[:8]}",
         password_hash=get_password_hash("testpassword123"),
         first_name="Test",
         last_name="User",
         preferred_currency="USD",
+        active_household_id=test_household.id,
     )
     db.add(user)
+    db.flush()
+    db.add(UserHouseholdMembership(user_id=user.id, household_id=test_household.id))
     db.commit()
     db.refresh(user)
     return user
 
 
 @pytest.fixture
-def other_user(db: Session) -> User:
+def other_user(db: Session, other_household: Household) -> User:
     user = User(
         username=f"other_{uuid.uuid4().hex[:8]}",
         password_hash=get_password_hash("testpassword123"),
         first_name="Other",
         last_name="User",
         preferred_currency="USD",
+        active_household_id=other_household.id,
     )
     db.add(user)
+    db.flush()
+    db.add(UserHouseholdMembership(user_id=user.id, household_id=other_household.id))
     db.commit()
     db.refresh(user)
     return user
 
 
 @pytest.fixture
-def usd_payment_method(db: Session, test_user: User) -> PaymentMethod:
+def usd_payment_method(db: Session, test_household: Household) -> PaymentMethod:
     pm = PaymentMethod(
-        user_id=test_user.id,
+        household_id=test_household.id,
         name="Chase Debit",
         method_type=PaymentMethodType.DEBIT,
         default_currency=PMCurrencyCode.USD,
@@ -66,9 +91,9 @@ def usd_payment_method(db: Session, test_user: User) -> PaymentMethod:
 
 
 @pytest.fixture
-def mxn_payment_method(db: Session, test_user: User) -> PaymentMethod:
+def mxn_payment_method(db: Session, test_household: Household) -> PaymentMethod:
     pm = PaymentMethod(
-        user_id=test_user.id,
+        household_id=test_household.id,
         name="BBVA MXN",
         method_type=PaymentMethodType.DEBIT,
         default_currency=PMCurrencyCode.MXN,
@@ -94,9 +119,9 @@ def mxn_exchange_rate(db: Session) -> ExchangeRate:
 
 
 @pytest.fixture
-def test_cycle(db: Session, test_user: User) -> Cycle:
+def test_cycle(db: Session, test_household: Household) -> Cycle:
     cycle = Cycle(
-        user_id=test_user.id,
+        household_id=test_household.id,
         name="January 2025",
         start_date=date(2025, 1, 1),
         end_date=date(2025, 2, 11),

@@ -23,28 +23,27 @@ class RecurrentIncomeService:
     def _verify_payment_method(
         db: Session,
         payment_method_id: UUID,
-        user_id: str,
+        household_id: str,
     ) -> pm_models.PaymentMethod:
-        """Verify a payment method exists and belongs to the user.
+        """Verify a payment method exists and belongs to the household.
 
         Args:
             db: Active database session.
             payment_method_id: UUID of the payment method to verify.
-            user_id: The authenticated user's ID.
+            household_id: The active household's ID.
 
         Returns:
             The PaymentMethod instance.
 
         Raises:
-            PaymentMethodNotFoundExceptionError: If the payment method does not
-                exist or does not belong to the user.
+            PaymentMethodNotFoundExceptionError: If not found or not in household.
         """
         pm = (
             db.query(pm_models.PaymentMethod)
             .filter(
                 and_(
                     pm_models.PaymentMethod.id == payment_method_id,
-                    pm_models.PaymentMethod.user_id == user_id,
+                    pm_models.PaymentMethod.household_id == household_id,
                     pm_models.PaymentMethod.active.is_(True),
                 )
             )
@@ -57,15 +56,15 @@ class RecurrentIncomeService:
     @staticmethod
     def get_recurrent_incomes(
         db: Session,
-        user_id: str,
+        household_id: str,
         active: bool | None = None,
         currency: str | None = None,
     ) -> list[models.RecurrentIncome]:
-        """List recurrent incomes for a user with optional filters.
+        """List recurrent incomes for a household with optional filters.
 
         Args:
             db: Active database session.
-            user_id: The authenticated user's ID.
+            household_id: The active household's ID.
             active: Optional filter by active status.
             currency: Optional filter by currency code.
 
@@ -73,7 +72,7 @@ class RecurrentIncomeService:
             List of matching recurrent incomes ordered by created_at descending.
         """
         query = db.query(models.RecurrentIncome).filter(
-            models.RecurrentIncome.user_id == user_id
+            models.RecurrentIncome.household_id == household_id
         )
 
         if active is not None:
@@ -88,24 +87,24 @@ class RecurrentIncomeService:
     def get_recurrent_income_by_id(
         db: Session,
         recurrent_income_id: str,
-        user_id: str,
+        household_id: str,
     ) -> models.RecurrentIncome | None:
-        """Get a single recurrent income verifying ownership.
+        """Get a single recurrent income verifying it belongs to the household.
 
         Args:
             db: Active database session.
             recurrent_income_id: The recurrent income UUID as a string.
-            user_id: The authenticated user's ID.
+            household_id: The active household's ID.
 
         Returns:
-            The RecurrentIncome if found and owned by user, else None.
+            The RecurrentIncome if found and in household, else None.
         """
         return (
             db.query(models.RecurrentIncome)
             .filter(
                 and_(
                     models.RecurrentIncome.id == recurrent_income_id,
-                    models.RecurrentIncome.user_id == user_id,
+                    models.RecurrentIncome.household_id == household_id,
                 )
             )
             .first()
@@ -115,33 +114,35 @@ class RecurrentIncomeService:
     def create_recurrent_income(
         db: Session,
         data: schemas.RecurrentIncomeCreate,
-        user_id: str,
+        household_id: str,
     ) -> models.RecurrentIncome:
-        """Create a new recurrent income.
+        """Create a new recurrent income for a household.
 
         Args:
             db: Active database session.
             data: Validated creation schema.
-            user_id: The authenticated user's ID.
+            household_id: The active household's ID.
 
         Returns:
             The newly created RecurrentIncome.
 
         Raises:
-            PaymentMethodNotFoundExceptionError: If the payment method does not
-                exist or does not belong to the user.
+            PaymentMethodNotFoundExceptionError: If the payment method is invalid.
         """
         logger.info(
             "Creating recurrent income",
-            extra={"user_id": user_id, "description": data.description},
+            extra={
+                "household_id": household_id,
+                "description": data.description,
+            },
         )
 
         RecurrentIncomeService._verify_payment_method(
-            db, data.payment_method_id, user_id
+            db, data.payment_method_id, household_id
         )
 
         recurrent_income = models.RecurrentIncome(
-            user_id=user_id,
+            household_id=household_id,
             payment_method_id=data.payment_method_id,
             description=data.description,
             currency=data.currency,
@@ -156,9 +157,9 @@ class RecurrentIncomeService:
         db.refresh(recurrent_income)
 
         logger.info(
-            "Recurrent income created successfully",
+            "Recurrent income created",
             extra={
-                "user_id": user_id,
+                "household_id": household_id,
                 "recurrent_income_id": str(recurrent_income.id),
             },
         )
@@ -170,7 +171,7 @@ class RecurrentIncomeService:
         db: Session,
         recurrent_income: models.RecurrentIncome,
         data: schemas.RecurrentIncomeUpdate,
-        user_id: str,
+        household_id: str,
     ) -> models.RecurrentIncome:
         """Update an existing recurrent income.
 
@@ -178,16 +179,14 @@ class RecurrentIncomeService:
             db: Active database session.
             recurrent_income: The existing recurrent income ORM instance.
             data: Validated update schema (partial).
-            user_id: The authenticated user's ID.
+            household_id: The active household's ID.
 
         Returns:
             The updated RecurrentIncome.
 
         Raises:
-            PaymentMethodNotFoundExceptionError: If the new payment method does not
-                exist or does not belong to the user.
-            InvalidRecurrenceConfigExceptionError: If recurrence_config is updated
-                without recurrence_type and is invalid for the existing type.
+            PaymentMethodNotFoundExceptionError: If the new payment method is invalid.
+            InvalidRecurrenceConfigExceptionError: If recurrence_config is invalid.
         """
         logger.info(
             "Updating recurrent income",
@@ -198,11 +197,9 @@ class RecurrentIncomeService:
 
         if "payment_method_id" in update_data:
             RecurrentIncomeService._verify_payment_method(
-                db, update_data["payment_method_id"], user_id
+                db, update_data["payment_method_id"], household_id
             )
 
-        # When only recurrence_config is updated (no recurrence_type change),
-        # validate the new config against the existing recurrence_type.
         if "recurrence_config" in update_data and "recurrence_type" not in update_data:
             validator = _RECURRENCE_VALIDATORS.get(recurrent_income.recurrence_type)
             if validator:
@@ -218,7 +215,7 @@ class RecurrentIncomeService:
         db.refresh(recurrent_income)
 
         logger.info(
-            "Recurrent income updated successfully",
+            "Recurrent income updated",
             extra={"recurrent_income_id": str(recurrent_income.id)},
         )
 
@@ -244,10 +241,9 @@ class RecurrentIncomeService:
         db.commit()
 
         logger.info(
-            "Recurrent income deactivated successfully",
+            "Recurrent income deactivated",
             extra={"recurrent_income_id": str(recurrent_income.id)},
         )
 
 
-# Singleton service instance
 recurrent_income_service = RecurrentIncomeService()

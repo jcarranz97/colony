@@ -32,6 +32,26 @@ const EMPTY_CREATE: CreateForm = {
   role: "user",
 };
 
+function CopyIdButton({ id }: { id: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(id);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+
+  return (
+    <button
+      className="nb-btn-cancel"
+      onClick={handleCopy}
+      style={{ fontSize: "0.85em", minWidth: 72 }}
+    >
+      {copied ? "Copied!" : "Copy ID"}
+    </button>
+  );
+}
+
 export function UsersManager() {
   const [users, setUsers] = useState<UserResponse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -194,6 +214,7 @@ export function UsersManager() {
             )}
           </div>
           <div style={{ display: "flex", gap: 8 }}>
+            <CopyIdButton id={user.id} />
             <button
               className="nb-btn-cancel"
               onClick={() => openEdit(user)}

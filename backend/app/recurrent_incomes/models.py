@@ -12,13 +12,13 @@ from .constants import CurrencyCode, RecurrenceType
 
 
 class RecurrentIncome(BaseModel):
-    """Recurrent income template representing a repeating income source."""
+    """Recurrent income template belonging to a household."""
 
     __tablename__ = "recurrent_incomes"
 
-    user_id: Mapped[uuid.UUID] = mapped_column(
+    household_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
-        ForeignKey("users.id", ondelete="CASCADE"),
+        ForeignKey("households.id", ondelete="CASCADE"),
         nullable=False,
     )
     payment_method_id: Mapped[uuid.UUID] = mapped_column(
@@ -27,7 +27,6 @@ class RecurrentIncome(BaseModel):
         nullable=False,
     )
     description: Mapped[str] = mapped_column(String(255), nullable=False)
-    # Reuse existing currency_code PostgreSQL enum type
     currency: Mapped[CurrencyCode] = mapped_column(
         ENUM(CurrencyCode, name="currency_code", create_type=False),
         nullable=False,
@@ -41,8 +40,7 @@ class RecurrentIncome(BaseModel):
     reference_date: Mapped[date] = mapped_column(Date, nullable=False)
 
     # Relationships
-    user = relationship("User", back_populates="recurrent_incomes")
-    # lazy="joined" avoids N+1 queries when serializing nested PaymentMethodSummary
+    household = relationship("Household")
     payment_method = relationship(
         "PaymentMethod",
         back_populates="recurrent_incomes",

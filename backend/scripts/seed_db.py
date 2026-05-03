@@ -17,6 +17,7 @@ from app.cycles import schemas as cycle_schemas, service as cycle_service_module
 # before any query runs, and that create_all creates every table.
 from app.cycles.models import Cycle, CycleExpense, ExchangeRate  # noqa: F401
 from app.database import Base, SessionLocal, engine
+from app.households.models import Household, UserHouseholdMembership
 from app.payment_methods.models import PaymentMethod
 from app.recurrent_expenses.models import RecurrentExpense
 from app.recurrent_incomes.models import RecurrentIncome
@@ -29,47 +30,117 @@ def create_tables() -> None:
     print("✅ Tables created successfully!")
 
 
-def ensure_default_admin(db: Session) -> None:
+def seed_household(db: Session, name: str) -> Household:
+    """Return an existing household or create a new one.
+
+    Args:
+        db: Active SQLAlchemy session.
+        name: The household name.
+
+    Returns:
+        The existing or newly created Household instance.
+    """
+    existing = db.query(Household).filter(Household.name == name).first()
+    if existing:
+        print(f"  ⏭️  Household '{name}' already exists, skipping.")
+        return existing
+
+    household = Household(name=name)
+    db.add(household)
+    db.flush()
+    print(f"  ✅ Created household '{name}'.")
+    return household
+
+
+def seed_membership(
+    db: Session, user: User, household: Household
+) -> UserHouseholdMembership:
+    """Link a user to a household if not already a member.
+
+    Args:
+        db: Active SQLAlchemy session.
+        user: The User instance.
+        household: The Household instance.
+
+    Returns:
+        The existing or newly created UserHouseholdMembership instance.
+    """
+    existing = (
+        db.query(UserHouseholdMembership)
+        .filter(
+            UserHouseholdMembership.user_id == user.id,
+            UserHouseholdMembership.household_id == household.id,
+        )
+        .first()
+    )
+    if existing:
+        return existing
+
+    membership = UserHouseholdMembership(user_id=user.id, household_id=household.id)
+    db.add(membership)
+    db.flush()
+    print(f"    ✅ Added '{user.username}' to household '{household.name}'.")
+    return membership
+
+
+def ensure_default_admin(db: Session, household: Household) -> User:
     """Create the default admin user if it does not already exist.
 
+    The admin is assigned to the given household and has their active
+    household set to it.
+
     Credentials are read from env vars DEFAULT_ADMIN_USERNAME and
-    DEFAULT_ADMIN_PASSWORD.  This function is always called on startup
+    DEFAULT_ADMIN_PASSWORD. This function is always called on startup
     regardless of SEED_MODE.
 
     Args:
         db: Active SQLAlchemy session.
+        household: The Household to assign the admin to.
+
+    Returns:
+        The admin User instance.
     """
     username = os.getenv("DEFAULT_ADMIN_USERNAME", "admin")
     password = os.getenv("DEFAULT_ADMIN_PASSWORD", "colony-admin")
 
-    existing = db.query(User).filter(User.username == username).first()
-    if existing:
-        if existing.role != "admin":
-            existing.role = "admin"
+    admin = db.query(User).filter(User.username == username).first()
+    if admin:
+        if admin.role != "admin":
+            admin.role = "admin"
             db.commit()
             print(f"  ✅ Updated admin user '{username}' role to 'admin'.")
         else:
             print(f"  ⏭️  Admin user '{username}' already exists, skipping.")
-        return
+    else:
+        admin = User(
+            username=username,
+            password_hash=get_password_hash(password),
+            preferred_currency="USD",
+            locale="en-US",
+            role="admin",
+        )
+        db.add(admin)
+        db.flush()
+        print(f"  ✅ Created admin user '{username}'.")
 
-    admin = User(
-        username=username,
-        password_hash=get_password_hash(password),
-        preferred_currency="USD",
-        locale="en-US",
-        role="admin",
-    )
-    db.add(admin)
-    db.commit()
-    print(f"  ✅ Created admin user '{username}'.")
+    seed_membership(db, admin, household)
+    if admin.active_household_id is None:
+        admin.active_household_id = household.id
+        db.flush()
+
+    return admin
 
 
-def seed_user(db: Session, user_data: dict[str, Any]) -> User:
+def seed_user(db: Session, user_data: dict[str, Any], household: Household) -> User:
     """Return the existing user or create a new one from seed data.
+
+    The user is assigned to the given household and has their active
+    household set to it.
 
     Args:
         db: Active SQLAlchemy session.
         user_data: Dictionary of user fields from the seed YAML.
+        household: The Household to assign the user to.
 
     Returns:
         The existing or newly created User instance.
@@ -79,31 +150,36 @@ def seed_user(db: Session, user_data: dict[str, Any]) -> User:
 
     if user:
         print(f"  ⏭️  User '{username}' already exists, skipping.")
-        return user
+    else:
+        user = User(
+            username=username,
+            password_hash=get_password_hash(user_data["password"]),
+            first_name=user_data.get("first_name"),
+            last_name=user_data.get("last_name"),
+            preferred_currency=user_data.get("preferred_currency", "USD"),
+            locale=user_data.get("locale", "en-US"),
+            role=user_data.get("role", "user"),
+        )
+        db.add(user)
+        db.flush()
+        print(f"  ✅ Created user '{username}'.")
 
-    user = User(
-        username=username,
-        password_hash=get_password_hash(user_data["password"]),
-        first_name=user_data.get("first_name"),
-        last_name=user_data.get("last_name"),
-        preferred_currency=user_data.get("preferred_currency", "USD"),
-        locale=user_data.get("locale", "en-US"),
-        role=user_data.get("role", "user"),
-    )
-    db.add(user)
-    db.flush()  # populate user.id before inserting payment methods
-    print(f"  ✅ Created user '{username}'.")
+    seed_membership(db, user, household)
+    if user.active_household_id is None:
+        user.active_household_id = household.id
+        db.flush()
+
     return user
 
 
 def seed_payment_method(
-    db: Session, user: User, pm_data: dict[str, Any]
+    db: Session, household: Household, pm_data: dict[str, Any]
 ) -> PaymentMethod:
-    """Create a payment method for the user if it does not already exist.
+    """Create a payment method for the household if it does not already exist.
 
     Args:
         db: Active SQLAlchemy session.
-        user: The User instance to associate the payment method with.
+        household: The Household instance to associate the payment method with.
         pm_data: Dictionary of payment method fields from the seed YAML.
 
     Returns:
@@ -113,7 +189,7 @@ def seed_payment_method(
     existing = (
         db.query(PaymentMethod)
         .filter(
-            PaymentMethod.user_id == user.id,
+            PaymentMethod.household_id == household.id,
             PaymentMethod.name == name,
             PaymentMethod.active,
         )
@@ -125,7 +201,7 @@ def seed_payment_method(
         return existing
 
     pm = PaymentMethod(
-        user_id=user.id,
+        household_id=household.id,
         name=name,
         method_type=pm_data["method_type"],
         default_currency=pm_data["default_currency"],
@@ -139,15 +215,15 @@ def seed_payment_method(
 
 def seed_recurrent_expense(
     db: Session,
-    user: User,
+    household: Household,
     payment_method: PaymentMethod,
     tmpl_data: dict[str, Any],
 ) -> None:
-    """Create a recurrent expense for the user if it does not already exist.
+    """Create a recurrent expense for the household if it does not already exist.
 
     Args:
         db: Active SQLAlchemy session.
-        user: The User instance to associate the recurrent expense with.
+        household: The Household instance to associate the recurrent expense with.
         payment_method: The PaymentMethod instance to use.
         tmpl_data: Dictionary of recurrent expense fields from the seed YAML.
     """
@@ -155,7 +231,7 @@ def seed_recurrent_expense(
     existing = (
         db.query(RecurrentExpense)
         .filter(
-            RecurrentExpense.user_id == user.id,
+            RecurrentExpense.household_id == household.id,
             RecurrentExpense.description == description,
             RecurrentExpense.active,
         )
@@ -168,7 +244,7 @@ def seed_recurrent_expense(
 
     db.add(
         RecurrentExpense(
-            user_id=user.id,
+            household_id=household.id,
             payment_method_id=payment_method.id,
             description=description,
             currency=tmpl_data["currency"],
@@ -185,15 +261,15 @@ def seed_recurrent_expense(
 
 def seed_recurrent_income(
     db: Session,
-    user: User,
+    household: Household,
     payment_method: PaymentMethod,
     tmpl_data: dict[str, Any],
 ) -> None:
-    """Create a recurrent income for the user if it does not already exist.
+    """Create a recurrent income for the household if it does not already exist.
 
     Args:
         db: Active SQLAlchemy session.
-        user: The User instance to associate the recurrent income with.
+        household: The Household instance to associate the recurrent income with.
         payment_method: The PaymentMethod instance to use.
         tmpl_data: Dictionary of recurrent income fields from the seed YAML.
     """
@@ -201,7 +277,7 @@ def seed_recurrent_income(
     existing = (
         db.query(RecurrentIncome)
         .filter(
-            RecurrentIncome.user_id == user.id,
+            RecurrentIncome.household_id == household.id,
             RecurrentIncome.description == description,
             RecurrentIncome.active,
         )
@@ -214,7 +290,7 @@ def seed_recurrent_income(
 
     db.add(
         RecurrentIncome(
-            user_id=user.id,
+            household_id=household.id,
             payment_method_id=payment_method.id,
             description=description,
             currency=tmpl_data["currency"],
@@ -271,22 +347,22 @@ def seed_exchange_rate(db: Session, rate_data: dict[str, Any]) -> None:
     )
 
 
-def seed_cycle(db: Session, user: User, cycle_data: dict[str, Any]) -> None:
-    """Create a cycle (with generated expenses) for the user if it doesn't exist.
+def seed_cycle(db: Session, household: Household, cycle_data: dict[str, Any]) -> None:
+    """Create a cycle (with generated expenses) for the household if not existing.
 
     Uses the cycle service so that template generation, remaining balance
     calculation, and all business rules are applied consistently.
 
     Args:
         db: Active SQLAlchemy session.
-        user: The User instance to associate the cycle with.
+        household: The Household instance to associate the cycle with.
         cycle_data: Dict of cycle fields from the seed YAML.
     """
     name = cycle_data["name"]
     existing = (
         db.query(Cycle)
         .filter(
-            Cycle.user_id == user.id,
+            Cycle.household_id == household.id,
             Cycle.name == name,
             Cycle.active.is_(True),
         )
@@ -306,14 +382,13 @@ def seed_cycle(db: Session, user: User, cycle_data: dict[str, Any]) -> None:
 
     try:
         cycle = cycle_service_module.cycle_service.create_cycle(
-            db, create_schema, str(user.id)
+            db, create_schema, str(household.id)
         )
     except Exception as exc:
         print(f"    ⚠️  Failed to create cycle '{name}': {exc}")
         db.rollback()
         return
 
-    # Apply the desired status if different from the default "draft"
     desired_status = cycle_data.get("status", "draft")
     if desired_status != "draft":
         cycle.status = desired_status
@@ -326,11 +401,13 @@ def seed_cycle(db: Session, user: User, cycle_data: dict[str, Any]) -> None:
     )
 
 
-def _seed_user_full_data(db: Session, user: User, user_data: dict[str, Any]) -> None:
-    """Seed payment methods, recurrent expenses, and cycles for one user."""
+def _seed_household_full_data(
+    db: Session, household: Household, user_data: dict[str, Any]
+) -> None:
+    """Seed payment methods, recurrent expenses, and cycles for a household."""
     payment_methods: dict[str, PaymentMethod] = {}
     for pm_data in user_data.get("payment_methods", []):
-        pm = seed_payment_method(db, user, pm_data)
+        pm = seed_payment_method(db, household, pm_data)
         payment_methods[pm.name] = pm
 
     for tmpl_data in user_data.get("recurrent_expenses", []):
@@ -342,7 +419,7 @@ def _seed_user_full_data(db: Session, user: User, user_data: dict[str, Any]) -> 
                 f"recurrent expense '{tmpl_data.get('description')}', skipping."
             )
             continue
-        seed_recurrent_expense(db, user, pm, tmpl_data)
+        seed_recurrent_expense(db, household, pm, tmpl_data)
 
     for tmpl_data in user_data.get("recurrent_incomes", []):
         pm_name = tmpl_data.pop("payment_method_name")
@@ -353,12 +430,12 @@ def _seed_user_full_data(db: Session, user: User, user_data: dict[str, Any]) -> 
                 f"recurrent income '{tmpl_data.get('description')}', skipping."
             )
             continue
-        seed_recurrent_income(db, user, pm, tmpl_data)
+        seed_recurrent_income(db, household, pm, tmpl_data)
 
     db.commit()  # commit templates before generating cycle expenses
 
     for cycle_data in user_data.get("cycles", []):
-        seed_cycle(db, user, cycle_data)
+        seed_cycle(db, household, cycle_data)
 
 
 def seed_database(seed_file: Path, auth_only: bool = False) -> None:
@@ -384,8 +461,23 @@ def seed_database(seed_file: Path, auth_only: bool = False) -> None:
         data = yaml.safe_load(f)
 
     with SessionLocal() as db:
+        # Seed households first so users and data can reference them
+        households: dict[str, Household] = {}
+        for hh_data in data.get("households", []):
+            hh = seed_household(db, hh_data["name"])
+            households[hh.name] = hh
+        db.commit()
+
+        # Ensure the default admin exists and is in the first/default household
+        default_household_name = next(iter(households), None)
+        default_household = (
+            households[default_household_name]
+            if default_household_name
+            else seed_household(db, "Default Household")
+        )
         print("Ensuring default admin user exists...")
-        ensure_default_admin(db)
+        ensure_default_admin(db, default_household)
+        db.commit()
 
         if not auth_only:
             rates_data = data.get("exchange_rates", [])
@@ -399,11 +491,13 @@ def seed_database(seed_file: Path, auth_only: bool = False) -> None:
         print(f"Processing {len(users_data)} user(s)...")
 
         for user_data in users_data:
-            user = seed_user(db, user_data)
+            household_name = user_data.get("household", default_household_name)
+            household = households.get(household_name or "", default_household)
+            seed_user(db, user_data, household)
             if auth_only:
                 db.commit()
                 continue
-            _seed_user_full_data(db, user, user_data)
+            _seed_household_full_data(db, household, user_data)
 
         db.commit()
 

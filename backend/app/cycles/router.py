@@ -4,8 +4,8 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
-from app.auth.dependencies import CurrentActiveUser
 from app.dependencies import get_db
+from app.households.dependencies import CurrentActiveHousehold
 
 from . import schemas, service
 from .dependencies import CycleDep, CycleExpenseDep, CycleIncomeDep
@@ -32,12 +32,12 @@ DatabaseDep = Annotated[Session, Depends(get_db)]
     response_model=schemas.CyclesListResponse,
     summary="List cycles",
     description=(
-        "Return all cycles for the authenticated user with optional status filter "
+        "Return all cycles for the active household with optional status filter "
         "and pagination."
     ),
 )
 async def list_cycles(
-    current_user: CurrentActiveUser,
+    current_household: CurrentActiveHousehold,
     db: DatabaseDep,
     status_filter: str | None = Query(
         None,
@@ -47,10 +47,10 @@ async def list_cycles(
     page: int = Query(1, ge=1, description="Page number"),
     per_page: int = Query(20, ge=1, le=100, description="Items per page"),
 ) -> schemas.CyclesListResponse:
-    """Return a paginated list of cycles for the authenticated user."""
+    """Return a paginated list of cycles for the active household."""
     cycles, total = service.cycle_service.get_cycles(
         db,
-        str(current_user.id),
+        str(current_household.id),
         status=status_filter,
         page=page,
         per_page=per_page,
@@ -80,12 +80,12 @@ async def list_cycles(
 )
 async def create_cycle(
     data: schemas.CycleCreate,
-    current_user: CurrentActiveUser,
+    current_household: CurrentActiveHousehold,
     db: DatabaseDep,
 ) -> schemas.CycleResponse:
     """Create a new expense cycle."""
     try:
-        cycle = service.cycle_service.create_cycle(db, data, str(current_user.id))
+        cycle = service.cycle_service.create_cycle(db, data, str(current_household.id))
         return schemas.CycleResponse.model_validate(cycle)
     except CycleNameExistsExceptionError as exc:
         raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
@@ -163,7 +163,7 @@ async def get_cycle_summary(cycle: CycleDep) -> schemas.CycleSummaryResponse:
 )
 async def list_cycle_expenses(
     cycle_id: str,
-    current_user: CurrentActiveUser,
+    current_household: CurrentActiveHousehold,
     db: DatabaseDep,
     status_filter: str | None = Query(
         None,
@@ -177,8 +177,9 @@ async def list_cycle_expenses(
     ),
 ) -> schemas.CycleExpensesListResponse:
     """List all expenses for a specific cycle."""
-    # Verify the cycle belongs to the authenticated user
-    cycle = service.cycle_service.get_cycle_by_id(db, cycle_id, str(current_user.id))
+    cycle = service.cycle_service.get_cycle_by_id(
+        db, cycle_id, str(current_household.id)
+    )
     if not cycle:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Cycle not found"
@@ -213,12 +214,14 @@ async def list_cycle_expenses(
 )
 async def create_cycle_expense(
     data: schemas.CycleExpenseCreate,
-    current_user: CurrentActiveUser,
+    current_household: CurrentActiveHousehold,
     db: DatabaseDep,
     cycle_id: str,
 ) -> schemas.CycleExpenseResponse:
     """Add a manual expense to a cycle."""
-    cycle = service.cycle_service.get_cycle_by_id(db, cycle_id, str(current_user.id))
+    cycle = service.cycle_service.get_cycle_by_id(
+        db, cycle_id, str(current_household.id)
+    )
     if not cycle:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Cycle not found"
@@ -226,7 +229,7 @@ async def create_cycle_expense(
 
     try:
         expense = service.cycle_expense_service.create_expense(
-            db, cycle, data, str(current_user.id)
+            db, cycle, data, str(current_household.id)
         )
         return schemas.CycleExpenseResponse.model_validate(expense)
     except PaymentMethodNotFoundExceptionError as exc:
@@ -259,11 +262,13 @@ async def update_cycle_expense(
     data: schemas.CycleExpenseUpdate,
     expense: CycleExpenseDep,
     cycle_id: str,
-    current_user: CurrentActiveUser,
+    current_household: CurrentActiveHousehold,
     db: DatabaseDep,
 ) -> schemas.CycleExpenseResponse:
     """Partially update a cycle expense."""
-    cycle = service.cycle_service.get_cycle_by_id(db, cycle_id, str(current_user.id))
+    cycle = service.cycle_service.get_cycle_by_id(
+        db, cycle_id, str(current_household.id)
+    )
     if not cycle:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Cycle not found"
@@ -285,11 +290,13 @@ async def update_cycle_expense(
 async def delete_cycle_expense(
     expense: CycleExpenseDep,
     cycle_id: str,
-    current_user: CurrentActiveUser,
+    current_household: CurrentActiveHousehold,
     db: DatabaseDep,
 ) -> None:
     """Soft-delete a cycle expense."""
-    cycle = service.cycle_service.get_cycle_by_id(db, cycle_id, str(current_user.id))
+    cycle = service.cycle_service.get_cycle_by_id(
+        db, cycle_id, str(current_household.id)
+    )
     if not cycle:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Cycle not found"
@@ -311,11 +318,13 @@ async def delete_cycle_expense(
 )
 async def list_cycle_incomes(
     cycle_id: str,
-    current_user: CurrentActiveUser,
+    current_household: CurrentActiveHousehold,
     db: DatabaseDep,
 ) -> list[schemas.CycleIncomeResponse]:
     """List all incomes for a specific cycle."""
-    cycle = service.cycle_service.get_cycle_by_id(db, cycle_id, str(current_user.id))
+    cycle = service.cycle_service.get_cycle_by_id(
+        db, cycle_id, str(current_household.id)
+    )
     if not cycle:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Cycle not found"
@@ -334,12 +343,14 @@ async def list_cycle_incomes(
 )
 async def create_cycle_income(
     data: schemas.CycleIncomeCreate,
-    current_user: CurrentActiveUser,
+    current_household: CurrentActiveHousehold,
     db: DatabaseDep,
     cycle_id: str,
 ) -> schemas.CycleIncomeResponse:
     """Add a manual income to a cycle."""
-    cycle = service.cycle_service.get_cycle_by_id(db, cycle_id, str(current_user.id))
+    cycle = service.cycle_service.get_cycle_by_id(
+        db, cycle_id, str(current_household.id)
+    )
     if not cycle:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Cycle not found"
@@ -347,7 +358,7 @@ async def create_cycle_income(
 
     try:
         income = service.cycle_income_service.create_income(
-            db, cycle, data, str(current_user.id)
+            db, cycle, data, str(current_household.id)
         )
         return schemas.CycleIncomeResponse.model_validate(income)
     except PaymentMethodNotFoundExceptionError as exc:
@@ -377,11 +388,13 @@ async def update_cycle_income(
     data: schemas.CycleIncomeUpdate,
     income: CycleIncomeDep,
     cycle_id: str,
-    current_user: CurrentActiveUser,
+    current_household: CurrentActiveHousehold,
     db: DatabaseDep,
 ) -> schemas.CycleIncomeResponse:
     """Partially update a cycle income."""
-    cycle = service.cycle_service.get_cycle_by_id(db, cycle_id, str(current_user.id))
+    cycle = service.cycle_service.get_cycle_by_id(
+        db, cycle_id, str(current_household.id)
+    )
     if not cycle:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Cycle not found"
@@ -389,7 +402,7 @@ async def update_cycle_income(
 
     try:
         updated = service.cycle_income_service.update_income(
-            db, cycle, income, data, str(current_user.id)
+            db, cycle, income, data, str(current_household.id)
         )
         return schemas.CycleIncomeResponse.model_validate(updated)
     except PaymentMethodNotFoundExceptionError as exc:
@@ -407,11 +420,13 @@ async def update_cycle_income(
 async def delete_cycle_income(
     income: CycleIncomeDep,
     cycle_id: str,
-    current_user: CurrentActiveUser,
+    current_household: CurrentActiveHousehold,
     db: DatabaseDep,
 ) -> None:
     """Soft-delete a cycle income."""
-    cycle = service.cycle_service.get_cycle_by_id(db, cycle_id, str(current_user.id))
+    cycle = service.cycle_service.get_cycle_by_id(
+        db, cycle_id, str(current_household.id)
+    )
     if not cycle:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Cycle not found"

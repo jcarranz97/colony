@@ -12,13 +12,13 @@ from .constants import CurrencyCode, ExpenseCategory, RecurrenceType
 
 
 class RecurrentExpense(BaseModel):
-    """Recurrent expense model representing a recurring expense definition."""
+    """Recurrent expense template belonging to a household."""
 
     __tablename__ = "recurrent_expenses"
 
-    user_id: Mapped[uuid.UUID] = mapped_column(
+    household_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
-        ForeignKey("users.id", ondelete="CASCADE"),
+        ForeignKey("households.id", ondelete="CASCADE"),
         nullable=False,
     )
     payment_method_id: Mapped[uuid.UUID] = mapped_column(
@@ -27,7 +27,6 @@ class RecurrentExpense(BaseModel):
         nullable=False,
     )
     description: Mapped[str] = mapped_column(String(255), nullable=False)
-    # Reuse existing currency_code PostgreSQL enum type (created by users migration)
     currency: Mapped[CurrencyCode] = mapped_column(
         ENUM(CurrencyCode, name="currency_code", create_type=False),
         nullable=False,
@@ -46,8 +45,7 @@ class RecurrentExpense(BaseModel):
     autopay: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     # Relationships
-    user = relationship("User", back_populates="recurrent_expenses")
-    # lazy="joined" avoids N+1 queries when serializing nested PaymentMethodSummary
+    household = relationship("Household")
     payment_method = relationship(
         "PaymentMethod",
         back_populates="recurrent_expenses",

@@ -3,8 +3,8 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
-from app.auth.dependencies import CurrentActiveUser
 from app.dependencies import get_db
+from app.households.dependencies import CurrentActiveHousehold
 
 from . import schemas, service
 from .dependencies import PaymentMethodDep
@@ -15,7 +15,6 @@ from .exceptions import (
 
 router = APIRouter(prefix="/payment-methods", tags=["payment-methods"])
 
-# Create dependency aliases
 DatabaseDep = Annotated[Session, Depends(get_db)]
 
 
@@ -34,18 +33,18 @@ async def payment_method_health_check() -> dict[str, str]:
     response_model=list[schemas.PaymentMethodResponse],
     summary="Get all payment methods",
     description=(
-        "Retrieve all payment methods for the authenticated user with optional filters"
+        "Retrieve all payment methods for the active household with optional filters."
     ),
 )
 async def get_payment_methods(
-    current_user: CurrentActiveUser,
+    current_household: CurrentActiveHousehold,
     db: DatabaseDep,
     active: bool | None = Query(None, description="Filter by active status"),
     currency: str | None = Query(None, description="Filter by default currency"),
 ) -> list[schemas.PaymentMethodResponse]:
-    """Get all payment methods for the authenticated user."""
+    """Get all payment methods for the active household."""
     payment_methods = service.payment_method_service.get_payment_methods(
-        db, str(current_user.id), active=active, currency=currency
+        db, str(current_household.id), active=active, currency=currency
     )
     return [schemas.PaymentMethodResponse.model_validate(pm) for pm in payment_methods]
 
@@ -55,17 +54,17 @@ async def get_payment_methods(
     response_model=schemas.PaymentMethodResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Create a new payment method",
-    description="Create a new payment method for the authenticated user",
+    description="Create a new payment method for the active household.",
 )
 async def create_payment_method(
     payment_method_data: schemas.PaymentMethodCreate,
-    current_user: CurrentActiveUser,
+    current_household: CurrentActiveHousehold,
     db: DatabaseDep,
 ) -> schemas.PaymentMethodResponse:
     """Create a new payment method."""
     try:
         payment_method = service.payment_method_service.create_payment_method(
-            db, payment_method_data, str(current_user.id)
+            db, payment_method_data, str(current_household.id)
         )
         return schemas.PaymentMethodResponse.model_validate(payment_method)
     except PaymentMethodNameExistsExceptionError as e:
@@ -76,7 +75,7 @@ async def create_payment_method(
     "/{payment_method_id}",
     response_model=schemas.PaymentMethodResponse,
     summary="Get a payment method",
-    description="Retrieve a specific payment method by ID",
+    description="Retrieve a specific payment method by ID.",
 )
 async def get_payment_method(
     payment_method: PaymentMethodDep,
@@ -89,7 +88,7 @@ async def get_payment_method(
     "/{payment_method_id}",
     response_model=schemas.PaymentMethodResponse,
     summary="Update a payment method",
-    description="Update an existing payment method",
+    description="Update an existing payment method.",
 )
 async def update_payment_method(
     payment_method_data: schemas.PaymentMethodUpdate,
@@ -110,7 +109,7 @@ async def update_payment_method(
     "/{payment_method_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Deactivate a payment method",
-    description="Deactivate a payment method (soft delete)",
+    description="Deactivate a payment method (soft delete).",
 )
 async def delete_payment_method(
     payment_method: PaymentMethodDep,

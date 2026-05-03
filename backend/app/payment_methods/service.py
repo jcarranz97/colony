@@ -20,13 +20,13 @@ class PaymentMethodService:
     @staticmethod
     def get_payment_methods(
         db: Session,
-        user_id: str,
+        household_id: str,
         active: bool | None = None,
         currency: str | None = None,
     ) -> list[models.PaymentMethod]:
-        """Get all payment methods for a user with optional filters."""
+        """Get all payment methods for a household with optional filters."""
         query = db.query(models.PaymentMethod).filter(
-            models.PaymentMethod.user_id == user_id
+            models.PaymentMethod.household_id == household_id
         )
 
         if active is not None:
@@ -41,15 +41,15 @@ class PaymentMethodService:
     def get_payment_method_by_id(
         db: Session,
         payment_method_id: str,
-        user_id: str,
+        household_id: str,
     ) -> models.PaymentMethod | None:
-        """Get payment method by ID and verify ownership."""
+        """Get payment method by ID and verify it belongs to the household."""
         return (
             db.query(models.PaymentMethod)
             .filter(
                 and_(
                     models.PaymentMethod.id == payment_method_id,
-                    models.PaymentMethod.user_id == user_id,
+                    models.PaymentMethod.household_id == household_id,
                 )
             )
             .first()
@@ -59,20 +59,22 @@ class PaymentMethodService:
     def create_payment_method(
         db: Session,
         payment_method_data: schemas.PaymentMethodCreate,
-        user_id: str,
+        household_id: str,
     ) -> models.PaymentMethod:
-        """Create a new payment method."""
+        """Create a new payment method for a household."""
         logger.info(
             "Creating payment method",
-            extra={"user_id": user_id, "name": payment_method_data.name},
+            extra={
+                "household_id": household_id,
+                "name": payment_method_data.name,
+            },
         )
 
-        # Check if user has reached the limit
         existing_count = (
             db.query(models.PaymentMethod)
             .filter(
                 and_(
-                    models.PaymentMethod.user_id == user_id,
+                    models.PaymentMethod.household_id == household_id,
                     models.PaymentMethod.active,
                 )
             )
@@ -84,12 +86,11 @@ class PaymentMethodService:
                 f"Maximum {MAX_PAYMENT_METHODS_PER_USER} payment methods allowed"
             )
 
-        # Check for duplicate name
         existing_method = (
             db.query(models.PaymentMethod)
             .filter(
                 and_(
-                    models.PaymentMethod.user_id == user_id,
+                    models.PaymentMethod.household_id == household_id,
                     models.PaymentMethod.name == payment_method_data.name,
                     models.PaymentMethod.active,
                 )
@@ -102,7 +103,7 @@ class PaymentMethodService:
 
         try:
             payment_method = models.PaymentMethod(
-                user_id=user_id,
+                household_id=household_id,
                 name=payment_method_data.name,
                 method_type=payment_method_data.method_type,
                 default_currency=payment_method_data.default_currency,
@@ -114,8 +115,11 @@ class PaymentMethodService:
             db.refresh(payment_method)
 
             logger.info(
-                "Payment method created successfully",
-                extra={"user_id": user_id, "payment_method_id": str(payment_method.id)},
+                "Payment method created",
+                extra={
+                    "household_id": household_id,
+                    "payment_method_id": str(payment_method.id),
+                },
             )
 
             return payment_method
@@ -124,7 +128,7 @@ class PaymentMethodService:
             db.rollback()
             logger.error(
                 "Failed to create payment method",
-                extra={"user_id": user_id, "error": str(e)},
+                extra={"household_id": household_id, "error": str(e)},
             )
             raise PaymentMethodNameExistsExceptionError(payment_method_data.name) from e
 
@@ -140,13 +144,13 @@ class PaymentMethodService:
             extra={"payment_method_id": str(payment_method.id)},
         )
 
-        # Check for duplicate name if name is being updated
         if payment_method_data.name and payment_method_data.name != payment_method.name:
             existing_method = (
                 db.query(models.PaymentMethod)
                 .filter(
                     and_(
-                        models.PaymentMethod.user_id == payment_method.user_id,
+                        models.PaymentMethod.household_id
+                        == payment_method.household_id,
                         models.PaymentMethod.name == payment_method_data.name,
                         models.PaymentMethod.active,
                         models.PaymentMethod.id != payment_method.id,
@@ -168,7 +172,7 @@ class PaymentMethodService:
             db.refresh(payment_method)
 
             logger.info(
-                "Payment method updated successfully",
+                "Payment method updated",
                 extra={"payment_method_id": str(payment_method.id)},
             )
 
@@ -178,7 +182,10 @@ class PaymentMethodService:
             db.rollback()
             logger.error(
                 "Failed to update payment method",
-                extra={"payment_method_id": str(payment_method.id), "error": str(e)},
+                extra={
+                    "payment_method_id": str(payment_method.id),
+                    "error": str(e),
+                },
             )
             raise PaymentMethodNameExistsExceptionError(
                 payment_method_data.name or payment_method.name
@@ -195,29 +202,25 @@ class PaymentMethodService:
             extra={"payment_method_id": str(payment_method.id)},
         )
 
-        # Check if payment method is in use by expense templates or cycle expenses
-        # This would require importing other domain services
-        # For now, we'll just do a soft delete
-
         payment_method.active = False
         db.commit()
 
         logger.info(
-            "Payment method deactivated successfully",
+            "Payment method deactivated",
             extra={"payment_method_id": str(payment_method.id)},
         )
 
     @staticmethod
-    def get_active_payment_methods_for_user(
+    def get_active_payment_methods_for_household(
         db: Session,
-        user_id: str,
+        household_id: str,
     ) -> list[models.PaymentMethod]:
-        """Get all active payment methods for a user."""
+        """Get all active payment methods for a household."""
         return (
             db.query(models.PaymentMethod)
             .filter(
                 and_(
-                    models.PaymentMethod.user_id == user_id,
+                    models.PaymentMethod.household_id == household_id,
                     models.PaymentMethod.active,
                 )
             )
@@ -226,5 +229,4 @@ class PaymentMethodService:
         )
 
 
-# Create service instance
 payment_method_service = PaymentMethodService()

@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.auth.models import User
 from app.auth.utils import get_password_hash
+from app.households.models import Household, UserHouseholdMembership
 from app.payment_methods.constants import (
     CurrencyCode as PMCurrencyCode,
     PaymentMethodType,
@@ -21,39 +22,63 @@ from app.recurrent_expenses.models import RecurrentExpense
 
 
 @pytest.fixture
-def test_user(db: Session) -> User:
+def test_household(db: Session) -> Household:
+    household = Household(name=f"Test Household {uuid.uuid4().hex[:8]}")
+    db.add(household)
+    db.commit()
+    db.refresh(household)
+    return household
+
+
+@pytest.fixture
+def other_household(db: Session) -> Household:
+    household = Household(name=f"Other Household {uuid.uuid4().hex[:8]}")
+    db.add(household)
+    db.commit()
+    db.refresh(household)
+    return household
+
+
+@pytest.fixture
+def test_user(db: Session, test_household: Household) -> User:
     user = User(
         username=f"test_{uuid.uuid4().hex[:8]}",
         password_hash=get_password_hash("testpassword123"),
         first_name="Test",
         last_name="User",
         preferred_currency="USD",
+        active_household_id=test_household.id,
     )
     db.add(user)
+    db.flush()
+    db.add(UserHouseholdMembership(user_id=user.id, household_id=test_household.id))
     db.commit()
     db.refresh(user)
     return user
 
 
 @pytest.fixture
-def other_user(db: Session) -> User:
+def other_user(db: Session, other_household: Household) -> User:
     user = User(
         username=f"other_{uuid.uuid4().hex[:8]}",
         password_hash=get_password_hash("testpassword123"),
         first_name="Other",
         last_name="User",
         preferred_currency="USD",
+        active_household_id=other_household.id,
     )
     db.add(user)
+    db.flush()
+    db.add(UserHouseholdMembership(user_id=user.id, household_id=other_household.id))
     db.commit()
     db.refresh(user)
     return user
 
 
 @pytest.fixture
-def test_payment_method(db: Session, test_user: User) -> PaymentMethod:
+def test_payment_method(db: Session, test_household: Household) -> PaymentMethod:
     pm = PaymentMethod(
-        user_id=test_user.id,
+        household_id=test_household.id,
         name="Chase Debit",
         method_type=PaymentMethodType.DEBIT,
         default_currency=PMCurrencyCode.USD,
@@ -65,9 +90,9 @@ def test_payment_method(db: Session, test_user: User) -> PaymentMethod:
 
 
 @pytest.fixture
-def other_payment_method(db: Session, other_user: User) -> PaymentMethod:
+def other_payment_method(db: Session, other_household: Household) -> PaymentMethod:
     pm = PaymentMethod(
-        user_id=other_user.id,
+        household_id=other_household.id,
         name="Other Card",
         method_type=PaymentMethodType.CREDIT,
         default_currency=PMCurrencyCode.USD,
@@ -81,11 +106,11 @@ def other_payment_method(db: Session, other_user: User) -> PaymentMethod:
 @pytest.fixture
 def test_template(
     db: Session,
-    test_user: User,
+    test_household: Household,
     test_payment_method: PaymentMethod,
 ) -> RecurrentExpense:
     recurrent_expense = RecurrentExpense(
-        user_id=test_user.id,
+        household_id=test_household.id,
         payment_method_id=test_payment_method.id,
         description="Groceries",
         currency=CurrencyCode.USD,

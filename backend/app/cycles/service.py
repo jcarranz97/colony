@@ -99,14 +99,14 @@ def _recalculate_remaining_balance(
 
 
 def _verify_payment_method(
-    db: Session, payment_method_id: UUID, user_id: str
+    db: Session, payment_method_id: UUID, household_id: str
 ) -> pm_models.PaymentMethod:
-    """Verify a payment method exists and belongs to the user.
+    """Verify a payment method exists and belongs to the household.
 
     Args:
         db: Active database session.
         payment_method_id: UUID of the payment method to verify.
-        user_id: The authenticated user's ID.
+        household_id: The active household's ID.
 
     Returns:
         The active PaymentMethod instance.
@@ -119,7 +119,7 @@ def _verify_payment_method(
         .filter(
             and_(
                 pm_models.PaymentMethod.id == payment_method_id,
-                pm_models.PaymentMethod.user_id == user_id,
+                pm_models.PaymentMethod.household_id == household_id,
                 pm_models.PaymentMethod.active.is_(True),
             )
         )
@@ -141,16 +141,16 @@ class CycleService:
     @staticmethod
     def get_cycles(
         db: Session,
-        user_id: str,
+        household_id: str,
         status: str | None = None,
         page: int = 1,
         per_page: int = 20,
     ) -> tuple[list[models.Cycle], int]:
-        """Return a paginated list of cycles for *user_id*.
+        """Return a paginated list of cycles for *household_id*.
 
         Args:
             db: Active database session.
-            user_id: The authenticated user's ID.
+            household_id: The active household's ID.
             status: Optional filter by cycle status.
             page: 1-based page number.
             per_page: Maximum items per page.
@@ -162,7 +162,7 @@ class CycleService:
             db.query(models.Cycle)
             .filter(
                 and_(
-                    models.Cycle.user_id == user_id,
+                    models.Cycle.household_id == household_id,
                     models.Cycle.active.is_(True),
                 )
             )
@@ -186,24 +186,24 @@ class CycleService:
 
     @staticmethod
     def get_cycle_by_id(
-        db: Session, cycle_id: str, user_id: str
+        db: Session, cycle_id: str, household_id: str
     ) -> models.Cycle | None:
-        """Return a single active cycle owned by *user_id*.
+        """Return a single active cycle belonging to *household_id*.
 
         Args:
             db: Active database session.
             cycle_id: UUID string of the cycle to fetch.
-            user_id: The authenticated user's ID.
+            household_id: The active household's ID.
 
         Returns:
-            The Cycle instance, or None if not found / not owned.
+            The Cycle instance, or None if not found / not in household.
         """
         return (
             db.query(models.Cycle)
             .filter(
                 and_(
                     models.Cycle.id == cycle_id,
-                    models.Cycle.user_id == user_id,
+                    models.Cycle.household_id == household_id,
                     models.Cycle.active.is_(True),
                 )
             )
@@ -218,18 +218,18 @@ class CycleService:
     def create_cycle(
         db: Session,
         data: schemas.CycleCreate,
-        user_id: str,
+        household_id: str,
     ) -> models.Cycle:
         """Create a new cycle and optionally generate expenses from templates.
 
         When ``data.generate_from_templates`` is True all active expense
-        templates for the user are inspected and occurrences that fall within
-        the new cycle's date range are created as CycleExpense records.
+        templates for the household are inspected and occurrences that fall
+        within the new cycle's date range are created as CycleExpense records.
 
         Args:
             db: Active database session.
             data: Validated cycle creation schema.
-            user_id: The authenticated user's ID.
+            household_id: The active household's ID.
 
         Returns:
             The newly created Cycle instance with expenses loaded.
@@ -240,11 +240,11 @@ class CycleService:
         """
         logger.info(
             "Creating cycle",
-            extra={"user_id": user_id, "name": data.name},
+            extra={"household_id": household_id, "name": data.name},
         )
 
         cycle = models.Cycle(
-            user_id=user_id,
+            household_id=household_id,
             name=data.name,
             start_date=data.start_date,
             end_date=data.end_date,
@@ -259,13 +259,13 @@ class CycleService:
             db.rollback()
             logger.warning(
                 "Cycle name conflict",
-                extra={"user_id": user_id, "name": data.name},
+                extra={"household_id": household_id, "name": data.name},
             )
             raise CycleNameExistsExceptionError(data.name) from exc
 
         if data.generate_from_templates:
-            CycleService._generate_expenses_from_templates(db, cycle, user_id)
-            CycleService._generate_incomes_from_templates(db, cycle, user_id)
+            CycleService._generate_expenses_from_templates(db, cycle, household_id)
+            CycleService._generate_incomes_from_templates(db, cycle, household_id)
 
         _recalculate_remaining_balance(db, cycle)
         db.commit()
@@ -279,7 +279,7 @@ class CycleService:
 
         logger.info(
             "Cycle created",
-            extra={"user_id": user_id, "cycle_id": str(cycle.id)},
+            extra={"household_id": household_id, "cycle_id": str(cycle.id)},
         )
         return cycle
 
@@ -287,9 +287,9 @@ class CycleService:
     def _generate_expenses_from_templates(
         db: Session,
         cycle: models.Cycle,
-        user_id: str,
+        household_id: str,
     ) -> None:
-        """Generate CycleExpense rows from the user's active templates.
+        """Generate CycleExpense rows from the household's active templates.
 
         For each active template, calculates all recurrence dates within the
         cycle period and inserts a CycleExpense for each occurrence.
@@ -297,7 +297,7 @@ class CycleService:
         Args:
             db: Active database session.
             cycle: The Cycle instance to attach expenses to.
-            user_id: The authenticated user's ID.
+            household_id: The active household's ID.
 
         Raises:
             CycleGenerationExceptionError: If an exchange rate is unavailable.
@@ -306,7 +306,8 @@ class CycleService:
             db.query(recurrent_expense_models.RecurrentExpense)
             .filter(
                 and_(
-                    recurrent_expense_models.RecurrentExpense.user_id == user_id,
+                    recurrent_expense_models.RecurrentExpense.household_id
+                    == household_id,
                     recurrent_expense_models.RecurrentExpense.active.is_(True),
                 )
             )
@@ -361,9 +362,9 @@ class CycleService:
     def _generate_incomes_from_templates(
         db: Session,
         cycle: models.Cycle,
-        user_id: str,
+        household_id: str,
     ) -> None:
-        """Generate CycleIncome rows from the user's active income templates.
+        """Generate CycleIncome rows from the household's active income templates.
 
         For each active template, calculates all recurrence dates within the
         cycle period and inserts a CycleIncome for each occurrence.
@@ -371,7 +372,7 @@ class CycleService:
         Args:
             db: Active database session.
             cycle: The Cycle instance to attach incomes to.
-            user_id: The authenticated user's ID.
+            household_id: The active household's ID.
 
         Raises:
             CycleGenerationExceptionError: If an exchange rate is unavailable.
@@ -380,7 +381,8 @@ class CycleService:
             db.query(recurrent_income_models.RecurrentIncome)
             .filter(
                 and_(
-                    recurrent_income_models.RecurrentIncome.user_id == user_id,
+                    recurrent_income_models.RecurrentIncome.household_id
+                    == household_id,
                     recurrent_income_models.RecurrentIncome.active.is_(True),
                 )
             )
@@ -699,7 +701,7 @@ class CycleExpenseService:
         db: Session,
         cycle: models.Cycle,
         data: schemas.CycleExpenseCreate,
-        user_id: str,
+        household_id: str,
     ) -> models.CycleExpense:
         """Add a manual expense to *cycle*.
 
@@ -707,7 +709,7 @@ class CycleExpenseService:
             db: Active database session.
             cycle: The parent Cycle ORM instance.
             data: Validated expense creation schema.
-            user_id: The authenticated user's ID.
+            household_id: The active household's ID.
 
         Returns:
             The newly created CycleExpense instance.
@@ -721,7 +723,7 @@ class CycleExpenseService:
             extra={"cycle_id": str(cycle.id), "description": data.description},
         )
 
-        _verify_payment_method(db, data.payment_method_id, user_id)
+        _verify_payment_method(db, data.payment_method_id, household_id)
 
         rate = _get_usd_rate(db, data.currency.value)
         amount_usd = (data.amount * rate).quantize(Decimal("0.01"))
@@ -1040,7 +1042,7 @@ class CycleIncomeService:
         db: Session,
         cycle: models.Cycle,
         data: schemas.CycleIncomeCreate,
-        user_id: str,
+        household_id: str,
     ) -> models.CycleIncome:
         """Add a manual income to *cycle*.
 
@@ -1048,7 +1050,7 @@ class CycleIncomeService:
             db: Active database session.
             cycle: The parent Cycle ORM instance.
             data: Validated income creation schema.
-            user_id: The authenticated user's ID.
+            household_id: The active household's ID.
 
         Returns:
             The newly created CycleIncome instance.
@@ -1064,7 +1066,7 @@ class CycleIncomeService:
         )
 
         if data.payment_method_id is not None:
-            _verify_payment_method(db, data.payment_method_id, user_id)
+            _verify_payment_method(db, data.payment_method_id, household_id)
 
         rate = _get_usd_rate(db, data.currency.value)
         amount_usd = (data.amount * rate).quantize(Decimal("0.01"))
@@ -1099,7 +1101,7 @@ class CycleIncomeService:
         cycle: models.Cycle,
         income: models.CycleIncome,
         data: schemas.CycleIncomeUpdate,
-        user_id: str,
+        household_id: str,
     ) -> models.CycleIncome:
         """Apply a partial update to *income*.
 
@@ -1108,7 +1110,7 @@ class CycleIncomeService:
             cycle: Parent Cycle ORM instance (used for balance recalculation).
             income: The CycleIncome ORM instance to update.
             data: Validated partial update schema.
-            user_id: The authenticated user's ID.
+            household_id: The active household's ID.
 
         Returns:
             The updated CycleIncome instance.
@@ -1118,7 +1120,7 @@ class CycleIncomeService:
         update_data = data.model_dump(exclude_unset=True)
 
         if update_data.get("payment_method_id"):
-            _verify_payment_method(db, update_data["payment_method_id"], user_id)
+            _verify_payment_method(db, update_data["payment_method_id"], household_id)
 
         for field, value in update_data.items():
             setattr(income, field, value)

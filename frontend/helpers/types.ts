@@ -23,8 +23,40 @@ export interface UserResponse {
   locale: string;
   role: UserRole;
   active: boolean;
+  active_household_id: string | null;
   created_at: string;
   updated_at: string;
+}
+
+// Households
+export interface HouseholdResponse {
+  id: string;
+  name: string;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface HouseholdMemberResponse {
+  id: string;
+  username: string;
+  first_name: string | null;
+  last_name: string | null;
+  role: UserRole;
+  active: boolean;
+}
+
+export interface CreateHouseholdRequest {
+  name: string;
+}
+
+export interface UpdateHouseholdRequest {
+  name?: string;
+  active?: boolean;
+}
+
+export interface AddMemberRequest {
+  user_id: string;
 }
 
 export interface AdminCreateUserRequest {
