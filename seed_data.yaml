@@ -14,13 +14,17 @@
 #
 # You can modify this file before running docker-compose for the first time
 # to use your own credentials and payment methods.
-
+#
 # Exchange rates are seeded before users so MXN template generation works.
+
 exchange_rates:
   - from_currency: MXN
     to_currency: USD
     rate: "0.050000"
     rate_date: "2026-01-01"
+
+households:
+  - name: Default Household
 
 users:
   - username: devuser
@@ -29,6 +33,7 @@ users:
     last_name: Doe
     preferred_currency: USD
     locale: en-US
+    household: Default Household
 
     payment_methods:
       - name: US Bank Debit

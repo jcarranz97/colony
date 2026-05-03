@@ -1,4 +1,6 @@
-from sqlalchemy import String
+import uuid
+
+from sqlalchemy import ForeignKey, String
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -23,18 +25,20 @@ class User(BaseModel):
     role: Mapped[str] = mapped_column(
         ENUM("admin", "user", name="user_role"), nullable=False, default="user"
     )
+    active_household_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("households.id", ondelete="SET NULL"),
+        nullable=True,
+    )
 
-    # Relationships
-    payment_methods = relationship(
-        "PaymentMethod", back_populates="user", cascade="all, delete-orphan"
+    # Which household the user is currently operating in
+    active_household = relationship(
+        "Household",
+        foreign_keys=[active_household_id],
     )
-    recurrent_expenses = relationship(
-        "RecurrentExpense", back_populates="user", cascade="all, delete-orphan"
+    # All household memberships (many-to-many join records)
+    household_memberships = relationship(
+        "UserHouseholdMembership", back_populates="user"
     )
-    recurrent_incomes = relationship(
-        "RecurrentIncome", back_populates="user", cascade="all, delete-orphan"
-    )
-    cycles = relationship("Cycle", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         """String representation of the User model."""

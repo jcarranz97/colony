@@ -65,17 +65,18 @@ class TestGetRecurrentExpenses:
         assert response.status_code == 200
         assert all(t["active"] for t in response.json())
 
-    def test_list_does_not_include_other_users_recurrent_expenses(
+    def test_list_does_not_include_other_households_recurrent_expenses(
         self,
         client,
         test_user,
         other_user,
+        other_household,
         test_template,
         other_payment_method,
         db,
     ):
         other_recurrent_expense = RecurrentExpense(
-            user_id=other_user.id,
+            household_id=other_household.id,
             payment_method_id=other_payment_method.id,
             description="Other Template",
             currency=CurrencyCode.USD,
@@ -160,7 +161,7 @@ class TestGetRecurrentExpenseById:
         assert response.status_code == 200
         assert response.json()["id"] == str(test_template.id)
 
-    def test_get_returns_404_for_other_users_recurrent_expense(
+    def test_get_returns_404_for_other_households_recurrent_expense(
         self, client, other_user, test_template
     ):
         headers = get_auth_headers(client, other_user)
@@ -192,7 +193,7 @@ class TestUpdateRecurrentExpense:
         assert response.status_code == 200
         assert response.json()["description"] == "Updated Groceries"
 
-    def test_update_returns_404_for_other_users_recurrent_expense(
+    def test_update_returns_404_for_other_households_recurrent_expense(
         self, client, other_user, test_template
     ):
         headers = get_auth_headers(client, other_user)
@@ -227,7 +228,7 @@ class TestDeleteRecurrentExpense:
         assert response.status_code == 200
         assert response.json()["active"] is False
 
-    def test_delete_returns_404_for_other_users_recurrent_expense(
+    def test_delete_returns_404_for_other_households_recurrent_expense(
         self, client, other_user, test_template
     ):
         headers = get_auth_headers(client, other_user)

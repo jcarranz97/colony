@@ -50,7 +50,7 @@ backend/
 │   ├── dependencies.py  # Re-exports: CurrentActiveUser, CurrentUser, get_db
 │   ├── models.py        # BaseModel (id UUID, created_at, updated_at, active bool)
 │   ├── schemas.py       # Global Pydantic schemas
-│   └── <domain>/        # auth | payment_methods | recurrent_expenses | cycles
+│   └── <domain>/        # auth | households | payment_methods | recurrent_expenses | cycles
 ├── alembic/             # DB migrations
 ├── tests/               # pytest suite (mirrors domain layout)
 └── pyproject.toml
@@ -58,8 +58,8 @@ backend/
 
 ### Domain Module Layout
 
-Every domain (`auth`, `payment_methods`, `recurrent_expenses`, `cycles`) has
-exactly this structure — follow it when adding a new domain:
+Every domain (`auth`, `households`, `payment_methods`, `recurrent_expenses`,
+`cycles`) has exactly this structure — follow it when adding a new domain:
 
 ```text
 app/<domain>/
@@ -100,6 +100,9 @@ async def create_foo(
 - Routers are thin — no business logic, only call service methods.
 - Always use `CurrentActiveUser` (not `CurrentUser`) unless the endpoint
   explicitly serves inactive users.
+- For data endpoints (payment methods, cycles, etc.) use `CurrentActiveHousehold`
+  (imported from `app.dependencies`) instead of extracting `user.id`.
+  All domain data is owned by a household, not a user.
 
 ### Service Pattern
 
@@ -168,7 +171,9 @@ Every ORM model inherits `BaseModel` from `app/models.py`:
 ```python
 class Foo(BaseModel):
     __tablename__ = "foos"
-    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    household_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("households.id", ondelete="CASCADE")
+    )
     name: Mapped[str] = mapped_column(String(100))
 ```
 
@@ -177,7 +182,8 @@ Key rules:
 - **UUID primary keys** — always, inherited from BaseModel.
 - **Soft deletes** — set `active = False`; never `db.delete()`.
 - **Timestamps** — `created_at` and `updated_at` are auto-managed by BaseModel.
-- **Cascade deletes** — user-owned data uses `ondelete="CASCADE"` on the FK.
+- **Cascade deletes** — household-owned data uses `ondelete="CASCADE"` on
+  the `household_id` FK.
 
 ### Model Changes Require Migrations
 
@@ -232,6 +238,9 @@ async def endpoint(current_user: CurrentActiveUser): ...
 
 - `CurrentActiveUser` — resolves JWT → raises 401/403 if invalid/inactive.
 - `CurrentUser` — resolves JWT → raises 401 if invalid (allows inactive).
+- `CurrentActiveHousehold` — resolves `current_user.active_household_id` →
+  `Household`; raises `UserHasNoActiveHouseholdExceptionError` if null.
+  Use this in all data endpoints instead of `current_user.id`.
 - Passwords hashed with Argon2ID via `pwdlib`.
 - JWT signed with `SECRET_KEY` from config; `ALGORITHM` is HS256 by default.
 - Auth uses **username + password** (no email). A default admin user is

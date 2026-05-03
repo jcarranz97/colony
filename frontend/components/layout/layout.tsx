@@ -4,6 +4,7 @@ import { deleteAuthCookie, getAuthToken } from "@/actions/auth.action";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth.api";
+import { getMyHouseholds } from "@/lib/households.api";
 import type { UserResponse } from "@/helpers/types";
 
 const BASE_NAV_ITEMS = [
@@ -14,7 +15,10 @@ const BASE_NAV_ITEMS = [
   { href: "/settings", label: "Settings", icon: "⚙️" },
 ];
 
-const ADMIN_NAV_ITEM = { href: "/users", label: "Users", icon: "👥" };
+const ADMIN_NAV_ITEMS = [
+  { href: "/users", label: "Users", icon: "👥" },
+  { href: "/households", label: "Households", icon: "🏠" },
+];
 
 const RING_COUNT = 16;
 
@@ -24,6 +28,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [currentUser, setCurrentUser] = useState<UserResponse | null>(null);
+  const [activeHouseholdName, setActiveHouseholdName] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     setMounted(true);
@@ -34,7 +41,15 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       const token = await getAuthToken();
       if (!token) return;
       const result = await getCurrentUser(token);
-      if (result.success) setCurrentUser(result.data);
+      if (!result.success) return;
+      setCurrentUser(result.data);
+      const activeId = result.data.active_household_id;
+      if (!activeId) return;
+      const hhResult = await getMyHouseholds(token);
+      if (hhResult.success) {
+        const active = hhResult.data.find((h) => h.id === activeId);
+        if (active) setActiveHouseholdName(active.name);
+      }
     };
     fetchUser();
   }, []);
@@ -50,7 +65,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   const navItems =
     currentUser?.role === "admin"
-      ? [...BASE_NAV_ITEMS, ADMIN_NAV_ITEM]
+      ? [...BASE_NAV_ITEMS, ...ADMIN_NAV_ITEMS]
       : BASE_NAV_ITEMS;
 
   return (
@@ -58,7 +73,24 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       {/* Cover bar */}
       <div className="nb-cover">
         <span className="nb-logo">Colony</span>
-        <span className="nb-subtitle">household budget tracker</span>
+        <span className="nb-subtitle">
+          household budget tracker
+          {activeHouseholdName && (
+            <span
+              style={{
+                marginLeft: 10,
+                paddingLeft: 10,
+                borderLeft: "1px solid rgba(201,168,76,0.5)",
+                color: "var(--cover-accent)",
+                fontFamily: "var(--font-title)",
+                fontWeight: 600,
+                fontSize: "1.05em",
+              }}
+            >
+              🏠 {activeHouseholdName}
+            </span>
+          )}
+        </span>
         {mounted && (
           <button
             className="nb-theme-toggle"

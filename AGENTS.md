@@ -29,6 +29,7 @@ colony/
 ├── backend/
 │   ├── app/
 │   │   ├── auth/              # Auth domain
+│   │   ├── households/        # Household + membership domain
 │   │   ├── payment_methods/   # Payment methods domain
 │   │   ├── recurrent_expenses/ # Recurrent expenses domain
 │   │   ├── cycles/            # Cycles + expenses domain
@@ -78,7 +79,7 @@ app/<domain>/
 └── utils.py         # Helper functions
 ```
 
-Currently implemented domains: `auth`, `payment_methods`,
+Currently implemented domains: `auth`, `households`, `payment_methods`,
 `recurrent_expenses`, `cycles`.
 
 ---
@@ -232,6 +233,13 @@ layout shell — the notebook uses plain HTML + custom CSS.
   injects `Authorization: Bearer` header, returns
   `{ success: true, data } | { success: false, error }`,
   intercepts 401 → redirects to `/login`
+- **`"use server"` scope**: only `actions/auth.action.ts` uses this
+  directive (it needs server-only cookie APIs). `components/*/actions.ts`
+  files must NOT have `"use server"` — they run client-side so that
+  `apiClient` can reach the backend at `localhost:8000` from the browser.
+  Adding `"use server"` to a component actions file causes "Network error"
+  because the fetch runs inside the Next.js container, which cannot reach
+  the backend container via `localhost`.
 - **State**: `useState` everywhere; no Redux/Zustand/SWR
 - **Forms**: simple controlled `<input>` / `<select>` with `nb-form-*` CSS
   classes; HeroUI form components (Formik/Yup) are **not** used inside the

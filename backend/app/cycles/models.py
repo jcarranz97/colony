@@ -63,13 +63,13 @@ class ExchangeRate(Base):
 
 
 class Cycle(BaseModel):
-    """Expense management cycle covering roughly 6 weeks aligned to pay periods."""
+    """Expense management cycle belonging to a household."""
 
     __tablename__ = "cycles"
 
-    user_id: Mapped[uuid.UUID] = mapped_column(
+    household_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
-        ForeignKey("users.id", ondelete="CASCADE"),
+        ForeignKey("households.id", ondelete="CASCADE"),
         nullable=False,
     )
     name: Mapped[str] = mapped_column(String(100), nullable=False)
@@ -85,7 +85,7 @@ class Cycle(BaseModel):
     )
 
     # Relationships
-    user = relationship("User", back_populates="cycles")
+    household = relationship("Household")
     expenses = relationship(
         "CycleExpense",
         back_populates="cycle",
@@ -99,16 +99,12 @@ class Cycle(BaseModel):
 
     __table_args__ = (
         CheckConstraint("end_date > start_date", name="valid_cycle_dates"),
-        UniqueConstraint("user_id", "name", name="unique_user_cycle_name"),
+        UniqueConstraint("household_id", "name", name="unique_household_cycle_name"),
     )
 
     @property
     def summary(self) -> dict:
-        """Compute a financial summary from the cycle's active non-cancelled expenses.
-
-        Returns:
-            Dict compatible with the CycleSummary Pydantic schema.
-        """
+        """Compute a financial summary from the cycle's active expenses."""
         active = [e for e in self.expenses if e.active]
         countable = [e for e in active if e.status != ExpenseStatus.CANCELLED]
         total = sum((e.amount_usd for e in countable), Decimal("0"))
@@ -213,13 +209,11 @@ class CycleIncome(BaseModel):
         ForeignKey("cycles.id", ondelete="CASCADE"),
         nullable=False,
     )
-    # Null when income is entered manually (not from a template)
     template_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("recurrent_incomes.id", ondelete="SET NULL"),
         nullable=True,
     )
-    # Optional — required for template-generated incomes, optional for manual
     payment_method_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("payment_methods.id"),

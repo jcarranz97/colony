@@ -69,6 +69,7 @@ class UserAdminUpdate(AppBaseModel):
     locale: str | None = None
     role: UserRole | None = None
     active: bool | None = None
+    active_household_id: uuid.UUID | None = None
 
 
 class UserUpdatePassword(AppBaseModel):
@@ -85,6 +86,7 @@ class UserResponse(UserBase):
 
     id: uuid.UUID
     active: bool
+    active_household_id: uuid.UUID | None = None
     created_at: datetime
     updated_at: datetime
 
