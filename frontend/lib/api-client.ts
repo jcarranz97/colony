@@ -65,11 +65,11 @@ export async function apiClient<T>(
 }
 
 export async function loginUser(
-  email: string,
+  username: string,
   password: string,
 ): Promise<ApiResponse<any>> {
   const payload = new URLSearchParams();
-  payload.append("username", email);
+  payload.append("username", username);
   payload.append("password", password);
 
   let response: Response;

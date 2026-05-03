@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { Formik } from "formik";
 import {
   Button,
@@ -28,11 +27,14 @@ export function Login() {
       </Card.Header>
       <Card.Content>
         <Formik
-          initialValues={{ email: "", password: "" }}
+          initialValues={{ username: "", password: "" }}
           validationSchema={LoginSchema}
           onSubmit={async (values, { setSubmitting }) => {
             setError(null);
-            const result = await loginWithForm(values.email, values.password);
+            const result = await loginWithForm(
+              values.username,
+              values.password,
+            );
             if (result.success) {
               await createAuthCookie((result.data as any).access_token);
               router.replace("/cycles");
@@ -52,14 +54,14 @@ export function Login() {
           }) => (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <TextField
-                isInvalid={!!errors.email && !!touched.email}
-                value={values.email}
-                onChange={(v) => setFieldValue("email", v)}
+                isInvalid={!!errors.username && !!touched.username}
+                value={values.username}
+                onChange={(v) => setFieldValue("username", v)}
               >
-                <Label>Email</Label>
-                <Input type="email" autoComplete="email" />
-                {touched.email && errors.email && (
-                  <FieldError>{errors.email}</FieldError>
+                <Label>Username</Label>
+                <Input type="text" autoComplete="username" />
+                {touched.username && errors.username && (
+                  <FieldError>{errors.username}</FieldError>
                 )}
               </TextField>
               <TextField
@@ -82,15 +84,6 @@ export function Login() {
               >
                 {isSubmitting ? <Spinner size="sm" /> : "Sign In"}
               </Button>
-              <p className="text-center text-sm text-gray-500">
-                Don&apos;t have an account?{" "}
-                <Link
-                  href="/register"
-                  className="text-blue-600 font-medium hover:underline"
-                >
-                  Register
-                </Link>
-              </p>
             </form>
           )}
         </Formik>

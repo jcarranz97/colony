@@ -1,4 +1,5 @@
 from typing import Annotated, Any
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
@@ -7,11 +8,12 @@ from sqlalchemy.orm import Session
 from app.dependencies import get_db
 
 from . import schemas, service
-from .dependencies import CurrentActiveUser
+from .dependencies import CurrentActiveUser, CurrentAdminUser
 from .exceptions import (
     IncorrectPasswordExceptionError,
     InvalidCredentialsExceptionError,
     UserAlreadyExistsExceptionError,
+    UserNotFoundExceptionError,
 )
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
@@ -26,9 +28,11 @@ DatabaseDep = Annotated[Session, Depends(get_db)]
     status_code=status.HTTP_201_CREATED,
 )
 async def register(
-    user_data: schemas.UserCreate, db: DatabaseDep
+    user_data: schemas.UserCreate,
+    db: DatabaseDep,
+    _admin: CurrentAdminUser,
 ) -> schemas.UserResponse:
-    """Register a new user."""
+    """Create a new user. Requires admin role."""
     try:
         user = service.auth_service.create_user(db, user_data)
         return schemas.UserResponse.from_orm(user)
@@ -43,10 +47,9 @@ async def login(
 ) -> schemas.Token:
     """Login user and return access token."""
     try:
-        # Note: OAuth2PasswordRequestForm uses 'username' field, but we use email
         user = service.auth_service.authenticate_user(
             db,
-            email=form_data.username,  # Email is passed as username
+            username=form_data.username,
             password=form_data.password,
         )
 
@@ -90,6 +93,59 @@ async def update_current_user_password(
         service.auth_service.update_password(db, current_user, password_update)
         return {"message": "Password updated successfully"}
     except IncorrectPasswordExceptionError as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message) from e
+
+
+# Admin user management endpoints
+@router.get("/users", response_model=list[schemas.UserResponse])
+async def list_users(
+    _admin: CurrentAdminUser,
+    db: DatabaseDep,
+) -> list[schemas.UserResponse]:
+    """List all users. Requires admin role."""
+    return service.auth_service.list_all_users(db)  # type: ignore[return-value]
+
+
+@router.get("/users/{user_id}", response_model=schemas.UserResponse)
+async def get_user(
+    user_id: UUID,
+    _admin: CurrentAdminUser,
+    db: DatabaseDep,
+) -> schemas.UserResponse:
+    """Get a user by ID. Requires admin role."""
+    try:
+        return service.auth_service.get_user_by_id_admin(db, user_id)  # type: ignore[return-value]
+    except UserNotFoundExceptionError as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message) from e
+
+
+@router.put("/users/{user_id}", response_model=schemas.UserResponse)
+async def update_user(
+    user_id: UUID,
+    user_update: schemas.UserAdminUpdate,
+    _admin: CurrentAdminUser,
+    db: DatabaseDep,
+) -> schemas.UserResponse:
+    """Update a user. Requires admin role."""
+    try:
+        user = service.auth_service.get_user_by_id_admin(db, user_id)
+        return service.auth_service.update_user_admin(db, user, user_update)  # type: ignore[return-value]
+    except UserNotFoundExceptionError as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message) from e
+
+
+@router.delete("/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def deactivate_user(
+    user_id: UUID,
+    _admin: CurrentAdminUser,
+    db: DatabaseDep,
+) -> None:
+    """Deactivate a user (soft delete). Requires admin role."""
+    try:
+        user = service.auth_service.get_user_by_id_admin(db, user_id)
+        user.active = False
+        db.commit()
+    except UserNotFoundExceptionError as e:
         raise HTTPException(status_code=e.status_code, detail=e.message) from e
 
 

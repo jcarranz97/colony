@@ -18,6 +18,18 @@ class AuthSettings(BaseSettings):
         env_prefix = "AUTH_"
 
 
+class AdminSettings(BaseSettings):
+    """Default admin user settings — used by the seeder on first deploy."""
+
+    USERNAME: str = "admin"
+    PASSWORD: str = "colony-admin"
+
+    class Config:
+        """Configuration for environment variable prefix."""
+
+        env_prefix = "DEFAULT_ADMIN_"
+
+
 class Settings(BaseSettings):
     """Application configuration settings."""
 
@@ -39,6 +51,9 @@ class Settings(BaseSettings):
 
     # Auth settings
     AUTH: AuthSettings = AuthSettings()
+
+    # Admin settings
+    ADMIN: AdminSettings = AdminSettings()
 
     class Config:
         """Configuration for environment file."""

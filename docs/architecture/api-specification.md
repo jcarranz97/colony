@@ -57,17 +57,18 @@ All errors follow a consistent format:
 ### 1. Authentication & Users
 
 #### POST /auth/register
-Register a new user account.
+Create a new user account. **Requires admin role.**
 
 **Request Body:**
 ```json
 {
-  "email": "user@example.com",
+  "username": "alice",
   "password": "securePassword123",
-  "first_name": "John",
-  "last_name": "Doe",
+  "first_name": "Alice",
+  "last_name": "Smith",
   "preferred_currency": "USD",
-  "locale": "en-US"
+  "locale": "en-US",
+  "role": "user"
 }
 ```
 
@@ -75,23 +76,27 @@ Register a new user account.
 ```json
 {
   "id": "123e4567-e89b-12d3-a456-426614174000",
-  "email": "user@example.com",
-  "first_name": "John",
-  "last_name": "Doe",
+  "username": "alice",
+  "first_name": "Alice",
+  "last_name": "Smith",
   "preferred_currency": "USD",
   "locale": "en-US",
+  "role": "user",
   "active": true,
   "created_at": "2025-01-01T00:00:00Z",
   "updated_at": "2025-01-01T00:00:00Z"
 }
 ```
 
+**Errors:** `401 Unauthorized`, `403 Forbidden` (non-admin),
+`409 Conflict` (username taken)
+
 #### POST /auth/login
 Authenticate user and get access token.
 
 **Request Body (Form Data):**
 ```
-username=user@example.com
+username=alice
 password=securePassword123
 ```
 
@@ -111,16 +116,52 @@ Get current user information.
 ```json
 {
   "id": "123e4567-e89b-12d3-a456-426614174000",
-  "email": "user@example.com",
-  "first_name": "John",
-  "last_name": "Doe",
+  "username": "alice",
+  "first_name": "Alice",
+  "last_name": "Smith",
   "preferred_currency": "USD",
   "locale": "en-US",
+  "role": "user",
   "active": true,
   "created_at": "2025-01-01T00:00:00Z",
   "updated_at": "2025-01-01T00:00:00Z"
 }
 ```
+
+#### GET /auth/users
+List all users. **Requires admin role.**
+
+**Response:** `200 OK` — array of user objects (same shape as `/auth/me`).
+
+#### GET /auth/users/{user_id}
+Get a specific user by ID. **Requires admin role.**
+
+**Response:** `200 OK` — user object.
+**Errors:** `404 Not Found`
+
+#### PUT /auth/users/{user_id}
+Update a user. **Requires admin role.**
+
+**Request Body (all fields optional):**
+```json
+{
+  "first_name": "Alice",
+  "last_name": "Smith",
+  "preferred_currency": "USD",
+  "locale": "en-US",
+  "role": "admin",
+  "active": true
+}
+```
+
+**Response:** `200 OK` — updated user object.
+**Errors:** `404 Not Found`
+
+#### DELETE /auth/users/{user_id}
+Deactivate a user (soft delete). **Requires admin role.**
+
+**Response:** `204 No Content`
+**Errors:** `404 Not Found`
 
 #### PUT /auth/me
 Update current user information.

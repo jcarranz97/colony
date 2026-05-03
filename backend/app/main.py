@@ -1,3 +1,6 @@
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -5,6 +8,7 @@ from app.auth.router import router as auth_router
 from app.config import settings
 from app.cycles.exchange_rates_router import router as exchange_rates_router
 from app.cycles.router import router as cycles_router
+from app.database import Base, engine
 from app.exceptions import (
     AppExceptionError,
     app_exception_handler,
@@ -17,6 +21,13 @@ from app.recurrent_expenses.router import router as recurrent_expenses_router
 from app.recurrent_incomes.router import router as recurrent_incomes_router
 
 
+@asynccontextmanager
+async def lifespan(_app: FastAPI) -> AsyncGenerator[None]:
+    """Create database tables on startup and clean up on shutdown."""
+    Base.metadata.create_all(bind=engine)
+    yield
+
+
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
     app = FastAPI(
@@ -25,6 +36,7 @@ def create_app() -> FastAPI:
         description="Personal expense management API",
         docs_url="/docs",
         redoc_url="/redoc",
+        lifespan=lifespan,
     )
 
     # Add exception handlers

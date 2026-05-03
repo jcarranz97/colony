@@ -1,5 +1,6 @@
 // Enums
 export type CurrencyCode = "USD" | "MXN";
+export type UserRole = "admin" | "user";
 export type PaymentMethodType = "debit" | "credit" | "cash" | "transfer";
 export type ExpenseCategory = "fixed" | "variable";
 export type RecurrenceType = "weekly" | "bi_weekly" | "monthly" | "custom";
@@ -15,14 +16,32 @@ export interface Token {
 
 export interface UserResponse {
   id: string;
-  email: string;
-  first_name: string;
-  last_name: string;
+  username: string;
+  first_name: string | null;
+  last_name: string | null;
   preferred_currency: CurrencyCode;
   locale: string;
+  role: UserRole;
   active: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface AdminCreateUserRequest {
+  username: string;
+  password: string;
+  first_name?: string | null;
+  last_name?: string | null;
+  preferred_currency?: CurrencyCode;
+  role?: UserRole;
+}
+
+export interface AdminUpdateUserRequest {
+  first_name?: string | null;
+  last_name?: string | null;
+  preferred_currency?: CurrencyCode;
+  role?: UserRole;
+  active?: boolean;
 }
 
 export interface UpdateUserRequest {

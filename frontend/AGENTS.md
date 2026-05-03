@@ -87,6 +87,8 @@ Apply as extra class on `.nb-expense-row`:
 - JWT stored in `httpOnly` cookie (`colony-token`) via `actions/auth.action.ts`
 - `middleware.ts` blocks unauthenticated access to `(app)` routes server-side
 - 401 from API → `apiClient` clears cookie and redirects to `/login`
+- Login and registration use **username + password** (no email field).
+- Default admin: `admin` / `colony-admin` (configurable via env vars on deploy).
 
 ## Naming Conventions: UI vs Backend
 

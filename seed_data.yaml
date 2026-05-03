@@ -4,8 +4,12 @@
 # project is started for the first time. It is safe to run multiple times
 # (idempotent: existing records are skipped).
 #
-# Default dev credentials:
-#   Email:    dev@colony.local
+# Default admin credentials (created automatically on every deploy):
+#   Username: admin  (override with DEFAULT_ADMIN_USERNAME env var)
+#   Password: colony-admin  (override with DEFAULT_ADMIN_PASSWORD env var)
+#
+# Default dev user (created only in full seed mode):
+#   Username: devuser
 #   Password: colony123
 #
 # You can modify this file before running docker-compose for the first time
@@ -19,7 +23,7 @@ exchange_rates:
     rate_date: "2026-01-01"
 
 users:
-  - email: dev@colony.local
+  - username: devuser
     password: colony123
     first_name: John
     last_name: Doe

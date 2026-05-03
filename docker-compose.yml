@@ -48,6 +48,8 @@ services:
       DATABASE_URL: postgresql://colony_user:colony_password@postgres:5432/colony_db
       SEED_FILE: /seed_data.yaml
       SEED_MODE: ${SEED_MODE:-full}
+      DEFAULT_ADMIN_USERNAME: ${DEFAULT_ADMIN_USERNAME:-admin}
+      DEFAULT_ADMIN_PASSWORD: ${DEFAULT_ADMIN_PASSWORD:-colony-admin}
       PYTHONPATH: /app
       UV_PROJECT_ENVIRONMENT: /tmp/.venv
     command: >-

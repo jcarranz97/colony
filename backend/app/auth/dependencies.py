@@ -20,11 +20,11 @@ oauth2_scheme = OAuth2PasswordBearer(
 
 async def get_current_user(
     token: Annotated[str, Depends(oauth2_scheme)],
-    db: Annotated[Session, Depends(get_db)],  # Use Annotated consistently
+    db: Annotated[Session, Depends(get_db)],
 ) -> models.User:
     """Get current authenticated user from JWT token."""
     try:
-        email = utils.extract_email_from_token(token)
+        username = utils.extract_username_from_token(token)
     except InvalidTokenExceptionError as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -32,7 +32,7 @@ async def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         ) from e
 
-    user = service.auth_service.get_user_by_email(db, email=email)
+    user = service.auth_service.get_user_by_username(db, username=username)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -54,6 +54,19 @@ async def get_current_active_user(
     return current_user
 
 
+async def get_current_admin_user(
+    current_user: Annotated[models.User, Depends(get_current_active_user)],
+) -> models.User:
+    """Get current user and assert they have the admin role."""
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required",
+        )
+    return current_user
+
+
 # Type aliases for dependency injection
 CurrentUser = Annotated[models.User, Depends(get_current_user)]
 CurrentActiveUser = Annotated[models.User, Depends(get_current_active_user)]
+CurrentAdminUser = Annotated[models.User, Depends(get_current_admin_user)]

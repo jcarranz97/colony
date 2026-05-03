@@ -1,3 +1,13 @@
+from enum import Enum
+
+
+class UserRole(str, Enum):
+    """User roles for authorization."""
+
+    ADMIN = "admin"
+    USER = "user"
+
+
 class ErrorCode:
     """Authentication error codes."""
 
@@ -9,6 +19,7 @@ class ErrorCode:
     TOKEN_EXPIRED = "TOKEN_EXPIRED"
     INCORRECT_PASSWORD = "INCORRECT_PASSWORD"
     PASSWORD_TOO_WEAK = "PASSWORD_TOO_WEAK"
+    INSUFFICIENT_PERMISSIONS = "INSUFFICIENT_PERMISSIONS"
 
 
 # JWT Constants

@@ -2,9 +2,11 @@ import uuid
 from datetime import datetime
 from enum import Enum
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 
 from app.schemas import AppBaseModel
+
+from .constants import UserRole
 
 
 class CurrencyCode(str, Enum):
@@ -26,18 +28,19 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     """JWT token payload data."""
 
-    email: str | None = None
+    username: str | None = None
 
 
 # User schemas
 class UserBase(AppBaseModel):
     """Base user model with common fields."""
 
-    email: EmailStr
+    username: str = Field(..., min_length=3, max_length=50)
     first_name: str | None = None
     last_name: str | None = None
     preferred_currency: CurrencyCode = CurrencyCode.USD
     locale: str = "en-US"
+    role: UserRole = UserRole.USER
 
 
 class UserCreate(UserBase):
@@ -49,12 +52,23 @@ class UserCreate(UserBase):
 
 
 class UserUpdate(AppBaseModel):
-    """User update schema for modifying user information."""
+    """User update schema for modifying own profile (no role change)."""
 
     first_name: str | None = None
     last_name: str | None = None
     preferred_currency: CurrencyCode | None = None
     locale: str | None = None
+
+
+class UserAdminUpdate(AppBaseModel):
+    """Admin-only update schema; allows changing role and active status."""
+
+    first_name: str | None = None
+    last_name: str | None = None
+    preferred_currency: CurrencyCode | None = None
+    locale: str | None = None
+    role: UserRole | None = None
+    active: bool | None = None
 
 
 class UserUpdatePassword(AppBaseModel):
