@@ -1,4 +1,3 @@
-"use server";
 import { getAuthToken } from "@/actions/auth.action";
 import {
   listUsers,
