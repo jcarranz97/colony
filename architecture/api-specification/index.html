@@ -986,15 +986,87 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#4-cycles" class="md-nav__link">
+  <a href="#4-recurrent-incomes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Cycles
+        4. Recurrent Incomes
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="4. Cycles">
+    <nav class="md-nav" aria-label="4. Recurrent Incomes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-recurrent-incomes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /recurrent-incomes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-recurrent-incomes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST /recurrent-incomes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-recurrent-incomesid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /recurrent-incomes/{id}
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#put-recurrent-incomesid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PUT /recurrent-incomes/{id}
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#delete-recurrent-incomesid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DELETE /recurrent-incomes/{id}
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-cycles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Cycles
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Cycles">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1108,6 +1180,50 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#get-cyclescycle_idincomes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /cycles/{cycle_id}/incomes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-cyclescycle_idincomes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST /cycles/{cycle_id}/incomes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#put-cyclescycle_idincomesincome_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PUT /cycles/{cycle_id}/incomes/{income_id}
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#delete-cyclescycle_idincomesincome_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DELETE /cycles/{cycle_id}/incomes/{income_id}
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#get-cyclescycle_idsummary" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1124,15 +1240,15 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#5-reports-analytics" class="md-nav__link">
+  <a href="#6-reports-analytics" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Reports &amp; Analytics
+        6. Reports &amp; Analytics
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="5. Reports &amp; Analytics">
+    <nav class="md-nav" aria-label="6. Reports &amp; Analytics">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1152,15 +1268,15 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#6-system-endpoints" class="md-nav__link">
+  <a href="#7-system-endpoints" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6. System Endpoints
+        7. System Endpoints
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="6. System Endpoints">
+    <nav class="md-nav" aria-label="7. System Endpoints">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1863,7 +1979,105 @@
 <h4 id="delete-recurrent-expensesid">DELETE /recurrent-expenses/{id}</h4>
 <p>Delete a recurrent expense.</p>
 <p><strong>Response:</strong> <code>204 No Content</code></p>
-<h3 id="4-cycles">4. Cycles</h3>
+<h3 id="4-recurrent-incomes">4. Recurrent Incomes</h3>
+<h4 id="get-recurrent-incomes">GET /recurrent-incomes</h4>
+<p>Get all recurrent income templates for the current user.</p>
+<p><strong>Query Parameters:</strong></p>
+<ul>
+<li><code>active</code> (boolean, optional): Filter by active status</li>
+<li><code>currency</code> (string, optional): Filter by currency</li>
+</ul>
+<p><strong>Response:</strong> <code>200 OK</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="p">[</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">  </span><span class="p">{</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;aaa11111-e89b-12d3-a456-426614174001&quot;</span><span class="p">,</span>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="w">    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Monthly Salary&quot;</span><span class="p">,</span>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="w">    </span><span class="nt">&quot;base_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3500.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="w">    </span><span class="nt">&quot;currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;USD&quot;</span><span class="p">,</span>
+<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="w">    </span><span class="nt">&quot;recurrence_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;monthly&quot;</span><span class="p">,</span>
+<a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a><span class="w">    </span><span class="nt">&quot;recurrence_config&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;day_of_month&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a><span class="w">    </span><span class="nt">&quot;reference_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15&quot;</span><span class="p">,</span>
+<a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a><span class="w">    </span><span class="nt">&quot;payment_method&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a><span class="w">      </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174001&quot;</span><span class="p">,</span>
+<a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a><span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Chase Debit&quot;</span><span class="p">,</span>
+<a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a><span class="w">      </span><span class="nt">&quot;method_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;debit&quot;</span>
+<a id="__codelineno-20-14" name="__codelineno-20-14" href="#__codelineno-20-14"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-20-15" name="__codelineno-20-15" href="#__codelineno-20-15"></a><span class="w">    </span><span class="nt">&quot;active&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-20-16" name="__codelineno-20-16" href="#__codelineno-20-16"></a><span class="w">    </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span><span class="p">,</span>
+<a id="__codelineno-20-17" name="__codelineno-20-17" href="#__codelineno-20-17"></a><span class="w">    </span><span class="nt">&quot;updated_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span>
+<a id="__codelineno-20-18" name="__codelineno-20-18" href="#__codelineno-20-18"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-20-19" name="__codelineno-20-19" href="#__codelineno-20-19"></a><span class="p">]</span>
+</code></pre></div>
+<h4 id="post-recurrent-incomes">POST /recurrent-incomes</h4>
+<p>Create a new recurrent income template.</p>
+<p><strong>Request Body:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="p">{</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">  </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Monthly Salary&quot;</span><span class="p">,</span>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">  </span><span class="nt">&quot;base_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3500.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="w">  </span><span class="nt">&quot;currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;USD&quot;</span><span class="p">,</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="w">  </span><span class="nt">&quot;recurrence_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;monthly&quot;</span><span class="p">,</span>
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="w">  </span><span class="nt">&quot;recurrence_config&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;day_of_month&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="w">  </span><span class="nt">&quot;reference_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15&quot;</span><span class="p">,</span>
+<a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a><span class="w">  </span><span class="nt">&quot;payment_method_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174001&quot;</span>
+<a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Response:</strong> <code>201 Created</code> — same shape as list item above.</p>
+<p><strong>Error Codes:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Status</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PAYMENT_METHOD_NOT_FOUND</code></td>
+<td>404</td>
+<td>Payment method not found or not owned</td>
+</tr>
+<tr>
+<td><code>INVALID_RECURRENCE_CONFIG</code></td>
+<td>422</td>
+<td>Config does not match recurrence type</td>
+</tr>
+</tbody>
+</table>
+<h4 id="get-recurrent-incomesid">GET /recurrent-incomes/{id}</h4>
+<p>Get a specific recurrent income template.</p>
+<p><strong>Response:</strong> <code>200 OK</code> — same shape as list item.</p>
+<p><strong>Error Codes:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Status</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RECURRENT_INCOME_NOT_FOUND</code></td>
+<td>404</td>
+<td>Income template not found</td>
+</tr>
+</tbody>
+</table>
+<h4 id="put-recurrent-incomesid">PUT /recurrent-incomes/{id}</h4>
+<p>Update a recurrent income template. All fields optional.</p>
+<p><strong>Request Body:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="p">{</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">  </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Updated Salary&quot;</span><span class="p">,</span>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">  </span><span class="nt">&quot;base_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3800.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="w">  </span><span class="nt">&quot;active&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Response:</strong> <code>200 OK</code> — updated template.</p>
+<h4 id="delete-recurrent-incomesid">DELETE /recurrent-incomes/{id}</h4>
+<p>Soft-delete (deactivate) a recurrent income template.</p>
+<p><strong>Response:</strong> <code>204 No Content</code></p>
+<h3 id="5-cycles">5. Cycles</h3>
 <h4 id="get-cycles">GET /cycles</h4>
 <p>Get all user's cycles with pagination.</p>
 <p><strong>Query Parameters:</strong>
@@ -1871,100 +2085,94 @@
 - <code>page</code> (integer, optional): Page number (default: 1)
 - <code>per_page</code> (integer, optional): Items per page (default: 20, max: 100)</p>
 <p><strong>Response:</strong> <code>200 OK</code>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="p">{</span>
-<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">  </span><span class="nt">&quot;cycles&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">    </span><span class="p">{</span>
-<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="w">      </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174004&quot;</span><span class="p">,</span>
-<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;January 2025 Cycle&quot;</span><span class="p">,</span>
-<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="w">      </span><span class="nt">&quot;start_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01&quot;</span><span class="p">,</span>
-<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="w">      </span><span class="nt">&quot;end_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-02-11&quot;</span><span class="p">,</span>
-<a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a><span class="w">      </span><span class="nt">&quot;income_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;5000.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a><span class="w">      </span><span class="nt">&quot;remaining_balance&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;500.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a><span class="w">      </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;active&quot;</span><span class="p">,</span>
-<a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a><span class="w">      </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a><span class="w">        </span><span class="nt">&quot;total_expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;4500.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a><span class="w">        </span><span class="nt">&quot;fixed_expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3000.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-20-14" name="__codelineno-20-14" href="#__codelineno-20-14"></a><span class="w">        </span><span class="nt">&quot;variable_expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1500.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-20-15" name="__codelineno-20-15" href="#__codelineno-20-15"></a><span class="w">        </span><span class="nt">&quot;expense_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">25</span><span class="p">,</span>
-<a id="__codelineno-20-16" name="__codelineno-20-16" href="#__codelineno-20-16"></a><span class="w">        </span><span class="nt">&quot;paid_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span>
-<a id="__codelineno-20-17" name="__codelineno-20-17" href="#__codelineno-20-17"></a><span class="w">        </span><span class="nt">&quot;pending_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span>
-<a id="__codelineno-20-18" name="__codelineno-20-18" href="#__codelineno-20-18"></a><span class="w">      </span><span class="p">},</span>
-<a id="__codelineno-20-19" name="__codelineno-20-19" href="#__codelineno-20-19"></a><span class="w">      </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span><span class="p">,</span>
-<a id="__codelineno-20-20" name="__codelineno-20-20" href="#__codelineno-20-20"></a><span class="w">      </span><span class="nt">&quot;updated_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span>
-<a id="__codelineno-20-21" name="__codelineno-20-21" href="#__codelineno-20-21"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-20-22" name="__codelineno-20-22" href="#__codelineno-20-22"></a><span class="w">  </span><span class="p">],</span>
-<a id="__codelineno-20-23" name="__codelineno-20-23" href="#__codelineno-20-23"></a><span class="w">  </span><span class="nt">&quot;pagination&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-20-24" name="__codelineno-20-24" href="#__codelineno-20-24"></a><span class="w">    </span><span class="nt">&quot;page&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
-<a id="__codelineno-20-25" name="__codelineno-20-25" href="#__codelineno-20-25"></a><span class="w">    </span><span class="nt">&quot;per_page&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span>
-<a id="__codelineno-20-26" name="__codelineno-20-26" href="#__codelineno-20-26"></a><span class="w">    </span><span class="nt">&quot;total&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
-<a id="__codelineno-20-27" name="__codelineno-20-27" href="#__codelineno-20-27"></a><span class="w">    </span><span class="nt">&quot;pages&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
-<a id="__codelineno-20-28" name="__codelineno-20-28" href="#__codelineno-20-28"></a><span class="w">  </span><span class="p">}</span>
-<a id="__codelineno-20-29" name="__codelineno-20-29" href="#__codelineno-20-29"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="p">{</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="w">  </span><span class="nt">&quot;cycles&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="w">      </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174004&quot;</span><span class="p">,</span>
+<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;January 2025 Cycle&quot;</span><span class="p">,</span>
+<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="w">      </span><span class="nt">&quot;start_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="w">      </span><span class="nt">&quot;end_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-02-11&quot;</span><span class="p">,</span>
+<a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a><span class="w">      </span><span class="nt">&quot;remaining_balance&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;500.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a><span class="w">      </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;active&quot;</span><span class="p">,</span>
+<a id="__codelineno-23-10" name="__codelineno-23-10" href="#__codelineno-23-10"></a><span class="w">      </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-23-11" name="__codelineno-23-11" href="#__codelineno-23-11"></a><span class="w">        </span><span class="nt">&quot;total_expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;4500.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-23-12" name="__codelineno-23-12" href="#__codelineno-23-12"></a><span class="w">        </span><span class="nt">&quot;fixed_expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3000.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-23-13" name="__codelineno-23-13" href="#__codelineno-23-13"></a><span class="w">        </span><span class="nt">&quot;variable_expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1500.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-23-14" name="__codelineno-23-14" href="#__codelineno-23-14"></a><span class="w">        </span><span class="nt">&quot;expense_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">25</span><span class="p">,</span>
+<a id="__codelineno-23-15" name="__codelineno-23-15" href="#__codelineno-23-15"></a><span class="w">        </span><span class="nt">&quot;paid_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span>
+<a id="__codelineno-23-16" name="__codelineno-23-16" href="#__codelineno-23-16"></a><span class="w">        </span><span class="nt">&quot;pending_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span>
+<a id="__codelineno-23-17" name="__codelineno-23-17" href="#__codelineno-23-17"></a><span class="w">      </span><span class="p">},</span>
+<a id="__codelineno-23-18" name="__codelineno-23-18" href="#__codelineno-23-18"></a><span class="w">      </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span><span class="p">,</span>
+<a id="__codelineno-23-19" name="__codelineno-23-19" href="#__codelineno-23-19"></a><span class="w">      </span><span class="nt">&quot;updated_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span>
+<a id="__codelineno-23-20" name="__codelineno-23-20" href="#__codelineno-23-20"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-23-21" name="__codelineno-23-21" href="#__codelineno-23-21"></a><span class="w">  </span><span class="p">],</span>
+<a id="__codelineno-23-22" name="__codelineno-23-22" href="#__codelineno-23-22"></a><span class="w">  </span><span class="nt">&quot;pagination&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-23-23" name="__codelineno-23-23" href="#__codelineno-23-23"></a><span class="w">    </span><span class="nt">&quot;page&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-23-24" name="__codelineno-23-24" href="#__codelineno-23-24"></a><span class="w">    </span><span class="nt">&quot;per_page&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span>
+<a id="__codelineno-23-25" name="__codelineno-23-25" href="#__codelineno-23-25"></a><span class="w">    </span><span class="nt">&quot;total&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-23-26" name="__codelineno-23-26" href="#__codelineno-23-26"></a><span class="w">    </span><span class="nt">&quot;pages&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+<a id="__codelineno-23-27" name="__codelineno-23-27" href="#__codelineno-23-27"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-23-28" name="__codelineno-23-28" href="#__codelineno-23-28"></a><span class="p">}</span>
 </code></pre></div></p>
 <h4 id="post-cycles">POST /cycles</h4>
 <p>Create a new cycle.</p>
 <p><strong>Request Body:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="p">{</span>
-<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;February 2025 Cycle&quot;</span><span class="p">,</span>
-<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">  </span><span class="nt">&quot;start_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-02-12&quot;</span><span class="p">,</span>
-<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="w">  </span><span class="nt">&quot;end_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-03-25&quot;</span><span class="p">,</span>
-<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="w">  </span><span class="nt">&quot;income_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;5200.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="w">  </span><span class="nt">&quot;remaining_balance&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="w">  </span><span class="nt">&quot;generate_from_templates&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
-<a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="p">{</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;February 2025 Cycle&quot;</span><span class="p">,</span>
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">  </span><span class="nt">&quot;start_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-02-12&quot;</span><span class="p">,</span>
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="w">  </span><span class="nt">&quot;end_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-03-25&quot;</span><span class="p">,</span>
+<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="w">  </span><span class="nt">&quot;generate_from_templates&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Response:</strong> <code>201 Created</code>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="p">{</span>
-<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174005&quot;</span><span class="p">,</span>
-<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;February 2025 Cycle&quot;</span><span class="p">,</span>
-<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="w">  </span><span class="nt">&quot;start_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-02-12&quot;</span><span class="p">,</span>
-<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="w">  </span><span class="nt">&quot;end_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-03-25&quot;</span><span class="p">,</span>
-<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a><span class="w">  </span><span class="nt">&quot;income_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;5200.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="w">  </span><span class="nt">&quot;remaining_balance&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;5200.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a><span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;draft&quot;</span><span class="p">,</span>
-<a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="w">  </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a><span class="w">    </span><span class="nt">&quot;total_expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a><span class="w">    </span><span class="nt">&quot;fixed_expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-22-12" name="__codelineno-22-12" href="#__codelineno-22-12"></a><span class="w">    </span><span class="nt">&quot;variable_expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-22-13" name="__codelineno-22-13" href="#__codelineno-22-13"></a><span class="w">    </span><span class="nt">&quot;expense_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<a id="__codelineno-22-14" name="__codelineno-22-14" href="#__codelineno-22-14"></a><span class="w">    </span><span class="nt">&quot;paid_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<a id="__codelineno-22-15" name="__codelineno-22-15" href="#__codelineno-22-15"></a><span class="w">    </span><span class="nt">&quot;pending_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
-<a id="__codelineno-22-16" name="__codelineno-22-16" href="#__codelineno-22-16"></a><span class="w">  </span><span class="p">},</span>
-<a id="__codelineno-22-17" name="__codelineno-22-17" href="#__codelineno-22-17"></a><span class="w">  </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span><span class="p">,</span>
-<a id="__codelineno-22-18" name="__codelineno-22-18" href="#__codelineno-22-18"></a><span class="w">  </span><span class="nt">&quot;updated_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span>
-<a id="__codelineno-22-19" name="__codelineno-22-19" href="#__codelineno-22-19"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="p">{</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174005&quot;</span><span class="p">,</span>
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;February 2025 Cycle&quot;</span><span class="p">,</span>
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="w">  </span><span class="nt">&quot;start_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-02-12&quot;</span><span class="p">,</span>
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="w">  </span><span class="nt">&quot;end_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-03-25&quot;</span><span class="p">,</span>
+<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="w">  </span><span class="nt">&quot;remaining_balance&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;draft&quot;</span><span class="p">,</span>
+<a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="w">  </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a><span class="w">    </span><span class="nt">&quot;total_expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a><span class="w">    </span><span class="nt">&quot;fixed_expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-25-11" name="__codelineno-25-11" href="#__codelineno-25-11"></a><span class="w">    </span><span class="nt">&quot;variable_expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-25-12" name="__codelineno-25-12" href="#__codelineno-25-12"></a><span class="w">    </span><span class="nt">&quot;expense_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-25-13" name="__codelineno-25-13" href="#__codelineno-25-13"></a><span class="w">    </span><span class="nt">&quot;paid_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-25-14" name="__codelineno-25-14" href="#__codelineno-25-14"></a><span class="w">    </span><span class="nt">&quot;pending_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
+<a id="__codelineno-25-15" name="__codelineno-25-15" href="#__codelineno-25-15"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-25-16" name="__codelineno-25-16" href="#__codelineno-25-16"></a><span class="w">  </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span><span class="p">,</span>
+<a id="__codelineno-25-17" name="__codelineno-25-17" href="#__codelineno-25-17"></a><span class="w">  </span><span class="nt">&quot;updated_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span>
+<a id="__codelineno-25-18" name="__codelineno-25-18" href="#__codelineno-25-18"></a><span class="p">}</span>
 </code></pre></div></p>
 <h4 id="get-cyclesid">GET /cycles/{id}</h4>
 <p>Get a specific cycle with detailed information.</p>
 <p><strong>Response:</strong> <code>200 OK</code>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="p">{</span>
-<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174004&quot;</span><span class="p">,</span>
-<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;January 2025 Cycle&quot;</span><span class="p">,</span>
-<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="w">  </span><span class="nt">&quot;start_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01&quot;</span><span class="p">,</span>
-<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="w">  </span><span class="nt">&quot;end_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-02-11&quot;</span><span class="p">,</span>
-<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="w">  </span><span class="nt">&quot;income_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;5000.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="w">  </span><span class="nt">&quot;remaining_balance&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;500.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a><span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;active&quot;</span><span class="p">,</span>
-<a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a><span class="w">  </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-23-10" name="__codelineno-23-10" href="#__codelineno-23-10"></a><span class="w">    </span><span class="nt">&quot;total_expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;4500.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-23-11" name="__codelineno-23-11" href="#__codelineno-23-11"></a><span class="w">    </span><span class="nt">&quot;fixed_expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3000.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-23-12" name="__codelineno-23-12" href="#__codelineno-23-12"></a><span class="w">    </span><span class="nt">&quot;variable_expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1500.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-23-13" name="__codelineno-23-13" href="#__codelineno-23-13"></a><span class="w">    </span><span class="nt">&quot;expense_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">25</span><span class="p">,</span>
-<a id="__codelineno-23-14" name="__codelineno-23-14" href="#__codelineno-23-14"></a><span class="w">    </span><span class="nt">&quot;paid_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span>
-<a id="__codelineno-23-15" name="__codelineno-23-15" href="#__codelineno-23-15"></a><span class="w">    </span><span class="nt">&quot;pending_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span>
-<a id="__codelineno-23-16" name="__codelineno-23-16" href="#__codelineno-23-16"></a><span class="w">  </span><span class="p">},</span>
-<a id="__codelineno-23-17" name="__codelineno-23-17" href="#__codelineno-23-17"></a><span class="w">  </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span><span class="p">,</span>
-<a id="__codelineno-23-18" name="__codelineno-23-18" href="#__codelineno-23-18"></a><span class="w">  </span><span class="nt">&quot;updated_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span>
-<a id="__codelineno-23-19" name="__codelineno-23-19" href="#__codelineno-23-19"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="p">{</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174004&quot;</span><span class="p">,</span>
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;January 2025 Cycle&quot;</span><span class="p">,</span>
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="w">  </span><span class="nt">&quot;start_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="w">  </span><span class="nt">&quot;end_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-02-11&quot;</span><span class="p">,</span>
+<a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="w">  </span><span class="nt">&quot;remaining_balance&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;500.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;active&quot;</span><span class="p">,</span>
+<a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a><span class="w">  </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="w">    </span><span class="nt">&quot;total_expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;4500.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a><span class="w">    </span><span class="nt">&quot;fixed_expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3000.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a><span class="w">    </span><span class="nt">&quot;variable_expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1500.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-26-12" name="__codelineno-26-12" href="#__codelineno-26-12"></a><span class="w">    </span><span class="nt">&quot;expense_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">25</span><span class="p">,</span>
+<a id="__codelineno-26-13" name="__codelineno-26-13" href="#__codelineno-26-13"></a><span class="w">    </span><span class="nt">&quot;paid_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span>
+<a id="__codelineno-26-14" name="__codelineno-26-14" href="#__codelineno-26-14"></a><span class="w">    </span><span class="nt">&quot;pending_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span>
+<a id="__codelineno-26-15" name="__codelineno-26-15" href="#__codelineno-26-15"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-26-16" name="__codelineno-26-16" href="#__codelineno-26-16"></a><span class="w">  </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span><span class="p">,</span>
+<a id="__codelineno-26-17" name="__codelineno-26-17" href="#__codelineno-26-17"></a><span class="w">  </span><span class="nt">&quot;updated_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span>
+<a id="__codelineno-26-18" name="__codelineno-26-18" href="#__codelineno-26-18"></a><span class="p">}</span>
 </code></pre></div></p>
 <h4 id="put-cyclesid">PUT /cycles/{id}</h4>
 <p>Update a cycle.</p>
 <p><strong>Request Body:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="p">{</span>
-<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;January 2025 Cycle Updated&quot;</span><span class="p">,</span>
-<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">  </span><span class="nt">&quot;income_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;5500.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;active&quot;</span>
-<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="p">{</span>
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;January 2025 Cycle Updated&quot;</span><span class="p">,</span>
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;active&quot;</span>
+<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Response:</strong> <code>200 OK</code></p>
 <h4 id="delete-cyclesid">DELETE /cycles/{id}</h4>
@@ -1978,213 +2186,317 @@
 - <code>currency</code> (string, optional): Filter by currency
 - <code>payment_method_id</code> (string, optional): Filter by payment method</p>
 <p><strong>Response:</strong> <code>200 OK</code>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="p">{</span>
-<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="w">  </span><span class="nt">&quot;expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="w">    </span><span class="p">{</span>
-<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="w">      </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174005&quot;</span><span class="p">,</span>
-<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="w">      </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Rent&quot;</span><span class="p">,</span>
-<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="w">      </span><span class="nt">&quot;currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;USD&quot;</span><span class="p">,</span>
-<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="w">      </span><span class="nt">&quot;amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1200.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="w">      </span><span class="nt">&quot;amount_usd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1200.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a><span class="w">      </span><span class="nt">&quot;due_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01&quot;</span><span class="p">,</span>
-<a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a><span class="w">      </span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span>
-<a id="__codelineno-25-11" name="__codelineno-25-11" href="#__codelineno-25-11"></a><span class="w">      </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;paid&quot;</span><span class="p">,</span>
-<a id="__codelineno-25-12" name="__codelineno-25-12" href="#__codelineno-25-12"></a><span class="w">      </span><span class="nt">&quot;paid&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<a id="__codelineno-25-13" name="__codelineno-25-13" href="#__codelineno-25-13"></a><span class="w">      </span><span class="nt">&quot;paid_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T08:00:00Z&quot;</span><span class="p">,</span>
-<a id="__codelineno-25-14" name="__codelineno-25-14" href="#__codelineno-25-14"></a><span class="w">      </span><span class="nt">&quot;comments&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Paid on time&quot;</span><span class="p">,</span>
-<a id="__codelineno-25-15" name="__codelineno-25-15" href="#__codelineno-25-15"></a><span class="w">    </span><span class="nt">&quot;autopay&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<a id="__codelineno-25-16" name="__codelineno-25-16" href="#__codelineno-25-16"></a><span class="w">    </span><span class="nt">&quot;template_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174003&quot;</span><span class="p">,</span>
-<a id="__codelineno-25-17" name="__codelineno-25-17" href="#__codelineno-25-17"></a><span class="w">      </span><span class="nt">&quot;payment_method&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-25-18" name="__codelineno-25-18" href="#__codelineno-25-18"></a><span class="w">        </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174001&quot;</span><span class="p">,</span>
-<a id="__codelineno-25-19" name="__codelineno-25-19" href="#__codelineno-25-19"></a><span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Chase Debit&quot;</span><span class="p">,</span>
-<a id="__codelineno-25-20" name="__codelineno-25-20" href="#__codelineno-25-20"></a><span class="w">        </span><span class="nt">&quot;method_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;debit&quot;</span>
-<a id="__codelineno-25-21" name="__codelineno-25-21" href="#__codelineno-25-21"></a><span class="w">      </span><span class="p">},</span>
-<a id="__codelineno-25-22" name="__codelineno-25-22" href="#__codelineno-25-22"></a><span class="w">      </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span><span class="p">,</span>
-<a id="__codelineno-25-23" name="__codelineno-25-23" href="#__codelineno-25-23"></a><span class="w">      </span><span class="nt">&quot;updated_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T08:00:00Z&quot;</span>
-<a id="__codelineno-25-24" name="__codelineno-25-24" href="#__codelineno-25-24"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-25-25" name="__codelineno-25-25" href="#__codelineno-25-25"></a><span class="w">  </span><span class="p">],</span>
-<a id="__codelineno-25-26" name="__codelineno-25-26" href="#__codelineno-25-26"></a><span class="w">  </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-25-27" name="__codelineno-25-27" href="#__codelineno-25-27"></a><span class="w">    </span><span class="nt">&quot;total_amount_usd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1200.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-25-28" name="__codelineno-25-28" href="#__codelineno-25-28"></a><span class="w">    </span><span class="nt">&quot;fixed_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1200.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-25-29" name="__codelineno-25-29" href="#__codelineno-25-29"></a><span class="w">    </span><span class="nt">&quot;variable_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-25-30" name="__codelineno-25-30" href="#__codelineno-25-30"></a><span class="w">    </span><span class="nt">&quot;paid_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1200.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-25-31" name="__codelineno-25-31" href="#__codelineno-25-31"></a><span class="w">    </span><span class="nt">&quot;pending_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-25-32" name="__codelineno-25-32" href="#__codelineno-25-32"></a><span class="w">    </span><span class="nt">&quot;total_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
-<a id="__codelineno-25-33" name="__codelineno-25-33" href="#__codelineno-25-33"></a><span class="w">  </span><span class="p">}</span>
-<a id="__codelineno-25-34" name="__codelineno-25-34" href="#__codelineno-25-34"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="p">{</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="w">  </span><span class="nt">&quot;expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="w">      </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174005&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="w">      </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Rent&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a><span class="w">      </span><span class="nt">&quot;currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;USD&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a><span class="w">      </span><span class="nt">&quot;amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1200.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a><span class="w">      </span><span class="nt">&quot;amount_usd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1200.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-9" name="__codelineno-28-9" href="#__codelineno-28-9"></a><span class="w">      </span><span class="nt">&quot;due_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-10" name="__codelineno-28-10" href="#__codelineno-28-10"></a><span class="w">      </span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-11" name="__codelineno-28-11" href="#__codelineno-28-11"></a><span class="w">      </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;paid&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-12" name="__codelineno-28-12" href="#__codelineno-28-12"></a><span class="w">      </span><span class="nt">&quot;paid&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-28-13" name="__codelineno-28-13" href="#__codelineno-28-13"></a><span class="w">      </span><span class="nt">&quot;paid_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T08:00:00Z&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-14" name="__codelineno-28-14" href="#__codelineno-28-14"></a><span class="w">      </span><span class="nt">&quot;comments&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Paid on time&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-15" name="__codelineno-28-15" href="#__codelineno-28-15"></a><span class="w">    </span><span class="nt">&quot;autopay&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-28-16" name="__codelineno-28-16" href="#__codelineno-28-16"></a><span class="w">    </span><span class="nt">&quot;template_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174003&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-17" name="__codelineno-28-17" href="#__codelineno-28-17"></a><span class="w">      </span><span class="nt">&quot;payment_method&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-28-18" name="__codelineno-28-18" href="#__codelineno-28-18"></a><span class="w">        </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174001&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-19" name="__codelineno-28-19" href="#__codelineno-28-19"></a><span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Chase Debit&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-20" name="__codelineno-28-20" href="#__codelineno-28-20"></a><span class="w">        </span><span class="nt">&quot;method_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;debit&quot;</span>
+<a id="__codelineno-28-21" name="__codelineno-28-21" href="#__codelineno-28-21"></a><span class="w">      </span><span class="p">},</span>
+<a id="__codelineno-28-22" name="__codelineno-28-22" href="#__codelineno-28-22"></a><span class="w">      </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-23" name="__codelineno-28-23" href="#__codelineno-28-23"></a><span class="w">      </span><span class="nt">&quot;updated_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T08:00:00Z&quot;</span>
+<a id="__codelineno-28-24" name="__codelineno-28-24" href="#__codelineno-28-24"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-28-25" name="__codelineno-28-25" href="#__codelineno-28-25"></a><span class="w">  </span><span class="p">],</span>
+<a id="__codelineno-28-26" name="__codelineno-28-26" href="#__codelineno-28-26"></a><span class="w">  </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-28-27" name="__codelineno-28-27" href="#__codelineno-28-27"></a><span class="w">    </span><span class="nt">&quot;total_amount_usd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1200.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-28" name="__codelineno-28-28" href="#__codelineno-28-28"></a><span class="w">    </span><span class="nt">&quot;fixed_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1200.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-29" name="__codelineno-28-29" href="#__codelineno-28-29"></a><span class="w">    </span><span class="nt">&quot;variable_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-30" name="__codelineno-28-30" href="#__codelineno-28-30"></a><span class="w">    </span><span class="nt">&quot;paid_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1200.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-31" name="__codelineno-28-31" href="#__codelineno-28-31"></a><span class="w">    </span><span class="nt">&quot;pending_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-32" name="__codelineno-28-32" href="#__codelineno-28-32"></a><span class="w">    </span><span class="nt">&quot;total_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+<a id="__codelineno-28-33" name="__codelineno-28-33" href="#__codelineno-28-33"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-28-34" name="__codelineno-28-34" href="#__codelineno-28-34"></a><span class="p">}</span>
 </code></pre></div></p>
 <h4 id="post-cyclescycle_idexpenses">POST /cycles/{cycle_id}/expenses</h4>
 <p>Add a manual expense to a cycle.</p>
 <p><strong>Request Body:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="p">{</span>
-<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="w">  </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Emergency car repair&quot;</span><span class="p">,</span>
-<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="w">  </span><span class="nt">&quot;currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;USD&quot;</span><span class="p">,</span>
-<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="w">  </span><span class="nt">&quot;payment_method_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174002&quot;</span><span class="p">,</span>
-<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="w">  </span><span class="nt">&quot;amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;350.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="w">  </span><span class="nt">&quot;due_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15&quot;</span><span class="p">,</span>
-<a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="w">  </span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;variable&quot;</span><span class="p">,</span>
-<a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a><span class="w">  </span><span class="nt">&quot;comments&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Unexpected expense&quot;</span>
-<a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="p">{</span>
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="w">  </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Emergency car repair&quot;</span><span class="p">,</span>
+<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="w">  </span><span class="nt">&quot;currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;USD&quot;</span><span class="p">,</span>
+<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="w">  </span><span class="nt">&quot;payment_method_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174002&quot;</span><span class="p">,</span>
+<a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a><span class="w">  </span><span class="nt">&quot;amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;350.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a><span class="w">  </span><span class="nt">&quot;due_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15&quot;</span><span class="p">,</span>
+<a id="__codelineno-29-7" name="__codelineno-29-7" href="#__codelineno-29-7"></a><span class="w">  </span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;variable&quot;</span><span class="p">,</span>
+<a id="__codelineno-29-8" name="__codelineno-29-8" href="#__codelineno-29-8"></a><span class="w">  </span><span class="nt">&quot;comments&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Unexpected expense&quot;</span>
+<a id="__codelineno-29-9" name="__codelineno-29-9" href="#__codelineno-29-9"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Response:</strong> <code>201 Created</code>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="p">{</span>
-<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174006&quot;</span><span class="p">,</span>
-<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="w">  </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Emergency car repair&quot;</span><span class="p">,</span>
-<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="w">  </span><span class="nt">&quot;currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;USD&quot;</span><span class="p">,</span>
-<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="w">  </span><span class="nt">&quot;amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;350.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="w">  </span><span class="nt">&quot;amount_usd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;350.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a><span class="w">  </span><span class="nt">&quot;due_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15&quot;</span><span class="p">,</span>
-<a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a><span class="w">  </span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;variable&quot;</span><span class="p">,</span>
-<a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a><span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pending&quot;</span><span class="p">,</span>
-<a id="__codelineno-27-10" name="__codelineno-27-10" href="#__codelineno-27-10"></a><span class="w">  </span><span class="nt">&quot;paid&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-<a id="__codelineno-27-11" name="__codelineno-27-11" href="#__codelineno-27-11"></a><span class="w">  </span><span class="nt">&quot;paid_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
-<a id="__codelineno-27-12" name="__codelineno-27-12" href="#__codelineno-27-12"></a><span class="w">  </span><span class="nt">&quot;autopay&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-<a id="__codelineno-27-13" name="__codelineno-27-13" href="#__codelineno-27-13"></a><span class="w">  </span><span class="nt">&quot;template_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
-<a id="__codelineno-27-14" name="__codelineno-27-14" href="#__codelineno-27-14"></a><span class="w">  </span><span class="nt">&quot;payment_method&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-27-15" name="__codelineno-27-15" href="#__codelineno-27-15"></a><span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174002&quot;</span><span class="p">,</span>
-<a id="__codelineno-27-16" name="__codelineno-27-16" href="#__codelineno-27-16"></a><span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Capital One Credit&quot;</span><span class="p">,</span>
-<a id="__codelineno-27-17" name="__codelineno-27-17" href="#__codelineno-27-17"></a><span class="w">    </span><span class="nt">&quot;method_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;credit&quot;</span>
-<a id="__codelineno-27-18" name="__codelineno-27-18" href="#__codelineno-27-18"></a><span class="w">  </span><span class="p">},</span>
-<a id="__codelineno-27-19" name="__codelineno-27-19" href="#__codelineno-27-19"></a><span class="w">  </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span><span class="p">,</span>
-<a id="__codelineno-27-20" name="__codelineno-27-20" href="#__codelineno-27-20"></a><span class="w">  </span><span class="nt">&quot;updated_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span>
-<a id="__codelineno-27-21" name="__codelineno-27-21" href="#__codelineno-27-21"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="p">{</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174006&quot;</span><span class="p">,</span>
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="w">  </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Emergency car repair&quot;</span><span class="p">,</span>
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="w">  </span><span class="nt">&quot;currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;USD&quot;</span><span class="p">,</span>
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="w">  </span><span class="nt">&quot;amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;350.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a><span class="w">  </span><span class="nt">&quot;amount_usd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;350.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a><span class="w">  </span><span class="nt">&quot;due_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15&quot;</span><span class="p">,</span>
+<a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a><span class="w">  </span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;variable&quot;</span><span class="p">,</span>
+<a id="__codelineno-30-9" name="__codelineno-30-9" href="#__codelineno-30-9"></a><span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pending&quot;</span><span class="p">,</span>
+<a id="__codelineno-30-10" name="__codelineno-30-10" href="#__codelineno-30-10"></a><span class="w">  </span><span class="nt">&quot;paid&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<a id="__codelineno-30-11" name="__codelineno-30-11" href="#__codelineno-30-11"></a><span class="w">  </span><span class="nt">&quot;paid_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<a id="__codelineno-30-12" name="__codelineno-30-12" href="#__codelineno-30-12"></a><span class="w">  </span><span class="nt">&quot;autopay&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<a id="__codelineno-30-13" name="__codelineno-30-13" href="#__codelineno-30-13"></a><span class="w">  </span><span class="nt">&quot;template_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<a id="__codelineno-30-14" name="__codelineno-30-14" href="#__codelineno-30-14"></a><span class="w">  </span><span class="nt">&quot;payment_method&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-30-15" name="__codelineno-30-15" href="#__codelineno-30-15"></a><span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174002&quot;</span><span class="p">,</span>
+<a id="__codelineno-30-16" name="__codelineno-30-16" href="#__codelineno-30-16"></a><span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Capital One Credit&quot;</span><span class="p">,</span>
+<a id="__codelineno-30-17" name="__codelineno-30-17" href="#__codelineno-30-17"></a><span class="w">    </span><span class="nt">&quot;method_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;credit&quot;</span>
+<a id="__codelineno-30-18" name="__codelineno-30-18" href="#__codelineno-30-18"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-30-19" name="__codelineno-30-19" href="#__codelineno-30-19"></a><span class="w">  </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span><span class="p">,</span>
+<a id="__codelineno-30-20" name="__codelineno-30-20" href="#__codelineno-30-20"></a><span class="w">  </span><span class="nt">&quot;updated_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span>
+<a id="__codelineno-30-21" name="__codelineno-30-21" href="#__codelineno-30-21"></a><span class="p">}</span>
 </code></pre></div></p>
 <h4 id="get-cyclescycle_idexpensesexpense_id">GET /cycles/{cycle_id}/expenses/{expense_id}</h4>
 <p>Get a specific expense.</p>
 <h4 id="put-cyclescycle_idexpensesexpense_id">PUT /cycles/{cycle_id}/expenses/{expense_id}</h4>
 <p>Update an expense.</p>
 <p><strong>Request Body:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="p">{</span>
-<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="w">  </span><span class="nt">&quot;amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;375.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="w">  </span><span class="nt">&quot;paid&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="w">  </span><span class="nt">&quot;paid_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15T14:30:00Z&quot;</span><span class="p">,</span>
-<a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="w">  </span><span class="nt">&quot;comments&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Updated amount and marked as paid&quot;</span>
-<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="p">{</span>
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="w">  </span><span class="nt">&quot;amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;375.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="w">  </span><span class="nt">&quot;paid&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="w">  </span><span class="nt">&quot;paid_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15T14:30:00Z&quot;</span><span class="p">,</span>
+<a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="w">  </span><span class="nt">&quot;comments&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Updated amount and marked as paid&quot;</span>
+<a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Response:</strong> <code>200 OK</code></p>
 <h4 id="delete-cyclescycle_idexpensesexpense_id">DELETE /cycles/{cycle_id}/expenses/{expense_id}</h4>
 <p>Delete an expense from a cycle.</p>
 <p><strong>Response:</strong> <code>204 No Content</code></p>
+<h4 id="get-cyclescycle_idincomes">GET /cycles/{cycle_id}/incomes</h4>
+<p>List all income entries for a cycle (auto-generated + manual).</p>
+<p><strong>Response:</strong> <code>200 OK</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="p">[</span>
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="w">  </span><span class="p">{</span>
+<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bbb22222-e89b-12d3-a456-426614174001&quot;</span><span class="p">,</span>
+<a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="w">    </span><span class="nt">&quot;cycle_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174004&quot;</span><span class="p">,</span>
+<a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a><span class="w">    </span><span class="nt">&quot;template_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;aaa11111-e89b-12d3-a456-426614174001&quot;</span><span class="p">,</span>
+<a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a><span class="w">    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Monthly Salary&quot;</span><span class="p">,</span>
+<a id="__codelineno-32-7" name="__codelineno-32-7" href="#__codelineno-32-7"></a><span class="w">    </span><span class="nt">&quot;amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3500.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-32-8" name="__codelineno-32-8" href="#__codelineno-32-8"></a><span class="w">    </span><span class="nt">&quot;amount_usd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3500.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-32-9" name="__codelineno-32-9" href="#__codelineno-32-9"></a><span class="w">    </span><span class="nt">&quot;currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;USD&quot;</span><span class="p">,</span>
+<a id="__codelineno-32-10" name="__codelineno-32-10" href="#__codelineno-32-10"></a><span class="w">    </span><span class="nt">&quot;income_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15&quot;</span><span class="p">,</span>
+<a id="__codelineno-32-11" name="__codelineno-32-11" href="#__codelineno-32-11"></a><span class="w">    </span><span class="nt">&quot;payment_method&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-32-12" name="__codelineno-32-12" href="#__codelineno-32-12"></a><span class="w">      </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174001&quot;</span><span class="p">,</span>
+<a id="__codelineno-32-13" name="__codelineno-32-13" href="#__codelineno-32-13"></a><span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Chase Debit&quot;</span><span class="p">,</span>
+<a id="__codelineno-32-14" name="__codelineno-32-14" href="#__codelineno-32-14"></a><span class="w">      </span><span class="nt">&quot;method_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;debit&quot;</span>
+<a id="__codelineno-32-15" name="__codelineno-32-15" href="#__codelineno-32-15"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-32-16" name="__codelineno-32-16" href="#__codelineno-32-16"></a><span class="w">    </span><span class="nt">&quot;comments&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<a id="__codelineno-32-17" name="__codelineno-32-17" href="#__codelineno-32-17"></a><span class="w">    </span><span class="nt">&quot;active&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-32-18" name="__codelineno-32-18" href="#__codelineno-32-18"></a><span class="w">    </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span><span class="p">,</span>
+<a id="__codelineno-32-19" name="__codelineno-32-19" href="#__codelineno-32-19"></a><span class="w">    </span><span class="nt">&quot;updated_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span>
+<a id="__codelineno-32-20" name="__codelineno-32-20" href="#__codelineno-32-20"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-32-21" name="__codelineno-32-21" href="#__codelineno-32-21"></a><span class="w">  </span><span class="p">{</span>
+<a id="__codelineno-32-22" name="__codelineno-32-22" href="#__codelineno-32-22"></a><span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bbb33333-e89b-12d3-a456-426614174002&quot;</span><span class="p">,</span>
+<a id="__codelineno-32-23" name="__codelineno-32-23" href="#__codelineno-32-23"></a><span class="w">    </span><span class="nt">&quot;cycle_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174004&quot;</span><span class="p">,</span>
+<a id="__codelineno-32-24" name="__codelineno-32-24" href="#__codelineno-32-24"></a><span class="w">    </span><span class="nt">&quot;template_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<a id="__codelineno-32-25" name="__codelineno-32-25" href="#__codelineno-32-25"></a><span class="w">    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Freelance bonus&quot;</span><span class="p">,</span>
+<a id="__codelineno-32-26" name="__codelineno-32-26" href="#__codelineno-32-26"></a><span class="w">    </span><span class="nt">&quot;amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;500.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-32-27" name="__codelineno-32-27" href="#__codelineno-32-27"></a><span class="w">    </span><span class="nt">&quot;amount_usd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;500.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-32-28" name="__codelineno-32-28" href="#__codelineno-32-28"></a><span class="w">    </span><span class="nt">&quot;currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;USD&quot;</span><span class="p">,</span>
+<a id="__codelineno-32-29" name="__codelineno-32-29" href="#__codelineno-32-29"></a><span class="w">    </span><span class="nt">&quot;income_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-20&quot;</span><span class="p">,</span>
+<a id="__codelineno-32-30" name="__codelineno-32-30" href="#__codelineno-32-30"></a><span class="w">    </span><span class="nt">&quot;payment_method&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<a id="__codelineno-32-31" name="__codelineno-32-31" href="#__codelineno-32-31"></a><span class="w">    </span><span class="nt">&quot;comments&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;One-time project&quot;</span><span class="p">,</span>
+<a id="__codelineno-32-32" name="__codelineno-32-32" href="#__codelineno-32-32"></a><span class="w">    </span><span class="nt">&quot;active&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-32-33" name="__codelineno-32-33" href="#__codelineno-32-33"></a><span class="w">    </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-20T00:00:00Z&quot;</span><span class="p">,</span>
+<a id="__codelineno-32-34" name="__codelineno-32-34" href="#__codelineno-32-34"></a><span class="w">    </span><span class="nt">&quot;updated_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-20T00:00:00Z&quot;</span>
+<a id="__codelineno-32-35" name="__codelineno-32-35" href="#__codelineno-32-35"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-32-36" name="__codelineno-32-36" href="#__codelineno-32-36"></a><span class="p">]</span>
+</code></pre></div>
+<h4 id="post-cyclescycle_idincomes">POST /cycles/{cycle_id}/incomes</h4>
+<p>Add a manual income entry to a cycle.</p>
+<p><strong>Request Body:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="p">{</span>
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="w">  </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Freelance bonus&quot;</span><span class="p">,</span>
+<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="w">  </span><span class="nt">&quot;amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;500.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="w">  </span><span class="nt">&quot;currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;USD&quot;</span><span class="p">,</span>
+<a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="w">  </span><span class="nt">&quot;income_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-20&quot;</span><span class="p">,</span>
+<a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a><span class="w">  </span><span class="nt">&quot;payment_method_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<a id="__codelineno-33-7" name="__codelineno-33-7" href="#__codelineno-33-7"></a><span class="w">  </span><span class="nt">&quot;comments&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;One-time project&quot;</span>
+<a id="__codelineno-33-8" name="__codelineno-33-8" href="#__codelineno-33-8"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Response:</strong> <code>201 Created</code> — same shape as list item above.</p>
+<p><strong>Error Codes:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Status</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CYCLE_NOT_FOUND</code></td>
+<td>404</td>
+<td>Cycle not found</td>
+</tr>
+<tr>
+<td><code>CYCLE_INCOME_NOT_FOUND</code></td>
+<td>404</td>
+<td>Income entry not found</td>
+</tr>
+</tbody>
+</table>
+<h4 id="put-cyclescycle_idincomesincome_id">PUT /cycles/{cycle_id}/incomes/{income_id}</h4>
+<p>Update a cycle income entry. All fields optional.</p>
+<p><strong>Response:</strong> <code>200 OK</code> — updated income entry.</p>
+<h4 id="delete-cyclescycle_idincomesincome_id">DELETE /cycles/{cycle_id}/incomes/{income_id}</h4>
+<p>Soft-delete an income entry from a cycle. Recalculates <code>remaining_balance</code>.</p>
+<p><strong>Response:</strong> <code>204 No Content</code></p>
 <h4 id="get-cyclescycle_idsummary">GET /cycles/{cycle_id}/summary</h4>
 <p>Get detailed cycle summary and analytics.</p>
-<p><strong>Response:</strong> <code>200 OK</code>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="p">{</span>
-<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="w">  </span><span class="nt">&quot;cycle&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174004&quot;</span><span class="p">,</span>
-<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;January 2025 Cycle&quot;</span><span class="p">,</span>
-<a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a><span class="w">    </span><span class="nt">&quot;start_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01&quot;</span><span class="p">,</span>
-<a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a><span class="w">    </span><span class="nt">&quot;end_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-02-11&quot;</span><span class="p">,</span>
-<a id="__codelineno-29-7" name="__codelineno-29-7" href="#__codelineno-29-7"></a><span class="w">    </span><span class="nt">&quot;income_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;5000.00&quot;</span>
-<a id="__codelineno-29-8" name="__codelineno-29-8" href="#__codelineno-29-8"></a><span class="w">  </span><span class="p">},</span>
-<a id="__codelineno-29-9" name="__codelineno-29-9" href="#__codelineno-29-9"></a><span class="w">  </span><span class="nt">&quot;financial&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-29-10" name="__codelineno-29-10" href="#__codelineno-29-10"></a><span class="w">    </span><span class="nt">&quot;total_expenses_usd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;4500.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-29-11" name="__codelineno-29-11" href="#__codelineno-29-11"></a><span class="w">    </span><span class="nt">&quot;fixed_expenses_usd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3000.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-29-12" name="__codelineno-29-12" href="#__codelineno-29-12"></a><span class="w">    </span><span class="nt">&quot;variable_expenses_usd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1500.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-29-13" name="__codelineno-29-13" href="#__codelineno-29-13"></a><span class="w">    </span><span class="nt">&quot;usa_expenses_usd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3800.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-29-14" name="__codelineno-29-14" href="#__codelineno-29-14"></a><span class="w">    </span><span class="nt">&quot;mexico_expenses_usd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;700.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-29-15" name="__codelineno-29-15" href="#__codelineno-29-15"></a><span class="w">    </span><span class="nt">&quot;net_balance&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;500.00&quot;</span>
-<a id="__codelineno-29-16" name="__codelineno-29-16" href="#__codelineno-29-16"></a><span class="w">  </span><span class="p">},</span>
-<a id="__codelineno-29-17" name="__codelineno-29-17" href="#__codelineno-29-17"></a><span class="w">  </span><span class="nt">&quot;by_payment_method&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<a id="__codelineno-29-18" name="__codelineno-29-18" href="#__codelineno-29-18"></a><span class="w">    </span><span class="p">{</span>
-<a id="__codelineno-29-19" name="__codelineno-29-19" href="#__codelineno-29-19"></a><span class="w">      </span><span class="nt">&quot;payment_method&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-29-20" name="__codelineno-29-20" href="#__codelineno-29-20"></a><span class="w">        </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174001&quot;</span><span class="p">,</span>
-<a id="__codelineno-29-21" name="__codelineno-29-21" href="#__codelineno-29-21"></a><span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Chase Debit&quot;</span>
-<a id="__codelineno-29-22" name="__codelineno-29-22" href="#__codelineno-29-22"></a><span class="w">      </span><span class="p">},</span>
-<a id="__codelineno-29-23" name="__codelineno-29-23" href="#__codelineno-29-23"></a><span class="w">      </span><span class="nt">&quot;total_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2500.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-29-24" name="__codelineno-29-24" href="#__codelineno-29-24"></a><span class="w">      </span><span class="nt">&quot;paid_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1500.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-29-25" name="__codelineno-29-25" href="#__codelineno-29-25"></a><span class="w">      </span><span class="nt">&quot;pending_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1000.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-29-26" name="__codelineno-29-26" href="#__codelineno-29-26"></a><span class="w">      </span><span class="nt">&quot;expense_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span>
-<a id="__codelineno-29-27" name="__codelineno-29-27" href="#__codelineno-29-27"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-29-28" name="__codelineno-29-28" href="#__codelineno-29-28"></a><span class="w">  </span><span class="p">],</span>
-<a id="__codelineno-29-29" name="__codelineno-29-29" href="#__codelineno-29-29"></a><span class="w">  </span><span class="nt">&quot;by_currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-29-30" name="__codelineno-29-30" href="#__codelineno-29-30"></a><span class="w">    </span><span class="nt">&quot;USD&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-29-31" name="__codelineno-29-31" href="#__codelineno-29-31"></a><span class="w">      </span><span class="nt">&quot;total_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3800.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-29-32" name="__codelineno-29-32" href="#__codelineno-29-32"></a><span class="w">      </span><span class="nt">&quot;expense_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span>
-<a id="__codelineno-29-33" name="__codelineno-29-33" href="#__codelineno-29-33"></a><span class="w">    </span><span class="p">},</span>
-<a id="__codelineno-29-34" name="__codelineno-29-34" href="#__codelineno-29-34"></a><span class="w">    </span><span class="nt">&quot;MXN&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-29-35" name="__codelineno-29-35" href="#__codelineno-29-35"></a><span class="w">      </span><span class="nt">&quot;total_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;14000.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-29-36" name="__codelineno-29-36" href="#__codelineno-29-36"></a><span class="w">      </span><span class="nt">&quot;total_amount_usd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;700.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-29-37" name="__codelineno-29-37" href="#__codelineno-29-37"></a><span class="w">      </span><span class="nt">&quot;expense_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span>
-<a id="__codelineno-29-38" name="__codelineno-29-38" href="#__codelineno-29-38"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-29-39" name="__codelineno-29-39" href="#__codelineno-29-39"></a><span class="w">  </span><span class="p">},</span>
-<a id="__codelineno-29-40" name="__codelineno-29-40" href="#__codelineno-29-40"></a><span class="w">  </span><span class="nt">&quot;status_breakdown&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-29-41" name="__codelineno-29-41" href="#__codelineno-29-41"></a><span class="w">    </span><span class="nt">&quot;pending&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span><span class="p">,</span>
-<a id="__codelineno-29-42" name="__codelineno-29-42" href="#__codelineno-29-42"></a><span class="w">    </span><span class="nt">&quot;paid&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span>
-<a id="__codelineno-29-43" name="__codelineno-29-43" href="#__codelineno-29-43"></a><span class="w">    </span><span class="nt">&quot;overdue&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
-<a id="__codelineno-29-44" name="__codelineno-29-44" href="#__codelineno-29-44"></a><span class="w">    </span><span class="nt">&quot;cancelled&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
-<a id="__codelineno-29-45" name="__codelineno-29-45" href="#__codelineno-29-45"></a><span class="w">  </span><span class="p">}</span>
-<a id="__codelineno-29-46" name="__codelineno-29-46" href="#__codelineno-29-46"></a><span class="p">}</span>
-</code></pre></div></p>
+<p><strong>Response:</strong> <code>200 OK</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="p">{</span>
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="w">  </span><span class="nt">&quot;cycle&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174004&quot;</span><span class="p">,</span>
+<a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;January 2025 Cycle&quot;</span><span class="p">,</span>
+<a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a><span class="w">    </span><span class="nt">&quot;start_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-34-6" name="__codelineno-34-6" href="#__codelineno-34-6"></a><span class="w">    </span><span class="nt">&quot;end_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-02-11&quot;</span>
+<a id="__codelineno-34-7" name="__codelineno-34-7" href="#__codelineno-34-7"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-34-8" name="__codelineno-34-8" href="#__codelineno-34-8"></a><span class="w">  </span><span class="nt">&quot;financial&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-34-9" name="__codelineno-34-9" href="#__codelineno-34-9"></a><span class="w">    </span><span class="nt">&quot;total_expenses_usd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;4500.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-34-10" name="__codelineno-34-10" href="#__codelineno-34-10"></a><span class="w">    </span><span class="nt">&quot;fixed_expenses_usd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3000.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-34-11" name="__codelineno-34-11" href="#__codelineno-34-11"></a><span class="w">    </span><span class="nt">&quot;variable_expenses_usd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1500.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-34-12" name="__codelineno-34-12" href="#__codelineno-34-12"></a><span class="w">    </span><span class="nt">&quot;usa_expenses_usd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3800.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-34-13" name="__codelineno-34-13" href="#__codelineno-34-13"></a><span class="w">    </span><span class="nt">&quot;mexico_expenses_usd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;700.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-34-14" name="__codelineno-34-14" href="#__codelineno-34-14"></a><span class="w">    </span><span class="nt">&quot;total_incomes_usd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;4000.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-34-15" name="__codelineno-34-15" href="#__codelineno-34-15"></a><span class="w">    </span><span class="nt">&quot;net_balance&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;4500.00&quot;</span>
+<a id="__codelineno-34-16" name="__codelineno-34-16" href="#__codelineno-34-16"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-34-17" name="__codelineno-34-17" href="#__codelineno-34-17"></a><span class="w">  </span><span class="nt">&quot;incomes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-34-18" name="__codelineno-34-18" href="#__codelineno-34-18"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-34-19" name="__codelineno-34-19" href="#__codelineno-34-19"></a><span class="w">      </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bbb22222-e89b-12d3-a456-426614174001&quot;</span><span class="p">,</span>
+<a id="__codelineno-34-20" name="__codelineno-34-20" href="#__codelineno-34-20"></a><span class="w">      </span><span class="nt">&quot;template_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;aaa11111-e89b-12d3-a456-426614174001&quot;</span><span class="p">,</span>
+<a id="__codelineno-34-21" name="__codelineno-34-21" href="#__codelineno-34-21"></a><span class="w">      </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Monthly Salary&quot;</span><span class="p">,</span>
+<a id="__codelineno-34-22" name="__codelineno-34-22" href="#__codelineno-34-22"></a><span class="w">      </span><span class="nt">&quot;amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3500.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-34-23" name="__codelineno-34-23" href="#__codelineno-34-23"></a><span class="w">      </span><span class="nt">&quot;amount_usd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3500.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-34-24" name="__codelineno-34-24" href="#__codelineno-34-24"></a><span class="w">      </span><span class="nt">&quot;currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;USD&quot;</span><span class="p">,</span>
+<a id="__codelineno-34-25" name="__codelineno-34-25" href="#__codelineno-34-25"></a><span class="w">      </span><span class="nt">&quot;income_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15&quot;</span><span class="p">,</span>
+<a id="__codelineno-34-26" name="__codelineno-34-26" href="#__codelineno-34-26"></a><span class="w">      </span><span class="nt">&quot;payment_method&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<a id="__codelineno-34-27" name="__codelineno-34-27" href="#__codelineno-34-27"></a><span class="w">      </span><span class="nt">&quot;comments&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<a id="__codelineno-34-28" name="__codelineno-34-28" href="#__codelineno-34-28"></a><span class="w">      </span><span class="nt">&quot;active&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-34-29" name="__codelineno-34-29" href="#__codelineno-34-29"></a><span class="w">      </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span><span class="p">,</span>
+<a id="__codelineno-34-30" name="__codelineno-34-30" href="#__codelineno-34-30"></a><span class="w">      </span><span class="nt">&quot;updated_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span>
+<a id="__codelineno-34-31" name="__codelineno-34-31" href="#__codelineno-34-31"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-34-32" name="__codelineno-34-32" href="#__codelineno-34-32"></a><span class="w">  </span><span class="p">],</span>
+<a id="__codelineno-34-33" name="__codelineno-34-33" href="#__codelineno-34-33"></a><span class="w">  </span><span class="nt">&quot;by_payment_method&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-34-34" name="__codelineno-34-34" href="#__codelineno-34-34"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-34-35" name="__codelineno-34-35" href="#__codelineno-34-35"></a><span class="w">      </span><span class="nt">&quot;payment_method&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-34-36" name="__codelineno-34-36" href="#__codelineno-34-36"></a><span class="w">        </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174001&quot;</span><span class="p">,</span>
+<a id="__codelineno-34-37" name="__codelineno-34-37" href="#__codelineno-34-37"></a><span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Chase Debit&quot;</span>
+<a id="__codelineno-34-38" name="__codelineno-34-38" href="#__codelineno-34-38"></a><span class="w">      </span><span class="p">},</span>
+<a id="__codelineno-34-39" name="__codelineno-34-39" href="#__codelineno-34-39"></a><span class="w">      </span><span class="nt">&quot;total_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2500.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-34-40" name="__codelineno-34-40" href="#__codelineno-34-40"></a><span class="w">      </span><span class="nt">&quot;paid_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1500.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-34-41" name="__codelineno-34-41" href="#__codelineno-34-41"></a><span class="w">      </span><span class="nt">&quot;pending_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1000.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-34-42" name="__codelineno-34-42" href="#__codelineno-34-42"></a><span class="w">      </span><span class="nt">&quot;expense_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span>
+<a id="__codelineno-34-43" name="__codelineno-34-43" href="#__codelineno-34-43"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-34-44" name="__codelineno-34-44" href="#__codelineno-34-44"></a><span class="w">  </span><span class="p">],</span>
+<a id="__codelineno-34-45" name="__codelineno-34-45" href="#__codelineno-34-45"></a><span class="w">  </span><span class="nt">&quot;by_currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-34-46" name="__codelineno-34-46" href="#__codelineno-34-46"></a><span class="w">    </span><span class="nt">&quot;USD&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-34-47" name="__codelineno-34-47" href="#__codelineno-34-47"></a><span class="w">      </span><span class="nt">&quot;total_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3800.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-34-48" name="__codelineno-34-48" href="#__codelineno-34-48"></a><span class="w">      </span><span class="nt">&quot;expense_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span>
+<a id="__codelineno-34-49" name="__codelineno-34-49" href="#__codelineno-34-49"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-34-50" name="__codelineno-34-50" href="#__codelineno-34-50"></a><span class="w">    </span><span class="nt">&quot;MXN&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-34-51" name="__codelineno-34-51" href="#__codelineno-34-51"></a><span class="w">      </span><span class="nt">&quot;total_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;14000.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-34-52" name="__codelineno-34-52" href="#__codelineno-34-52"></a><span class="w">      </span><span class="nt">&quot;total_amount_usd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;700.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-34-53" name="__codelineno-34-53" href="#__codelineno-34-53"></a><span class="w">      </span><span class="nt">&quot;expense_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span>
+<a id="__codelineno-34-54" name="__codelineno-34-54" href="#__codelineno-34-54"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-34-55" name="__codelineno-34-55" href="#__codelineno-34-55"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-34-56" name="__codelineno-34-56" href="#__codelineno-34-56"></a><span class="w">  </span><span class="nt">&quot;status_breakdown&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-34-57" name="__codelineno-34-57" href="#__codelineno-34-57"></a><span class="w">    </span><span class="nt">&quot;pending&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span><span class="p">,</span>
+<a id="__codelineno-34-58" name="__codelineno-34-58" href="#__codelineno-34-58"></a><span class="w">    </span><span class="nt">&quot;paid&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span>
+<a id="__codelineno-34-59" name="__codelineno-34-59" href="#__codelineno-34-59"></a><span class="w">    </span><span class="nt">&quot;overdue&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<a id="__codelineno-34-60" name="__codelineno-34-60" href="#__codelineno-34-60"></a><span class="w">    </span><span class="nt">&quot;cancelled&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
+<a id="__codelineno-34-61" name="__codelineno-34-61" href="#__codelineno-34-61"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-34-62" name="__codelineno-34-62" href="#__codelineno-34-62"></a><span class="p">}</span>
+</code></pre></div>
 <blockquote>
-<p><strong>Note on <code>overdue</code> count:</strong> The <code>overdue</code> value in <code>status_breakdown</code> is <strong>derived at request time</strong>, not read from the stored <code>status</code> column. Any expense whose stored status is <code>pending</code> and whose <code>due_date</code> is earlier than today is counted as <code>overdue</code> (and removed from <code>pending</code>). This matches the per-expense overdue derivation applied in individual expense responses.</p>
+<p><strong>Note on <code>overdue</code> count:</strong> The <code>overdue</code> value in <code>status_breakdown</code>
+is <strong>derived at request time</strong>, not read from the stored <code>status</code>
+column. Any expense whose stored status is <code>pending</code> and whose
+<code>due_date</code> is earlier than today is counted as <code>overdue</code> (and removed
+from <code>pending</code>). This matches the per-expense overdue derivation
+applied in individual expense responses.</p>
+<p><strong>Note on <code>net_balance</code>:</strong>
+<code>net_balance = total_incomes_usd − total_expenses_usd</code></p>
 </blockquote>
-<h3 id="5-reports-analytics">5. Reports &amp; Analytics</h3>
+<h3 id="6-reports-analytics">6. Reports &amp; Analytics</h3>
 <h4 id="get-reportscycles-comparison">GET /reports/cycles-comparison</h4>
 <p>Compare multiple cycles.</p>
 <p><strong>Query Parameters:</strong>
 - <code>cycle_ids</code> (array, required): Comma-separated cycle IDs
 - <code>metrics</code> (array, optional): Specific metrics to compare</p>
 <p><strong>Response:</strong> <code>200 OK</code>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="p">{</span>
-<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="w">  </span><span class="nt">&quot;cycles&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="w">    </span><span class="p">{</span>
-<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="w">      </span><span class="nt">&quot;cycle&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="w">        </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174004&quot;</span><span class="p">,</span>
-<a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a><span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;January 2025 Cycle&quot;</span>
-<a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a><span class="w">      </span><span class="p">},</span>
-<a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a><span class="w">      </span><span class="nt">&quot;metrics&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-30-9" name="__codelineno-30-9" href="#__codelineno-30-9"></a><span class="w">        </span><span class="nt">&quot;total_expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;4500.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-30-10" name="__codelineno-30-10" href="#__codelineno-30-10"></a><span class="w">        </span><span class="nt">&quot;fixed_expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3000.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-30-11" name="__codelineno-30-11" href="#__codelineno-30-11"></a><span class="w">        </span><span class="nt">&quot;variable_expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1500.00&quot;</span>
-<a id="__codelineno-30-12" name="__codelineno-30-12" href="#__codelineno-30-12"></a><span class="w">      </span><span class="p">}</span>
-<a id="__codelineno-30-13" name="__codelineno-30-13" href="#__codelineno-30-13"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-30-14" name="__codelineno-30-14" href="#__codelineno-30-14"></a><span class="w">  </span><span class="p">],</span>
-<a id="__codelineno-30-15" name="__codelineno-30-15" href="#__codelineno-30-15"></a><span class="w">  </span><span class="nt">&quot;comparison&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-30-16" name="__codelineno-30-16" href="#__codelineno-30-16"></a><span class="w">    </span><span class="nt">&quot;average_total&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;4500.00&quot;</span><span class="p">,</span>
-<a id="__codelineno-30-17" name="__codelineno-30-17" href="#__codelineno-30-17"></a><span class="w">    </span><span class="nt">&quot;trends&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-30-18" name="__codelineno-30-18" href="#__codelineno-30-18"></a><span class="w">      </span><span class="nt">&quot;expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;stable&quot;</span>
-<a id="__codelineno-30-19" name="__codelineno-30-19" href="#__codelineno-30-19"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-30-20" name="__codelineno-30-20" href="#__codelineno-30-20"></a><span class="w">  </span><span class="p">}</span>
-<a id="__codelineno-30-21" name="__codelineno-30-21" href="#__codelineno-30-21"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="p">{</span>
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="w">  </span><span class="nt">&quot;cycles&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a><span class="w">      </span><span class="nt">&quot;cycle&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-35-5" name="__codelineno-35-5" href="#__codelineno-35-5"></a><span class="w">        </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174004&quot;</span><span class="p">,</span>
+<a id="__codelineno-35-6" name="__codelineno-35-6" href="#__codelineno-35-6"></a><span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;January 2025 Cycle&quot;</span>
+<a id="__codelineno-35-7" name="__codelineno-35-7" href="#__codelineno-35-7"></a><span class="w">      </span><span class="p">},</span>
+<a id="__codelineno-35-8" name="__codelineno-35-8" href="#__codelineno-35-8"></a><span class="w">      </span><span class="nt">&quot;metrics&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-35-9" name="__codelineno-35-9" href="#__codelineno-35-9"></a><span class="w">        </span><span class="nt">&quot;total_expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;4500.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-35-10" name="__codelineno-35-10" href="#__codelineno-35-10"></a><span class="w">        </span><span class="nt">&quot;fixed_expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3000.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-35-11" name="__codelineno-35-11" href="#__codelineno-35-11"></a><span class="w">        </span><span class="nt">&quot;variable_expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1500.00&quot;</span>
+<a id="__codelineno-35-12" name="__codelineno-35-12" href="#__codelineno-35-12"></a><span class="w">      </span><span class="p">}</span>
+<a id="__codelineno-35-13" name="__codelineno-35-13" href="#__codelineno-35-13"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-35-14" name="__codelineno-35-14" href="#__codelineno-35-14"></a><span class="w">  </span><span class="p">],</span>
+<a id="__codelineno-35-15" name="__codelineno-35-15" href="#__codelineno-35-15"></a><span class="w">  </span><span class="nt">&quot;comparison&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-35-16" name="__codelineno-35-16" href="#__codelineno-35-16"></a><span class="w">    </span><span class="nt">&quot;average_total&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;4500.00&quot;</span><span class="p">,</span>
+<a id="__codelineno-35-17" name="__codelineno-35-17" href="#__codelineno-35-17"></a><span class="w">    </span><span class="nt">&quot;trends&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-35-18" name="__codelineno-35-18" href="#__codelineno-35-18"></a><span class="w">      </span><span class="nt">&quot;expenses&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;stable&quot;</span>
+<a id="__codelineno-35-19" name="__codelineno-35-19" href="#__codelineno-35-19"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-35-20" name="__codelineno-35-20" href="#__codelineno-35-20"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-35-21" name="__codelineno-35-21" href="#__codelineno-35-21"></a><span class="p">}</span>
 </code></pre></div></p>
-<h3 id="6-system-endpoints">6. System Endpoints</h3>
+<h3 id="7-system-endpoints">7. System Endpoints</h3>
 <h4 id="get-enums">GET /enums</h4>
 <p>Get all system enums for form validation.</p>
 <p><strong>Response:</strong> <code>200 OK</code>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="p">{</span>
-<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="w">  </span><span class="nt">&quot;currency_codes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;USD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;MXN&quot;</span><span class="p">],</span>
-<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="w">  </span><span class="nt">&quot;payment_method_types&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;debit&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;credit&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;cash&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;transfer&quot;</span><span class="p">],</span>
-<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="w">  </span><span class="nt">&quot;expense_categories&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;variable&quot;</span><span class="p">],</span>
-<a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="w">  </span><span class="nt">&quot;recurrence_types&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;weekly&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;bi_weekly&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;monthly&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;custom&quot;</span><span class="p">],</span>
-<a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a><span class="w">  </span><span class="nt">&quot;cycle_statuses&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;draft&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;active&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;completed&quot;</span><span class="p">],</span>
-<a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a><span class="w">  </span><span class="nt">&quot;expense_statuses&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;pending&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;paid&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;cancelled&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;overdue&quot;</span><span class="p">]</span>
-<a id="__codelineno-31-8" name="__codelineno-31-8" href="#__codelineno-31-8"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="p">{</span>
+<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="w">  </span><span class="nt">&quot;currency_codes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;USD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;MXN&quot;</span><span class="p">],</span>
+<a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a><span class="w">  </span><span class="nt">&quot;payment_method_types&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;debit&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;credit&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;cash&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;transfer&quot;</span><span class="p">],</span>
+<a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a><span class="w">  </span><span class="nt">&quot;expense_categories&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;variable&quot;</span><span class="p">],</span>
+<a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a><span class="w">  </span><span class="nt">&quot;recurrence_types&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;weekly&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;bi_weekly&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;monthly&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;custom&quot;</span><span class="p">],</span>
+<a id="__codelineno-36-6" name="__codelineno-36-6" href="#__codelineno-36-6"></a><span class="w">  </span><span class="nt">&quot;cycle_statuses&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;draft&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;active&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;completed&quot;</span><span class="p">],</span>
+<a id="__codelineno-36-7" name="__codelineno-36-7" href="#__codelineno-36-7"></a><span class="w">  </span><span class="nt">&quot;expense_statuses&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;pending&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;paid&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;cancelled&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;overdue&quot;</span><span class="p">]</span>
+<a id="__codelineno-36-8" name="__codelineno-36-8" href="#__codelineno-36-8"></a><span class="p">}</span>
 </code></pre></div></p>
 <h4 id="get-exchange-rates">GET /exchange-rates/</h4>
 <p>List all exchange rates ordered by date descending.</p>
 <p><strong>Auth required:</strong> Yes</p>
 <p><strong>Response:</strong> <code>200 OK</code></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="p">[</span>
-<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="w">  </span><span class="p">{</span>
-<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;uuid&quot;</span><span class="p">,</span>
-<a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="w">    </span><span class="nt">&quot;from_currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;MXN&quot;</span><span class="p">,</span>
-<a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a><span class="w">    </span><span class="nt">&quot;to_currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;USD&quot;</span><span class="p">,</span>
-<a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a><span class="w">    </span><span class="nt">&quot;rate&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.052000&quot;</span><span class="p">,</span>
-<a id="__codelineno-32-7" name="__codelineno-32-7" href="#__codelineno-32-7"></a><span class="w">    </span><span class="nt">&quot;rate_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15&quot;</span><span class="p">,</span>
-<a id="__codelineno-32-8" name="__codelineno-32-8" href="#__codelineno-32-8"></a><span class="w">    </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15T10:00:00Z&quot;</span>
-<a id="__codelineno-32-9" name="__codelineno-32-9" href="#__codelineno-32-9"></a><span class="w">  </span><span class="p">}</span>
-<a id="__codelineno-32-10" name="__codelineno-32-10" href="#__codelineno-32-10"></a><span class="p">]</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="p">[</span>
+<a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a><span class="w">  </span><span class="p">{</span>
+<a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a><span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;uuid&quot;</span><span class="p">,</span>
+<a id="__codelineno-37-4" name="__codelineno-37-4" href="#__codelineno-37-4"></a><span class="w">    </span><span class="nt">&quot;from_currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;MXN&quot;</span><span class="p">,</span>
+<a id="__codelineno-37-5" name="__codelineno-37-5" href="#__codelineno-37-5"></a><span class="w">    </span><span class="nt">&quot;to_currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;USD&quot;</span><span class="p">,</span>
+<a id="__codelineno-37-6" name="__codelineno-37-6" href="#__codelineno-37-6"></a><span class="w">    </span><span class="nt">&quot;rate&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.052000&quot;</span><span class="p">,</span>
+<a id="__codelineno-37-7" name="__codelineno-37-7" href="#__codelineno-37-7"></a><span class="w">    </span><span class="nt">&quot;rate_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15&quot;</span><span class="p">,</span>
+<a id="__codelineno-37-8" name="__codelineno-37-8" href="#__codelineno-37-8"></a><span class="w">    </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15T10:00:00Z&quot;</span>
+<a id="__codelineno-37-9" name="__codelineno-37-9" href="#__codelineno-37-9"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-37-10" name="__codelineno-37-10" href="#__codelineno-37-10"></a><span class="p">]</span>
 </code></pre></div>
 <h4 id="post-exchange-rates">POST /exchange-rates/</h4>
 <p>Create a new exchange rate record.</p>
 <p><strong>Auth required:</strong> Yes</p>
 <p><strong>Request Body:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="p">{</span>
-<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="w">  </span><span class="nt">&quot;from_currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;MXN&quot;</span><span class="p">,</span>
-<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="w">  </span><span class="nt">&quot;to_currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;USD&quot;</span><span class="p">,</span>
-<a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="w">  </span><span class="nt">&quot;rate&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.052</span><span class="p">,</span>
-<a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="w">  </span><span class="nt">&quot;rate_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15&quot;</span>
-<a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="p">{</span>
+<a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="w">  </span><span class="nt">&quot;from_currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;MXN&quot;</span><span class="p">,</span>
+<a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a><span class="w">  </span><span class="nt">&quot;to_currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;USD&quot;</span><span class="p">,</span>
+<a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a><span class="w">  </span><span class="nt">&quot;rate&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.052</span><span class="p">,</span>
+<a id="__codelineno-38-5" name="__codelineno-38-5" href="#__codelineno-38-5"></a><span class="w">  </span><span class="nt">&quot;rate_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15&quot;</span>
+<a id="__codelineno-38-6" name="__codelineno-38-6" href="#__codelineno-38-6"></a><span class="p">}</span>
 </code></pre></div>
 <p><strong>Response:</strong> <code>201 Created</code> — the created exchange rate object.</p>
 <p><strong>Errors:</strong></p>
@@ -2197,7 +2509,7 @@
 Only the <code>rate</code> field is mutable; the date is immutable.</p>
 <p><strong>Auth required:</strong> Yes</p>
 <p><strong>Request Body:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;rate&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.053</span><span class="w"> </span><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;rate&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.053</span><span class="w"> </span><span class="p">}</span>
 </code></pre></div>
 <p><strong>Response:</strong> <code>200 OK</code> — the updated exchange rate object.</p>
 <p><strong>Errors:</strong></p>
@@ -2207,12 +2519,12 @@ Only the <code>rate</code> field is mutable; the date is immutable.</p>
 <h4 id="get-health">GET /health</h4>
 <p>System health check.</p>
 <p><strong>Response:</strong> <code>200 OK</code>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="p">{</span>
-<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;healthy&quot;</span><span class="p">,</span>
-<a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a><span class="w">  </span><span class="nt">&quot;service&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;colony-api&quot;</span><span class="p">,</span>
-<a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a><span class="w">  </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
-<a id="__codelineno-35-5" name="__codelineno-35-5" href="#__codelineno-35-5"></a><span class="w">  </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span>
-<a id="__codelineno-35-6" name="__codelineno-35-6" href="#__codelineno-35-6"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="p">{</span>
+<a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a><span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;healthy&quot;</span><span class="p">,</span>
+<a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a><span class="w">  </span><span class="nt">&quot;service&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;colony-api&quot;</span><span class="p">,</span>
+<a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a><span class="w">  </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
+<a id="__codelineno-40-5" name="__codelineno-40-5" href="#__codelineno-40-5"></a><span class="w">  </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span>
+<a id="__codelineno-40-6" name="__codelineno-40-6" href="#__codelineno-40-6"></a><span class="p">}</span>
 </code></pre></div></p>
 <h2 id="error-codes">Error Codes</h2>
 <table>
@@ -2345,64 +2657,63 @@ Only the <code>rate</code> field is mutable; the date is immutable.</p>
 <li><strong>Generate Reports</strong> for analysis</li>
 </ol>
 <h3 id="example-workflow">Example Workflow</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="c1">// 1. Create payment method</span>
-<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="kd">const</span><span class="w"> </span><span class="nx">paymentMethodResponse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;/api/v1/payment-methods&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a><span class="w">  </span><span class="nx">method</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;POST&#39;</span><span class="p">,</span>
-<a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a><span class="w">  </span><span class="nx">headers</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a><span class="w">    </span><span class="s1">&#39;Content-Type&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
-<a id="__codelineno-36-6" name="__codelineno-36-6" href="#__codelineno-36-6"></a><span class="w">    </span><span class="s1">&#39;Authorization&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Bearer &#39;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">token</span>
-<a id="__codelineno-36-7" name="__codelineno-36-7" href="#__codelineno-36-7"></a><span class="w">  </span><span class="p">},</span>
-<a id="__codelineno-36-8" name="__codelineno-36-8" href="#__codelineno-36-8"></a><span class="w">  </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
-<a id="__codelineno-36-9" name="__codelineno-36-9" href="#__codelineno-36-9"></a><span class="w">    </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Chase Debit&#39;</span><span class="p">,</span>
-<a id="__codelineno-36-10" name="__codelineno-36-10" href="#__codelineno-36-10"></a><span class="w">    </span><span class="nx">method_type</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;debit&#39;</span><span class="p">,</span>
-<a id="__codelineno-36-11" name="__codelineno-36-11" href="#__codelineno-36-11"></a><span class="w">    </span><span class="nx">default_currency</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;USD&#39;</span>
-<a id="__codelineno-36-12" name="__codelineno-36-12" href="#__codelineno-36-12"></a><span class="w">  </span><span class="p">})</span>
-<a id="__codelineno-36-13" name="__codelineno-36-13" href="#__codelineno-36-13"></a><span class="p">});</span>
-<a id="__codelineno-36-14" name="__codelineno-36-14" href="#__codelineno-36-14"></a><span class="kd">const</span><span class="w"> </span><span class="nx">paymentMethod</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">paymentMethodResponse</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
-<a id="__codelineno-36-15" name="__codelineno-36-15" href="#__codelineno-36-15"></a>
-<a id="__codelineno-36-16" name="__codelineno-36-16" href="#__codelineno-36-16"></a><span class="c1">// 2. Create recurrent expense</span>
-<a id="__codelineno-36-17" name="__codelineno-36-17" href="#__codelineno-36-17"></a><span class="kd">const</span><span class="w"> </span><span class="nx">templateResponse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;/api/v1/recurrent-expenses&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-36-18" name="__codelineno-36-18" href="#__codelineno-36-18"></a><span class="w">  </span><span class="nx">method</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;POST&#39;</span><span class="p">,</span>
-<a id="__codelineno-36-19" name="__codelineno-36-19" href="#__codelineno-36-19"></a><span class="w">  </span><span class="nx">headers</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-36-20" name="__codelineno-36-20" href="#__codelineno-36-20"></a><span class="w">    </span><span class="s1">&#39;Content-Type&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
-<a id="__codelineno-36-21" name="__codelineno-36-21" href="#__codelineno-36-21"></a><span class="w">    </span><span class="s1">&#39;Authorization&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Bearer &#39;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">token</span>
-<a id="__codelineno-36-22" name="__codelineno-36-22" href="#__codelineno-36-22"></a><span class="w">  </span><span class="p">},</span>
-<a id="__codelineno-36-23" name="__codelineno-36-23" href="#__codelineno-36-23"></a><span class="w">  </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
-<a id="__codelineno-36-24" name="__codelineno-36-24" href="#__codelineno-36-24"></a><span class="w">    </span><span class="nx">description</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Rent&#39;</span><span class="p">,</span>
-<a id="__codelineno-36-25" name="__codelineno-36-25" href="#__codelineno-36-25"></a><span class="w">    </span><span class="nx">currency</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;USD&#39;</span><span class="p">,</span>
-<a id="__codelineno-36-26" name="__codelineno-36-26" href="#__codelineno-36-26"></a><span class="w">    </span><span class="nx">payment_method_id</span><span class="o">:</span><span class="w"> </span><span class="nx">paymentMethod</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>
-<a id="__codelineno-36-27" name="__codelineno-36-27" href="#__codelineno-36-27"></a><span class="w">    </span><span class="nx">base_amount</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;1200.00&#39;</span><span class="p">,</span>
-<a id="__codelineno-36-28" name="__codelineno-36-28" href="#__codelineno-36-28"></a><span class="w">    </span><span class="nx">category</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;fixed&#39;</span><span class="p">,</span>
-<a id="__codelineno-36-29" name="__codelineno-36-29" href="#__codelineno-36-29"></a><span class="w">    </span><span class="nx">recurrence_type</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span>
-<a id="__codelineno-36-30" name="__codelineno-36-30" href="#__codelineno-36-30"></a><span class="w">    </span><span class="nx">recurrence_config</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">day_of_month</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="p">},</span>
-<a id="__codelineno-36-31" name="__codelineno-36-31" href="#__codelineno-36-31"></a><span class="w">    </span><span class="nx">reference_date</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;2024-12-01&#39;</span>
-<a id="__codelineno-36-32" name="__codelineno-36-32" href="#__codelineno-36-32"></a><span class="w">  </span><span class="p">})</span>
-<a id="__codelineno-36-33" name="__codelineno-36-33" href="#__codelineno-36-33"></a><span class="p">});</span>
-<a id="__codelineno-36-34" name="__codelineno-36-34" href="#__codelineno-36-34"></a>
-<a id="__codelineno-36-35" name="__codelineno-36-35" href="#__codelineno-36-35"></a><span class="c1">// 3. Create cycle</span>
-<a id="__codelineno-36-36" name="__codelineno-36-36" href="#__codelineno-36-36"></a><span class="kd">const</span><span class="w"> </span><span class="nx">cycleResponse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;/api/v1/cycles&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-36-37" name="__codelineno-36-37" href="#__codelineno-36-37"></a><span class="w">  </span><span class="nx">method</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;POST&#39;</span><span class="p">,</span>
-<a id="__codelineno-36-38" name="__codelineno-36-38" href="#__codelineno-36-38"></a><span class="w">  </span><span class="nx">headers</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-36-39" name="__codelineno-36-39" href="#__codelineno-36-39"></a><span class="w">    </span><span class="s1">&#39;Content-Type&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
-<a id="__codelineno-36-40" name="__codelineno-36-40" href="#__codelineno-36-40"></a><span class="w">    </span><span class="s1">&#39;Authorization&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Bearer &#39;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">token</span>
-<a id="__codelineno-36-41" name="__codelineno-36-41" href="#__codelineno-36-41"></a><span class="w">  </span><span class="p">},</span>
-<a id="__codelineno-36-42" name="__codelineno-36-42" href="#__codelineno-36-42"></a><span class="w">  </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
-<a id="__codelineno-36-43" name="__codelineno-36-43" href="#__codelineno-36-43"></a><span class="w">    </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;February 2025 Cycle&#39;</span><span class="p">,</span>
-<a id="__codelineno-36-44" name="__codelineno-36-44" href="#__codelineno-36-44"></a><span class="w">    </span><span class="nx">start_date</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;2025-02-01&#39;</span><span class="p">,</span>
-<a id="__codelineno-36-45" name="__codelineno-36-45" href="#__codelineno-36-45"></a><span class="w">    </span><span class="nx">end_date</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;2025-03-14&#39;</span><span class="p">,</span>
-<a id="__codelineno-36-46" name="__codelineno-36-46" href="#__codelineno-36-46"></a><span class="w">    </span><span class="nx">income_amount</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;5000.00&#39;</span><span class="p">,</span>
-<a id="__codelineno-36-47" name="__codelineno-36-47" href="#__codelineno-36-47"></a><span class="w">    </span><span class="nx">generate_from_templates</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span>
-<a id="__codelineno-36-48" name="__codelineno-36-48" href="#__codelineno-36-48"></a><span class="w">  </span><span class="p">})</span>
-<a id="__codelineno-36-49" name="__codelineno-36-49" href="#__codelineno-36-49"></a><span class="p">});</span>
-<a id="__codelineno-36-50" name="__codelineno-36-50" href="#__codelineno-36-50"></a><span class="kd">const</span><span class="w"> </span><span class="nx">cycle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">cycleResponse</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
-<a id="__codelineno-36-51" name="__codelineno-36-51" href="#__codelineno-36-51"></a>
-<a id="__codelineno-36-52" name="__codelineno-36-52" href="#__codelineno-36-52"></a><span class="c1">// 4. Get cycle summary</span>
-<a id="__codelineno-36-53" name="__codelineno-36-53" href="#__codelineno-36-53"></a><span class="kd">const</span><span class="w"> </span><span class="nx">summaryResponse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span><span class="sb">`/api/v1/cycles/</span><span class="si">${</span><span class="nx">cycle</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb">/summary`</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-36-54" name="__codelineno-36-54" href="#__codelineno-36-54"></a><span class="w">  </span><span class="nx">headers</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-36-55" name="__codelineno-36-55" href="#__codelineno-36-55"></a><span class="w">    </span><span class="s1">&#39;Authorization&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Bearer &#39;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">token</span>
-<a id="__codelineno-36-56" name="__codelineno-36-56" href="#__codelineno-36-56"></a><span class="w">  </span><span class="p">}</span>
-<a id="__codelineno-36-57" name="__codelineno-36-57" href="#__codelineno-36-57"></a><span class="p">});</span>
-<a id="__codelineno-36-58" name="__codelineno-36-58" href="#__codelineno-36-58"></a><span class="kd">const</span><span class="w"> </span><span class="nx">summary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">summaryResponse</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="c1">// 1. Create payment method</span>
+<a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a><span class="kd">const</span><span class="w"> </span><span class="nx">paymentMethodResponse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;/api/v1/payment-methods&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-41-3" name="__codelineno-41-3" href="#__codelineno-41-3"></a><span class="w">  </span><span class="nx">method</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;POST&#39;</span><span class="p">,</span>
+<a id="__codelineno-41-4" name="__codelineno-41-4" href="#__codelineno-41-4"></a><span class="w">  </span><span class="nx">headers</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-41-5" name="__codelineno-41-5" href="#__codelineno-41-5"></a><span class="w">    </span><span class="s1">&#39;Content-Type&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
+<a id="__codelineno-41-6" name="__codelineno-41-6" href="#__codelineno-41-6"></a><span class="w">    </span><span class="s1">&#39;Authorization&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Bearer &#39;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">token</span>
+<a id="__codelineno-41-7" name="__codelineno-41-7" href="#__codelineno-41-7"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-41-8" name="__codelineno-41-8" href="#__codelineno-41-8"></a><span class="w">  </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
+<a id="__codelineno-41-9" name="__codelineno-41-9" href="#__codelineno-41-9"></a><span class="w">    </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Chase Debit&#39;</span><span class="p">,</span>
+<a id="__codelineno-41-10" name="__codelineno-41-10" href="#__codelineno-41-10"></a><span class="w">    </span><span class="nx">method_type</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;debit&#39;</span><span class="p">,</span>
+<a id="__codelineno-41-11" name="__codelineno-41-11" href="#__codelineno-41-11"></a><span class="w">    </span><span class="nx">default_currency</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;USD&#39;</span>
+<a id="__codelineno-41-12" name="__codelineno-41-12" href="#__codelineno-41-12"></a><span class="w">  </span><span class="p">})</span>
+<a id="__codelineno-41-13" name="__codelineno-41-13" href="#__codelineno-41-13"></a><span class="p">});</span>
+<a id="__codelineno-41-14" name="__codelineno-41-14" href="#__codelineno-41-14"></a><span class="kd">const</span><span class="w"> </span><span class="nx">paymentMethod</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">paymentMethodResponse</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
+<a id="__codelineno-41-15" name="__codelineno-41-15" href="#__codelineno-41-15"></a>
+<a id="__codelineno-41-16" name="__codelineno-41-16" href="#__codelineno-41-16"></a><span class="c1">// 2. Create recurrent expense</span>
+<a id="__codelineno-41-17" name="__codelineno-41-17" href="#__codelineno-41-17"></a><span class="kd">const</span><span class="w"> </span><span class="nx">templateResponse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;/api/v1/recurrent-expenses&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-41-18" name="__codelineno-41-18" href="#__codelineno-41-18"></a><span class="w">  </span><span class="nx">method</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;POST&#39;</span><span class="p">,</span>
+<a id="__codelineno-41-19" name="__codelineno-41-19" href="#__codelineno-41-19"></a><span class="w">  </span><span class="nx">headers</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-41-20" name="__codelineno-41-20" href="#__codelineno-41-20"></a><span class="w">    </span><span class="s1">&#39;Content-Type&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
+<a id="__codelineno-41-21" name="__codelineno-41-21" href="#__codelineno-41-21"></a><span class="w">    </span><span class="s1">&#39;Authorization&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Bearer &#39;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">token</span>
+<a id="__codelineno-41-22" name="__codelineno-41-22" href="#__codelineno-41-22"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-41-23" name="__codelineno-41-23" href="#__codelineno-41-23"></a><span class="w">  </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
+<a id="__codelineno-41-24" name="__codelineno-41-24" href="#__codelineno-41-24"></a><span class="w">    </span><span class="nx">description</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Rent&#39;</span><span class="p">,</span>
+<a id="__codelineno-41-25" name="__codelineno-41-25" href="#__codelineno-41-25"></a><span class="w">    </span><span class="nx">currency</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;USD&#39;</span><span class="p">,</span>
+<a id="__codelineno-41-26" name="__codelineno-41-26" href="#__codelineno-41-26"></a><span class="w">    </span><span class="nx">payment_method_id</span><span class="o">:</span><span class="w"> </span><span class="nx">paymentMethod</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>
+<a id="__codelineno-41-27" name="__codelineno-41-27" href="#__codelineno-41-27"></a><span class="w">    </span><span class="nx">base_amount</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;1200.00&#39;</span><span class="p">,</span>
+<a id="__codelineno-41-28" name="__codelineno-41-28" href="#__codelineno-41-28"></a><span class="w">    </span><span class="nx">category</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;fixed&#39;</span><span class="p">,</span>
+<a id="__codelineno-41-29" name="__codelineno-41-29" href="#__codelineno-41-29"></a><span class="w">    </span><span class="nx">recurrence_type</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span>
+<a id="__codelineno-41-30" name="__codelineno-41-30" href="#__codelineno-41-30"></a><span class="w">    </span><span class="nx">recurrence_config</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">day_of_month</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-41-31" name="__codelineno-41-31" href="#__codelineno-41-31"></a><span class="w">    </span><span class="nx">reference_date</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;2024-12-01&#39;</span>
+<a id="__codelineno-41-32" name="__codelineno-41-32" href="#__codelineno-41-32"></a><span class="w">  </span><span class="p">})</span>
+<a id="__codelineno-41-33" name="__codelineno-41-33" href="#__codelineno-41-33"></a><span class="p">});</span>
+<a id="__codelineno-41-34" name="__codelineno-41-34" href="#__codelineno-41-34"></a>
+<a id="__codelineno-41-35" name="__codelineno-41-35" href="#__codelineno-41-35"></a><span class="c1">// 3. Create cycle</span>
+<a id="__codelineno-41-36" name="__codelineno-41-36" href="#__codelineno-41-36"></a><span class="kd">const</span><span class="w"> </span><span class="nx">cycleResponse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;/api/v1/cycles&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-41-37" name="__codelineno-41-37" href="#__codelineno-41-37"></a><span class="w">  </span><span class="nx">method</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;POST&#39;</span><span class="p">,</span>
+<a id="__codelineno-41-38" name="__codelineno-41-38" href="#__codelineno-41-38"></a><span class="w">  </span><span class="nx">headers</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-41-39" name="__codelineno-41-39" href="#__codelineno-41-39"></a><span class="w">    </span><span class="s1">&#39;Content-Type&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
+<a id="__codelineno-41-40" name="__codelineno-41-40" href="#__codelineno-41-40"></a><span class="w">    </span><span class="s1">&#39;Authorization&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Bearer &#39;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">token</span>
+<a id="__codelineno-41-41" name="__codelineno-41-41" href="#__codelineno-41-41"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-41-42" name="__codelineno-41-42" href="#__codelineno-41-42"></a><span class="w">  </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
+<a id="__codelineno-41-43" name="__codelineno-41-43" href="#__codelineno-41-43"></a><span class="w">    </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;February 2025 Cycle&#39;</span><span class="p">,</span>
+<a id="__codelineno-41-44" name="__codelineno-41-44" href="#__codelineno-41-44"></a><span class="w">    </span><span class="nx">start_date</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;2025-02-01&#39;</span><span class="p">,</span>
+<a id="__codelineno-41-45" name="__codelineno-41-45" href="#__codelineno-41-45"></a><span class="w">    </span><span class="nx">end_date</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;2025-03-14&#39;</span><span class="p">,</span>
+<a id="__codelineno-41-46" name="__codelineno-41-46" href="#__codelineno-41-46"></a><span class="w">    </span><span class="nx">generate_from_templates</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-41-47" name="__codelineno-41-47" href="#__codelineno-41-47"></a><span class="w">  </span><span class="p">})</span>
+<a id="__codelineno-41-48" name="__codelineno-41-48" href="#__codelineno-41-48"></a><span class="p">});</span>
+<a id="__codelineno-41-49" name="__codelineno-41-49" href="#__codelineno-41-49"></a><span class="kd">const</span><span class="w"> </span><span class="nx">cycle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">cycleResponse</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
+<a id="__codelineno-41-50" name="__codelineno-41-50" href="#__codelineno-41-50"></a>
+<a id="__codelineno-41-51" name="__codelineno-41-51" href="#__codelineno-41-51"></a><span class="c1">// 4. Get cycle summary</span>
+<a id="__codelineno-41-52" name="__codelineno-41-52" href="#__codelineno-41-52"></a><span class="kd">const</span><span class="w"> </span><span class="nx">summaryResponse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span><span class="sb">`/api/v1/cycles/</span><span class="si">${</span><span class="nx">cycle</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb">/summary`</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-41-53" name="__codelineno-41-53" href="#__codelineno-41-53"></a><span class="w">  </span><span class="nx">headers</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-41-54" name="__codelineno-41-54" href="#__codelineno-41-54"></a><span class="w">    </span><span class="s1">&#39;Authorization&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Bearer &#39;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">token</span>
+<a id="__codelineno-41-55" name="__codelineno-41-55" href="#__codelineno-41-55"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-41-56" name="__codelineno-41-56" href="#__codelineno-41-56"></a><span class="p">});</span>
+<a id="__codelineno-41-57" name="__codelineno-41-57" href="#__codelineno-41-57"></a><span class="kd">const</span><span class="w"> </span><span class="nx">summary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">summaryResponse</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
 </code></pre></div>
 
 

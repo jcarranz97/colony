@@ -1725,20 +1725,18 @@
 <a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
 <a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="n">start_date</span><span class="p">:</span> <span class="n">date</span>
 <a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    <span class="n">end_date</span><span class="p">:</span> <span class="n">date</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="n">income_amount</span><span class="p">:</span> <span class="n">Decimal</span>
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>    <span class="n">generate_from_templates</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>
-<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="k">class</span><span class="w"> </span><span class="nc">CycleResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>    <span class="n">start_date</span><span class="p">:</span> <span class="n">date</span>
-<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>    <span class="n">end_date</span><span class="p">:</span> <span class="n">date</span>
-<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>    <span class="n">income_amount</span><span class="p">:</span> <span class="n">Decimal</span>
-<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>    <span class="n">status</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>    <span class="n">created_at</span><span class="p">:</span> <span class="n">datetime</span>
-<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>
-<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>    <span class="k">class</span><span class="w"> </span><span class="nc">Config</span><span class="p">:</span>
-<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a>        <span class="n">from_attributes</span> <span class="o">=</span> <span class="kc">True</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="n">generate_from_templates</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="k">class</span><span class="w"> </span><span class="nc">CycleResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>    <span class="n">start_date</span><span class="p">:</span> <span class="n">date</span>
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>    <span class="n">end_date</span><span class="p">:</span> <span class="n">date</span>
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>    <span class="n">status</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>    <span class="n">created_at</span><span class="p">:</span> <span class="n">datetime</span>
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>    <span class="k">class</span><span class="w"> </span><span class="nc">Config</span><span class="p">:</span>
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>        <span class="n">from_attributes</span> <span class="o">=</span> <span class="kc">True</span>
 </code></pre></div>
 <h4 id="modelspy">models.py</h4>
 <p>SQLAlchemy database models representing the domain's data structure.</p>
@@ -1756,12 +1754,11 @@
 <a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>    <span class="n">user_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">UUID</span><span class="p">(</span><span class="n">as_uuid</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;users.id&quot;</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>    <span class="n">start_date</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Date</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>    <span class="n">end_date</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Date</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>    <span class="n">income_amount</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>    <span class="n">status</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">ENUM</span><span class="p">(</span><span class="n">CycleStatus</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="n">CycleStatus</span><span class="o">.</span><span class="n">DRAFT</span><span class="p">)</span>
-<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>
-<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>    <span class="c1"># Relationships</span>
-<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>    <span class="n">user</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;User&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;cycles&quot;</span><span class="p">)</span>
-<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>    <span class="n">expenses</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;CycleExpense&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;cycle&quot;</span><span class="p">)</span>
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>    <span class="n">status</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">ENUM</span><span class="p">(</span><span class="n">CycleStatus</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="n">CycleStatus</span><span class="o">.</span><span class="n">DRAFT</span><span class="p">)</span>
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>    <span class="c1"># Relationships</span>
+<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>    <span class="n">user</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;User&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;cycles&quot;</span><span class="p">)</span>
+<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>    <span class="n">expenses</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;CycleExpense&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;cycle&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h4 id="servicepy">service.py</h4>
 <p>Contains the domain's business logic, data processing, and complex operations.</p>
@@ -1785,19 +1782,18 @@
 <a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>        <span class="n">name</span><span class="o">=</span><span class="n">cycle_data</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
 <a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>        <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span>
 <a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>        <span class="n">start_date</span><span class="o">=</span><span class="n">cycle_data</span><span class="o">.</span><span class="n">start_date</span><span class="p">,</span>
-<a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>        <span class="n">end_date</span><span class="o">=</span><span class="n">cycle_data</span><span class="o">.</span><span class="n">end_date</span><span class="p">,</span>
-<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a>        <span class="n">income_amount</span><span class="o">=</span><span class="n">cycle_data</span><span class="o">.</span><span class="n">income_amount</span>
-<a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>    <span class="p">)</span>
-<a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a>
-<a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>    <span class="n">db</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cycle</span><span class="p">)</span>
-<a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a>    <span class="n">db</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>  <span class="c1"># Get cycle ID</span>
-<a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a>
-<a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a>    <span class="c1"># Generate expenses from templates if requested</span>
-<a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a>    <span class="k">if</span> <span class="n">cycle_data</span><span class="o">.</span><span class="n">generate_from_templates</span><span class="p">:</span>
-<a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a>        <span class="k">await</span> <span class="n">_generate_expenses_from_templates</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">cycle</span><span class="p">)</span>
-<a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a>
-<a id="__codelineno-4-32" name="__codelineno-4-32" href="#__codelineno-4-32"></a>    <span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-<a id="__codelineno-4-33" name="__codelineno-4-33" href="#__codelineno-4-33"></a>    <span class="k">return</span> <span class="n">cycle</span>
+<a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>        <span class="n">end_date</span><span class="o">=</span><span class="n">cycle_data</span><span class="o">.</span><span class="n">end_date</span>
+<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a>    <span class="p">)</span>
+<a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>
+<a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a>    <span class="n">db</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cycle</span><span class="p">)</span>
+<a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>    <span class="n">db</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>  <span class="c1"># Get cycle ID</span>
+<a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a>
+<a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a>    <span class="c1"># Generate expenses from templates if requested</span>
+<a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a>    <span class="k">if</span> <span class="n">cycle_data</span><span class="o">.</span><span class="n">generate_from_templates</span><span class="p">:</span>
+<a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a>        <span class="k">await</span> <span class="n">_generate_expenses_from_templates</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">cycle</span><span class="p">)</span>
+<a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a>
+<a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a>    <span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+<a id="__codelineno-4-32" name="__codelineno-4-32" href="#__codelineno-4-32"></a>    <span class="k">return</span> <span class="n">cycle</span>
 </code></pre></div>
 <h4 id="dependenciespy">dependencies.py</h4>
 <p>Domain-specific dependencies for dependency injection.</p>

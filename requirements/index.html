@@ -691,10 +691,43 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#39-data-importexport" class="md-nav__link">
+  <a href="#39-recurrent-income-management" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3.9 Data Import/Export
+        3.9 Recurrent Income Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#310-cycle-income-tracking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.10 Cycle Income Tracking
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#311-navigation-updates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.11 Navigation Updates
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#312-data-importexport" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.12 Data Import/Export
       
     </span>
   </a>
@@ -1421,12 +1454,12 @@
 <h3 id="38-financial-reporting-and-analytics">3.8 Financial Reporting and Analytics</h3>
 <ul>
 <li><strong>FR-039</strong>: System must generate cycle summaries showing:<ul>
-<li>Income for the period</li>
+<li>Total incomes USD (sum of all <code>CycleIncome</code> entries)</li>
 <li>Fixed expenses total</li>
 <li>Variable expenses total</li>
 <li>Mexico expenses total (MXN currency expenses converted to USD)</li>
 <li>USA expenses total (USD currency expenses)</li>
-<li>Net balance (Income - Total Expenses)</li>
+<li>Net balance (Total Incomes − Total Expenses)</li>
 </ul>
 </li>
 <li><strong>FR-040</strong>: System must generate payment method summaries showing:<ul>
@@ -1450,11 +1483,59 @@
 </ul>
 </li>
 </ul>
-<h3 id="39-data-importexport">3.9 Data Import/Export</h3>
+<h3 id="39-recurrent-income-management">3.9 Recurrent Income Management</h3>
 <ul>
-<li><strong>FR-045</strong>: Users must be able to import existing expense data from Excel/CSV</li>
-<li><strong>FR-046</strong>: Users must be able to export cycle data to Excel/CSV</li>
-<li><strong>FR-047</strong>: System must support bulk recurrent expense creation</li>
+<li><strong>FR-048</strong>: Users must be able to create recurrent income sources with:<ul>
+<li>Description</li>
+<li>Currency (USD/MXN)</li>
+<li>Base amount</li>
+<li>Recurrence pattern (same types as recurrent expenses)</li>
+<li>Start date</li>
+<li>Payment method (required for future reporting use)</li>
+<li>Active/Inactive status</li>
+</ul>
+</li>
+<li><strong>FR-049</strong>: System must support the same recurrence patterns for incomes
+  as for expenses (weekly, bi-weekly, monthly, custom)</li>
+<li><strong>FR-050</strong>: Users must be able to edit recurrent income templates</li>
+<li><strong>FR-051</strong>: Users must be able to deactivate/reactivate recurrent
+  income templates</li>
+<li><strong>FR-052</strong>: Users must be able to duplicate recurrent income templates</li>
+<li><strong>FR-053</strong>: Recurrent income templates must appear in the Incomes tab
+  of the navigation</li>
+</ul>
+<h3 id="310-cycle-income-tracking">3.10 Cycle Income Tracking</h3>
+<ul>
+<li><strong>FR-054</strong>: When a cycle is created with <code>generate_from_templates=true</code>,
+  the system must auto-generate <code>CycleIncome</code> rows from all active
+  recurrent income templates that fall within the cycle date range</li>
+<li><strong>FR-055</strong>: Users must be able to add one-off manual income entries
+  directly to a cycle (without a recurrent template)</li>
+<li><strong>FR-056</strong>: Users must be able to remove income entries from a cycle</li>
+<li><strong>FR-057</strong>: Cycle income entries must display whether they were
+  auto-generated (from a template) or added manually</li>
+<li><strong>FR-058</strong>: The cycle's <code>remaining_balance</code> must be recalculated on
+  every income write:
+  <code>remaining_balance = Σ(cycle_incomes.amount_usd)</code>
+  <code>− Σ(active non-cancelled cycle_expenses.amount_usd)</code></li>
+<li><strong>FR-059</strong>: Cycle summaries must include <code>total_incomes_usd</code> showing
+  the sum of all cycle income entries converted to USD</li>
+<li><strong>FR-060</strong>: The cycle detail view must show a Total Income figure
+  equal to the sum of all <code>CycleIncome.amount_usd</code> entries</li>
+</ul>
+<h3 id="311-navigation-updates">3.11 Navigation Updates</h3>
+<ul>
+<li><strong>FR-061</strong>: The application navigation must have exactly 5 tabs:
+  Cycles, Payment Methods, Recurrent Expenses, Incomes, Settings</li>
+<li><strong>FR-062</strong>: The Incomes tab manages recurrent income templates and
+  does not replace the Recurrent Expenses tab</li>
+</ul>
+<h3 id="312-data-importexport">3.12 Data Import/Export</h3>
+<ul>
+<li><strong>FR-063</strong>: Users must be able to import existing expense data from
+  Excel/CSV</li>
+<li><strong>FR-064</strong>: Users must be able to export cycle data to Excel/CSV</li>
+<li><strong>FR-065</strong>: System must support bulk recurrent expense creation</li>
 </ul>
 <h2 id="4-non-functional-requirements">4. Non-Functional Requirements</h2>
 <h3 id="41-performance">4.1 Performance</h3>
@@ -1519,10 +1600,9 @@
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>- start_date: Date
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>- end_date: Date
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>- remaining_balance: Decimal
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>- income_amount: Decimal
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>- status: Enum (active, completed, draft)
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>- created_at: DateTime
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>- user_id: UUID (FK)
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>- status: Enum (active, completed, draft)
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>- created_at: DateTime
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>- user_id: UUID (FK)
 </code></pre></div>
 <h3 id="63-cycle-expense-schema">6.3 Cycle Expense Schema</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>- id: UUID
