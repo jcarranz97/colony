@@ -204,11 +204,16 @@ class HouseholdService:
         membership = UserHouseholdMembership(user_id=user_id, household_id=household_id)
         try:
             db.add(membership)
-            db.commit()
+            db.flush()
         except IntegrityError as exc:
             db.rollback()
             raise UserAlreadyInHouseholdExceptionError(user_id, household_id) from exc
 
+        user = db.query(User).filter(User.id == user_id).first()
+        if user and user.active_household_id is None:
+            user.active_household_id = household_id
+
+        db.commit()
         logger.info(
             "User added to household",
             extra={
