@@ -65,7 +65,7 @@ export const getMyHouseholds = (token: string) =>
   apiClient<HouseholdResponse[]>("/households/me", { token });
 
 export const setActiveHousehold = (householdId: string, token: string) =>
-  apiClient<{ active_household_id: string }>("/households/me/active", {
+  apiClient<HouseholdResponse>("/households/me/active", {
     method: "PUT",
     body: JSON.stringify({ household_id: householdId }),
     token,

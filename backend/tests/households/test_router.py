@@ -353,7 +353,7 @@ class TestSetActiveHousehold:
             headers=headers,
         )
         assert response.status_code == 200
-        assert response.json()["active_household_id"] == str(other_household.id)
+        assert response.json()["id"] == str(other_household.id)
 
     def test_returns_404_if_not_member(
         self,
