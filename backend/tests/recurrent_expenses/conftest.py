@@ -23,7 +23,7 @@ from app.recurrent_expenses.models import RecurrentExpense
 @pytest.fixture
 def test_user(db: Session) -> User:
     user = User(
-        email=f"test_{uuid.uuid4().hex[:8]}@example.com",
+        username=f"test_{uuid.uuid4().hex[:8]}",
         password_hash=get_password_hash("testpassword123"),
         first_name="Test",
         last_name="User",
@@ -38,7 +38,7 @@ def test_user(db: Session) -> User:
 @pytest.fixture
 def other_user(db: Session) -> User:
     user = User(
-        email=f"other_{uuid.uuid4().hex[:8]}@example.com",
+        username=f"other_{uuid.uuid4().hex[:8]}",
         password_hash=get_password_hash("testpassword123"),
         first_name="Other",
         last_name="User",

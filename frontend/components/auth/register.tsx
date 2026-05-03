@@ -29,7 +29,7 @@ export function Register() {
       <Card.Content>
         <Formik
           initialValues={{
-            email: "",
+            username: "",
             password: "",
             first_name: "",
             last_name: "",
@@ -44,7 +44,7 @@ export function Register() {
               return;
             }
             const loginResult = await loginWithForm(
-              values.email,
+              values.username,
               values.password,
             );
             if (loginResult.success) {
@@ -65,39 +65,15 @@ export function Register() {
             isSubmitting,
           }) => (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              <div className="grid grid-cols-2 gap-4">
-                <TextField
-                  isInvalid={!!errors.first_name && !!touched.first_name}
-                  value={values.first_name}
-                  onChange={(v) => setFieldValue("first_name", v)}
-                >
-                  <Label>First Name</Label>
-                  <Input />
-                  {touched.first_name && errors.first_name && (
-                    <FieldError>{errors.first_name}</FieldError>
-                  )}
-                </TextField>
-                <TextField
-                  isInvalid={!!errors.last_name && !!touched.last_name}
-                  value={values.last_name}
-                  onChange={(v) => setFieldValue("last_name", v)}
-                >
-                  <Label>Last Name</Label>
-                  <Input />
-                  {touched.last_name && errors.last_name && (
-                    <FieldError>{errors.last_name}</FieldError>
-                  )}
-                </TextField>
-              </div>
               <TextField
-                isInvalid={!!errors.email && !!touched.email}
-                value={values.email}
-                onChange={(v) => setFieldValue("email", v)}
+                isInvalid={!!errors.username && !!touched.username}
+                value={values.username}
+                onChange={(v) => setFieldValue("username", v)}
               >
-                <Label>Email</Label>
-                <Input type="email" autoComplete="email" />
-                {touched.email && errors.email && (
-                  <FieldError>{errors.email}</FieldError>
+                <Label>Username</Label>
+                <Input type="text" autoComplete="username" />
+                {touched.username && errors.username && (
+                  <FieldError>{errors.username}</FieldError>
                 )}
               </TextField>
               <TextField
@@ -111,6 +87,30 @@ export function Register() {
                   <FieldError>{errors.password}</FieldError>
                 )}
               </TextField>
+              <div className="grid grid-cols-2 gap-4">
+                <TextField
+                  isInvalid={!!errors.first_name && !!touched.first_name}
+                  value={values.first_name}
+                  onChange={(v) => setFieldValue("first_name", v)}
+                >
+                  <Label>First Name (optional)</Label>
+                  <Input />
+                  {touched.first_name && errors.first_name && (
+                    <FieldError>{errors.first_name}</FieldError>
+                  )}
+                </TextField>
+                <TextField
+                  isInvalid={!!errors.last_name && !!touched.last_name}
+                  value={values.last_name}
+                  onChange={(v) => setFieldValue("last_name", v)}
+                >
+                  <Label>Last Name (optional)</Label>
+                  <Input />
+                  {touched.last_name && errors.last_name && (
+                    <FieldError>{errors.last_name}</FieldError>
+                  )}
+                </TextField>
+              </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
               <Button
                 type="submit"

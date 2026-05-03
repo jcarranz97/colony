@@ -52,12 +52,12 @@ def verify_token(token: str) -> dict[str, Any]:
         raise InvalidTokenExceptionError from e
 
 
-def extract_email_from_token(token: str) -> str:
-    """Extract email from JWT token."""
+def extract_username_from_token(token: str) -> str:
+    """Extract username from JWT token."""
     payload = verify_token(token)
-    email = payload.get("sub")
+    username = payload.get("sub")
 
-    if not email or not isinstance(email, str):
+    if not username or not isinstance(username, str):
         raise InvalidTokenExceptionError
 
-    return email
+    return username

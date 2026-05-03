@@ -234,6 +234,10 @@ async def endpoint(current_user: CurrentActiveUser): ...
 - `CurrentUser` — resolves JWT → raises 401 if invalid (allows inactive).
 - Passwords hashed with Argon2ID via `pwdlib`.
 - JWT signed with `SECRET_KEY` from config; `ALGORITHM` is HS256 by default.
+- Auth uses **username + password** (no email). A default admin user is
+  created automatically on first deploy from the `DEFAULT_ADMIN_USERNAME`
+  and `DEFAULT_ADMIN_PASSWORD` env vars (defaults: `admin` / `colony-admin`).
+- JWT `sub` claim holds the username.
 
 ---
 
@@ -264,7 +268,10 @@ fixtures (users, payment methods, cycles, etc.).
 
 ```python
 def get_auth_headers(client: TestClient, user: User) -> dict:
-    resp = client.post("/api/v1/auth/login", data={"username": user.email, "password": RAW_PASSWORD})
+    resp = client.post(
+        "/api/v1/auth/login",
+        data={"username": user.username, "password": RAW_PASSWORD},
+    )
     return {"Authorization": f"Bearer {resp.json()['access_token']}"}
 ```
 

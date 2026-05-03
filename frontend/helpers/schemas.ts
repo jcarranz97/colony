@@ -1,17 +1,23 @@
 import * as Yup from "yup";
 
 export const LoginSchema = Yup.object({
-  email: Yup.string().email("Invalid email").required("Email is required"),
+  username: Yup.string()
+    .min(3, "Username must be at least 3 characters")
+    .max(50, "Username must be at most 50 characters")
+    .required("Username is required"),
   password: Yup.string().required("Password is required"),
 });
 
 export const RegisterSchema = Yup.object({
-  email: Yup.string().email("Invalid email").required("Email is required"),
+  username: Yup.string()
+    .min(3, "Username must be at least 3 characters")
+    .max(50, "Username must be at most 50 characters")
+    .required("Username is required"),
   password: Yup.string()
     .min(8, "Password must be at least 8 characters")
     .required("Password is required"),
-  first_name: Yup.string().required("First name is required"),
-  last_name: Yup.string().required("Last name is required"),
+  first_name: Yup.string().optional(),
+  last_name: Yup.string().optional(),
 });
 
 export const PaymentMethodSchema = Yup.object({

@@ -1,16 +1,20 @@
 "use client";
 import { usePathname, useRouter } from "next/navigation";
-import { deleteAuthCookie } from "@/actions/auth.action";
+import { deleteAuthCookie, getAuthToken } from "@/actions/auth.action";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { getCurrentUser } from "@/lib/auth.api";
+import type { UserResponse } from "@/helpers/types";
 
-const NAV_ITEMS = [
+const BASE_NAV_ITEMS = [
   { href: "/cycles", label: "Cycles", icon: "📅" },
   { href: "/payment-methods", label: "Payment Methods", icon: "💳" },
   { href: "/recurrent-expenses", label: "Recurrent Expenses", icon: "📋" },
   { href: "/incomes", label: "Incomes", icon: "💰" },
   { href: "/settings", label: "Settings", icon: "⚙️" },
 ];
+
+const ADMIN_NAV_ITEM = { href: "/users", label: "Users", icon: "👥" };
 
 const RING_COUNT = 16;
 
@@ -19,9 +23,20 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [currentUser, setCurrentUser] = useState<UserResponse | null>(null);
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const token = await getAuthToken();
+      if (!token) return;
+      const result = await getCurrentUser(token);
+      if (result.success) setCurrentUser(result.data);
+    };
+    fetchUser();
   }, []);
 
   const handleLogout = async () => {
@@ -32,6 +47,11 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
   };
+
+  const navItems =
+    currentUser?.role === "admin"
+      ? [...BASE_NAV_ITEMS, ADMIN_NAV_ITEM]
+      : BASE_NAV_ITEMS;
 
   return (
     <div className="nb-shell">
@@ -64,7 +84,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
         {/* Navigation tabs */}
         <nav className="nb-nav">
-          {NAV_ITEMS.map((item) => {
+          {navItems.map((item) => {
             const isActive = pathname.startsWith(item.href);
             return (
               <button

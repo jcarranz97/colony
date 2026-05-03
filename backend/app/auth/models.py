@@ -10,16 +10,19 @@ class User(BaseModel):
 
     __tablename__ = "users"
 
-    email: Mapped[str] = mapped_column(
-        String(255), unique=True, nullable=False, index=True
+    username: Mapped[str] = mapped_column(
+        String(50), unique=True, nullable=False, index=True
     )
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
-    first_name: Mapped[str] = mapped_column(String(100))
-    last_name: Mapped[str] = mapped_column(String(100))
+    first_name: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    last_name: Mapped[str | None] = mapped_column(String(100), nullable=True)
     preferred_currency: Mapped[str] = mapped_column(
         ENUM("USD", "MXN", name="currency_code"), default="USD"
     )
     locale: Mapped[str] = mapped_column(String(10), default="en-US")
+    role: Mapped[str] = mapped_column(
+        ENUM("admin", "user", name="user_role"), nullable=False, default="user"
+    )
 
     # Relationships
     payment_methods = relationship(
@@ -35,6 +38,4 @@ class User(BaseModel):
 
     def __repr__(self) -> str:
         """String representation of the User model."""
-        return (
-            f"<User(email='{self.email}', name='{self.first_name} {self.last_name}')>"
-        )
+        return f"<User(username='{self.username}')>"

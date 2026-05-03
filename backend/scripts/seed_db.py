@@ -29,6 +29,41 @@ def create_tables() -> None:
     print("✅ Tables created successfully!")
 
 
+def ensure_default_admin(db: Session) -> None:
+    """Create the default admin user if it does not already exist.
+
+    Credentials are read from env vars DEFAULT_ADMIN_USERNAME and
+    DEFAULT_ADMIN_PASSWORD.  This function is always called on startup
+    regardless of SEED_MODE.
+
+    Args:
+        db: Active SQLAlchemy session.
+    """
+    username = os.getenv("DEFAULT_ADMIN_USERNAME", "admin")
+    password = os.getenv("DEFAULT_ADMIN_PASSWORD", "colony-admin")
+
+    existing = db.query(User).filter(User.username == username).first()
+    if existing:
+        if existing.role != "admin":
+            existing.role = "admin"
+            db.commit()
+            print(f"  ✅ Updated admin user '{username}' role to 'admin'.")
+        else:
+            print(f"  ⏭️  Admin user '{username}' already exists, skipping.")
+        return
+
+    admin = User(
+        username=username,
+        password_hash=get_password_hash(password),
+        preferred_currency="USD",
+        locale="en-US",
+        role="admin",
+    )
+    db.add(admin)
+    db.commit()
+    print(f"  ✅ Created admin user '{username}'.")
+
+
 def seed_user(db: Session, user_data: dict[str, Any]) -> User:
     """Return the existing user or create a new one from seed data.
 
@@ -39,24 +74,25 @@ def seed_user(db: Session, user_data: dict[str, Any]) -> User:
     Returns:
         The existing or newly created User instance.
     """
-    email = user_data["email"]
-    user = db.query(User).filter(User.email == email).first()
+    username = user_data["username"]
+    user = db.query(User).filter(User.username == username).first()
 
     if user:
-        print(f"  ⏭️  User '{email}' already exists, skipping.")
+        print(f"  ⏭️  User '{username}' already exists, skipping.")
         return user
 
     user = User(
-        email=email,
+        username=username,
         password_hash=get_password_hash(user_data["password"]),
         first_name=user_data.get("first_name"),
         last_name=user_data.get("last_name"),
         preferred_currency=user_data.get("preferred_currency", "USD"),
         locale=user_data.get("locale", "en-US"),
+        role=user_data.get("role", "user"),
     )
     db.add(user)
     db.flush()  # populate user.id before inserting payment methods
-    print(f"  ✅ Created user '{email}'.")
+    print(f"  ✅ Created user '{username}'.")
     return user
 
 
@@ -348,6 +384,9 @@ def seed_database(seed_file: Path, auth_only: bool = False) -> None:
         data = yaml.safe_load(f)
 
     with SessionLocal() as db:
+        print("Ensuring default admin user exists...")
+        ensure_default_admin(db)
+
         if not auth_only:
             rates_data = data.get("exchange_rates", [])
             if rates_data:

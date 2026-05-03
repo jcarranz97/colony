@@ -11,7 +11,7 @@ from app.cycles.models import Cycle
 def get_auth_headers(client: TestClient, user: User) -> dict[str, str]:
     response = client.post(
         "/api/v1/auth/login",
-        data={"username": user.email, "password": "testpassword123"},
+        data={"username": user.username, "password": "testpassword123"},
     )
     assert response.status_code == 200
     token = response.json()["access_token"]

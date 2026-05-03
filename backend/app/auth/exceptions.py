@@ -23,10 +23,10 @@ class UserNotFoundExceptionError(AuthExceptionError):
 class UserAlreadyExistsExceptionError(AuthExceptionError):
     """Exception raised when attempting to create a user that already exists."""
 
-    def __init__(self, email: str) -> None:
+    def __init__(self, username: str) -> None:
         super().__init__(
             error_code=ErrorCode.USER_ALREADY_EXISTS,
-            message=f"User with email {email} already exists",
+            message=f"User '{username}' already exists",
             status_code=status.HTTP_409_CONFLICT,
         )
 
@@ -37,7 +37,7 @@ class InvalidCredentialsExceptionError(AuthExceptionError):
     def __init__(self) -> None:
         super().__init__(
             error_code=ErrorCode.INVALID_CREDENTIALS,
-            message="Incorrect email or password",
+            message="Incorrect username or password",
             status_code=status.HTTP_401_UNAUTHORIZED,
         )
 
@@ -96,4 +96,15 @@ class TokenExpiredExceptionError(AuthExceptionError):
             error_code=ErrorCode.TOKEN_EXPIRED,
             message="Token has expired",
             status_code=status.HTTP_401_UNAUTHORIZED,
+        )
+
+
+class InsufficientPermissionsExceptionError(AuthExceptionError):
+    """Exception raised when a user lacks the required role."""
+
+    def __init__(self) -> None:
+        super().__init__(
+            error_code=ErrorCode.INSUFFICIENT_PERMISSIONS,
+            message="Admin access required",
+            status_code=status.HTTP_403_FORBIDDEN,
         )

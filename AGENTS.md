@@ -174,6 +174,10 @@ uv run pyright .
 
 - **Domain-Driven Design**: Each feature is a self-contained module
 - **Stateless auth**: JWT tokens, no server-side sessions
+- **Username-based auth**: Users log in with username + password (no email).
+  A default `admin` account is created automatically on first deploy;
+  credentials are set via `DEFAULT_ADMIN_USERNAME` /
+  `DEFAULT_ADMIN_PASSWORD` env vars (defaults: `admin` / `colony-admin`).
 - **Billing cycles**: Core business concept — expenses live inside cycles
   aligned to pay periods
 - **Fixed vs Variable expenses**: Core categorization; location implicitly
