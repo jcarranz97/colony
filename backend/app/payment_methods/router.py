@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
-from app.dependencies import get_db
+from app.dependencies import CurrentActiveUser, get_db
 from app.households.dependencies import CurrentActiveHousehold
 
 from . import schemas, service
@@ -38,11 +38,20 @@ async def payment_method_health_check() -> dict[str, str]:
 )
 async def get_payment_methods(
     current_household: CurrentActiveHousehold,
+    current_user: CurrentActiveUser,
     db: DatabaseDep,
-    active: bool | None = Query(None, description="Filter by active status"),
+    include_inactive: bool = Query(
+        False, description="Include deactivated payment methods (admin only)"
+    ),
     currency: str | None = Query(None, description="Filter by default currency"),
 ) -> list[schemas.PaymentMethodResponse]:
     """Get all payment methods for the active household."""
+    if include_inactive and current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required",
+        )
+    active: bool | None = None if include_inactive else True
     payment_methods = service.payment_method_service.get_payment_methods(
         db, str(current_household.id), active=active, currency=currency
     )

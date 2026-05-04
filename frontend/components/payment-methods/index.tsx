@@ -6,6 +6,7 @@ import type {
   CurrencyCode,
 } from "@/helpers/types";
 import {
+  getCurrentUserAction,
   getPaymentMethods,
   addPaymentMethod,
   editPaymentMethod,
@@ -49,19 +50,14 @@ const iconBtn: React.CSSProperties = {
 function PaymentCard({
   method,
   onEdit,
-  onToggle,
-  toggling,
+  onTrash,
 }: {
   method: PaymentMethod;
   onEdit: (m: PaymentMethod) => void;
-  onToggle: (m: PaymentMethod) => void;
-  toggling: boolean;
+  onTrash: (m: PaymentMethod) => void;
 }) {
   return (
-    <div
-      className="nb-payment-card"
-      style={{ opacity: method.active ? 1 : 0.5 }}
-    >
+    <div className="nb-payment-card">
       <div
         style={{
           width: 44,
@@ -113,15 +109,198 @@ function PaymentCard({
         <button
           style={{
             ...iconBtn,
-            ...(method.active
-              ? { color: "var(--hl-overdue-border)" }
-              : { color: "var(--hl-paid-border)" }),
+            color: "rgba(220,53,69,0.7)",
+            border: "1px solid rgba(220,53,69,0.35)",
           }}
-          onClick={() => onToggle(method)}
-          disabled={toggling}
+          onClick={() => onTrash(method)}
+          title="Move to trash"
         >
-          {method.active ? "Deactivate" : "Activate"}
+          🗑 Trash
         </button>
+      </div>
+    </div>
+  );
+}
+
+// ── Trashed method card (admin only) ─────────────────────────────────────────
+
+function TrashedPaymentCard({
+  method,
+  onRestore,
+  restoring,
+}: {
+  method: PaymentMethod;
+  onRestore: (m: PaymentMethod) => void;
+  restoring: boolean;
+}) {
+  return (
+    <div
+      style={{
+        border: "1px dashed rgba(180,180,180,0.5)",
+        borderRadius: 6,
+        padding: "10px 14px",
+        background: "rgba(180,180,180,0.07)",
+        opacity: 0.7,
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        marginBottom: 8,
+      }}
+    >
+      <div
+        style={{
+          width: 36,
+          height: 36,
+          borderRadius: 8,
+          background: "rgba(180,180,180,0.15)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 18,
+          flexShrink: 0,
+        }}
+      >
+        {METHOD_ICON[method.method_type]}
+      </div>
+      <div style={{ flex: 1 }}>
+        <div
+          style={{
+            fontFamily: "var(--font-title)",
+            fontSize: 16,
+            color: "var(--ink)",
+            textDecoration: "line-through",
+            opacity: 0.55,
+          }}
+        >
+          {method.name}
+        </div>
+        <div
+          style={{
+            fontFamily: "var(--font-hand)",
+            fontSize: 12,
+            color: "var(--ink-light)",
+            opacity: 0.45,
+          }}
+        >
+          {METHOD_LABEL[method.method_type]} · {method.default_currency}
+        </div>
+      </div>
+      <span
+        style={{
+          fontFamily: "var(--font-hand)",
+          fontSize: 11,
+          background: "rgba(180,180,180,0.28)",
+          color: "var(--ink-light)",
+          borderRadius: 3,
+          padding: "2px 8px",
+        }}
+      >
+        trashed
+      </span>
+      <button
+        style={{
+          fontFamily: "var(--font-hand)",
+          fontSize: 12,
+          fontWeight: 600,
+          background: "transparent",
+          border: "1px solid var(--hl-paid-border, rgba(80,200,100,0.6))",
+          borderRadius: 4,
+          padding: "3px 10px",
+          cursor: "pointer",
+          color: "var(--hl-paid-border, rgba(80,200,100,0.8))",
+        }}
+        onClick={() => onRestore(method)}
+        disabled={restoring}
+      >
+        ↩ Restore
+      </button>
+    </div>
+  );
+}
+
+// ── Confirm Trash Modal ───────────────────────────────────────────────────────
+
+function ConfirmTrashModal({
+  isOpen,
+  onClose,
+  method,
+  onConfirmed,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  method: PaymentMethod | null;
+  onConfirmed: (id: string) => void;
+}) {
+  const [trashing, setTrashing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isOpen) setError(null);
+  }, [isOpen]);
+
+  const handleConfirm = async () => {
+    if (!method) return;
+    setTrashing(true);
+    setError(null);
+    const res = await deactivatePaymentMethod(method.id);
+    if (res.success) {
+      onConfirmed(method.id);
+      onClose();
+    } else {
+      setError(res.error.message);
+    }
+    setTrashing(false);
+  };
+
+  if (!isOpen || !method) return null;
+
+  return (
+    <div
+      className="nb-modal-backdrop"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div className="nb-modal">
+        <button className="nb-modal-close" onClick={onClose}>
+          ✕
+        </button>
+        <div className="nb-modal-title">Move to Trash?</div>
+        <p
+          style={{
+            fontFamily: "var(--font-hand)",
+            fontSize: 15,
+            color: "var(--ink)",
+            marginBottom: 8,
+            lineHeight: 1.5,
+          }}
+        >
+          <strong>{method.name}</strong> will be deactivated and moved to trash.
+          Regular users will no longer see it. Contact your admin if you need it
+          restored.
+        </p>
+        {error && (
+          <p
+            style={{
+              fontFamily: "var(--font-hand)",
+              color: "var(--hl-overdue-border)",
+              fontSize: 14,
+              marginBottom: 8,
+            }}
+          >
+            {error}
+          </p>
+        )}
+        <div className="nb-modal-actions">
+          <button className="nb-btn-cancel" onClick={onClose}>
+            Cancel
+          </button>
+          <button
+            className="nb-btn-danger"
+            onClick={handleConfirm}
+            disabled={trashing}
+          >
+            {trashing ? "Moving…" : "Move to Trash 🗑"}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -258,34 +437,46 @@ function MethodModal({
 
 export function PaymentMethods() {
   const [methods, setMethods] = useState<PaymentMethod[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [addOpen, setAddOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<PaymentMethod | null>(null);
-  const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [trashTarget, setTrashTarget] = useState<PaymentMethod | null>(null);
+  const [restoringId, setRestoringId] = useState<string | null>(null);
+  const [restoreError, setRestoreError] = useState<string | null>(null);
 
   useEffect(() => {
-    getPaymentMethods().then((res) => {
+    getCurrentUserAction().then(async (userRes) => {
+      const admin = userRes.success && userRes.data.role === "admin";
+      setIsAdmin(admin);
+      const res = await getPaymentMethods(admin);
       if (res.success) setMethods(res.data);
       setLoading(false);
     });
   }, []);
 
-  const active = methods.filter((m) => m.active);
-  const inactive = methods.filter((m) => !m.active);
+  const activeMethods = methods.filter((m) => m.active);
+  const trashedMethods = methods.filter((m) => !m.active);
 
-  const handleToggle = async (method: PaymentMethod) => {
-    setTogglingId(method.id);
-    const res = method.active
-      ? await deactivatePaymentMethod(method.id)
-      : await activatePaymentMethod(method.id);
+  const handleTrashed = (id: string) => {
+    setMethods((prev) =>
+      prev.map((m) => (m.id === id ? { ...m, active: false } : m)),
+    );
+    setTrashTarget(null);
+  };
+
+  const handleRestore = async (method: PaymentMethod) => {
+    setRestoringId(method.id);
+    setRestoreError(null);
+    const res = await activatePaymentMethod(method.id);
     if (res.success) {
       setMethods((prev) =>
-        prev.map((m) =>
-          m.id === method.id ? { ...m, active: !method.active } : m,
-        ),
+        prev.map((m) => (m.id === method.id ? { ...m, active: true } : m)),
       );
+    } else {
+      setRestoreError(res.error.message);
     }
-    setTogglingId(null);
+    setRestoringId(null);
   };
 
   const handleAdd = async (form: MethodForm): Promise<string | null> => {
@@ -332,14 +523,16 @@ export function PaymentMethods() {
         style={{ display: "flex", gap: 12, marginBottom: 24, flexWrap: "wrap" }}
       >
         {[
-          { label: "Active methods", value: active.length },
+          { label: "Active methods", value: activeMethods.length },
           {
             label: "USD methods",
-            value: active.filter((m) => m.default_currency === "USD").length,
+            value: activeMethods.filter((m) => m.default_currency === "USD")
+              .length,
           },
           {
             label: "MXN methods",
-            value: active.filter((m) => m.default_currency === "MXN").length,
+            value: activeMethods.filter((m) => m.default_currency === "MXN")
+              .length,
           },
         ].map((stat) => (
           <div key={stat.label} className="nb-payment-stat-card">
@@ -350,40 +543,21 @@ export function PaymentMethods() {
       </div>
 
       {/* Active methods */}
-      {active.length > 0 && (
+      {activeMethods.length > 0 && (
         <>
           <div className="nb-section-title">✓ Active</div>
-          {active.map((m) => (
+          {activeMethods.map((m) => (
             <PaymentCard
               key={m.id}
               method={m}
               onEdit={setEditTarget}
-              onToggle={handleToggle}
-              toggling={togglingId === m.id}
+              onTrash={setTrashTarget}
             />
           ))}
         </>
       )}
 
-      {/* Inactive methods */}
-      {inactive.length > 0 && (
-        <>
-          <div className="nb-section-title" style={{ marginTop: 24 }}>
-            ○ Inactive
-          </div>
-          {inactive.map((m) => (
-            <PaymentCard
-              key={m.id}
-              method={m}
-              onEdit={setEditTarget}
-              onToggle={handleToggle}
-              toggling={togglingId === m.id}
-            />
-          ))}
-        </>
-      )}
-
-      {methods.length === 0 && (
+      {activeMethods.length === 0 && (
         <div className="nb-empty">
           <div className="nb-empty-icon">💳</div>
           <div className="nb-empty-text">
@@ -395,6 +569,38 @@ export function PaymentMethods() {
       <button className="nb-add-btn" onClick={() => setAddOpen(true)}>
         + Add Payment Method
       </button>
+
+      {/* Trashed section (admin only) */}
+      {isAdmin && trashedMethods.length > 0 && (
+        <div style={{ marginTop: 32 }}>
+          <div
+            className="nb-section-title"
+            style={{ opacity: 0.55, marginBottom: 12 }}
+          >
+            🗑 Trashed Payment Methods
+          </div>
+          {restoreError && (
+            <p
+              style={{
+                fontFamily: "var(--font-hand)",
+                color: "var(--hl-overdue-border)",
+                fontSize: 14,
+                marginBottom: 10,
+              }}
+            >
+              {restoreError}
+            </p>
+          )}
+          {trashedMethods.map((m) => (
+            <TrashedPaymentCard
+              key={m.id}
+              method={m}
+              onRestore={handleRestore}
+              restoring={restoringId === m.id}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Add modal */}
       <MethodModal
@@ -420,6 +626,14 @@ export function PaymentMethods() {
         }
         onClose={() => setEditTarget(null)}
         onSave={handleEdit}
+      />
+
+      {/* Confirm trash modal */}
+      <ConfirmTrashModal
+        isOpen={trashTarget !== null}
+        onClose={() => setTrashTarget(null)}
+        method={trashTarget}
+        onConfirmed={handleTrashed}
       />
     </>
   );

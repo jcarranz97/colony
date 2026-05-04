@@ -5,6 +5,7 @@ import {
   updatePaymentMethod,
   deletePaymentMethod,
 } from "@/lib/payment-methods.api";
+import { getCurrentUser } from "@/lib/auth.api";
 import type {
   CreatePaymentMethodRequest,
   UpdatePaymentMethodRequest,
@@ -14,7 +15,10 @@ async function token() {
   return (await getAuthToken()) ?? "";
 }
 
-export const getPaymentMethods = async () => fetchPaymentMethods(await token());
+export const getCurrentUserAction = async () => getCurrentUser(await token());
+
+export const getPaymentMethods = async (includeInactive = false) =>
+  fetchPaymentMethods(await token(), includeInactive);
 
 export const addPaymentMethod = async (payload: CreatePaymentMethodRequest) =>
   createPaymentMethod(payload, await token());

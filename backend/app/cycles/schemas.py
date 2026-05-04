@@ -132,6 +132,7 @@ class CycleResponse(BaseModel):
     end_date: date
     remaining_balance: Decimal
     status: CycleStatus
+    active: bool
     summary: CycleSummary
     created_at: datetime
     updated_at: datetime

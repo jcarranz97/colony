@@ -151,6 +151,7 @@ class CycleService:
         status: str | None = None,
         page: int = 1,
         per_page: int = 20,
+        include_inactive: bool = False,
     ) -> tuple[list[models.Cycle], int]:
         """Return a paginated list of cycles for *household_id*.
 
@@ -160,23 +161,22 @@ class CycleService:
             status: Optional filter by cycle status.
             page: 1-based page number.
             per_page: Maximum items per page.
+            include_inactive: When True, include deactivated cycles (admin only).
 
         Returns:
             Tuple of (list of Cycle instances, total count).
         """
         query = (
             db.query(models.Cycle)
-            .filter(
-                and_(
-                    models.Cycle.household_id == household_id,
-                    models.Cycle.active.is_(True),
-                )
-            )
+            .filter(models.Cycle.household_id == household_id)
             .options(
                 selectinload(models.Cycle.expenses),
                 selectinload(models.Cycle.incomes),
             )
         )
+
+        if not include_inactive:
+            query = query.filter(models.Cycle.active.is_(True))
 
         if status:
             query = query.filter(models.Cycle.status == status)
@@ -631,6 +631,47 @@ class CycleService:
         db.commit()
 
         logger.info("Cycle deleted", extra={"cycle_id": str(cycle.id)})
+
+    @staticmethod
+    def restore_cycle(
+        db: Session,
+        cycle_id: str,
+        household_id: str,
+    ) -> models.Cycle | None:
+        """Restore a soft-deleted cycle (admin only).
+
+        Args:
+            db: Active database session.
+            cycle_id: UUID string of the cycle to restore.
+            household_id: The active household's ID.
+
+        Returns:
+            The restored Cycle instance, or None if not found.
+        """
+        cycle = (
+            db.query(models.Cycle)
+            .filter(
+                and_(
+                    models.Cycle.id == cycle_id,
+                    models.Cycle.household_id == household_id,
+                    models.Cycle.active.is_(False),
+                )
+            )
+            .options(
+                selectinload(models.Cycle.expenses),
+                selectinload(models.Cycle.incomes),
+            )
+            .first()
+        )
+        if not cycle:
+            return None
+
+        logger.info("Restoring cycle", extra={"cycle_id": str(cycle.id)})
+        cycle.active = True
+        db.commit()
+        db.refresh(cycle)
+        logger.info("Cycle restored", extra={"cycle_id": str(cycle.id)})
+        return cycle
 
 
 # ---------------------------------------------------------------------------

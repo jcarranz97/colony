@@ -182,6 +182,7 @@ class RecurrentExpenseUpdate(AppBaseModel):
     recurrence_config: dict[str, Any] | None = None
     reference_date: date | None = None
     autopay: bool = False
+    active: bool | None = None
 
     @field_validator("description")
     @classmethod

@@ -179,6 +179,7 @@ class RecurrentIncomeUpdate(AppBaseModel):
     recurrence_type: RecurrenceType | None = None
     recurrence_config: dict[str, Any] | None = None
     reference_date: date | None = None
+    active: bool | None = None
 
     @field_validator("description")
     @classmethod
