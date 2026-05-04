@@ -34,8 +34,10 @@ uv run alembic revision --autogenerate -m "description"
 uv run alembic upgrade head
 ```
 
-Pre-commit runs Ruff, Pyright, Hadolint, and YAML/JSON validators on every
-commit — don't bypass with `--no-verify`.
+Pre-commit runs Hadolint, markdownlint, Prettier, and YAML/JSON validators
+on every commit — don't bypass with `--no-verify`. Ruff and Pyright are
+**not** pre-commit hooks; run them directly via `uv run ruff` / `uv run
+pyright` (see Validation Checklist below).
 
 ---
 
@@ -444,6 +446,11 @@ pre-commit run --files backend/app/cycles/service.py backend/AGENTS.md
 
 Do **not** use `--all-files`; it processes the entire frontend too and can
 run out of memory. Pass only the files you touched.
+
+**Important**: `ruff` is **not** a registered pre-commit hook in this repo.
+Do not run `pre-commit run ruff --files ...` — it will fail with "No hook
+with id `ruff`". Run Ruff directly: `PYTHONPATH=. uv run ruff check . --fix`
+and `PYTHONPATH=. uv run ruff format .`
 
 ### API Documentation
 
