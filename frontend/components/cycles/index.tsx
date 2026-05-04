@@ -285,6 +285,7 @@ function ExpenseRow({
             : "✏️"}
       </div>
       <div className="nb-expense-name">{expense.description}</div>
+      {expense.autopay && <div className="nb-expense-autopay">⚡ autopay</div>}
       {expense.payment_method && (
         <div className="nb-expense-method">
           {formatPaymentMethodName(expense.payment_method)}
