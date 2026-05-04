@@ -1161,3 +1161,31 @@
   --tpl-border-hover: #3a3a5c;
   --pill-border: #3a3a5c;
 }
+
+/* ── Similar-items suggestions panel (add modals) ───────────────────────── */
+.nb-similar-items {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 6px 10px;
+  background: rgba(201, 168, 76, 0.1);
+  border-left: 3px solid var(--cover-accent);
+  border-radius: 0 4px 4px 0;
+  font-family: var(--font-hand);
+  font-size: 12px;
+  color: var(--ink-light);
+}
+
+.nb-similar-item-chip {
+  display: inline-block;
+  background: rgba(201, 168, 76, 0.18);
+  border: 1px solid rgba(201, 168, 76, 0.45);
+  border-radius: 10px;
+  padding: 1px 8px;
+  font-size: 12px;
+  font-family: var(--font-hand);
+  color: var(--ink);
+  white-space: nowrap;
+}

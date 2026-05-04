@@ -520,6 +520,7 @@ function TemplateModal({
   paymentMethods,
   onClose,
   onSave,
+  existingNames,
 }: {
   isOpen: boolean;
   title: string;
@@ -527,6 +528,7 @@ function TemplateModal({
   paymentMethods: PaymentMethod[];
   onClose: () => void;
   onSave: (form: TemplateForm) => Promise<string | null>;
+  existingNames?: string[];
 }) {
   const [form, setForm] = useState<TemplateForm>(initial);
   const [saving, setSaving] = useState(false);
@@ -541,6 +543,15 @@ function TemplateModal({
 
   const set = <K extends keyof TemplateForm>(k: K, v: TemplateForm[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
+
+  const nameSuggestions =
+    existingNames && form.description.trim().length > 0
+      ? existingNames
+          .filter((n) =>
+            n.toLowerCase().includes(form.description.trim().toLowerCase()),
+          )
+          .slice(0, 5)
+      : [];
 
   const handleRecurrenceTypeChange = (rt: RecurrenceType) => {
     setForm((f) => {
@@ -599,6 +610,17 @@ function TemplateModal({
             onChange={(e) => set("description", e.target.value)}
           />
         </div>
+
+        {nameSuggestions.length > 0 && (
+          <div className="nb-similar-items">
+            <span>Similar:</span>
+            {nameSuggestions.map((n, i) => (
+              <span key={i} className="nb-similar-item-chip">
+                {n}
+              </span>
+            ))}
+          </div>
+        )}
 
         <div className="nb-form-row">
           <div className="nb-form-group">
@@ -1010,6 +1032,9 @@ export function RecurrentExpenses() {
         paymentMethods={paymentMethods}
         onClose={() => setAddOpen(false)}
         onSave={handleAdd}
+        existingNames={templates
+          .filter((t) => t.active)
+          .map((t) => t.description)}
       />
 
       {/* Edit modal */}

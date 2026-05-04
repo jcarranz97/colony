@@ -497,6 +497,7 @@ function IncomeModal({
   paymentMethods,
   onClose,
   onSave,
+  existingNames,
 }: {
   isOpen: boolean;
   title: string;
@@ -504,6 +505,7 @@ function IncomeModal({
   paymentMethods: PaymentMethod[];
   onClose: () => void;
   onSave: (form: IncomeForm) => Promise<string | null>;
+  existingNames?: string[];
 }) {
   const [form, setForm] = useState<IncomeForm>(initial);
   const [saving, setSaving] = useState(false);
@@ -518,6 +520,15 @@ function IncomeModal({
 
   const set = <K extends keyof IncomeForm>(k: K, v: IncomeForm[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
+
+  const nameSuggestions =
+    existingNames && form.description.trim().length > 0
+      ? existingNames
+          .filter((n) =>
+            n.toLowerCase().includes(form.description.trim().toLowerCase()),
+          )
+          .slice(0, 5)
+      : [];
 
   const handleRecurrenceTypeChange = (rt: RecurrenceType) => {
     setForm((f) => {
@@ -581,6 +592,17 @@ function IncomeModal({
             onChange={(e) => set("description", e.target.value)}
           />
         </div>
+
+        {nameSuggestions.length > 0 && (
+          <div className="nb-similar-items">
+            <span>Similar:</span>
+            {nameSuggestions.map((n, i) => (
+              <span key={i} className="nb-similar-item-chip">
+                {n}
+              </span>
+            ))}
+          </div>
+        )}
 
         <div className="nb-form-row">
           <div className="nb-form-group">
@@ -914,6 +936,7 @@ export function Incomes() {
         paymentMethods={paymentMethods}
         onClose={() => setAddOpen(false)}
         onSave={handleAdd}
+        existingNames={activeIncomes.map((i) => i.description)}
       />
 
       <IncomeModal
