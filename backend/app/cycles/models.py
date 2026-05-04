@@ -121,6 +121,10 @@ class Cycle(BaseModel):
             (e.amount_usd for e in countable if e.category == ExpenseCategory.VARIABLE),
             Decimal("0"),
         )
+        extra = sum(
+            (e.amount_usd for e in countable if e.category == ExpenseCategory.EXTRA),
+            Decimal("0"),
+        )
         expense_count = len(countable)
         paid_count = sum(1 for e in countable if e.paid)
         pending_count = expense_count - paid_count
@@ -128,6 +132,7 @@ class Cycle(BaseModel):
             "total_expenses": total,
             "fixed_expenses": fixed,
             "variable_expenses": variable,
+            "extra_expenses": extra,
             "expense_count": expense_count,
             "paid_count": paid_count,
             "pending_count": pending_count,

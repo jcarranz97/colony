@@ -21,6 +21,7 @@ class ExpenseCategory(str, Enum):
 
     FIXED = "fixed"
     VARIABLE = "variable"
+    EXTRA = "extra"
 
 
 class RecurrenceType(str, Enum):

@@ -8,7 +8,6 @@ import type {
   PaymentMethod,
   ExpenseStatus,
   CurrencyCode,
-  ExpenseCategory,
 } from "@/helpers/types";
 import {
   getCycles,
@@ -273,11 +272,17 @@ function ExpenseRow({
           background:
             expense.category === "fixed"
               ? "rgba(44,74,62,0.10)"
-              : "rgba(201,168,76,0.15)",
+              : expense.category === "variable"
+                ? "rgba(201,168,76,0.15)"
+                : "rgba(70,130,180,0.12)",
           fontSize: 12,
         }}
       >
-        {expense.category === "fixed" ? "📌" : "🛒"}
+        {expense.category === "fixed"
+          ? "📌"
+          : expense.category === "variable"
+            ? "🛒"
+            : "✏️"}
       </div>
       <div className="nb-expense-name">{expense.description}</div>
       {expense.payment_method && (
@@ -293,7 +298,13 @@ function ExpenseRow({
       </div>
       <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
         <span
-          className={`nb-template-badge ${expense.category === "fixed" ? "nb-badge-fixed" : "nb-badge-variable"}`}
+          className={`nb-template-badge ${
+            expense.category === "fixed"
+              ? "nb-badge-fixed"
+              : expense.category === "variable"
+                ? "nb-badge-variable"
+                : "nb-badge-extra"
+          }`}
         >
           {expense.category}
         </span>
@@ -954,9 +965,9 @@ interface AddExpenseForm {
   description: string;
   amount: string;
   currency: CurrencyCode;
-  category: ExpenseCategory;
   due_date: string;
   payment_method_id: string;
+  paid: boolean;
 }
 
 function AddExpenseModal({
@@ -978,9 +989,9 @@ function AddExpenseModal({
     description: "",
     amount: "",
     currency: "USD",
-    category: "fixed",
-    due_date: "",
+    due_date: new Date().toISOString().split("T")[0],
     payment_method_id: "",
+    paid: false,
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -1008,9 +1019,9 @@ function AddExpenseModal({
       description: form.description,
       amount: form.amount,
       currency: form.currency,
-      category: form.category,
       due_date: form.due_date || null,
       payment_method_id: form.payment_method_id || null,
+      paid: form.paid,
     });
     if (res.success) {
       onAdded(res.data);
@@ -1018,9 +1029,9 @@ function AddExpenseModal({
         description: "",
         amount: "",
         currency: "USD",
-        category: "fixed",
-        due_date: "",
+        due_date: new Date().toISOString().split("T")[0],
         payment_method_id: "",
+        paid: false,
       });
       onClose();
     } else {
@@ -1087,29 +1098,14 @@ function AddExpenseModal({
           </div>
         </div>
 
-        <div className="nb-form-row">
-          <div className="nb-form-group">
-            <label className="nb-form-label">Category</label>
-            <select
-              className="nb-form-select"
-              value={form.category}
-              onChange={(e) =>
-                set("category", e.target.value as ExpenseCategory)
-              }
-            >
-              <option value="fixed">Fixed</option>
-              <option value="variable">Variable</option>
-            </select>
-          </div>
-          <div className="nb-form-group">
-            <label className="nb-form-label">Due date</label>
-            <input
-              className="nb-form-input"
-              type="date"
-              value={form.due_date}
-              onChange={(e) => set("due_date", e.target.value)}
-            />
-          </div>
+        <div className="nb-form-group">
+          <label className="nb-form-label">Due date</label>
+          <input
+            className="nb-form-input"
+            type="date"
+            value={form.due_date}
+            onChange={(e) => set("due_date", e.target.value)}
+          />
         </div>
 
         {paymentMethods.length > 0 && (
@@ -1131,6 +1127,15 @@ function AddExpenseModal({
             </select>
           </div>
         )}
+
+        <label className="nb-checkbox-label">
+          <input
+            type="checkbox"
+            checked={form.paid}
+            onChange={(e) => set("paid", e.target.checked)}
+          />
+          Already paid
+        </label>
 
         {error && (
           <p

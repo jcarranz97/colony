@@ -35,6 +35,7 @@ class ExpenseCategory(str, Enum):
 
     FIXED = "fixed"
     VARIABLE = "variable"
+    EXTRA = "extra"
 
 
 class ExpenseStatus(str, Enum):

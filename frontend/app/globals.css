@@ -927,6 +927,22 @@
 .nb-form-row .nb-form-group {
   flex: 1;
 }
+.nb-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-hand);
+  font-size: 15px;
+  color: var(--ink);
+  margin: 10px 0;
+  cursor: pointer;
+}
+.nb-checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--cover-bg);
+  cursor: pointer;
+}
 .nb-modal-actions {
   display: flex;
   justify-content: flex-end;
@@ -1076,6 +1092,11 @@
   background: rgba(80, 200, 100, 0.18);
   color: #276838;
   border: 1px solid #3aad55;
+}
+.nb-badge-extra {
+  background: rgba(70, 130, 180, 0.15);
+  color: #2a5f8a;
+  border: 1px solid rgba(70, 130, 180, 0.3);
 }
 
 /* ── Filter pills ────────────────────────────────────────────────────────── */

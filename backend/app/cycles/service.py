@@ -509,6 +509,10 @@ class CycleService:
             (e.amount_usd for e in countable if e.category == ExpenseCategory.VARIABLE),
             Decimal("0"),
         )
+        extra_usd = sum(
+            (e.amount_usd for e in countable if e.category == ExpenseCategory.EXTRA),
+            Decimal("0"),
+        )
         # USD currency → US expenses; MXN → Mexico expenses
         usa_usd = sum(
             (e.amount_usd for e in countable if e.currency == CurrencyCode.USD),
@@ -526,6 +530,7 @@ class CycleService:
             total_expenses_usd=total_usd,
             fixed_expenses_usd=fixed_usd,
             variable_expenses_usd=variable_usd,
+            extra_expenses_usd=extra_usd,
             usa_expenses_usd=usa_usd,
             mexico_expenses_usd=mexico_usd,
             total_incomes_usd=total_incomes_usd,
@@ -793,7 +798,9 @@ class CycleExpenseService:
             category=data.category,
             comments=data.comments,
             autopay=data.autopay,
-            status=ExpenseStatus.PENDING,
+            paid=data.paid,
+            status=ExpenseStatus.PAID if data.paid else ExpenseStatus.PENDING,
+            paid_at=datetime.now(UTC) if data.paid else None,
         )
 
         db.add(expense)
@@ -913,6 +920,10 @@ class CycleExpenseService:
             (e.amount_usd for e in expenses if e.category == ExpenseCategory.VARIABLE),
             Decimal("0"),
         )
+        extra = sum(
+            (e.amount_usd for e in expenses if e.category == ExpenseCategory.EXTRA),
+            Decimal("0"),
+        )
         paid = sum(
             (e.amount_usd for e in expenses if e.paid),
             Decimal("0"),
@@ -925,6 +936,7 @@ class CycleExpenseService:
             total_amount_usd=total_usd,
             fixed_amount=fixed,
             variable_amount=variable,
+            extra_amount=extra,
             paid_amount=paid,
             pending_amount=pending,
             total_count=len(expenses),

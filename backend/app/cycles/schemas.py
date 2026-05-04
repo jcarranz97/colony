@@ -24,6 +24,7 @@ class CycleSummary(BaseModel):
     total_expenses: Decimal
     fixed_expenses: Decimal
     variable_expenses: Decimal
+    extra_expenses: Decimal
     expense_count: int
     paid_count: int
     pending_count: int
@@ -163,9 +164,10 @@ class CycleExpenseCreate(AppBaseModel):
     payment_method_id: uuid.UUID
     amount: Decimal = Field(..., gt=0, decimal_places=2)
     due_date: date
-    category: ExpenseCategory
+    category: ExpenseCategory = ExpenseCategory.EXTRA
     comments: str | None = Field(None, max_length=1000)
     autopay: bool = False
+    paid: bool = False
 
     @field_validator("description")
     @classmethod
@@ -261,6 +263,7 @@ class ExpensesSummary(BaseModel):
     total_amount_usd: Decimal
     fixed_amount: Decimal
     variable_amount: Decimal
+    extra_amount: Decimal
     paid_amount: Decimal
     pending_amount: Decimal
     total_count: int
@@ -387,6 +390,7 @@ class FinancialSummary(BaseModel):
     total_expenses_usd: Decimal
     fixed_expenses_usd: Decimal
     variable_expenses_usd: Decimal
+    extra_expenses_usd: Decimal
     usa_expenses_usd: Decimal
     mexico_expenses_usd: Decimal
     total_incomes_usd: Decimal
