@@ -333,7 +333,7 @@ Get all user's recurrent expenses.
 
 **Query Parameters:**
 - `active` (boolean, optional): Filter by active status
-- `category` (string, optional): Filter by category (fixed/variable)
+- `category` (string, optional): Filter by category (fixed/variable/extra)
 - `currency` (string, optional): Filter by currency
 
 **Response:** `200 OK`
@@ -636,7 +636,7 @@ Get all expenses for a specific cycle.
 **Query Parameters:**
 - `status` (string, optional): Filter by status
   (pending/paid/cancelled/overdue/paid_other/skipped)
-- `category` (string, optional): Filter by category (fixed/variable)
+- `category` (string, optional): Filter by category (fixed/variable/extra)
 - `currency` (string, optional): Filter by currency
 - `payment_method_id` (string, optional): Filter by payment method
 
@@ -671,6 +671,7 @@ Get all expenses for a specific cycle.
     "total_amount_usd": "1200.00",
     "fixed_amount": "1200.00",
     "variable_amount": "0.00",
+    "extra_amount": "0.00",
     "paid_amount": "1200.00",
     "pending_amount": "0.00",
     "total_count": 1
@@ -679,7 +680,8 @@ Get all expenses for a specific cycle.
 ```
 
 #### POST /cycles/{cycle_id}/expenses
-Add a manual expense to a cycle.
+Add a manual expense to a cycle. Category is always set to `extra`
+automatically — it cannot be specified by the caller.
 
 **Request Body:**
 ```json
@@ -689,10 +691,13 @@ Add a manual expense to a cycle.
   "payment_method_id": "123e4567-e89b-12d3-a456-426614174002",
   "amount": "350.00",
   "due_date": "2025-01-15",
-  "category": "variable",
-  "comments": "Unexpected expense"
+  "comments": "Unexpected expense",
+  "paid": false
 }
 ```
+
+`paid` is optional (default `false`). When `true`, the expense is created
+with status `paid` and `paid_at` set to the current timestamp.
 
 **Response:** `201 Created`
 ```json
@@ -703,7 +708,7 @@ Add a manual expense to a cycle.
   "amount": "350.00",
   "amount_usd": "350.00",
   "due_date": "2025-01-15",
-  "category": "variable",
+  "category": "extra",
   "status": "pending",
   "paid": false,
   "paid_at": null,
@@ -838,6 +843,7 @@ Get detailed cycle summary and analytics.
     "total_expenses_usd": "4500.00",
     "fixed_expenses_usd": "3000.00",
     "variable_expenses_usd": "1500.00",
+    "extra_expenses_usd": "0.00",
     "usa_expenses_usd": "3800.00",
     "mexico_expenses_usd": "700.00",
     "total_incomes_usd": "4000.00",

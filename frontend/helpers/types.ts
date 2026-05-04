@@ -2,7 +2,7 @@
 export type CurrencyCode = "USD" | "MXN";
 export type UserRole = "admin" | "user";
 export type PaymentMethodType = "debit" | "credit" | "cash" | "transfer";
-export type ExpenseCategory = "fixed" | "variable";
+export type ExpenseCategory = "fixed" | "variable" | "extra";
 export type RecurrenceType = "weekly" | "bi_weekly" | "monthly" | "custom";
 export type CycleStatus = "draft" | "active" | "completed";
 export type ExpenseStatus =
@@ -269,9 +269,9 @@ export interface CreateCycleExpenseRequest {
   description: string;
   amount: string;
   currency: CurrencyCode;
-  category: ExpenseCategory;
   due_date?: string | null;
   payment_method_id?: string | null;
+  paid?: boolean;
 }
 
 export interface UpdateCycleExpenseRequest extends Partial<CreateCycleExpenseRequest> {

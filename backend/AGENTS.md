@@ -301,7 +301,7 @@ Defined per domain in `constants.py` but semantically identical across domains:
 |---|---|
 | `CurrencyCode` | `USD`, `MXN` |
 | `PaymentMethodType` | `debit`, `credit`, `cash`, `transfer` |
-| `ExpenseCategory` | `fixed`, `variable` |
+| `ExpenseCategory` | `fixed`, `variable`, `extra` |
 | `RecurrenceType` | `weekly`, `bi_weekly`, `monthly`, `custom` |
 | `CycleStatus` | `draft`, `active`, `completed` |
 | `ExpenseStatus` | `pending`, `paid`, `cancelled`, `overdue`, `paid_other`, `skipped` |

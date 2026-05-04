@@ -158,7 +158,7 @@ CREATE TYPE currency_code AS ENUM ('USD', 'MXN');
 CREATE TYPE payment_method_type AS ENUM ('debit', 'credit', 'cash', 'transfer');
 
 -- Expense categorization
-CREATE TYPE expense_category AS ENUM ('fixed', 'variable');
+CREATE TYPE expense_category AS ENUM ('fixed', 'variable', 'extra');
 
 -- Template recurrence patterns
 CREATE TYPE recurrence_type AS ENUM ('weekly', 'bi_weekly', 'monthly', 'custom');
@@ -178,7 +178,7 @@ CREATE TYPE expense_status AS ENUM (
 |------|--------|-------------|
 | `currency_code` | `USD`, `MXN` | ISO 4217 currency codes for supported currencies |
 | `payment_method_type` | `debit`, `credit`, `cash`, `transfer` | Types of payment methods available |
-| `expense_category` | `fixed`, `variable` | Expense categorization for budgeting |
+| `expense_category` | `fixed`, `variable`, `extra` | Expense categorization; `extra` is auto-assigned to manually-added cycle expenses |
 | `recurrence_type` | `weekly`, `bi_weekly`, `monthly`, `custom` | How often template expenses recur |
 | `cycle_status` | `draft`, `active`, `completed` | Lifecycle state of expense cycles |
 | `expense_status` | `pending`, `paid`, `cancelled`, `overdue`, `paid_other`, `skipped` | Current state of individual expenses |
@@ -867,6 +867,7 @@ SELECT
     SUM(ce.amount_usd) as total_amount_usd,
     SUM(CASE WHEN ce.category = 'fixed' THEN ce.amount_usd ELSE 0 END) as fixed_expenses,
     SUM(CASE WHEN ce.category = 'variable' THEN ce.amount_usd ELSE 0 END) as variable_expenses,
+    SUM(CASE WHEN ce.category = 'extra' THEN ce.amount_usd ELSE 0 END) as extra_expenses,
     COALESCE((SELECT SUM(ci.amount_usd) FROM cycle_incomes ci WHERE ci.cycle_id = c.id), 0)
         - SUM(ce.amount_usd) as net_balance
 FROM cycles c
