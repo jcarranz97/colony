@@ -13,6 +13,8 @@ const STATUS_COLOR: Record<Status, ChipColor> = {
   paid: "success",
   overdue: "danger",
   cancelled: "default",
+  paid_other: "accent",
+  skipped: "default",
 };
 
 export function StatusChip({ status }: { status: Status }) {

@@ -145,10 +145,12 @@ function CycleCard({
 function ExpenseRow({
   expense,
   onToggle,
+  onStatusChange,
   onEdit,
 }: {
   expense: CycleExpense;
   onToggle: (id: string) => void;
+  onStatusChange: (id: string, status: ExpenseStatus) => void;
   onEdit: (expense: CycleExpense) => void;
 }) {
   const statusCls =
@@ -158,27 +160,59 @@ function ExpenseRow({
         ? "nb-overdue"
         : expense.status === "cancelled"
           ? "nb-cancelled"
-          : "nb-pending";
+          : expense.status === "paid_other"
+            ? "nb-paid-other"
+            : expense.status === "skipped"
+              ? "nb-skipped"
+              : "nb-pending";
 
   const checkCls =
     expense.status === "paid"
       ? "nb-check-paid"
       : expense.status === "overdue"
         ? "nb-check-overdue"
-        : "nb-check-pending";
+        : expense.status === "paid_other"
+          ? "nb-check-paid-other"
+          : expense.status === "skipped"
+            ? "nb-check-skipped"
+            : "nb-check-pending";
+
+  const checkIcon =
+    expense.status === "paid"
+      ? "✓"
+      : expense.status === "overdue"
+        ? "!"
+        : expense.status === "paid_other"
+          ? "~"
+          : expense.status === "skipped"
+            ? "—"
+            : "";
+
+  const isLocked =
+    expense.status === "cancelled" ||
+    expense.status === "paid_other" ||
+    expense.status === "skipped";
+
+  const handleOther = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const next: ExpenseStatus =
+      expense.status === "paid_other" ? "pending" : "paid_other";
+    onStatusChange(expense.id, next);
+  };
+
+  const handleSkip = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const next: ExpenseStatus =
+      expense.status === "skipped" ? "pending" : "skipped";
+    onStatusChange(expense.id, next);
+  };
 
   return (
     <div
       className={`nb-expense-row ${statusCls}`}
-      onClick={() => expense.status !== "cancelled" && onToggle(expense.id)}
+      onClick={() => !isLocked && onToggle(expense.id)}
     >
-      <div className={`nb-expense-check ${checkCls}`}>
-        {expense.status === "paid"
-          ? "✓"
-          : expense.status === "overdue"
-            ? "!"
-            : ""}
-      </div>
+      <div className={`nb-expense-check ${checkCls}`}>{checkIcon}</div>
       <div className="nb-expense-name">{expense.description}</div>
       {expense.payment_method && (
         <div className="nb-expense-method">{expense.payment_method.name}</div>
@@ -189,6 +223,28 @@ function ExpenseRow({
       <div className="nb-expense-amount">
         {fmtAmount(expense.amount, expense.currency)}
       </div>
+      {expense.status !== "cancelled" && (
+        <>
+          <button
+            className={`nb-expense-action-btn nb-btn-other${expense.status === "paid_other" ? " nb-btn-active" : ""}`}
+            title={
+              expense.status === "paid_other"
+                ? "Revert to pending"
+                : "Mark as paid by other"
+            }
+            onClick={handleOther}
+          >
+            Other
+          </button>
+          <button
+            className={`nb-expense-action-btn nb-btn-skip${expense.status === "skipped" ? " nb-btn-active" : ""}`}
+            title={expense.status === "skipped" ? "Revert to pending" : "Skip"}
+            onClick={handleSkip}
+          >
+            Skip
+          </button>
+        </>
+      )}
       <button
         className="nb-expense-edit-btn"
         title="Edit expense"
@@ -974,6 +1030,7 @@ function CycleDetail({
   paymentMethods,
   onBack,
   onToggleExpense,
+  onStatusChange,
   onExpenseAdded,
   onExpenseEdited,
   onIncomeAdded,
@@ -987,6 +1044,7 @@ function CycleDetail({
   paymentMethods: PaymentMethod[];
   onBack: () => void;
   onToggleExpense: (id: string) => void;
+  onStatusChange: (id: string, status: ExpenseStatus) => void;
   onExpenseAdded: (e: CycleExpense) => void;
   onExpenseEdited: (updated: CycleExpense) => void;
   onIncomeAdded: (i: CycleIncome) => void;
@@ -1256,6 +1314,7 @@ function CycleDetail({
               key={e.id}
               expense={e}
               onToggle={onToggleExpense}
+              onStatusChange={onStatusChange}
               onEdit={handleEditExpense}
             />
           ))}
@@ -1270,6 +1329,7 @@ function CycleDetail({
               key={e.id}
               expense={e}
               onToggle={onToggleExpense}
+              onStatusChange={onStatusChange}
               onEdit={handleEditExpense}
             />
           ))}
@@ -1414,10 +1474,46 @@ export function Cycles() {
     setCycleIncomes([]);
   };
 
+  const handleStatusChange = async (
+    expenseId: string,
+    status: ExpenseStatus,
+  ) => {
+    if (!selectedCycle) return;
+    const expense = cycleExpenses.find((e) => e.id === expenseId);
+    if (!expense) return;
+
+    setCycleExpenses((prev) =>
+      prev.map((e) => (e.id === expenseId ? { ...e, status } : e)),
+    );
+
+    const res = await editExpense(selectedCycle.id, expenseId, { status });
+    if (!res.success) {
+      setCycleExpenses((prev) =>
+        prev.map((e) =>
+          e.id === expenseId ? { ...e, status: expense.status } : e,
+        ),
+      );
+    } else {
+      const summaryRes = await fetchSummary(selectedCycle.id);
+      if (summaryRes.success) {
+        setSummaries((prev) => ({
+          ...prev,
+          [selectedCycle.id]: summaryRes.data,
+        }));
+      }
+    }
+  };
+
   const handleToggleExpense = async (expenseId: string) => {
     if (!selectedCycle) return;
     const expense = cycleExpenses.find((e) => e.id === expenseId);
-    if (!expense || expense.status === "cancelled") return;
+    if (
+      !expense ||
+      expense.status === "cancelled" ||
+      expense.status === "paid_other" ||
+      expense.status === "skipped"
+    )
+      return;
 
     const nextStatus: ExpenseStatus =
       expense.status === "pending" || expense.status === "overdue"
@@ -1528,6 +1624,7 @@ export function Cycles() {
         paymentMethods={paymentMethods}
         onBack={handleBack}
         onToggleExpense={handleToggleExpense}
+        onStatusChange={handleStatusChange}
         onExpenseAdded={handleExpenseAdded}
         onExpenseEdited={handleExpenseEdited}
         onIncomeAdded={handleIncomeAdded}

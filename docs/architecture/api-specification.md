@@ -627,7 +627,8 @@ Delete a cycle and all associated expenses.
 Get all expenses for a specific cycle.
 
 **Query Parameters:**
-- `status` (string, optional): Filter by status (pending/paid/cancelled/overdue)
+- `status` (string, optional): Filter by status
+  (pending/paid/cancelled/overdue/paid_other/skipped)
 - `category` (string, optional): Filter by category (fixed/variable)
 - `currency` (string, optional): Filter by currency
 - `payment_method_id` (string, optional): Filter by payment method
@@ -878,7 +879,9 @@ Get detailed cycle summary and analytics.
     "pending": 15,
     "paid": 8,
     "overdue": 2,
-    "cancelled": 0
+    "cancelled": 0,
+    "paid_other": 1,
+    "skipped": 1
   }
 }
 ```
@@ -889,6 +892,12 @@ Get detailed cycle summary and analytics.
 > `due_date` is earlier than today is counted as `overdue` (and removed
 > from `pending`). This matches the per-expense overdue derivation
 > applied in individual expense responses.
+>
+> **Note on `paid_other` and `skipped`:** Both statuses are excluded from
+> `total_expenses_usd` and from the remaining balance calculation, the
+> same as `cancelled`. Use `paid_other` when an expense was covered by a
+> third party (not from tracked income). Use `skipped` when the expense
+> was not applicable for the current cycle.
 >
 > **Note on `net_balance`:**
 > `net_balance = total_incomes_usd − total_expenses_usd`
@@ -940,7 +949,7 @@ Get all system enums for form validation.
   "expense_categories": ["fixed", "variable"],
   "recurrence_types": ["weekly", "bi_weekly", "monthly", "custom"],
   "cycle_statuses": ["draft", "active", "completed"],
-  "expense_statuses": ["pending", "paid", "cancelled", "overdue"]
+  "expense_statuses": ["pending", "paid", "cancelled", "overdue", "paid_other", "skipped"]
 }
 ```
 

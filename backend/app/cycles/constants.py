@@ -44,3 +44,5 @@ class ExpenseStatus(str, Enum):
     PAID = "paid"
     CANCELLED = "cancelled"
     OVERDUE = "overdue"
+    PAID_OTHER = "paid_other"
+    SKIPPED = "skipped"

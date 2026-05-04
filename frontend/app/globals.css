@@ -18,11 +18,15 @@
   --hl-overdue: rgba(240, 80, 70, 0.3);
   --hl-pending: rgba(255, 210, 60, 0.45);
   --hl-cancelled: rgba(180, 180, 180, 0.28);
+  --hl-paid-other: rgba(0, 170, 200, 0.25);
+  --hl-skipped: rgba(140, 100, 190, 0.22);
 
   --hl-paid-border: #3aad55;
   --hl-overdue-border: #d94040;
   --hl-pending-border: #d4a800;
   --hl-cancelled-border: #aaa;
+  --hl-paid-other-border: #0096b4;
+  --hl-skipped-border: #7850aa;
 }
 
 /* ── Dark theme variables ───────────────────────────────────────────────── */
@@ -39,10 +43,14 @@
   --hl-overdue: rgba(240, 80, 70, 0.15);
   --hl-pending: rgba(255, 210, 60, 0.18);
   --hl-cancelled: rgba(180, 180, 180, 0.12);
+  --hl-paid-other: rgba(0, 170, 200, 0.15);
+  --hl-skipped: rgba(140, 100, 190, 0.14);
   --hl-paid-border: #3aad55;
   --hl-overdue-border: #d94040;
   --hl-pending-border: #d4a800;
   --hl-cancelled-border: #666;
+  --hl-paid-other-border: #0096b4;
+  --hl-skipped-border: #7850aa;
 }
 
 /* ── Notebook shell ─────────────────────────────────────────────────────── */
@@ -652,6 +660,15 @@
   border-left: 3px solid var(--hl-cancelled-border);
   opacity: 0.55;
 }
+.nb-expense-row.nb-paid-other {
+  background: var(--hl-paid-other);
+  border-left: 3px solid var(--hl-paid-other-border);
+}
+.nb-expense-row.nb-skipped {
+  background: var(--hl-skipped);
+  border-left: 3px solid var(--hl-skipped-border);
+  opacity: 0.8;
+}
 
 .nb-expense-check {
   width: 20px;
@@ -677,6 +694,14 @@
 }
 .nb-check-pending {
   color: var(--hl-pending-border);
+}
+.nb-check-paid-other {
+  background: var(--hl-paid-other-border);
+  border-color: var(--hl-paid-other-border);
+  color: white;
+}
+.nb-check-skipped {
+  color: var(--hl-skipped-border);
 }
 
 .nb-expense-name {
@@ -734,6 +759,36 @@
 }
 .nb-expense-row:hover .nb-expense-edit-btn {
   opacity: 1;
+}
+.nb-expense-action-btn {
+  background: none;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: var(--font-hand);
+  font-size: 11px;
+  padding: 1px 5px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  line-height: 1.4;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.nb-expense-row:hover .nb-expense-action-btn {
+  opacity: 0.75;
+}
+.nb-expense-action-btn:hover {
+  opacity: 1 !important;
+}
+.nb-expense-action-btn.nb-btn-other {
+  color: var(--hl-paid-other-border);
+}
+.nb-expense-action-btn.nb-btn-skip {
+  color: var(--hl-skipped-border);
+}
+.nb-expense-action-btn.nb-btn-active {
+  opacity: 1;
+  font-weight: 700;
 }
 
 /* Status breakdown dots */

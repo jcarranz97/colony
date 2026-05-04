@@ -216,6 +216,8 @@ The entire protected app is wrapped in a **notebook/handwriting aesthetic**:
   - Pending → yellow (`rgba(255,210,60,0.45)`)
   - Overdue → red (`rgba(240,80,70,0.30)`)
   - Cancelled → grey (`rgba(180,180,180,0.28)`)
+  - Paid (Other) → teal (`rgba(0,170,200,0.25)`)
+  - Skipped → lavender (`rgba(140,100,190,0.22)`)
 
 All notebook CSS lives in `frontend/app/globals.css` as `nb-*` prefixed
 classes and `:root` CSS variables. Do **not** use HeroUI components for the
@@ -319,6 +321,8 @@ When HeroUI is appropriate:
 | `--hl-paid` | `rgba(80,200,100,0.35)` | Green highlighter |
 | `--hl-pending` | `rgba(255,210,60,0.45)` | Yellow highlighter |
 | `--hl-overdue` | `rgba(240,80,70,0.30)` | Red highlighter |
+| `--hl-paid-other` | `rgba(0,170,200,0.25)` | Teal highlighter |
+| `--hl-skipped` | `rgba(140,100,190,0.22)` | Lavender highlighter |
 
 ### Environment
 

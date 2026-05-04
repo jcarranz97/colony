@@ -167,7 +167,9 @@ CREATE TYPE recurrence_type AS ENUM ('weekly', 'bi_weekly', 'monthly', 'custom')
 CREATE TYPE cycle_status AS ENUM ('draft', 'active', 'completed');
 
 -- Individual expense states
-CREATE TYPE expense_status AS ENUM ('pending', 'paid', 'cancelled', 'overdue');
+CREATE TYPE expense_status AS ENUM (
+  'pending', 'paid', 'cancelled', 'overdue', 'paid_other', 'skipped'
+);
 ```
 
 ### ENUM Descriptions
@@ -179,7 +181,7 @@ CREATE TYPE expense_status AS ENUM ('pending', 'paid', 'cancelled', 'overdue');
 | `expense_category` | `fixed`, `variable` | Expense categorization for budgeting |
 | `recurrence_type` | `weekly`, `bi_weekly`, `monthly`, `custom` | How often template expenses recur |
 | `cycle_status` | `draft`, `active`, `completed` | Lifecycle state of expense cycles |
-| `expense_status` | `pending`, `paid`, `cancelled`, `overdue` | Current state of individual expenses |
+| `expense_status` | `pending`, `paid`, `cancelled`, `overdue`, `paid_other`, `skipped` | Current state of individual expenses |
 
 ## Table Definitions
 

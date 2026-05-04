@@ -423,6 +423,8 @@ class StatusBreakdown(BaseModel):
     paid: int
     overdue: int
     cancelled: int
+    paid_other: int
+    skipped: int
 
 
 class CycleSummaryResponse(BaseModel):

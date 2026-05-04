@@ -16,17 +16,18 @@ cd backend
 uv sync
 uv run fastapi dev                 # hot reload
 
-# Tests
-uv run pytest                      # all tests
-uv run pytest tests/cycles/        # single domain
-uv run pytest -k test_name         # single test
+# Tests — PYTHONPATH=. is required; without it, system packages (e.g. ROS)
+# can leak into the path and cause import errors at pytest startup.
+PYTHONPATH=. uv run pytest                      # all tests
+PYTHONPATH=. uv run pytest tests/cycles/        # single domain
+PYTHONPATH=. uv run pytest -k test_name         # single test
 
 # Linting & formatting
-uv run ruff check . --fix
-uv run ruff format .
+PYTHONPATH=. uv run ruff check . --fix
+PYTHONPATH=. uv run ruff format .
 
 # Type checking
-uv run pyright .
+PYTHONPATH=. uv run pyright .
 
 # Migrations (Alembic)
 uv run alembic revision --autogenerate -m "description"
@@ -301,7 +302,7 @@ Defined per domain in `constants.py` but semantically identical across domains:
 | `ExpenseCategory` | `fixed`, `variable` |
 | `RecurrenceType` | `weekly`, `bi_weekly`, `monthly`, `custom` |
 | `CycleStatus` | `draft`, `active`, `completed` |
-| `ExpenseStatus` | `pending`, `paid`, `cancelled`, `overdue` |
+| `ExpenseStatus` | `pending`, `paid`, `cancelled`, `overdue`, `paid_other`, `skipped` |
 
 If you add a value to one domain's enum, add it to all domains that define the
 same enum and update the corresponding database enum type via a migration.
@@ -333,7 +334,9 @@ Health checks at `/<domain>/health` and root `/health`.
 1. **Completed cycles are read-only** — the service rejects all mutations
    once `status == "completed"`.
 2. **Remaining balance** is recalculated automatically on every expense
-   write (`_recalculate_remaining_balance`).
+   write (`_recalculate_remaining_balance`). Statuses `cancelled`,
+   `paid_other`, and `skipped` are all excluded from the expense total
+   and therefore do not reduce the remaining balance.
 3. **Generate from recurrent expenses** — `CycleCreate.generate_from_templates=true`
    triggers recurrence calculation via `cycles/utils.py` and bulk-creates
    `CycleExpense` rows from matching `RecurrentExpense` records.
@@ -416,15 +419,31 @@ Run all of the following and fix every error before stopping:
 
 ```bash
 cd backend
-uv run ruff check . --fix
-uv run ruff format .
-uv run pyright .
-uv run pytest
+PYTHONPATH=. uv run ruff check . --fix
+PYTHONPATH=. uv run ruff format .
+PYTHONPATH=. uv run pyright .
+PYTHONPATH=. uv run pytest
 ```
 
 Pyright is strict — add type annotations to every function you write or
 touch, including return types. Never use `Any` unless there is no alternative
 and you add a comment explaining why.
+
+### Pre-commit Hooks
+
+Run pre-commit on every file you changed before finishing. Pre-commit hooks
+run automatically on `git commit` and will abort the commit if they modify
+any file (requiring re-staging). Catching this beforehand avoids that
+disruption. Run from the **repo root** (where `.pre-commit-config.yaml`
+lives), not from inside `backend/`:
+
+```bash
+# From repo root — list every backend file you changed:
+pre-commit run --files backend/app/cycles/service.py backend/AGENTS.md
+```
+
+Do **not** use `--all-files`; it processes the entire frontend too and can
+run out of memory. Pass only the files you touched.
 
 ### API Documentation
 
@@ -444,7 +463,7 @@ create or edit any `.md` file, follow these rules or the commit will fail:
 - **80-character line limit** on prose lines (MD013).
 - Code blocks (` ``` `) and table rows are exempt from the line limit.
 - No trailing spaces, files must end with a newline.
-- Run `pre-commit run markdownlint --all-files` to check before committing.
+- Run `pre-commit run markdownlint --files <your .md files>` to check.
 
 ---
 

@@ -105,8 +105,13 @@ class Cycle(BaseModel):
     @property
     def summary(self) -> dict:
         """Compute a financial summary from the cycle's active expenses."""
+        _excluded = {
+            ExpenseStatus.CANCELLED,
+            ExpenseStatus.PAID_OTHER,
+            ExpenseStatus.SKIPPED,
+        }
         active = [e for e in self.expenses if e.active]
-        countable = [e for e in active if e.status != ExpenseStatus.CANCELLED]
+        countable = [e for e in active if e.status not in _excluded]
         total = sum((e.amount_usd for e in countable), Decimal("0"))
         fixed = sum(
             (e.amount_usd for e in countable if e.category == ExpenseCategory.FIXED),

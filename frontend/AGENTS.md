@@ -50,40 +50,42 @@ household it shows the name as read-only text. Switching calls
 
 ## Notebook CSS Classes (quick reference)
 
-| Class               | Purpose                                              |
-| ------------------- | ---------------------------------------------------- |
-| `nb-page-title`     | Large Kalam heading                                  |
-| `nb-page-subtitle`  | Small subtitle                                       |
-| `nb-section-title`  | Divider heading with line                            |
-| `nb-add-btn`        | Dashed "add" button (full width)                     |
-| `nb-modal-backdrop` | Full-screen modal overlay                            |
-| `nb-modal`          | Modal paper box                                      |
-| `nb-modal-title`    | Modal heading                                        |
-| `nb-form-group`     | Label + input wrapper                                |
-| `nb-form-label`     | Small uppercase label                                |
-| `nb-form-input`     | Underline-only text input                            |
-| `nb-form-select`    | Bordered select                                      |
-| `nb-form-row`       | Flex row for side-by-side fields                     |
-| `nb-modal-actions`  | Right-aligned Cancel + Submit row                    |
-| `nb-btn-cancel`     | Ghost cancel button                                  |
-| `nb-btn-primary`    | Green submit button                                  |
-| `nb-empty`          | Centered empty-state block                           |
-| `nb-payment-card`   | Payment method card row                              |
-| `nb-template-card`  | Template card row                                    |
-| `nb-expense-row`    | Expense row (add `.nb-paid/.nb-pending/.nb-overdue`) |
-| `nb-cycle-card`     | Cycle summary card                                   |
-| `nb-summary-strip`  | Dashed summary box in cycle detail                   |
+| Class               | Purpose                                       |
+| ------------------- | --------------------------------------------- |
+| `nb-page-title`     | Large Kalam heading                           |
+| `nb-page-subtitle`  | Small subtitle                                |
+| `nb-section-title`  | Divider heading with line                     |
+| `nb-add-btn`        | Dashed "add" button (full width)              |
+| `nb-modal-backdrop` | Full-screen modal overlay                     |
+| `nb-modal`          | Modal paper box                               |
+| `nb-modal-title`    | Modal heading                                 |
+| `nb-form-group`     | Label + input wrapper                         |
+| `nb-form-label`     | Small uppercase label                         |
+| `nb-form-input`     | Underline-only text input                     |
+| `nb-form-select`    | Bordered select                               |
+| `nb-form-row`       | Flex row for side-by-side fields              |
+| `nb-modal-actions`  | Right-aligned Cancel + Submit row             |
+| `nb-btn-cancel`     | Ghost cancel button                           |
+| `nb-btn-primary`    | Green submit button                           |
+| `nb-empty`          | Centered empty-state block                    |
+| `nb-payment-card`   | Payment method card row                       |
+| `nb-template-card`  | Template card row                             |
+| `nb-expense-row`    | Expense row (add status modifier — see below) |
+| `nb-cycle-card`     | Cycle summary card                            |
+| `nb-summary-strip`  | Dashed summary box in cycle detail            |
 
 ## Expense Status Colors
 
 Apply as extra class on `.nb-expense-row`:
 
-| Class          | Color                     | Meaning   |
-| -------------- | ------------------------- | --------- |
-| `nb-paid`      | Green highlight + border  | Paid      |
-| `nb-pending`   | Yellow highlight + border | Pending   |
-| `nb-overdue`   | Red highlight + border    | Overdue   |
-| `nb-cancelled` | Grey, reduced opacity     | Cancelled |
+| Class           | Color                     | Meaning                                          |
+| --------------- | ------------------------- | ------------------------------------------------ |
+| `nb-paid`       | Green highlight + border  | Paid from tracked income                         |
+| `nb-pending`    | Yellow highlight + border | Pending                                          |
+| `nb-overdue`    | Red highlight + border    | Overdue                                          |
+| `nb-cancelled`  | Grey, reduced opacity     | Cancelled                                        |
+| `nb-paid-other` | Teal highlight + border   | Paid by third party (no impact on balance)       |
+| `nb-skipped`    | Lavender, slightly dimmed | Not applicable this cycle (no impact on balance) |
 
 ## API Layer
 
@@ -113,6 +115,37 @@ via the Docker-exposed port, so `apiClient` must run on the client.
 - 401 from API → `apiClient` clears cookie and redirects to `/login`
 - Login and registration use **username + password** (no email field).
 - Default admin: `admin` / `colony-admin` (configurable via env vars on deploy).
+
+## Validation Checklist Before Finishing
+
+After implementing any frontend change, run prettier on every file you
+modified. Prettier auto-formats TypeScript, TSX, CSS, JSON, and Markdown.
+If you skip this step, the `git commit` hook will modify your files and
+abort the commit, requiring re-staging.
+
+Run from the **repo root** (where `.pre-commit-config.yaml` lives), not
+from inside `frontend/`. Pass only the files you changed — do **not** use
+`--all-files`, which processes the whole repo and can run out of memory:
+
+```bash
+# From repo root — list every frontend file you changed:
+pre-commit run prettier --files frontend/components/cycles/index.tsx \
+  frontend/app/globals.css frontend/helpers/types.ts
+```
+
+Also run markdownlint on any `.md` files you edited:
+
+```bash
+pre-commit run markdownlint --files frontend/AGENTS.md
+```
+
+Run TypeScript type checking from the `frontend/` directory:
+
+```bash
+cd frontend && npx tsc --noEmit
+```
+
+---
 
 ## Naming Conventions: UI vs Backend
 

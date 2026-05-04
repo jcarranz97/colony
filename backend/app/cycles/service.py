@@ -75,8 +75,9 @@ def _recalculate_remaining_balance(
 ) -> None:
     """Recalculate and persist ``remaining_balance`` on *cycle*.
 
-    The balance is the sum of all active cycle income amounts,
-    minus the sum of ``amount_usd`` for all active non-cancelled expenses.
+    The balance is the sum of all active cycle income amounts, minus the
+    sum of ``amount_usd`` for all active expenses whose status is not in
+    ``{cancelled, paid_other, skipped}``.
 
     Args:
         db: Active database session.
@@ -86,11 +87,16 @@ def _recalculate_remaining_balance(
         (i.amount_usd for i in cycle.incomes if i.active),
         Decimal("0"),
     )
+    _excluded = {
+        ExpenseStatus.CANCELLED,
+        ExpenseStatus.PAID_OTHER,
+        ExpenseStatus.SKIPPED,
+    }
     expense_total = sum(
         (
             e.amount_usd
             for e in cycle.expenses
-            if e.active and e.status != ExpenseStatus.CANCELLED
+            if e.active and e.status not in _excluded
         ),
         Decimal("0"),
     )
@@ -486,7 +492,12 @@ class CycleService:
             CycleSummaryResponse schema instance.
         """
         active = [e for e in cycle.expenses if e.active]
-        countable = [e for e in active if e.status != ExpenseStatus.CANCELLED]
+        _excluded_from_totals = {
+            ExpenseStatus.CANCELLED,
+            ExpenseStatus.PAID_OTHER,
+            ExpenseStatus.SKIPPED,
+        }
+        countable = [e for e in active if e.status not in _excluded_from_totals]
 
         # --- Financial totals ------------------------------------------------
         total_usd = sum((e.amount_usd for e in countable), Decimal("0"))
@@ -583,6 +594,8 @@ class CycleService:
             paid=sum(1 for e in active if e.status == ExpenseStatus.PAID),
             overdue=sum(1 for e in active if _is_overdue(e)),
             cancelled=sum(1 for e in active if e.status == ExpenseStatus.CANCELLED),
+            paid_other=sum(1 for e in active if e.status == ExpenseStatus.PAID_OTHER),
+            skipped=sum(1 for e in active if e.status == ExpenseStatus.SKIPPED),
         )
 
         income_responses = [
@@ -800,7 +813,13 @@ class CycleExpenseService:
             expense.amount_usd = (expense.amount * rate).quantize(Decimal("0.01"))
             _recalculate_remaining_balance(db, cycle)
 
-        if "status" in update_data and update_data["status"] == ExpenseStatus.CANCELLED:
+        _balance_statuses = {
+            ExpenseStatus.CANCELLED,
+            ExpenseStatus.PAID_OTHER,
+            ExpenseStatus.SKIPPED,
+            ExpenseStatus.PENDING,
+        }
+        if "status" in update_data and update_data["status"] in _balance_statuses:
             _recalculate_remaining_balance(db, cycle)
 
         db.commit()
