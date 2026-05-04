@@ -159,9 +159,7 @@ async def restore_cycle(
     db: DatabaseDep,
 ) -> schemas.CycleResponse:
     """Restore a soft-deleted cycle (admin only)."""
-    cycle = service.cycle_service.restore_cycle(
-        db, cycle_id, str(current_household.id)
-    )
+    cycle = service.cycle_service.restore_cycle(db, cycle_id, str(current_household.id))
     if not cycle:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
