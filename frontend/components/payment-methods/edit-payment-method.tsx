@@ -30,51 +30,56 @@ export function EditPaymentMethod({
   onUpdated,
 }: EditPaymentMethodProps) {
   const [error, setError] = useState<string | null>(null);
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
 
   if (!method) return null;
 
   return (
-    <Modal.Root
-      isOpen={isOpen}
-      onOpenChange={(open) => {
-        if (!open) onClose();
+    <Formik
+      key={method.id}
+      initialValues={{
+        name: method.name,
+        method_type: method.method_type,
+        default_currency: method.default_currency,
+      }}
+      validationSchema={PaymentMethodSchema}
+      onSubmit={async (values, { setSubmitting }) => {
+        setError(null);
+        const result = await editPaymentMethod(method.id, {
+          name: values.name,
+          method_type: values.method_type,
+          default_currency: values.default_currency,
+        });
+        if (result.success) {
+          onUpdated(result.data);
+          onClose();
+        } else {
+          setError(result.error.message);
+        }
+        setSubmitting(false);
       }}
     >
-      <Modal.Backdrop isDismissable>
-        <Modal.Container>
-          <Modal.Dialog>
-            <Formik
-              key={method.id}
-              initialValues={{
-                name: method.name,
-                method_type: method.method_type,
-                default_currency: method.default_currency,
-              }}
-              validationSchema={PaymentMethodSchema}
-              onSubmit={async (values, { setSubmitting }) => {
-                setError(null);
-                const result = await editPaymentMethod(method.id, {
-                  name: values.name,
-                  method_type: values.method_type,
-                  default_currency: values.default_currency,
-                });
-                if (result.success) {
-                  onUpdated(result.data);
-                  onClose();
-                } else {
-                  setError(result.error.message);
-                }
-                setSubmitting(false);
-              }}
-            >
-              {({
-                values,
-                errors,
-                touched,
-                setFieldValue,
-                handleSubmit,
-                isSubmitting,
-              }) => (
+      {({
+        values,
+        errors,
+        touched,
+        setFieldValue,
+        handleSubmit,
+        isSubmitting,
+        dirty,
+      }) => (
+        <Modal.Root
+          isOpen={isOpen}
+          onOpenChange={(open) => {
+            if (!open) {
+              setConfirmDiscard(false);
+              onClose();
+            }
+          }}
+        >
+          <Modal.Backdrop isDismissable={!dirty}>
+            <Modal.Container>
+              <Modal.Dialog>
                 <form onSubmit={handleSubmit}>
                   <Modal.Header>
                     <Modal.Heading>Edit Payment Method</Modal.Heading>
@@ -182,24 +187,58 @@ export function EditPaymentMethod({
 
                     {error && <p className="text-sm text-danger">{error}</p>}
                   </Modal.Body>
-                  <Modal.Footer className="gap-2">
-                    <Button variant="ghost" onPress={onClose}>
-                      Cancel
-                    </Button>
-                    <Button
-                      type="submit"
-                      variant="primary"
-                      isDisabled={isSubmitting}
-                    >
-                      {isSubmitting ? <Spinner size="sm" /> : "Save"}
-                    </Button>
-                  </Modal.Footer>
+                  {confirmDiscard ? (
+                    <Modal.Footer className="gap-2 flex-col items-start">
+                      <p
+                        className="text-sm"
+                        style={{ fontFamily: "var(--font-hand)" }}
+                      >
+                        You have unsaved changes. Discard them?
+                      </p>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          onPress={() => setConfirmDiscard(false)}
+                        >
+                          Keep Editing
+                        </Button>
+                        <Button
+                          variant="danger"
+                          onPress={() => {
+                            setConfirmDiscard(false);
+                            onClose();
+                          }}
+                        >
+                          Discard
+                        </Button>
+                      </div>
+                    </Modal.Footer>
+                  ) : (
+                    <Modal.Footer className="gap-2">
+                      <Button
+                        variant="ghost"
+                        onPress={() => {
+                          if (dirty) setConfirmDiscard(true);
+                          else onClose();
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="submit"
+                        variant="primary"
+                        isDisabled={isSubmitting}
+                      >
+                        {isSubmitting ? <Spinner size="sm" /> : "Save"}
+                      </Button>
+                    </Modal.Footer>
+                  )}
                 </form>
-              )}
-            </Formik>
-          </Modal.Dialog>
-        </Modal.Container>
-      </Modal.Backdrop>
-    </Modal.Root>
+              </Modal.Dialog>
+            </Modal.Container>
+          </Modal.Backdrop>
+        </Modal.Root>
+      )}
+    </Formik>
   );
 }
