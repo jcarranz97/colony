@@ -2255,7 +2255,8 @@
 <h4 id="get-cyclescycle_idexpenses">GET /cycles/{cycle_id}/expenses</h4>
 <p>Get all expenses for a specific cycle.</p>
 <p><strong>Query Parameters:</strong>
-- <code>status</code> (string, optional): Filter by status (pending/paid/cancelled/overdue)
+- <code>status</code> (string, optional): Filter by status
+  (pending/paid/cancelled/overdue/paid_other/skipped)
 - <code>category</code> (string, optional): Filter by category (fixed/variable)
 - <code>currency</code> (string, optional): Filter by currency
 - <code>payment_method_id</code> (string, optional): Filter by payment method</p>
@@ -2490,9 +2491,11 @@
 <a id="__codelineno-35-57" name="__codelineno-35-57" href="#__codelineno-35-57"></a><span class="w">    </span><span class="nt">&quot;pending&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span><span class="p">,</span>
 <a id="__codelineno-35-58" name="__codelineno-35-58" href="#__codelineno-35-58"></a><span class="w">    </span><span class="nt">&quot;paid&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span>
 <a id="__codelineno-35-59" name="__codelineno-35-59" href="#__codelineno-35-59"></a><span class="w">    </span><span class="nt">&quot;overdue&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
-<a id="__codelineno-35-60" name="__codelineno-35-60" href="#__codelineno-35-60"></a><span class="w">    </span><span class="nt">&quot;cancelled&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
-<a id="__codelineno-35-61" name="__codelineno-35-61" href="#__codelineno-35-61"></a><span class="w">  </span><span class="p">}</span>
-<a id="__codelineno-35-62" name="__codelineno-35-62" href="#__codelineno-35-62"></a><span class="p">}</span>
+<a id="__codelineno-35-60" name="__codelineno-35-60" href="#__codelineno-35-60"></a><span class="w">    </span><span class="nt">&quot;cancelled&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-35-61" name="__codelineno-35-61" href="#__codelineno-35-61"></a><span class="w">    </span><span class="nt">&quot;paid_other&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-35-62" name="__codelineno-35-62" href="#__codelineno-35-62"></a><span class="w">    </span><span class="nt">&quot;skipped&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+<a id="__codelineno-35-63" name="__codelineno-35-63" href="#__codelineno-35-63"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-35-64" name="__codelineno-35-64" href="#__codelineno-35-64"></a><span class="p">}</span>
 </code></pre></div>
 <blockquote>
 <p><strong>Note on <code>overdue</code> count:</strong> The <code>overdue</code> value in <code>status_breakdown</code>
@@ -2501,6 +2504,11 @@ column. Any expense whose stored status is <code>pending</code> and whose
 <code>due_date</code> is earlier than today is counted as <code>overdue</code> (and removed
 from <code>pending</code>). This matches the per-expense overdue derivation
 applied in individual expense responses.</p>
+<p><strong>Note on <code>paid_other</code> and <code>skipped</code>:</strong> Both statuses are excluded from
+<code>total_expenses_usd</code> and from the remaining balance calculation, the
+same as <code>cancelled</code>. Use <code>paid_other</code> when an expense was covered by a
+third party (not from tracked income). Use <code>skipped</code> when the expense
+was not applicable for the current cycle.</p>
 <p><strong>Note on <code>net_balance</code>:</strong>
 <code>net_balance = total_incomes_usd − total_expenses_usd</code></p>
 </blockquote>
@@ -2543,7 +2551,7 @@ applied in individual expense responses.</p>
 <a id="__codelineno-37-4" name="__codelineno-37-4" href="#__codelineno-37-4"></a><span class="w">  </span><span class="nt">&quot;expense_categories&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;variable&quot;</span><span class="p">],</span>
 <a id="__codelineno-37-5" name="__codelineno-37-5" href="#__codelineno-37-5"></a><span class="w">  </span><span class="nt">&quot;recurrence_types&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;weekly&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;bi_weekly&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;monthly&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;custom&quot;</span><span class="p">],</span>
 <a id="__codelineno-37-6" name="__codelineno-37-6" href="#__codelineno-37-6"></a><span class="w">  </span><span class="nt">&quot;cycle_statuses&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;draft&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;active&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;completed&quot;</span><span class="p">],</span>
-<a id="__codelineno-37-7" name="__codelineno-37-7" href="#__codelineno-37-7"></a><span class="w">  </span><span class="nt">&quot;expense_statuses&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;pending&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;paid&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;cancelled&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;overdue&quot;</span><span class="p">]</span>
+<a id="__codelineno-37-7" name="__codelineno-37-7" href="#__codelineno-37-7"></a><span class="w">  </span><span class="nt">&quot;expense_statuses&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;pending&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;paid&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;cancelled&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;overdue&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;paid_other&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;skipped&quot;</span><span class="p">]</span>
 <a id="__codelineno-37-8" name="__codelineno-37-8" href="#__codelineno-37-8"></a><span class="p">}</span>
 </code></pre></div></p>
 <h4 id="get-exchange-rates">GET /exchange-rates/</h4>
