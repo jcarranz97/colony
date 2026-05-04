@@ -717,6 +717,12 @@
   text-decoration-color: rgba(44, 100, 55, 0.5);
   opacity: 0.75;
 }
+.nb-expense-autopay {
+  font-family: var(--font-hand);
+  font-size: 12px;
+  color: #276838;
+  white-space: nowrap;
+}
 .nb-expense-method {
   font-family: var(--font-hand);
   font-size: 12px;
