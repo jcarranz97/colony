@@ -60,6 +60,7 @@ nav:
     - Overview: development/index.md
     - Local Setup: development/setup.md
     - Code Quality: development/code-quality.md
+    - Database Backups: development/database-backups.md
     # - Testing: development/testing.md
 
 markdown_extensions:
