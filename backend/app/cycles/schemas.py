@@ -164,6 +164,7 @@ class CycleExpenseCreate(AppBaseModel):
     payment_method_id: uuid.UUID
     amount: Decimal = Field(..., gt=0, decimal_places=2)
     due_date: date
+    category: ExpenseCategory = ExpenseCategory.EXTRA
     comments: str | None = Field(None, max_length=1000)
     autopay: bool = False
     paid: bool = False

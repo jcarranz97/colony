@@ -795,7 +795,7 @@ class CycleExpenseService:
             amount=data.amount,
             amount_usd=amount_usd,
             due_date=data.due_date,
-            category=ExpenseCategory.EXTRA,
+            category=data.category,
             comments=data.comments,
             autopay=data.autopay,
             paid=data.paid,
