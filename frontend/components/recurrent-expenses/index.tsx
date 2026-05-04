@@ -787,6 +787,7 @@ export function RecurrentExpenses() {
   const [editTarget, setEditTarget] = useState<RecurrentExpense | null>(null);
   const [trashTarget, setTrashTarget] = useState<RecurrentExpense | null>(null);
   const [restoringId, setRestoringId] = useState<string | null>(null);
+  const [restoreError, setRestoreError] = useState<string | null>(null);
 
   useEffect(() => {
     getCurrentUserAction().then(async (userRes) => {
@@ -819,11 +820,14 @@ export function RecurrentExpenses() {
 
   const handleRestore = async (template: RecurrentExpense) => {
     setRestoringId(template.id);
+    setRestoreError(null);
     const res = await activateRecurrentExpense(template.id);
     if (res.success) {
       setTemplates((prev) =>
         prev.map((t) => (t.id === template.id ? { ...t, active: true } : t)),
       );
+    } else {
+      setRestoreError(res.error.message);
     }
     setRestoringId(null);
   };
@@ -922,7 +926,8 @@ export function RecurrentExpenses() {
             marginLeft: "auto",
           }}
         >
-          {allActive.length} active · {allTrashed.length} trashed
+          {allActive.length} active
+          {isAdmin && ` · ${allTrashed.length} trashed`}
         </span>
       </div>
 
@@ -970,6 +975,18 @@ export function RecurrentExpenses() {
           >
             🗑 Trashed Templates
           </div>
+          {restoreError && (
+            <p
+              style={{
+                fontFamily: "var(--font-hand)",
+                color: "var(--hl-overdue-border)",
+                fontSize: 14,
+                marginBottom: 10,
+              }}
+            >
+              {restoreError}
+            </p>
+          )}
           {trashedTemplates.map((t) => (
             <TrashedTemplateCard
               key={t.id}

@@ -443,6 +443,7 @@ export function PaymentMethods() {
   const [editTarget, setEditTarget] = useState<PaymentMethod | null>(null);
   const [trashTarget, setTrashTarget] = useState<PaymentMethod | null>(null);
   const [restoringId, setRestoringId] = useState<string | null>(null);
+  const [restoreError, setRestoreError] = useState<string | null>(null);
 
   useEffect(() => {
     getCurrentUserAction().then(async (userRes) => {
@@ -466,11 +467,14 @@ export function PaymentMethods() {
 
   const handleRestore = async (method: PaymentMethod) => {
     setRestoringId(method.id);
+    setRestoreError(null);
     const res = await activatePaymentMethod(method.id);
     if (res.success) {
       setMethods((prev) =>
         prev.map((m) => (m.id === method.id ? { ...m, active: true } : m)),
       );
+    } else {
+      setRestoreError(res.error.message);
     }
     setRestoringId(null);
   };
@@ -575,6 +579,18 @@ export function PaymentMethods() {
           >
             🗑 Trashed Payment Methods
           </div>
+          {restoreError && (
+            <p
+              style={{
+                fontFamily: "var(--font-hand)",
+                color: "var(--hl-overdue-border)",
+                fontSize: 14,
+                marginBottom: 10,
+              }}
+            >
+              {restoreError}
+            </p>
+          )}
           {trashedMethods.map((m) => (
             <TrashedPaymentCard
               key={m.id}

@@ -721,6 +721,7 @@ export function Incomes() {
   const [editTarget, setEditTarget] = useState<RecurrentIncome | null>(null);
   const [trashTarget, setTrashTarget] = useState<RecurrentIncome | null>(null);
   const [restoringId, setRestoringId] = useState<string | null>(null);
+  const [restoreError, setRestoreError] = useState<string | null>(null);
 
   useEffect(() => {
     getCurrentUserAction().then(async (userRes) => {
@@ -748,11 +749,14 @@ export function Incomes() {
 
   const handleRestore = async (income: RecurrentIncome) => {
     setRestoringId(income.id);
+    setRestoreError(null);
     const res = await activateRecurrentIncome(income.id);
     if (res.success) {
       setIncomes((prev) =>
         prev.map((i) => (i.id === income.id ? { ...i, active: true } : i)),
       );
+    } else {
+      setRestoreError(res.error.message);
     }
     setRestoringId(null);
   };
@@ -829,7 +833,8 @@ export function Incomes() {
           marginBottom: 18,
         }}
       >
-        {activeIncomes.length} active · {trashedIncomes.length} trashed
+        {activeIncomes.length} active
+        {isAdmin && ` · ${trashedIncomes.length} trashed`}
       </div>
 
       {activeIncomes.length > 0 && (
@@ -875,6 +880,18 @@ export function Incomes() {
           >
             🗑 Trashed Recurrent Incomes
           </div>
+          {restoreError && (
+            <p
+              style={{
+                fontFamily: "var(--font-hand)",
+                color: "var(--hl-overdue-border)",
+                fontSize: 14,
+                marginBottom: 10,
+              }}
+            >
+              {restoreError}
+            </p>
+          )}
           {trashedIncomes.map((i) => (
             <TrashedIncomeCard
               key={i.id}
