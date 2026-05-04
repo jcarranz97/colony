@@ -217,11 +217,11 @@ CREATE TABLE payment_methods (
     method_type payment_method_type NOT NULL,        -- Uses global ENUM
     default_currency currency_code NOT NULL,         -- Uses global ENUM
     description TEXT,
+    last_4_digits VARCHAR(4),                        -- Optional last 4 digits of card
     active BOOLEAN DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-
-    CONSTRAINT unique_user_payment_method_name UNIQUE(user_id, name)
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    -- Uniqueness enforced at application layer: (household_id, name, last_4_digits)
 );
 
 CREATE INDEX idx_payment_methods_user_id ON payment_methods(user_id);

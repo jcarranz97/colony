@@ -27,6 +27,7 @@ import {
   getCurrentUserAction,
 } from "./actions";
 import { getPaymentMethods } from "@/components/payment-methods/actions";
+import { formatPaymentMethodName } from "@/helpers/formatters";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -262,7 +263,9 @@ function ExpenseRow({
       <div className={`nb-expense-check ${checkCls}`}>{checkIcon}</div>
       <div className="nb-expense-name">{expense.description}</div>
       {expense.payment_method && (
-        <div className="nb-expense-method">{expense.payment_method.name}</div>
+        <div className="nb-expense-method">
+          {formatPaymentMethodName(expense.payment_method)}
+        </div>
       )}
       {expense.due_date && (
         <div className="nb-expense-due">due {fmtDate(expense.due_date)}</div>
@@ -1094,7 +1097,7 @@ function AddExpenseModal({
                 .filter((m) => m.active)
                 .map((m) => (
                   <option key={m.id} value={m.id}>
-                    {m.name}
+                    {formatPaymentMethodName(m)}
                   </option>
                 ))}
             </select>

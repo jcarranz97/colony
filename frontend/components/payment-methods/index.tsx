@@ -5,6 +5,7 @@ import type {
   PaymentMethodType,
   CurrencyCode,
 } from "@/helpers/types";
+import { formatPaymentMethodName } from "@/helpers/formatters";
 import {
   getCurrentUserAction,
   getPaymentMethods,
@@ -83,7 +84,7 @@ function PaymentCard({
             color: "var(--ink)",
           }}
         >
-          {method.name}
+          {formatPaymentMethodName(method)}
         </div>
         <div
           style={{
@@ -172,7 +173,7 @@ function TrashedPaymentCard({
             opacity: 0.55,
           }}
         >
-          {method.name}
+          {formatPaymentMethodName(method)}
         </div>
         <div
           style={{
@@ -273,9 +274,9 @@ function ConfirmTrashModal({
             lineHeight: 1.5,
           }}
         >
-          <strong>{method.name}</strong> will be deactivated and moved to trash.
-          Regular users will no longer see it. Contact your admin if you need it
-          restored.
+          <strong>{formatPaymentMethodName(method)}</strong> will be deactivated
+          and moved to trash. Regular users will no longer see it. Contact your
+          admin if you need it restored.
         </p>
         {error && (
           <p
@@ -312,6 +313,7 @@ interface MethodForm {
   name: string;
   method_type: PaymentMethodType;
   default_currency: CurrencyCode;
+  last_4_digits: string;
 }
 
 function MethodModal({
@@ -338,17 +340,22 @@ function MethodModal({
       setForm(initial);
       setError(null);
     }
-  }, [isOpen, initial.name, initial.method_type, initial.default_currency]);
+  }, [
+    isOpen,
+    initial.name,
+    initial.method_type,
+    initial.default_currency,
+    initial.last_4_digits,
+  ]);
 
   const set = <K extends keyof MethodForm>(k: K, v: MethodForm[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
 
+  const nameQuery = form.name.trim().toLowerCase();
   const nameSuggestions =
-    existingNames && form.name.trim().length > 0
+    existingNames && nameQuery.length > 0
       ? existingNames
-          .filter((n) =>
-            n.toLowerCase().includes(form.name.trim().toLowerCase()),
-          )
+          .filter((n) => n.toLowerCase().includes(nameQuery))
           .slice(0, 5)
       : [];
 
@@ -373,14 +380,28 @@ function MethodModal({
         </button>
         <div className="nb-modal-title">{title}</div>
 
-        <div className="nb-form-group">
-          <label className="nb-form-label">Name</label>
-          <input
-            className="nb-form-input"
-            placeholder="e.g. Chase Debit"
-            value={form.name}
-            onChange={(e) => set("name", e.target.value)}
-          />
+        <div className="nb-form-row">
+          <div className="nb-form-group" style={{ flex: 2 }}>
+            <label className="nb-form-label">Name</label>
+            <input
+              className="nb-form-input"
+              placeholder="e.g. Chase Debit"
+              value={form.name}
+              onChange={(e) => set("name", e.target.value)}
+            />
+          </div>
+          <div className="nb-form-group" style={{ flex: 1 }}>
+            <label className="nb-form-label">Last 4 digits (optional)</label>
+            <input
+              className="nb-form-input"
+              placeholder="e.g. 1234"
+              maxLength={4}
+              value={form.last_4_digits}
+              onChange={(e) =>
+                set("last_4_digits", e.target.value.replace(/\D/g, ""))
+              }
+            />
+          </div>
         </div>
 
         {nameSuggestions.length > 0 && (
@@ -502,7 +523,11 @@ export function PaymentMethods() {
   };
 
   const handleAdd = async (form: MethodForm): Promise<string | null> => {
-    const res = await addPaymentMethod(form);
+    const payload = {
+      ...form,
+      last_4_digits: form.last_4_digits.trim() || null,
+    };
+    const res = await addPaymentMethod(payload);
     if (res.success) {
       setMethods((prev) => [res.data, ...prev]);
       setAddOpen(false);
@@ -513,7 +538,11 @@ export function PaymentMethods() {
 
   const handleEdit = async (form: MethodForm): Promise<string | null> => {
     if (!editTarget) return null;
-    const res = await editPaymentMethod(editTarget.id, form);
+    const payload = {
+      ...form,
+      last_4_digits: form.last_4_digits.trim() || null,
+    };
+    const res = await editPaymentMethod(editTarget.id, payload);
     if (res.success) {
       setMethods((prev) =>
         prev.map((m) => (m.id === editTarget.id ? res.data : m)),
@@ -628,10 +657,15 @@ export function PaymentMethods() {
       <MethodModal
         isOpen={addOpen}
         title="Add Payment Method"
-        initial={{ name: "", method_type: "debit", default_currency: "USD" }}
+        initial={{
+          name: "",
+          method_type: "debit",
+          default_currency: "USD",
+          last_4_digits: "",
+        }}
         onClose={() => setAddOpen(false)}
         onSave={handleAdd}
-        existingNames={activeMethods.map((m) => m.name)}
+        existingNames={activeMethods.map((m) => formatPaymentMethodName(m))}
       />
 
       {/* Edit modal */}
@@ -644,8 +678,14 @@ export function PaymentMethods() {
                 name: editTarget.name,
                 method_type: editTarget.method_type,
                 default_currency: editTarget.default_currency,
+                last_4_digits: editTarget.last_4_digits ?? "",
               }
-            : { name: "", method_type: "debit", default_currency: "USD" }
+            : {
+                name: "",
+                method_type: "debit",
+                default_currency: "USD",
+                last_4_digits: "",
+              }
         }
         onClose={() => setEditTarget(null)}
         onSave={handleEdit}

@@ -99,6 +99,7 @@ export interface PaymentMethod {
   name: string;
   method_type: PaymentMethodType;
   default_currency: CurrencyCode;
+  last_4_digits?: string | null;
   active: boolean;
   created_at: string;
   updated_at: string;
@@ -108,12 +109,14 @@ export interface CreatePaymentMethodRequest {
   name: string;
   method_type: PaymentMethodType;
   default_currency: CurrencyCode;
+  last_4_digits?: string | null;
 }
 
 export interface UpdatePaymentMethodRequest {
   name?: string;
   method_type?: PaymentMethodType;
   default_currency?: CurrencyCode;
+  last_4_digits?: string | null;
   active?: boolean;
 }
 

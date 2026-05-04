@@ -1,6 +1,15 @@
 import { format, parseISO, addDays } from "date-fns";
 import type { CurrencyCode } from "./types";
 
+export function formatPaymentMethodName(method: {
+  name: string;
+  last_4_digits?: string | null;
+}): string {
+  return method.last_4_digits
+    ? `${method.name} (...${method.last_4_digits})`
+    : method.name;
+}
+
 export function formatAmount(
   amount: string | number,
   currency: CurrencyCode,
