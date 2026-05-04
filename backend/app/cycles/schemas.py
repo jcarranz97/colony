@@ -162,7 +162,7 @@ class CycleExpenseCreate(AppBaseModel):
     description: str = Field(..., min_length=1, max_length=255)
     currency: CurrencyCode
     payment_method_id: uuid.UUID
-    amount: Decimal = Field(..., gt=0, decimal_places=2)
+    amount: Decimal = Field(..., ge=0, decimal_places=2)
     due_date: date
     category: ExpenseCategory = ExpenseCategory.EXTRA
     comments: str | None = Field(None, max_length=1000)
@@ -193,7 +193,7 @@ class CycleExpenseUpdate(AppBaseModel):
     """Schema for partially updating a cycle expense (all fields optional)."""
 
     description: str | None = Field(None, min_length=1, max_length=255)
-    amount: Decimal | None = Field(None, gt=0, decimal_places=2)
+    amount: Decimal | None = Field(None, ge=0, decimal_places=2)
     due_date: date | None = None
     status: ExpenseStatus | None = None
     paid: bool | None = None

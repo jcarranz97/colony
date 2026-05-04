@@ -121,7 +121,7 @@ class RecurrentExpenseBase(AppBaseModel):
     description: str = Field(..., min_length=1, max_length=255)
     currency: CurrencyCode
     payment_method_id: uuid.UUID
-    base_amount: Decimal = Field(..., gt=0, decimal_places=2)
+    base_amount: Decimal = Field(..., ge=0, decimal_places=2)
     category: ExpenseCategory
     recurrence_type: RecurrenceType
     recurrence_config: dict[str, Any] = Field(default_factory=dict)
@@ -176,7 +176,7 @@ class RecurrentExpenseUpdate(AppBaseModel):
     description: str | None = Field(default=None, min_length=1, max_length=255)
     currency: CurrencyCode | None = None
     payment_method_id: uuid.UUID | None = None
-    base_amount: Decimal | None = Field(default=None, gt=0, decimal_places=2)
+    base_amount: Decimal | None = Field(default=None, ge=0, decimal_places=2)
     category: ExpenseCategory | None = None
     recurrence_type: RecurrenceType | None = None
     recurrence_config: dict[str, Any] | None = None
