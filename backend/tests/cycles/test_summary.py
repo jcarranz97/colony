@@ -66,6 +66,8 @@ class TestGetCycleSummary:
             "paid": 0,
             "overdue": 0,
             "cancelled": 0,
+            "paid_other": 0,
+            "skipped": 0,
         }
 
     def test_financial_totals_exclude_cancelled(
@@ -154,6 +156,8 @@ class TestGetCycleSummary:
         assert breakdown["pending"] == 1
         assert breakdown["overdue"] == 1
         assert breakdown["cancelled"] == 1
+        assert breakdown["paid_other"] == 0
+        assert breakdown["skipped"] == 0
 
     def test_cycle_info_fields_are_present(
         self, client: TestClient, test_user: User, test_cycle: Cycle
@@ -169,3 +173,120 @@ class TestGetCycleSummary:
         assert cycle_info["name"] == "January 2025"
         assert cycle_info["start_date"] == "2025-01-01"
         assert cycle_info["end_date"] == "2025-02-11"
+
+    def test_paid_other_does_not_reduce_balance(
+        self,
+        client: TestClient,
+        test_user: User,
+        test_cycle: Cycle,
+        usd_payment_method,
+    ) -> None:
+        headers = get_auth_headers(client, test_user)
+
+        add_resp = client.post(
+            f"/api/v1/cycles/{test_cycle.id}/expenses",
+            json={
+                "description": "Friend paid dinner",
+                "amount": "50.00",
+                "currency": "USD",
+                "category": "variable",
+                "due_date": "2025-01-10",
+                "payment_method_id": str(usd_payment_method.id),
+            },
+            headers=headers,
+        )
+        assert add_resp.status_code == 201
+        expense_id = add_resp.json()["id"]
+
+        client.put(
+            f"/api/v1/cycles/{test_cycle.id}/expenses/{expense_id}",
+            json={"status": "paid_other"},
+            headers=headers,
+        )
+
+        summary_resp = client.get(
+            f"/api/v1/cycles/{test_cycle.id}/summary", headers=headers
+        )
+        assert summary_resp.status_code == 200
+        data = summary_resp.json()
+
+        assert Decimal(data["financial"]["total_expenses_usd"]) == Decimal("0.00")
+        assert data["status_breakdown"]["paid_other"] == 1
+
+    def test_skipped_does_not_reduce_balance(
+        self,
+        client: TestClient,
+        test_user: User,
+        test_cycle: Cycle,
+        usd_payment_method,
+    ) -> None:
+        headers = get_auth_headers(client, test_user)
+
+        add_resp = client.post(
+            f"/api/v1/cycles/{test_cycle.id}/expenses",
+            json={
+                "description": "Skipped subscription",
+                "amount": "15.00",
+                "currency": "USD",
+                "category": "fixed",
+                "due_date": "2025-01-05",
+                "payment_method_id": str(usd_payment_method.id),
+            },
+            headers=headers,
+        )
+        assert add_resp.status_code == 201
+        expense_id = add_resp.json()["id"]
+
+        client.put(
+            f"/api/v1/cycles/{test_cycle.id}/expenses/{expense_id}",
+            json={"status": "skipped"},
+            headers=headers,
+        )
+
+        summary_resp = client.get(
+            f"/api/v1/cycles/{test_cycle.id}/summary", headers=headers
+        )
+        assert summary_resp.status_code == 200
+        data = summary_resp.json()
+
+        assert Decimal(data["financial"]["total_expenses_usd"]) == Decimal("0.00")
+        assert data["status_breakdown"]["skipped"] == 1
+
+    def test_paid_still_reduces_balance(
+        self,
+        client: TestClient,
+        test_user: User,
+        test_cycle: Cycle,
+        usd_payment_method,
+    ) -> None:
+        headers = get_auth_headers(client, test_user)
+
+        add_resp = client.post(
+            f"/api/v1/cycles/{test_cycle.id}/expenses",
+            json={
+                "description": "Grocery run",
+                "amount": "75.00",
+                "currency": "USD",
+                "category": "variable",
+                "due_date": "2025-01-12",
+                "payment_method_id": str(usd_payment_method.id),
+            },
+            headers=headers,
+        )
+        assert add_resp.status_code == 201
+        expense_id = add_resp.json()["id"]
+
+        client.put(
+            f"/api/v1/cycles/{test_cycle.id}/expenses/{expense_id}",
+            json={"status": "paid"},
+            headers=headers,
+        )
+
+        summary_resp = client.get(
+            f"/api/v1/cycles/{test_cycle.id}/summary", headers=headers
+        )
+        assert summary_resp.status_code == 200
+        data = summary_resp.json()
+
+        assert Decimal(data["financial"]["total_expenses_usd"]) == Decimal("75.00")
+        assert data["status_breakdown"]["paid"] == 1

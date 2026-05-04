@@ -5,7 +5,13 @@ export type PaymentMethodType = "debit" | "credit" | "cash" | "transfer";
 export type ExpenseCategory = "fixed" | "variable";
 export type RecurrenceType = "weekly" | "bi_weekly" | "monthly" | "custom";
 export type CycleStatus = "draft" | "active" | "completed";
-export type ExpenseStatus = "pending" | "paid" | "overdue" | "cancelled";
+export type ExpenseStatus =
+  | "pending"
+  | "paid"
+  | "overdue"
+  | "cancelled"
+  | "paid_other"
+  | "skipped";
 
 // Auth
 export interface Token {
@@ -291,6 +297,8 @@ export interface StatusBreakdown {
   paid: number;
   overdue: number;
   cancelled: number;
+  paid_other: number;
+  skipped: number;
 }
 
 export interface CycleSummaryFinancial {
