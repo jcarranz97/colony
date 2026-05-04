@@ -825,22 +825,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#application-deployment" class="md-nav__link">
+  <a href="#application-deployment-kubernetes-k3s" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Application Deployment
+        Application Deployment — Kubernetes (k3s)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Application Deployment">
+    <nav class="md-nav" aria-label="Application Deployment — Kubernetes (k3s)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#backend-deployment" class="md-nav__link">
+  <a href="#prerequisites" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Backend Deployment
+        Prerequisites
       
     </span>
   </a>
@@ -848,10 +848,22 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#frontend-deployment" class="md-nav__link">
+  <a href="#step-1-harbor-setup-one-time" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Frontend Deployment
+        Step 1 — Harbor Setup (one-time)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 1 — Harbor Setup (one-time)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1a-allow-insecure-http-registry-on-each-k3s-node" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1a. Allow insecure HTTP registry on each k3s node
       
     </span>
   </a>
@@ -859,10 +871,315 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#full-stack-deployment" class="md-nav__link">
+  <a href="#1b-allow-insecure-push-from-your-local-docker" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Full Stack Deployment
+        1b. Allow insecure push from your local Docker
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1b. Allow insecure push from your local Docker">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#option-a-docker-engine-installed-natively-inside-wsl2-linux" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option A — Docker Engine installed natively inside WSL2 (Linux)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-b-docker-desktop-for-windows-wsl-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option B — Docker Desktop for Windows (WSL integration)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1c-create-a-project-in-harbor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1c. Create a project in Harbor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1d-log-in-to-harbor-from-docker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1d. Log in to Harbor from Docker
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-build-and-push-images" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2 — Build and Push Images
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 2 — Build and Push Images">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#build-the-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build the backend
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-the-frontend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build the frontend
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-install-with-helm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3 — Install with Helm
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 3 — Install with Helm">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-4-optional-harbor-pull-secret" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4 — Optional: Harbor Pull Secret
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-5-verify-the-deployment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5 — Verify the Deployment
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-6-access-the-application" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 6 — Access the Application
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#updating-the-application" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Updating the Application
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Updating the Application">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#update-the-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Update the backend
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#update-the-frontend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Update the frontend
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#update-both-at-once" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Update both at once
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rolling-back" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rolling Back
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seeding-sample-data-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Seeding Sample Data (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uninstalling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Uninstalling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#helm-chart-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Helm Chart Reference
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Helm Chart Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#key-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key values
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting-faq" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting &amp; FAQ
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting &amp; FAQ">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend-pod-crashes-on-startup-with-psycopg2operationalerror" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backend pod crashes on startup with psycopg2.OperationalError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#login-returns-401-incorrect-username-or-password-on-first-deploy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Login returns 401 "Incorrect username or password" on first deploy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#login-succeeds-backend-returns-200-but-the-app-redirects-back-to-login" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Login succeeds (backend returns 200) but the app redirects back to login
       
     </span>
   </a>
@@ -1056,14 +1373,17 @@
 
 
 <h1 id="deployment-guide">Deployment Guide</h1>
-<p>This guide covers how Colony's components are deployed to various environments.</p>
+<p>This guide covers how Colony's components are deployed to various
+environments.</p>
 <h2 id="documentation-deployment">Documentation Deployment</h2>
-<p>Colony's documentation is automatically deployed to GitHub Pages using GitHub Actions.</p>
+<p>Colony's documentation is automatically deployed to GitHub Pages using
+GitHub Actions.</p>
 <h3 id="github-pages-setup">GitHub Pages Setup</h3>
-<p>The documentation is built with MkDocs Material and deployed to GitHub Pages at:
-<code>https://your-username.github.io/colony/</code></p>
+<p>The documentation is built with MkDocs Material and deployed to GitHub
+Pages at: <code>https://your-username.github.io/colony/</code></p>
 <h3 id="automatic-deployment">Automatic Deployment</h3>
-<p>Every push to the <code>main</code> branch automatically triggers a documentation build and deployment via GitHub Actions.</p>
+<p>Every push to the <code>main</code> branch automatically triggers a documentation
+build and deployment via GitHub Actions.</p>
 <h4 id="github-actions-workflow">GitHub Actions Workflow</h4>
 <p>The deployment is handled by <code>.github/workflows/docs.yml</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deploy Documentation</span>
@@ -1116,7 +1436,8 @@
 <li><strong>Branch</strong>: <code>gh-pages</code></li>
 <li><strong>Folder</strong>: <code>/ (root)</code></li>
 </ol>
-<p>The <code>gh-deploy</code> command automatically creates and manages the <code>gh-pages</code> branch.</p>
+<p>The <code>gh-deploy</code> command automatically creates and manages the <code>gh-pages</code>
+branch.</p>
 <h3 id="local-preview">Local Preview</h3>
 <p>To preview documentation locally before deployment:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Install dependencies</span>
@@ -1132,7 +1453,8 @@
 <ul>
 <li><strong>Permission denied</strong>: Ensure GitHub Actions has write permissions</li>
 <li><strong>Build fails</strong>: Check that all referenced files exist in the docs folder</li>
-<li><strong>Pages not updating</strong>: GitHub Pages can take a few minutes to reflect changes</li>
+<li><strong>Pages not updating</strong>: GitHub Pages can take a few minutes to reflect
+  changes</li>
 </ul>
 <p><strong>Debug Steps:</strong></p>
 <ol>
@@ -1141,13 +1463,530 @@
 <li>Ensure <code>mkdocs.yml</code> configuration is valid</li>
 <li>Test build locally with <code>mkdocs build</code></li>
 </ol>
-<h2 id="application-deployment">Application Deployment</h2>
-<h3 id="backend-deployment">Backend Deployment</h3>
-<p><em>Coming soon - Docker containerization and deployment strategies</em></p>
-<h3 id="frontend-deployment">Frontend Deployment</h3>
-<p><em>Coming soon - Static site deployment options</em></p>
-<h3 id="full-stack-deployment">Full Stack Deployment</h3>
-<p><em>Coming soon - Complete deployment with Docker Compose</em></p>
+<hr />
+<h2 id="application-deployment-kubernetes-k3s">Application Deployment — Kubernetes (k3s)</h2>
+<p>Colony ships with a Helm chart located at <code>helm/colony/</code> for deploying
+to a Kubernetes cluster. This guide targets a k3s homelab setup with a
+private Harbor registry.</p>
+<p><strong>Cluster assumptions used in this guide:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Node IPs</td>
+<td><code>192.168.1.208</code> (control-plane), <code>192.168.1.206</code> (worker)</td>
+</tr>
+<tr>
+<td>Harbor URL</td>
+<td><code>http://192.168.1.206:30002</code></td>
+</tr>
+<tr>
+<td>Target namespace</td>
+<td><code>colony-app</code></td>
+</tr>
+<tr>
+<td>Frontend URL</td>
+<td><code>http://192.168.1.206:30080</code></td>
+</tr>
+<tr>
+<td>Backend URL</td>
+<td><code>http://192.168.1.206:30800</code></td>
+</tr>
+</tbody>
+</table>
+<p>Substitute your own values where needed.</p>
+<hr />
+<h3 id="prerequisites">Prerequisites</h3>
+<p>Install the following tools on the machine you will deploy from:</p>
+<ul>
+<li><strong>kubectl</strong> — configured with access to the cluster
+  (<code>kubectl get nodes</code> should return your nodes)</li>
+<li><strong>helm</strong> v3 — <code>helm version</code> to verify</li>
+<li><strong>docker</strong> — for building and pushing images</li>
+</ul>
+<hr />
+<h3 id="step-1-harbor-setup-one-time">Step 1 — Harbor Setup (one-time)</h3>
+<h4 id="1a-allow-insecure-http-registry-on-each-k3s-node">1a. Allow insecure HTTP registry on each k3s node</h4>
+<p>Harbor runs on plain HTTP, so every k3s node must be told to trust it.
+SSH into each node and create or edit
+<code>/etc/rancher/k3s/registries.yaml</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">mirrors</span><span class="p">:</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="s">&quot;192.168.1.206:30002&quot;</span><span class="p p-Indicator">:</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="nt">endpoint</span><span class="p">:</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;http://192.168.1.206:30002&quot;</span>
+</code></pre></div>
+<p>Then restart k3s:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># On dell-01</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>k3s
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># On nuc-01</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>k3s-agent
+</code></pre></div>
+<p>Verify k3s restarted cleanly:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>nodes
+</code></pre></div>
+<h4 id="1b-allow-insecure-push-from-your-local-docker">1b. Allow insecure push from your local Docker</h4>
+<p>The steps differ depending on how Docker is installed on your machine.</p>
+<h5 id="option-a-docker-engine-installed-natively-inside-wsl2-linux">Option A — Docker Engine installed natively inside WSL2 (Linux)</h5>
+<p>This is the case when you run <code>sudo apt install docker.io</code> (or equivalent)
+inside your WSL distro and the daemon runs there. All configuration happens
+from inside the WSL terminal.</p>
+<p>Edit <code>/etc/docker/daemon.json</code> inside WSL (create if missing):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">{</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">&quot;insecure-registries&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;192.168.1.206:30002&quot;</span><span class="p">]</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="p">}</span>
+</code></pre></div>
+<p>Restart the Docker daemon. WSL2 distros often run without systemd, so try
+<code>service</code> first:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>sudo<span class="w"> </span>service<span class="w"> </span>docker<span class="w"> </span>restart
+</code></pre></div>
+<p>If your distro has systemd enabled (WSL2 + systemd is supported in recent
+Windows builds and Ubuntu 22.04+):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>docker
+</code></pre></div>
+<p>Verify it picked up the change:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>docker<span class="w"> </span>info<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-A5<span class="w"> </span><span class="s2">&quot;Insecure Registries&quot;</span>
+</code></pre></div>
+<h5 id="option-b-docker-desktop-for-windows-wsl-integration">Option B — Docker Desktop for Windows (WSL integration)</h5>
+<p>This is the case when Docker Desktop is installed on Windows and your WSL
+distro uses it via the <strong>"Use the WSL 2 based engine"</strong> integration.
+The daemon runs inside Docker Desktop's own VM, so editing
+<code>/etc/docker/daemon.json</code> inside WSL has no effect — the change must be
+made on the Windows side.</p>
+<p><strong>Via the Docker Desktop UI (recommended):</strong></p>
+<ol>
+<li>Open Docker Desktop on Windows</li>
+<li>Go to <strong>Settings → Docker Engine</strong></li>
+<li>Add the <code>insecure-registries</code> key to the JSON config:</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="p">{</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">&quot;insecure-registries&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;192.168.1.206:30002&quot;</span><span class="p">]</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="p">}</span>
+</code></pre></div>
+<ol>
+<li>Click <strong>Apply &amp; restart</strong></li>
+</ol>
+<p><strong>Via the Windows config file (alternative):</strong></p>
+<p>Open <code>%USERPROFILE%\.docker\daemon.json</code>
+(i.e. <code>C:\Users\&lt;your-username&gt;\.docker\daemon.json</code>) in any text editor
+and add the same JSON block above. Then restart Docker Desktop.</p>
+<p>After either method, verify from your WSL terminal:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>docker<span class="w"> </span>info<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-A5<span class="w"> </span><span class="s2">&quot;Insecure Registries&quot;</span>
+</code></pre></div>
+<p>You should see <code>192.168.1.206:30002</code> listed.</p>
+<h4 id="1c-create-a-project-in-harbor">1c. Create a project in Harbor</h4>
+<ol>
+<li>Open <code>http://192.168.1.206:30002</code> in a browser</li>
+<li>Log in (default credentials: <code>admin</code> / <code>Harbor12345</code> — change these)</li>
+<li>Go to <strong>Projects → New Project</strong></li>
+<li>Create a project named <code>colony</code> (or use the existing <code>library</code> project)</li>
+<li>Set the project to <strong>Public</strong> so k3s can pull without authentication, or
+   keep it private and create a pull secret (see
+   <a href="#step-4--optional-harbor-pull-secret">Step 4 — Pull Secret</a>)</li>
+</ol>
+<h4 id="1d-log-in-to-harbor-from-docker">1d. Log in to Harbor from Docker</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>docker<span class="w"> </span>login<span class="w"> </span><span class="m">192</span>.168.1.206:30002
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="c1"># Enter your Harbor username and password</span>
+</code></pre></div>
+<hr />
+<h3 id="step-2-build-and-push-images">Step 2 — Build and Push Images</h3>
+<blockquote>
+<p><strong>Frontend API URL — runtime injection</strong></p>
+<p>The frontend image is built with a placeholder string instead of a
+hardcoded URL. At container startup, <code>entrypoint.sh</code> replaces that
+placeholder in the compiled JavaScript with the value of
+<code>NEXT_PUBLIC_API_URL</code> supplied at runtime. This means <strong>one image can
+be deployed anywhere</strong> — no rebuild needed when the backend URL changes.
+The URL is set in <code>values.yaml</code> under <code>frontend.env.apiUrl</code> and injected
+by Helm as a container environment variable.</p>
+</blockquote>
+<h4 id="build-the-backend">Build the backend</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>docker<span class="w"> </span>build<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span>-t<span class="w"> </span><span class="m">192</span>.168.1.206:30002/colony/colony-backend:1.0.0<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span>./backend
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>docker<span class="w"> </span>push<span class="w"> </span><span class="m">192</span>.168.1.206:30002/colony/colony-backend:1.0.0
+</code></pre></div>
+<h4 id="build-the-frontend">Build the frontend</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>docker<span class="w"> </span>build<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span>-t<span class="w"> </span><span class="m">192</span>.168.1.206:30002/colony/colony-frontend:1.0.0<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">  </span>./frontend
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>docker<span class="w"> </span>push<span class="w"> </span><span class="m">192</span>.168.1.206:30002/colony/colony-frontend:1.0.0
+</code></pre></div>
+<hr />
+<h3 id="step-3-install-with-helm">Step 3 — Install with Helm</h3>
+<p>Create the namespace and install the chart. Override the three sensitive
+values on the command line (or use a custom <code>values.yaml</code> file):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>helm<span class="w"> </span>install<span class="w"> </span>colony<span class="w"> </span>./helm/colony<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span>--namespace<span class="w"> </span>colony-app<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span>--create-namespace<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">  </span>--set<span class="w"> </span>image.registry<span class="o">=</span><span class="m">192</span>.168.1.206:30002<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">  </span>--set<span class="w"> </span>backend.image.repository<span class="o">=</span>colony/colony-backend<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="w">  </span>--set<span class="w"> </span>backend.image.tag<span class="o">=</span><span class="m">1</span>.0.0<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="w">  </span>--set<span class="w"> </span>frontend.image.repository<span class="o">=</span>colony/colony-frontend<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="w">  </span>--set<span class="w"> </span>frontend.image.tag<span class="o">=</span><span class="m">1</span>.0.0<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="w">  </span>--set<span class="w"> </span>backend.env.secretKey<span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span>python3<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;import secrets; print(secrets.token_hex(32))&#39;</span><span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="w">  </span>--set<span class="w"> </span>postgresql.password<span class="o">=</span><span class="s2">&quot;your-strong-db-password&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="w">  </span>--set<span class="w"> </span>backend.env.defaultAdminPassword<span class="o">=</span><span class="s2">&quot;your-admin-password&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a><span class="w">  </span>--set<span class="w"> </span>backend.env.allowedHosts<span class="o">=</span><span class="s1">&#39;[&quot;http://192.168.1.206:30080&quot;]&#39;</span>
+</code></pre></div>
+<p>Or with a custom values file (recommended for reproducibility):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># my-values.yaml</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="nt">image</span><span class="p">:</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="nt">registry</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;192.168.1.206:30002&quot;</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="nt">backend</span><span class="p">:</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">  </span><span class="nt">image</span><span class="p">:</span>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="w">    </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">colony/colony-backend</span>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="w">    </span><span class="nt">tag</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0.0&quot;</span>
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="w">  </span><span class="nt">env</span><span class="p">:</span>
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="w">    </span><span class="nt">secretKey</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;your-long-random-secret-here&quot;</span>
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a><span class="w">    </span><span class="nt">allowedHosts</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;[&quot;http://192.168.1.206:30080&quot;]&#39;</span>
+<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a><span class="w">    </span><span class="nt">defaultAdminPassword</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;your-admin-password&quot;</span>
+<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a>
+<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a><span class="nt">frontend</span><span class="p">:</span>
+<a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a><span class="w">  </span><span class="nt">image</span><span class="p">:</span>
+<a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a><span class="w">    </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">colony/colony-frontend</span>
+<a id="__codelineno-16-17" name="__codelineno-16-17" href="#__codelineno-16-17"></a><span class="w">    </span><span class="nt">tag</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0.0&quot;</span>
+<a id="__codelineno-16-18" name="__codelineno-16-18" href="#__codelineno-16-18"></a><span class="w">  </span><span class="nt">env</span><span class="p">:</span>
+<a id="__codelineno-16-19" name="__codelineno-16-19" href="#__codelineno-16-19"></a><span class="w">    </span><span class="nt">apiUrl</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;http://192.168.1.206:30800/api/v1&quot;</span>
+<a id="__codelineno-16-20" name="__codelineno-16-20" href="#__codelineno-16-20"></a>
+<a id="__codelineno-16-21" name="__codelineno-16-21" href="#__codelineno-16-21"></a><span class="nt">postgresql</span><span class="p">:</span>
+<a id="__codelineno-16-22" name="__codelineno-16-22" href="#__codelineno-16-22"></a><span class="w">  </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;your-strong-db-password&quot;</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>helm<span class="w"> </span>install<span class="w"> </span>colony<span class="w"> </span>./helm/colony<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">  </span>--namespace<span class="w"> </span>colony-app<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">  </span>--create-namespace<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">  </span>-f<span class="w"> </span>my-values.yaml
+</code></pre></div>
+<h4 id="step-4-optional-harbor-pull-secret">Step 4 — Optional: Harbor Pull Secret</h4>
+<p>If your Harbor project is private, create a pull secret so k3s can
+authenticate:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>kubectl<span class="w"> </span>create<span class="w"> </span>secret<span class="w"> </span>docker-registry<span class="w"> </span>harbor-secret<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span>--docker-server<span class="o">=</span><span class="m">192</span>.168.1.206:30002<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">  </span>--docker-username<span class="o">=</span>&lt;harbor-user&gt;<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">  </span>--docker-password<span class="o">=</span>&lt;harbor-password&gt;<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">  </span>--namespace<span class="w"> </span>colony-app
+</code></pre></div>
+<p>Then set <code>imagePullSecrets</code> in your values file:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nt">imagePullSecrets</span><span class="p">:</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">harbor-secret</span>
+</code></pre></div>
+<hr />
+<h3 id="step-5-verify-the-deployment">Step 5 — Verify the Deployment</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="c1"># Watch pods come up</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-n<span class="w"> </span>colony-app<span class="w"> </span>-w
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="c1"># All three pods should reach Running/Ready state:</span>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="c1"># colony-backend-*     1/1  Running</span>
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="c1"># colony-frontend-*    1/1  Running</span>
+<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="c1"># colony-postgresql-*  1/1  Running</span>
+<a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a>
+<a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a><span class="c1"># Check services and NodePorts</span>
+<a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a>kubectl<span class="w"> </span>get<span class="w"> </span>svc<span class="w"> </span>-n<span class="w"> </span>colony-app
+</code></pre></div>
+<hr />
+<h3 id="step-6-access-the-application">Step 6 — Access the Application</h3>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>URL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Frontend (app)</td>
+<td><code>http://192.168.1.206:30080</code></td>
+</tr>
+<tr>
+<td>Backend API docs</td>
+<td><code>http://192.168.1.206:30800/docs</code></td>
+</tr>
+<tr>
+<td>Backend health</td>
+<td><code>http://192.168.1.206:30800/health</code></td>
+</tr>
+</tbody>
+</table>
+<p>The default admin credentials are whatever you set in
+<code>backend.env.defaultAdminUsername</code> / <code>backend.env.defaultAdminPassword</code>
+(defaults: <code>admin</code> / <code>colony-admin</code>).</p>
+<hr />
+<h3 id="updating-the-application">Updating the Application</h3>
+<h4 id="update-the-backend">Update the backend</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c1"># 1. Build and push the new image</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span><span class="m">192</span>.168.1.206:30002/colony/colony-backend:1.1.0<span class="w"> </span>./backend
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>docker<span class="w"> </span>push<span class="w"> </span><span class="m">192</span>.168.1.206:30002/colony/colony-backend:1.1.0
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="c1"># 2. Upgrade the release</span>
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>colony<span class="w"> </span>./helm/colony<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="w">  </span>--namespace<span class="w"> </span>colony-app<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a><span class="w">  </span>--reuse-values<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a><span class="w">  </span>--set<span class="w"> </span>backend.image.tag<span class="o">=</span><span class="m">1</span>.1.0
+</code></pre></div>
+<h4 id="update-the-frontend">Update the frontend</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1"># 1. Build and push the new image (no build args needed)</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>docker<span class="w"> </span>build<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">  </span>-t<span class="w"> </span><span class="m">192</span>.168.1.206:30002/colony/colony-frontend:1.1.0<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="w">  </span>./frontend
+<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>docker<span class="w"> </span>push<span class="w"> </span><span class="m">192</span>.168.1.206:30002/colony/colony-frontend:1.1.0
+<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>
+<a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="c1"># 2. Upgrade the release</span>
+<a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>colony<span class="w"> </span>./helm/colony<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="w">  </span>--namespace<span class="w"> </span>colony-app<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a><span class="w">  </span>--reuse-values<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a><span class="w">  </span>--set<span class="w"> </span>frontend.image.tag<span class="o">=</span><span class="m">1</span>.1.0
+</code></pre></div>
+<p>To change the backend URL the frontend points to (e.g. after moving to a
+different node or port), no image rebuild is required — just update the
+value and upgrade:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>colony<span class="w"> </span>./helm/colony<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="w">  </span>--namespace<span class="w"> </span>colony-app<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="w">  </span>--reuse-values<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="w">  </span>--set<span class="w"> </span>frontend.env.apiUrl<span class="o">=</span><span class="s2">&quot;http://192.168.1.206:30800/api/v1&quot;</span>
+</code></pre></div>
+<h4 id="update-both-at-once">Update both at once</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>colony<span class="w"> </span>./helm/colony<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">  </span>--namespace<span class="w"> </span>colony-app<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">  </span>--reuse-values<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="w">  </span>--set<span class="w"> </span>backend.image.tag<span class="o">=</span><span class="m">1</span>.1.0<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="w">  </span>--set<span class="w"> </span>frontend.image.tag<span class="o">=</span><span class="m">1</span>.1.0
+</code></pre></div>
+<blockquote>
+<p><strong>Note on <code>--reuse-values</code></strong>: This flag carries forward all values from
+the previous <code>helm install</code> or <code>helm upgrade</code>. You only need to specify
+the values you want to change.</p>
+</blockquote>
+<hr />
+<h3 id="rolling-back">Rolling Back</h3>
+<p>If an upgrade introduces a problem, roll back to the previous release:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="c1"># See the release history</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>helm<span class="w"> </span><span class="nb">history</span><span class="w"> </span>colony<span class="w"> </span>-n<span class="w"> </span>colony-app
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="c1"># Roll back to the previous revision</span>
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>helm<span class="w"> </span>rollback<span class="w"> </span>colony<span class="w"> </span>-n<span class="w"> </span>colony-app
+<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>
+<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="c1"># Roll back to a specific revision number</span>
+<a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a>helm<span class="w"> </span>rollback<span class="w"> </span>colony<span class="w"> </span><span class="m">2</span><span class="w"> </span>-n<span class="w"> </span>colony-app
+</code></pre></div>
+<hr />
+<h3 id="seeding-sample-data-optional">Seeding Sample Data (optional)</h3>
+<p>The backend automatically creates the admin user on first startup via the
+<code>DEFAULT_ADMIN_*</code> environment variables. Seeding is only needed if you want
+to pre-populate sample payment methods, cycles, and expenses.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>colony<span class="w"> </span>./helm/colony<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="w">  </span>--namespace<span class="w"> </span>colony-app<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="w">  </span>--reuse-values<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="w">  </span>--set<span class="w"> </span>seeder.enabled<span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="w">  </span>--set-file<span class="w"> </span>seeder.seedDataContent<span class="o">=</span>./seed_data.yaml
+</code></pre></div>
+<p>The seeder runs once as a Kubernetes Job (Helm post-install hook) and
+self-deletes after it succeeds.</p>
+<hr />
+<h3 id="uninstalling">Uninstalling</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>helm<span class="w"> </span>uninstall<span class="w"> </span>colony<span class="w"> </span>-n<span class="w"> </span>colony-app
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="c1"># Optionally delete the namespace (removes all remaining resources)</span>
+<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>namespace<span class="w"> </span>colony-app
+</code></pre></div>
+<blockquote>
+<p>The PostgreSQL PersistentVolumeClaim is <strong>not</strong> deleted by
+<code>helm uninstall</code> because Helm does not delete PVCs by default. Delete it
+manually if you want to wipe the data:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>pvc<span class="w"> </span>colony-postgres-data<span class="w"> </span>-n<span class="w"> </span>colony-app
+</code></pre></div>
+</blockquote>
+<hr />
+<h3 id="helm-chart-reference">Helm Chart Reference</h3>
+<p>The chart lives at <code>helm/colony/</code>. Key files:</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Chart.yaml</code></td>
+<td>Chart metadata and version</td>
+</tr>
+<tr>
+<td><code>values.yaml</code></td>
+<td>All configurable defaults</td>
+</tr>
+<tr>
+<td><code>templates/secrets.yaml</code></td>
+<td>K8s Secret: DB password, JWT key</td>
+</tr>
+<tr>
+<td><code>templates/configmap-backend.yaml</code></td>
+<td>Non-sensitive backend env vars</td>
+</tr>
+<tr>
+<td><code>templates/postgres-*.yaml</code></td>
+<td>PostgreSQL Deployment, Service, PVC</td>
+</tr>
+<tr>
+<td><code>templates/backend-*.yaml</code></td>
+<td>FastAPI Deployment + NodePort Service</td>
+</tr>
+<tr>
+<td><code>templates/frontend-*.yaml</code></td>
+<td>Next.js Deployment + NodePort Service</td>
+</tr>
+<tr>
+<td><code>templates/seeder-job.yaml</code></td>
+<td>Optional seed data Job (post-install)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="key-values">Key values</h4>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>image.registry</code></td>
+<td><code>192.168.1.206:30002</code></td>
+<td>Harbor registry address</td>
+</tr>
+<tr>
+<td><code>backend.image.tag</code></td>
+<td><code>latest</code></td>
+<td>Backend image tag</td>
+</tr>
+<tr>
+<td><code>frontend.image.tag</code></td>
+<td><code>latest</code></td>
+<td>Frontend image tag</td>
+</tr>
+<tr>
+<td><code>frontend.env.apiUrl</code></td>
+<td><code>http://192.168.1.206:30800/api/v1</code></td>
+<td>Backend URL injected at runtime</td>
+</tr>
+<tr>
+<td><code>backend.service.nodePort</code></td>
+<td><code>30800</code></td>
+<td>Backend external port</td>
+</tr>
+<tr>
+<td><code>frontend.service.nodePort</code></td>
+<td><code>30080</code></td>
+<td>Frontend external port</td>
+</tr>
+<tr>
+<td><code>backend.env.secretKey</code></td>
+<td><em>(must set)</em></td>
+<td>JWT signing secret</td>
+</tr>
+<tr>
+<td><code>backend.env.allowedHosts</code></td>
+<td><code>["http://192.168.1.206:30080"]</code></td>
+<td>CORS origins</td>
+</tr>
+<tr>
+<td><code>postgresql.password</code></td>
+<td><em>(must set)</em></td>
+<td>Database password</td>
+</tr>
+<tr>
+<td><code>postgresql.persistence.size</code></td>
+<td><code>5Gi</code></td>
+<td>PVC size for Postgres</td>
+</tr>
+<tr>
+<td><code>seeder.enabled</code></td>
+<td><code>false</code></td>
+<td>Enable sample data seeder</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="troubleshooting-faq">Troubleshooting &amp; FAQ</h2>
+<h3 id="backend-pod-crashes-on-startup-with-psycopg2operationalerror">Backend pod crashes on startup with <code>psycopg2.OperationalError</code></h3>
+<p><strong>Symptom:</strong> The backend pod enters a crash loop immediately after the
+init container exits. The logs show a connection error like:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>psycopg2.OperationalError: connection to server on socket
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>&quot;@##@colony-postgresql/.s.PGSQL.5432&quot; failed: Connection refused
+</code></pre></div>
+<p><strong>Cause:</strong> The <code>postgresql.password</code> (or <code>postgresql.username</code>) in your
+<code>values.yaml</code> contains URL-special characters — most commonly <code>@</code> or <code>#</code>.
+These break the <code>DATABASE_URL</code> connection string:</p>
+<ul>
+<li><code>@</code> is the delimiter between credentials and hostname in a URL
+  (<code>user:pass@host</code>), so a <code>@</code> in the password confuses the parser.</li>
+<li><code>#</code> marks the start of a URL fragment, causing everything after it to be
+  ignored.</li>
+</ul>
+<p>The Helm chart URL-encodes both fields with <code>urlquery</code> to prevent this, but
+if you are using an older revision of the chart (before this fix) you will
+hit this issue.</p>
+<p><strong>Fix:</strong> Upgrade to the latest chart revision and restart the backend:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>colony<span class="w"> </span>./helm/colony<span class="w"> </span>--namespace<span class="w"> </span>colony-app<span class="w"> </span>-f<span class="w"> </span>my-values.yaml
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>kubectl<span class="w"> </span>rollout<span class="w"> </span>restart<span class="w"> </span>deployment<span class="w"> </span>colony-backend<span class="w"> </span>-n<span class="w"> </span>colony-app
+</code></pre></div>
+<p><strong>Prevention:</strong> Any password that works in a URL is fine. Characters to
+avoid unless you are on the fixed chart version: <code>@</code>, <code>#</code>, <code>%</code>, <code>?</code>, <code>&amp;</code>.</p>
+<h3 id="login-returns-401-incorrect-username-or-password-on-first-deploy">Login returns 401 "Incorrect username or password" on first deploy</h3>
+<p><strong>Symptom:</strong> The app loads, login page appears, but every login attempt
+with the admin credentials returns 401.</p>
+<p><strong>Cause:</strong> The admin user was never created. In the original Helm
+deployment the seeder was disabled by default, and the backend's startup
+only created tables — it did not bootstrap the admin user. A fresh
+database therefore has all tables but no rows in <code>users</code>.</p>
+<p><strong>Fix (chart v0.1.0 and later):</strong> As of the fix shipped in this chart,
+<code>_bootstrap_admin()</code> runs inside the FastAPI <code>lifespan</code> on every startup.
+It creates the default household and admin user automatically if they do
+not already exist. Simply deploying the updated image is enough.</p>
+<p><strong>Fix (manual, for existing deployments):</strong> If you are on an older image
+and the tables are already created but empty, exec into the running backend
+pod and run the seeder in <code>auth_only</code> mode — this creates only the admin
+user and household without touching any sample data:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-n<span class="w"> </span>colony-app<span class="w"> </span>deployment/colony-backend<span class="w"> </span>--<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="w">  </span>sh<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;echo &#39;{}&#39; &gt; /tmp/seed.yaml &amp;&amp; \</span>
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="s2">         SEED_FILE=/tmp/seed.yaml \</span>
+<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="s2">         SEED_MODE=auth_only \</span>
+<a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="s2">         uv run python scripts/seed_db.py&quot;</span>
+</code></pre></div>
+<p><strong>Prevention:</strong> Build and deploy the updated backend image which includes
+the <code>_bootstrap_admin()</code> lifespan call in <code>app/main.py</code>.</p>
+<h3 id="login-succeeds-backend-returns-200-but-the-app-redirects-back-to-login">Login succeeds (backend returns 200) but the app redirects back to login</h3>
+<p><strong>Symptom:</strong> You can see a <code>POST /api/v1/auth/login 200 OK</code> in the backend
+logs, but the browser immediately returns to the login page.</p>
+<p><strong>Cause:</strong> The auth cookie is set with <code>Secure: true</code> when
+<code>COOKIE_SECURE=true</code>, which tells browsers to only transmit the cookie over
+HTTPS. When the app is served over plain HTTP (as in a homelab without TLS),
+the browser silently discards the cookie — so every page load sees no token
+and redirects back to <code>/login</code>.</p>
+<p><strong>Fix:</strong> Ensure <code>COOKIE_SECURE=false</code> is set in the frontend container (the
+default in <code>values.yaml</code>). Then rebuild and deploy the frontend image with
+the updated <code>actions/auth.action.ts</code> that reads <code>COOKIE_SECURE</code> instead of
+<code>NODE_ENV</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span><span class="m">192</span>.168.1.206:30002/colony/colony-frontend:1.0.1<span class="w"> </span>./frontend
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>docker<span class="w"> </span>push<span class="w"> </span><span class="m">192</span>.168.1.206:30002/colony/colony-frontend:1.0.1
+<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>
+<a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>colony<span class="w"> </span>./helm/colony<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a><span class="w">  </span>--namespace<span class="w"> </span>colony-app<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a><span class="w">  </span>-f<span class="w"> </span>my-values.yaml<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-32-7" name="__codelineno-32-7" href="#__codelineno-32-7"></a><span class="w">  </span>--set<span class="w"> </span>frontend.image.tag<span class="o">=</span><span class="m">1</span>.0.1
+</code></pre></div>
+<p><strong>Note:</strong> If you ever add HTTPS to the cluster (e.g. via a TLS ingress),
+set <code>frontend.env.cookieSecure: "true"</code> in your values file so session
+cookies are properly protected.</p>
 
 
 
