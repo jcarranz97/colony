@@ -261,6 +261,24 @@ function ExpenseRow({
       onClick={() => !isLocked && onToggle(expense.id)}
     >
       <div className={`nb-expense-check ${checkCls}`}>{checkIcon}</div>
+      <div
+        style={{
+          width: 24,
+          height: 24,
+          borderRadius: "50%",
+          flexShrink: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background:
+            expense.category === "fixed"
+              ? "rgba(44,74,62,0.10)"
+              : "rgba(201,168,76,0.15)",
+          fontSize: 12,
+        }}
+      >
+        {expense.category === "fixed" ? "📌" : "🛒"}
+      </div>
       <div className="nb-expense-name">{expense.description}</div>
       {expense.payment_method && (
         <div className="nb-expense-method">
@@ -272,6 +290,16 @@ function ExpenseRow({
       )}
       <div className="nb-expense-amount">
         {fmtAmount(expense.amount, expense.currency)}
+      </div>
+      <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
+        <span
+          className={`nb-template-badge ${expense.category === "fixed" ? "nb-badge-fixed" : "nb-badge-variable"}`}
+        >
+          {expense.category}
+        </span>
+        {expense.autopay && (
+          <span className="nb-template-badge nb-badge-autopay">autopay</span>
+        )}
       </div>
       {expense.status !== "cancelled" && (
         <>
@@ -1691,49 +1719,55 @@ function CycleDetail({
         </div>
       </div>
 
-      {fixedExp.length > 0 && (
-        <>
-          <div className="nb-section-title">📌 Fixed</div>
-          {fixedExp.map((e) => (
-            <ExpenseRow
-              key={e.id}
-              expense={e}
-              onToggle={onToggleExpense}
-              onStatusChange={onStatusChange}
-              onEdit={handleEditExpense}
-            />
-          ))}
-        </>
-      )}
+      {/* Expenses section */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: 8,
+          marginTop: 16,
+        }}
+      >
+        <div className="nb-section-title" style={{ margin: 0 }}>
+          💸 Expenses
+        </div>
+        {cycle.status !== "completed" && (
+          <button
+            style={{
+              fontFamily: "var(--font-hand)",
+              fontSize: 13,
+              background: "transparent",
+              border: "1px dashed var(--cover-bg)",
+              borderRadius: 4,
+              padding: "3px 10px",
+              cursor: "pointer",
+              color: "var(--cover-bg)",
+            }}
+            onClick={() => setAddExpenseOpen(true)}
+          >
+            + Add expense
+          </button>
+        )}
+      </div>
 
-      {varExp.length > 0 && (
-        <>
-          <div className="nb-section-title">🛒 Variable</div>
-          {varExp.map((e) => (
-            <ExpenseRow
-              key={e.id}
-              expense={e}
-              onToggle={onToggleExpense}
-              onStatusChange={onStatusChange}
-              onEdit={handleEditExpense}
-            />
-          ))}
-        </>
-      )}
-
-      {expenses.length === 0 && (
+      {expenses.length > 0 ? (
+        expenses.map((e) => (
+          <ExpenseRow
+            key={e.id}
+            expense={e}
+            onToggle={onToggleExpense}
+            onStatusChange={onStatusChange}
+            onEdit={handleEditExpense}
+          />
+        ))
+      ) : (
         <div className="nb-empty">
           <div className="nb-empty-icon">📝</div>
           <div className="nb-empty-text">
             No expenses yet — add the first one!
           </div>
         </div>
-      )}
-
-      {cycle.status !== "completed" && (
-        <button className="nb-add-btn" onClick={() => setAddExpenseOpen(true)}>
-          + Add expense
-        </button>
       )}
 
       <AddIncomeModal
