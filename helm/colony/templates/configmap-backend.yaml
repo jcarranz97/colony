@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "colony.fullname" . }}-backend-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "colony.labels" . | nindent 4 }}
+data:
+  DEBUG: {{ .Values.backend.env.debug | quote }}
+  ALLOWED_HOSTS: {{ .Values.backend.env.allowedHosts | quote }}
+  AUTH_ALGORITHM: {{ .Values.backend.env.authAlgorithm | quote }}
+  AUTH_ACCESS_TOKEN_EXPIRE_MINUTES: {{ .Values.backend.env.authTokenExpireMinutes | quote }}
+  DEFAULT_ADMIN_USERNAME: {{ .Values.backend.env.defaultAdminUsername | quote }}
+  PYTHONPATH: "/app"

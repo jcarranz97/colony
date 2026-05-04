@@ -1,0 +1,142 @@
+# Colony Helm Chart — default values
+#
+# Override these at install time with --set or a custom values file:
+#   helm install colony ./helm/colony -f my-values.yaml
+#
+# Required overrides for production:
+#   image.registry              — your Harbor node IP + port
+#   backend.env.secretKey       — a strong random secret (≥32 chars)
+#   postgresql.password         — a strong database password
+#   backend.env.defaultAdminPassword — change from the default
+
+# ---------------------------------------------------------------------------
+# Image pull configuration
+# ---------------------------------------------------------------------------
+image:
+  # Harbor registry address, e.g. "192.168.1.206:30002"
+  # Leave empty to pull from Docker Hub (postgres image is always from Hub).
+  registry: "192.168.1.206:30002"
+  pullPolicy: IfNotPresent
+
+# Image pull secrets for the Harbor registry.
+# Create with: kubectl create secret docker-registry harbor-secret \
+#   --docker-server=192.168.1.208:30002 \
+#   --docker-username=<user> --docker-password=<pass> \
+#   -n colony-app
+imagePullSecrets: []
+# - name: harbor-secret
+
+# ---------------------------------------------------------------------------
+# Backend (FastAPI)
+# ---------------------------------------------------------------------------
+backend:
+  image:
+    repository: library/colony-backend
+    tag: "latest"
+  replicas: 1
+  port: 8000
+
+  # Override the default CMD to use uvicorn instead of "fastapi dev".
+  command:
+    - uv
+    - run
+    - uvicorn
+    - app.main:app
+    - "--host"
+    - "0.0.0.0"
+    - "--port"
+    - "8000"
+
+  service:
+    type: NodePort
+    nodePort: 30800
+
+  env:
+    # Set to "false" in production.
+    debug: "false"
+
+    # MUST be changed — used to sign JWT tokens.
+    # Generate with: python -c "import secrets; print(secrets.token_hex(32))"
+    secretKey: "change-me-in-production-generate-a-strong-random-secret"
+
+    # CORS: must include the frontend NodePort URL.
+    # Example: '["http://192.168.1.208:30080"]'
+    allowedHosts: '["http://192.168.1.206:30080"]'
+
+    authAlgorithm: "HS256"
+    authTokenExpireMinutes: "30"
+
+    # Default admin user created automatically on first startup.
+    defaultAdminUsername: "admin"
+    # MUST be changed before deploying.
+    defaultAdminPassword: "colony-admin"
+
+# ---------------------------------------------------------------------------
+# Frontend (Next.js)
+# ---------------------------------------------------------------------------
+frontend:
+  image:
+    repository: library/colony-frontend
+    tag: "latest"
+  replicas: 1
+  port: 3000
+
+  service:
+    type: NodePort
+    nodePort: 30080
+
+  env:
+    # Backend API URL injected at container startup (no image rebuild needed).
+    # Must match the backend NodePort: http://<node-ip>:<backend-nodeport>/api/v1
+    apiUrl: "http://192.168.1.206:30800/api/v1"
+    # Set to "true" only when the app is served over HTTPS.
+    # Browsers reject Secure cookies over plain HTTP, breaking login.
+    cookieSecure: "false"
+
+# ---------------------------------------------------------------------------
+# PostgreSQL
+# ---------------------------------------------------------------------------
+postgresql:
+  image:
+    # Pulled from Docker Hub directly, not from Harbor.
+    repository: postgres
+    tag: "15-alpine"
+  port: 5432
+  database: colony_db
+  username: colony_user
+  # MUST be changed before deploying.
+  password: "colony_password"
+
+  persistence:
+    enabled: true
+    # Uses the cluster default StorageClass (local-path on k3s).
+    storageClass: ""
+    size: 5Gi
+
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+# ---------------------------------------------------------------------------
+# Database seeder (optional — disabled by default)
+#
+# The seeder populates the database with initial sample data from seed_data.yaml.
+# It is NOT needed for a production deployment — the backend creates the
+# admin user automatically via DEFAULT_ADMIN_* env vars.
+#
+# To use:
+#   1. Enable the seeder and provide seed data content:
+#        helm install colony ./helm/colony \
+#          --set seeder.enabled=true \
+#          --set-file seeder.seedDataContent=./seed_data.yaml
+#   2. The seeder runs once as a Helm post-install Job.
+# ---------------------------------------------------------------------------
+seeder:
+  enabled: false
+  seedMode: "full"
+  # Raw contents of seed_data.yaml — pass via --set-file at install time.
+  seedDataContent: ""
