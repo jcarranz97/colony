@@ -1,0 +1,94 @@
+{{- if .Values.seeder.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "colony.fullname" . }}-seed-data
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "colony.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded,hook-failed
+data:
+  seed_data.yaml: |
+    {{- .Values.seeder.seedDataContent | nindent 4 }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "colony.fullname" . }}-seeder
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "colony.labels" . | nindent 4 }}
+    app.kubernetes.io/component: seeder
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  ttlSecondsAfterFinished: 300
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        {{- include "colony.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: seeder
+    spec:
+      restartPolicy: OnFailure
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      initContainers:
+        - name: wait-for-postgres
+          image: "{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"
+          command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h {{ include "colony.fullname" . }}-postgresql \
+                -p {{ .Values.postgresql.port }} \
+                -U {{ .Values.postgresql.username }}; do
+                echo "Waiting for PostgreSQL...";
+                sleep 2;
+              done
+      containers:
+        - name: seeder
+          image: {{ include "colony.image" (dict "registry" .Values.image.registry "repository" .Values.backend.image.repository "tag" .Values.backend.image.tag) }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - uv
+            - run
+            - python
+            - scripts/seed_db.py
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "colony.fullname" . }}-secret
+                  key: database-url
+            - name: SEED_FILE
+              value: "/seed_data/seed_data.yaml"
+            - name: SEED_MODE
+              value: {{ .Values.seeder.seedMode | quote }}
+            - name: DEFAULT_ADMIN_USERNAME
+              value: {{ .Values.backend.env.defaultAdminUsername | quote }}
+            - name: DEFAULT_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "colony.fullname" . }}-secret
+                  key: admin-password
+            - name: PYTHONPATH
+              value: "/app"
+            - name: UV_PROJECT_ENVIRONMENT
+              value: "/tmp/.venv"
+          volumeMounts:
+            - name: seed-data
+              mountPath: /seed_data
+      volumes:
+        - name: seed-data
+          configMap:
+            name: {{ include "colony.fullname" . }}-seed-data
+{{- end }}
