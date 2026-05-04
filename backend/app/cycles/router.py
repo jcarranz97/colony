@@ -4,7 +4,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
-from app.dependencies import get_db
+from app.dependencies import CurrentActiveUser, get_db
 from app.households.dependencies import CurrentActiveHousehold
 
 from . import schemas, service
@@ -38,6 +38,7 @@ DatabaseDep = Annotated[Session, Depends(get_db)]
 )
 async def list_cycles(
     current_household: CurrentActiveHousehold,
+    current_user: CurrentActiveUser,
     db: DatabaseDep,
     status_filter: str | None = Query(
         None,
@@ -46,14 +47,23 @@ async def list_cycles(
     ),
     page: int = Query(1, ge=1, description="Page number"),
     per_page: int = Query(20, ge=1, le=100, description="Items per page"),
+    include_inactive: bool = Query(
+        False, description="Include deactivated cycles (admin only)"
+    ),
 ) -> schemas.CyclesListResponse:
     """Return a paginated list of cycles for the active household."""
+    if include_inactive and current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required",
+        )
     cycles, total = service.cycle_service.get_cycles(
         db,
         str(current_household.id),
         status=status_filter,
         page=page,
         per_page=per_page,
+        include_inactive=include_inactive,
     )
     total_pages = math.ceil(total / per_page) if total else 0
     cycle_responses = [schemas.CycleResponse.model_validate(c) for c in cycles]

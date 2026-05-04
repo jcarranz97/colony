@@ -14,8 +14,11 @@ import type {
   UpdateCycleIncomeRequest,
 } from "@/helpers/types";
 
-export const fetchCycles = (token: string) =>
-  apiClient<CyclesListResponse>("/cycles", { token });
+export const fetchCycles = (token: string, includeInactive = false) =>
+  apiClient<CyclesListResponse>(
+    includeInactive ? "/cycles?include_inactive=true" : "/cycles",
+    { token },
+  );
 
 export const createCycle = (payload: CreateCycleRequest, token: string) =>
   apiClient<Cycle>("/cycles", {

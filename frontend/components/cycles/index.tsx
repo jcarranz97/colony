@@ -13,6 +13,8 @@ import type {
 import {
   getCycles,
   addCycle,
+  editCycle,
+  removeCycle,
   fetchSummary,
   getExpenses,
   addExpense,
@@ -21,6 +23,7 @@ import {
   addIncome,
   editIncome,
   removeIncome,
+  getCurrentUserAction,
 } from "./actions";
 import { getPaymentMethods } from "@/components/payment-methods/actions";
 
@@ -63,10 +66,14 @@ function CycleCard({
   cycle,
   summary,
   onOpen,
+  onRename,
+  onTrash,
 }: {
   cycle: Cycle;
   summary: CycleSummary | null;
   onOpen: (c: Cycle) => void;
+  onRename: (c: Cycle) => void;
+  onTrash: (c: Cycle) => void;
 }) {
   const paid = summary?.status_breakdown.paid ?? 0;
   const overdue = summary?.status_breakdown.overdue ?? 0;
@@ -94,6 +101,45 @@ function CycleCard({
           <StatusPill status={cycle.status} />
           <button className="nb-open-btn" onClick={() => onOpen(cycle)}>
             Open →
+          </button>
+          <button
+            title="Rename cycle"
+            style={{
+              background: "transparent",
+              border: "1px solid var(--ink-light)",
+              borderRadius: 4,
+              padding: "3px 8px",
+              cursor: "pointer",
+              fontFamily: "var(--font-hand)",
+              fontSize: 12,
+              color: "var(--ink-light)",
+              opacity: 0.7,
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onRename(cycle);
+            }}
+          >
+            ✎
+          </button>
+          <button
+            title="Move to trash"
+            style={{
+              background: "transparent",
+              border: "1px solid rgba(220,53,69,0.4)",
+              borderRadius: 4,
+              padding: "3px 8px",
+              cursor: "pointer",
+              fontFamily: "var(--font-hand)",
+              fontSize: 12,
+              color: "rgba(220,53,69,0.7)",
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onTrash(cycle);
+            }}
+          >
+            🗑
           </button>
         </div>
       </div>
@@ -526,6 +572,183 @@ function EditIncomeModal({
             disabled={saving}
           >
             {saving ? "Saving…" : "Save ✓"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Rename Cycle Modal ────────────────────────────────────────────────────────
+
+function RenameCycleModal({
+  isOpen,
+  onClose,
+  cycle,
+  onRenamed,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  cycle: Cycle | null;
+  onRenamed: (updated: Cycle) => void;
+}) {
+  const [name, setName] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (cycle) {
+      setName(cycle.name);
+      setError(null);
+    }
+  }, [cycle]);
+
+  const handleSubmit = async () => {
+    if (!cycle || !name.trim()) return;
+    setSaving(true);
+    setError(null);
+    const res = await editCycle(cycle.id, { name: name.trim() });
+    if (res.success) {
+      onRenamed(res.data);
+      onClose();
+    } else {
+      setError(res.error.message);
+    }
+    setSaving(false);
+  };
+
+  if (!isOpen || !cycle) return null;
+
+  return (
+    <div
+      className="nb-modal-backdrop"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div className="nb-modal">
+        <button className="nb-modal-close" onClick={onClose}>
+          ✕
+        </button>
+        <div className="nb-modal-title">Rename Cycle</div>
+        <div className="nb-form-group">
+          <label className="nb-form-label">Cycle name</label>
+          <input
+            className="nb-form-input"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+            autoFocus
+          />
+        </div>
+        {error && (
+          <p
+            style={{
+              fontFamily: "var(--font-hand)",
+              color: "var(--hl-overdue-border)",
+              fontSize: 14,
+              marginBottom: 8,
+            }}
+          >
+            {error}
+          </p>
+        )}
+        <div className="nb-modal-actions">
+          <button className="nb-btn-cancel" onClick={onClose}>
+            Cancel
+          </button>
+          <button
+            className="nb-btn-primary"
+            onClick={handleSubmit}
+            disabled={saving}
+          >
+            {saving ? "Saving…" : "Save ✓"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Confirm Trash Modal ───────────────────────────────────────────────────────
+
+function ConfirmTrashModal({
+  isOpen,
+  onClose,
+  cycle,
+  onConfirmed,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  cycle: Cycle | null;
+  onConfirmed: (cycleId: string) => void;
+}) {
+  const [trashing, setTrashing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isOpen) setError(null);
+  }, [isOpen]);
+
+  const handleConfirm = async () => {
+    if (!cycle) return;
+    setTrashing(true);
+    setError(null);
+    const res = await removeCycle(cycle.id);
+    if (res.success) {
+      onConfirmed(cycle.id);
+      onClose();
+    } else {
+      setError(res.error.message);
+    }
+    setTrashing(false);
+  };
+
+  if (!isOpen || !cycle) return null;
+
+  return (
+    <div
+      className="nb-modal-backdrop"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div className="nb-modal">
+        <button className="nb-modal-close" onClick={onClose}>
+          ✕
+        </button>
+        <div className="nb-modal-title">Move to Trash?</div>
+        <p
+          style={{
+            fontFamily: "var(--font-hand)",
+            fontSize: 15,
+            color: "var(--ink)",
+            marginBottom: 8,
+            lineHeight: 1.5,
+          }}
+        >
+          <strong>{cycle.name}</strong> will be deactivated and moved to trash.
+          Regular users will no longer see it. Admins can still view it in the
+          Trashed Cycles section.
+        </p>
+        {error && (
+          <p
+            style={{
+              fontFamily: "var(--font-hand)",
+              color: "var(--hl-overdue-border)",
+              fontSize: 14,
+              marginBottom: 8,
+            }}
+          >
+            {error}
+          </p>
+        )}
+        <div className="nb-modal-actions">
+          <button className="nb-btn-cancel" onClick={onClose}>
+            Cancel
+          </button>
+          <button
+            className="nb-btn-danger"
+            onClick={handleConfirm}
+            disabled={trashing}
+          >
+            {trashing ? "Moving…" : "Move to Trash 🗑"}
           </button>
         </div>
       </div>
@@ -1020,6 +1243,68 @@ function AddIncomeModal({
   );
 }
 
+// ── Trashed Cycle Card (admin view) ──────────────────────────────────────────
+
+function TrashedCycleCard({ cycle }: { cycle: Cycle }) {
+  return (
+    <div
+      style={{
+        border: "1px dashed rgba(180,180,180,0.5)",
+        borderRadius: 6,
+        padding: "12px 16px",
+        background: "rgba(180,180,180,0.08)",
+        opacity: 0.75,
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 8,
+        }}
+      >
+        <div>
+          <div
+            style={{
+              fontFamily: "var(--font-title)",
+              fontSize: 17,
+              color: "var(--ink)",
+              textDecoration: "line-through",
+              opacity: 0.6,
+            }}
+          >
+            {cycle.name}
+          </div>
+          <div
+            style={{
+              fontFamily: "var(--font-hand)",
+              fontSize: 12,
+              color: "var(--ink-light)",
+              opacity: 0.5,
+              marginTop: 2,
+            }}
+          >
+            {fmtDateRange(cycle.start_date, cycle.end_date)}
+          </div>
+        </div>
+        <span
+          style={{
+            fontFamily: "var(--font-hand)",
+            fontSize: 11,
+            background: "rgba(180,180,180,0.28)",
+            color: "var(--ink-light)",
+            borderRadius: 3,
+            padding: "2px 8px",
+          }}
+        >
+          trashed
+        </span>
+      </div>
+    </div>
+  );
+}
+
 // ── Cycle Detail View ─────────────────────────────────────────────────────────
 
 function CycleDetail({
@@ -1403,24 +1688,36 @@ function CycleDetail({
 
 export function Cycles() {
   const [cycles, setCycles] = useState<Cycle[]>([]);
+  const [trashedCycles, setTrashedCycles] = useState<Cycle[]>([]);
   const [summaries, setSummaries] = useState<Record<string, CycleSummary>>({});
   const [selectedCycle, setSelectedCycle] = useState<Cycle | null>(null);
   const [cycleExpenses, setCycleExpenses] = useState<CycleExpense[]>([]);
   const [cycleIncomes, setCycleIncomes] = useState<CycleIncome[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [expensesLoading, setExpensesLoading] = useState(false);
   const [addCycleOpen, setAddCycleOpen] = useState(false);
+  const [renameCycle, setRenameCycle] = useState<Cycle | null>(null);
+  const [trashCycle, setTrashCycle] = useState<Cycle | null>(null);
 
   useEffect(() => {
-    Promise.all([getCycles(), getPaymentMethods()]).then(
-      async ([cyclesRes, methodsRes]) => {
+    Promise.all([getPaymentMethods(), getCurrentUserAction()]).then(
+      async ([methodsRes, userRes]) => {
         if (methodsRes.success) setPaymentMethods(methodsRes.data);
+        const admin = userRes.success && userRes.data.role === "admin";
+        setIsAdmin(admin);
+
+        const cyclesRes = await getCycles(admin);
         if (cyclesRes.success) {
-          const loaded = cyclesRes.data.cycles;
-          setCycles(loaded);
+          const all = cyclesRes.data.cycles;
+          const active = all.filter((c) => c.active);
+          const trashed = all.filter((c) => !c.active);
+          setCycles(active);
+          if (admin) setTrashedCycles(trashed);
+
           const summaryResults = await Promise.all(
-            loaded.map((c) =>
+            active.map((c) =>
               fetchSummary(c.id).then((r) => ({ id: c.id, r })),
             ),
           );
@@ -1454,6 +1751,21 @@ export function Cycles() {
     if (summaryRes.success) {
       setSummaries((prev) => ({ ...prev, [cycle.id]: summaryRes.data }));
     }
+  };
+
+  const handleCycleRenamed = (updated: Cycle) => {
+    setCycles((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+    if (selectedCycle?.id === updated.id) setSelectedCycle(updated);
+    setRenameCycle(null);
+  };
+
+  const handleCycleTrashed = (cycleId: string) => {
+    const trashed = cycles.find((c) => c.id === cycleId);
+    setCycles((prev) => prev.filter((c) => c.id !== cycleId));
+    if (trashed && isAdmin) {
+      setTrashedCycles((prev) => [{ ...trashed, active: false }, ...prev]);
+    }
+    setTrashCycle(null);
   };
 
   const handleOpenCycle = (cycle: Cycle) => {
@@ -1656,6 +1968,8 @@ export function Cycles() {
               cycle={c}
               summary={summaries[c.id] ?? null}
               onOpen={handleOpenCycle}
+              onRename={setRenameCycle}
+              onTrash={setTrashCycle}
             />
           ))}
         </div>
@@ -1665,10 +1979,40 @@ export function Cycles() {
         + New Cycle
       </button>
 
+      {isAdmin && trashedCycles.length > 0 && (
+        <div style={{ marginTop: 32 }}>
+          <div
+            className="nb-section-title"
+            style={{ opacity: 0.55, marginBottom: 12 }}
+          >
+            🗑 Trashed Cycles
+          </div>
+          <div className="nb-cycles-grid">
+            {trashedCycles.map((c) => (
+              <TrashedCycleCard key={c.id} cycle={c} />
+            ))}
+          </div>
+        </div>
+      )}
+
       <AddCycleModal
         isOpen={addCycleOpen}
         onClose={() => setAddCycleOpen(false)}
         onAdd={handleCycleAdded}
+      />
+
+      <RenameCycleModal
+        isOpen={renameCycle !== null}
+        onClose={() => setRenameCycle(null)}
+        cycle={renameCycle}
+        onRenamed={handleCycleRenamed}
+      />
+
+      <ConfirmTrashModal
+        isOpen={trashCycle !== null}
+        onClose={() => setTrashCycle(null)}
+        cycle={trashCycle}
+        onConfirmed={handleCycleTrashed}
       />
     </>
   );

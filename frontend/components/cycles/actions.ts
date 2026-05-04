@@ -2,6 +2,8 @@ import { getAuthToken } from "@/actions/auth.action";
 import {
   fetchCycles,
   createCycle,
+  updateCycle,
+  deleteCycle,
   getCycleSummary,
   fetchCycleExpenses,
   createCycleExpense,
@@ -11,8 +13,10 @@ import {
   updateCycleIncome,
   deleteCycleIncome,
 } from "@/lib/cycles.api";
+import { getCurrentUser } from "@/lib/auth.api";
 import type {
   CreateCycleRequest,
+  UpdateCycleRequest,
   CreateCycleExpenseRequest,
   UpdateCycleExpenseRequest,
   CreateCycleIncomeRequest,
@@ -23,10 +27,18 @@ async function token() {
   return (await getAuthToken()) ?? "";
 }
 
-export const getCycles = async () => fetchCycles(await token());
+export const getCycles = async (includeInactive = false) =>
+  fetchCycles(await token(), includeInactive);
+
+export const getCurrentUserAction = async () => getCurrentUser(await token());
 
 export const addCycle = async (payload: CreateCycleRequest) =>
   createCycle(payload, await token());
+
+export const editCycle = async (id: string, payload: UpdateCycleRequest) =>
+  updateCycle(id, payload, await token());
+
+export const removeCycle = async (id: string) => deleteCycle(id, await token());
 
 export const fetchSummary = async (id: string) =>
   getCycleSummary(id, await token());

@@ -151,6 +151,7 @@ class CycleService:
         status: str | None = None,
         page: int = 1,
         per_page: int = 20,
+        include_inactive: bool = False,
     ) -> tuple[list[models.Cycle], int]:
         """Return a paginated list of cycles for *household_id*.
 
@@ -160,23 +161,22 @@ class CycleService:
             status: Optional filter by cycle status.
             page: 1-based page number.
             per_page: Maximum items per page.
+            include_inactive: When True, include deactivated cycles (admin only).
 
         Returns:
             Tuple of (list of Cycle instances, total count).
         """
         query = (
             db.query(models.Cycle)
-            .filter(
-                and_(
-                    models.Cycle.household_id == household_id,
-                    models.Cycle.active.is_(True),
-                )
-            )
+            .filter(models.Cycle.household_id == household_id)
             .options(
                 selectinload(models.Cycle.expenses),
                 selectinload(models.Cycle.incomes),
             )
         )
+
+        if not include_inactive:
+            query = query.filter(models.Cycle.active.is_(True))
 
         if status:
             query = query.filter(models.Cycle.status == status)

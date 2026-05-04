@@ -226,6 +226,7 @@ export interface Cycle {
   end_date: string;
   status: CycleStatus;
   remaining_balance: string;
+  active: boolean;
   created_at: string;
   updated_at: string;
 }
