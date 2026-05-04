@@ -23,6 +23,7 @@ import { RecurrentExpenseSchema } from "@/helpers/schemas";
 import { RecurrenceConfigBuilder } from "./recurrence-config-builder";
 import { editRecurrentExpense } from "./actions";
 import type { RecurrentExpense, PaymentMethod } from "@/helpers/types";
+import { formatPaymentMethodName } from "@/helpers/formatters";
 
 interface EditRecurrentExpenseProps {
   template: RecurrentExpense | null;
@@ -426,9 +427,9 @@ export function EditRecurrentExpense({
                               <ListBox.Item
                                 key={m.id}
                                 id={m.id}
-                                textValue={m.name}
+                                textValue={formatPaymentMethodName(m)}
                               >
-                                {m.name}
+                                {formatPaymentMethodName(m)}
                               </ListBox.Item>
                             ))}
                         </ListBox>
