@@ -257,6 +257,7 @@ export interface CycleExpense {
   status: ExpenseStatus;
   due_date: string | null;
   paid_at: string | null;
+  autopay: boolean;
   payment_method_id: string | null;
   payment_method?: PaymentMethod;
   active: boolean;
