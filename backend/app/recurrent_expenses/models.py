@@ -53,7 +53,7 @@ class RecurrentExpense(BaseModel):
     )
 
     __table_args__ = (
-        CheckConstraint("base_amount > 0", name="check_base_amount_positive"),
+        CheckConstraint("base_amount >= 0", name="check_base_amount_positive"),
     )
 
     def __repr__(self) -> str:

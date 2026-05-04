@@ -55,9 +55,9 @@ class TestRecurrentExpenseCreate:
         schema = RecurrentExpenseCreate(**data)
         assert schema.recurrence_config["unit"] == "months"
 
-    def test_base_amount_zero_raises(self):
-        with pytest.raises(ValidationError):
-            RecurrentExpenseCreate(**{**BASE_VALID, "base_amount": "0"})
+    def test_base_amount_zero_accepted(self):
+        schema = RecurrentExpenseCreate(**{**BASE_VALID, "base_amount": "0"})
+        assert schema.base_amount == Decimal("0")
 
     def test_base_amount_negative_raises(self):
         with pytest.raises(ValidationError):
@@ -168,6 +168,6 @@ class TestRecurrentExpenseUpdate:
         dumped = schema.model_dump(exclude_unset=True)
         assert dumped["autopay"] is True
 
-    def test_base_amount_zero_raises(self):
-        with pytest.raises(ValidationError):
-            RecurrentExpenseUpdate(base_amount=Decimal("0"))
+    def test_base_amount_zero_accepted(self):
+        schema = RecurrentExpenseUpdate(base_amount=Decimal("0"))
+        assert schema.base_amount == Decimal("0")

@@ -197,8 +197,10 @@ class CycleExpense(BaseModel):
     )
 
     __table_args__ = (
-        CheckConstraint("amount > 0", name="check_expense_amount_positive"),
-        CheckConstraint("amount_usd > 0", name="check_expense_amount_usd_positive"),
+        CheckConstraint("amount >= 0", name="check_expense_amount_positive"),
+        CheckConstraint(
+            "amount_usd >= 0", name="check_expense_amount_usd_positive"
+        ),
     )
 
     def __repr__(self) -> str:

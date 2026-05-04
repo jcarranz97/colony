@@ -120,10 +120,13 @@ npm run dev   # → http://localhost:3000
 
 ## Testing
 
-```bash
-cd backend
-uv run pytest
-```
+> ⚠️ **Do not run `pytest` locally or inside the `colony-backend`
+> container.** The `db` fixture calls `Base.metadata.drop_all()` after
+> every test against whatever database `DATABASE_URL` points at, which in
+> the dev container is the live `colony_db`. Running the suite there will
+> wipe all expense, cycle, and template data. Tests are CI-only — see
+> `backend/AGENTS.md` → "Testing" for the full rule and the safe override
+> path if you must run a single test interactively.
 
 Tests mirror the domain structure under `backend/tests/`.
 

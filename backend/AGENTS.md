@@ -16,11 +16,8 @@ cd backend
 uv sync
 uv run fastapi dev                 # hot reload
 
-# Tests — PYTHONPATH=. is required; without it, system packages (e.g. ROS)
-# can leak into the path and cause import errors at pytest startup.
-PYTHONPATH=. uv run pytest                      # all tests
-PYTHONPATH=. uv run pytest tests/cycles/        # single domain
-PYTHONPATH=. uv run pytest -k test_name         # single test
+# Tests — DO NOT run locally or inside the colony-backend container.
+# See "Testing — Do Not Run Locally" below. Tests are CI-only.
 
 # Linting & formatting
 PYTHONPATH=. uv run ruff check . --fix
@@ -255,6 +252,30 @@ async def endpoint(current_user: CurrentActiveUser): ...
 
 ## Testing
 
+### DO NOT run pytest locally or inside the `colony-backend` container
+
+The `db` fixture in `tests/conftest.py` calls
+`Base.metadata.drop_all(bind=engine_test)` after every test. The engine it
+binds to is built from the `DATABASE_URL` env var. **Inside the
+`colony-backend` Docker container, `DATABASE_URL` points at the live
+`colony_db`** — running `pytest` there will drop every table and wipe all
+expense, cycle, and template data. The same risk applies to any local shell
+where `DATABASE_URL` resolves to a database with real data.
+
+Tests are intended to run **only in CI** (GitHub Actions), where the
+workflow provisions a throwaway Postgres service and sets `DATABASE_URL` to
+that service. Do not run them anywhere else without confirming
+`DATABASE_URL` resolves to a disposable database.
+
+If you must run a single test interactively for debugging, do so only after:
+
+1. Creating a separate database (e.g. `colony_test_db`) in the local
+   Postgres container.
+2. Exporting `DATABASE_URL=postgresql://colony_user:colony_password@localhost:5432/colony_test_db`
+   in the shell where you launch pytest — never reuse the container's
+   `DATABASE_URL`.
+3. Confirming `echo $DATABASE_URL` shows the test DB before invoking pytest.
+
 ### Fixtures (backend/tests/conftest.py)
 
 ```python
@@ -424,8 +445,11 @@ cd backend
 PYTHONPATH=. uv run ruff check . --fix
 PYTHONPATH=. uv run ruff format .
 PYTHONPATH=. uv run pyright .
-PYTHONPATH=. uv run pytest
 ```
+
+**Do not run `pytest` here.** Tests drop every table in whatever database
+`DATABASE_URL` points at — see "Testing — DO NOT run pytest locally..."
+above. Rely on CI to run the test suite on a disposable database.
 
 Pyright is strict — add type annotations to every function you write or
 touch, including return types. Never use `Any` unless there is no alternative
