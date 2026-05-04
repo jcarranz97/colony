@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import type {
   Cycle,
   CycleExpense,
@@ -27,6 +27,7 @@ import {
 } from "./actions";
 import { getPaymentMethods } from "@/components/payment-methods/actions";
 import { formatPaymentMethodName } from "@/helpers/formatters";
+import { DiscardChangesDialog } from "@/components/shared/discard-changes-dialog";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -377,17 +378,36 @@ function EditExpenseModal({
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
+  const initialFormRef = useRef<EditExpenseForm>({
+    amount: "",
+    due_date: "",
+    comments: "",
+  });
 
   useEffect(() => {
     if (expense) {
-      setForm({
+      const initial = {
         amount: expense.amount,
         due_date: expense.due_date ?? "",
         comments: "",
-      });
+      };
+      setForm(initial);
+      initialFormRef.current = initial;
       setError(null);
+      setConfirmDiscard(false);
     }
   }, [expense]);
+
+  const isDirty =
+    form.amount !== initialFormRef.current.amount ||
+    form.due_date !== initialFormRef.current.due_date ||
+    form.comments !== initialFormRef.current.comments;
+
+  const handleAttemptClose = () => {
+    if (isDirty) setConfirmDiscard(true);
+    else onClose();
+  };
 
   const set = <K extends keyof EditExpenseForm>(k: K, v: EditExpenseForm[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
@@ -415,10 +435,10 @@ function EditExpenseModal({
   return (
     <div
       className="nb-modal-backdrop"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+      onClick={(e) => e.target === e.currentTarget && handleAttemptClose()}
     >
       <div className="nb-modal">
-        <button className="nb-modal-close" onClick={onClose}>
+        <button className="nb-modal-close" onClick={handleAttemptClose}>
           ✕
         </button>
         <div className="nb-modal-title">Edit Expense</div>
@@ -481,7 +501,7 @@ function EditExpenseModal({
         )}
 
         <div className="nb-modal-actions">
-          <button className="nb-btn-cancel" onClick={onClose}>
+          <button className="nb-btn-cancel" onClick={handleAttemptClose}>
             Cancel
           </button>
           <button
@@ -493,6 +513,14 @@ function EditExpenseModal({
           </button>
         </div>
       </div>
+      <DiscardChangesDialog
+        isOpen={confirmDiscard}
+        onKeepEditing={() => setConfirmDiscard(false)}
+        onDiscard={() => {
+          setConfirmDiscard(false);
+          onClose();
+        }}
+      />
     </div>
   );
 }
@@ -523,13 +551,33 @@ function EditIncomeModal({
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
+  const initialFormRef = useRef<EditIncomeForm>({
+    amount: "",
+    income_date: "",
+  });
 
   useEffect(() => {
     if (income) {
-      setForm({ amount: income.amount, income_date: income.income_date ?? "" });
+      const initial = {
+        amount: income.amount,
+        income_date: income.income_date ?? "",
+      };
+      setForm(initial);
+      initialFormRef.current = initial;
       setError(null);
+      setConfirmDiscard(false);
     }
   }, [income]);
+
+  const isDirty =
+    form.amount !== initialFormRef.current.amount ||
+    form.income_date !== initialFormRef.current.income_date;
+
+  const handleAttemptClose = () => {
+    if (isDirty) setConfirmDiscard(true);
+    else onClose();
+  };
 
   const set = <K extends keyof EditIncomeForm>(k: K, v: EditIncomeForm[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
@@ -556,10 +604,10 @@ function EditIncomeModal({
   return (
     <div
       className="nb-modal-backdrop"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+      onClick={(e) => e.target === e.currentTarget && handleAttemptClose()}
     >
       <div className="nb-modal">
-        <button className="nb-modal-close" onClick={onClose}>
+        <button className="nb-modal-close" onClick={handleAttemptClose}>
           ✕
         </button>
         <div className="nb-modal-title">Edit Income</div>
@@ -607,7 +655,7 @@ function EditIncomeModal({
           </p>
         )}
         <div className="nb-modal-actions">
-          <button className="nb-btn-cancel" onClick={onClose}>
+          <button className="nb-btn-cancel" onClick={handleAttemptClose}>
             Cancel
           </button>
           <button
@@ -619,6 +667,14 @@ function EditIncomeModal({
           </button>
         </div>
       </div>
+      <DiscardChangesDialog
+        isOpen={confirmDiscard}
+        onKeepEditing={() => setConfirmDiscard(false)}
+        onDiscard={() => {
+          setConfirmDiscard(false);
+          onClose();
+        }}
+      />
     </div>
   );
 }
@@ -639,13 +695,22 @@ function RenameCycleModal({
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
 
   useEffect(() => {
     if (cycle) {
       setName(cycle.name);
       setError(null);
+      setConfirmDiscard(false);
     }
   }, [cycle]);
+
+  const isDirty = name.trim() !== (cycle?.name ?? "");
+
+  const handleAttemptClose = () => {
+    if (isDirty) setConfirmDiscard(true);
+    else onClose();
+  };
 
   const handleSubmit = async () => {
     if (!cycle || !name.trim()) return;
@@ -666,10 +731,10 @@ function RenameCycleModal({
   return (
     <div
       className="nb-modal-backdrop"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+      onClick={(e) => e.target === e.currentTarget && handleAttemptClose()}
     >
       <div className="nb-modal">
-        <button className="nb-modal-close" onClick={onClose}>
+        <button className="nb-modal-close" onClick={handleAttemptClose}>
           ✕
         </button>
         <div className="nb-modal-title">Rename Cycle</div>
@@ -696,7 +761,7 @@ function RenameCycleModal({
           </p>
         )}
         <div className="nb-modal-actions">
-          <button className="nb-btn-cancel" onClick={onClose}>
+          <button className="nb-btn-cancel" onClick={handleAttemptClose}>
             Cancel
           </button>
           <button
@@ -708,6 +773,14 @@ function RenameCycleModal({
           </button>
         </div>
       </div>
+      <DiscardChangesDialog
+        isOpen={confirmDiscard}
+        onKeepEditing={() => setConfirmDiscard(false)}
+        onDiscard={() => {
+          setConfirmDiscard(false);
+          onClose();
+        }}
+      />
     </div>
   );
 }

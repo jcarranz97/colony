@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type {
   RecurrentExpense,
   PaymentMethod,
@@ -19,6 +19,7 @@ import {
   activateRecurrentExpense,
 } from "./actions";
 import { getPaymentMethods } from "@/components/payment-methods/actions";
+import { DiscardChangesDialog } from "@/components/shared/discard-changes-dialog";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -542,13 +543,25 @@ function TemplateModal({
   const [form, setForm] = useState<TemplateForm>(initial);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
+  const initialFormRef = useRef<TemplateForm>(initial);
 
   useEffect(() => {
     if (isOpen) {
       setForm(initial);
+      initialFormRef.current = initial;
       setError(null);
+      setConfirmDiscard(false);
     }
   }, [isOpen]);
+
+  const isDirty =
+    JSON.stringify(form) !== JSON.stringify(initialFormRef.current);
+
+  const handleAttemptClose = () => {
+    if (isDirty) setConfirmDiscard(true);
+    else onClose();
+  };
 
   const set = <K extends keyof TemplateForm>(k: K, v: TemplateForm[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
@@ -598,14 +611,14 @@ function TemplateModal({
   return (
     <div
       className="nb-modal-backdrop"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+      onClick={(e) => e.target === e.currentTarget && handleAttemptClose()}
     >
       <div
         className="nb-modal"
         style={{ width: 480 }}
         onClick={(e) => e.stopPropagation()}
       >
-        <button className="nb-modal-close" onClick={onClose}>
+        <button className="nb-modal-close" onClick={handleAttemptClose}>
           ✕
         </button>
         <div className="nb-modal-title">{title}</div>
@@ -761,7 +774,7 @@ function TemplateModal({
         )}
 
         <div className="nb-modal-actions">
-          <button className="nb-btn-cancel" onClick={onClose}>
+          <button className="nb-btn-cancel" onClick={handleAttemptClose}>
             Cancel
           </button>
           <button
@@ -773,6 +786,14 @@ function TemplateModal({
           </button>
         </div>
       </div>
+      <DiscardChangesDialog
+        isOpen={confirmDiscard}
+        onKeepEditing={() => setConfirmDiscard(false)}
+        onDiscard={() => {
+          setConfirmDiscard(false);
+          onClose();
+        }}
+      />
     </div>
   );
 }
