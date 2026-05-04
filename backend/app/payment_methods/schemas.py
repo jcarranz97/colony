@@ -1,3 +1,4 @@
+import re
 import uuid
 from datetime import datetime
 
@@ -21,6 +22,9 @@ class PaymentMethodBase(AppBaseModel):
     description: str | None = Field(
         None, max_length=500, description="Optional description"
     )
+    last_4_digits: str | None = Field(
+        None, description="Last 4 digits of card number (optional)"
+    )
 
     @field_validator("name")
     @classmethod
@@ -41,6 +45,18 @@ class PaymentMethodBase(AppBaseModel):
                 return None
         return v
 
+    @field_validator("last_4_digits")
+    @classmethod
+    def validate_last_4_digits(cls, v: str | None) -> str | None:
+        """Validate last 4 digits — must be exactly 4 numeric characters."""
+        if v is not None:
+            v = v.strip()
+            if not v:
+                return None
+            if not re.fullmatch(r"\d{4}", v):
+                raise ValueError("last_4_digits must be exactly 4 digits")
+        return v
+
 
 class PaymentMethodCreate(PaymentMethodBase):
     """Payment method creation schema."""
@@ -59,6 +75,9 @@ class PaymentMethodUpdate(AppBaseModel):
         None, description="Default currency for this payment method"
     )
     description: str | None = Field(None, max_length=500, description="Description")
+    last_4_digits: str | None = Field(
+        None, description="Last 4 digits of card number (optional)"
+    )
     active: bool | None = Field(
         None, description="Whether the payment method is active"
     )
@@ -83,6 +102,18 @@ class PaymentMethodUpdate(AppBaseModel):
                 return None
         return v
 
+    @field_validator("last_4_digits")
+    @classmethod
+    def validate_last_4_digits(cls, v: str | None) -> str | None:
+        """Validate last 4 digits — must be exactly 4 numeric characters."""
+        if v is not None:
+            v = v.strip()
+            if not v:
+                return None
+            if not re.fullmatch(r"\d{4}", v):
+                raise ValueError("last_4_digits must be exactly 4 digits")
+        return v
+
 
 class PaymentMethodResponse(PaymentMethodBase):
     """Payment method response schema."""
@@ -101,5 +132,6 @@ class PaymentMethodSummary(BaseModel):
     id: uuid.UUID
     name: str
     method_type: PaymentMethodType
+    last_4_digits: str | None = None
 
     model_config = ConfigDict(from_attributes=True)

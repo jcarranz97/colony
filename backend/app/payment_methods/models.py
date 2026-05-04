@@ -25,6 +25,7 @@ class PaymentMethod(BaseModel):
         ENUM(CurrencyCode), nullable=False
     )
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    last_4_digits: Mapped[str | None] = mapped_column(String(4), nullable=True)
 
     # Relationships
     household = relationship("Household")

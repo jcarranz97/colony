@@ -227,6 +227,7 @@ Get all user's payment methods.
     "method_type": "debit",
     "default_currency": "USD",
     "description": "Primary checking account",
+    "last_4_digits": "4242",
     "active": true,
     "created_at": "2025-01-01T00:00:00Z",
     "updated_at": "2025-01-01T00:00:00Z"
@@ -237,6 +238,7 @@ Get all user's payment methods.
     "method_type": "credit",
     "default_currency": "USD",
     "description": "Rewards credit card",
+    "last_4_digits": null,
     "active": true,
     "created_at": "2025-01-01T00:00:00Z",
     "updated_at": "2025-01-01T00:00:00Z"
@@ -253,7 +255,8 @@ Create a new payment method.
   "name": "Capital One Credit",
   "method_type": "credit",
   "default_currency": "USD",
-  "description": "Rewards credit card"
+  "description": "Rewards credit card",
+  "last_4_digits": "4242"
 }
 ```
 
@@ -265,6 +268,7 @@ Create a new payment method.
   "method_type": "credit",
   "default_currency": "USD",
   "description": "Rewards credit card",
+  "last_4_digits": "4242",
   "active": true,
   "created_at": "2025-01-01T00:00:00Z",
   "updated_at": "2025-01-01T00:00:00Z"
@@ -282,6 +286,7 @@ Get a specific payment method.
   "method_type": "debit",
   "default_currency": "USD",
   "description": "Primary checking account",
+  "last_4_digits": "4242",
   "active": true,
   "created_at": "2025-01-01T00:00:00Z",
   "updated_at": "2025-01-01T00:00:00Z"
@@ -296,6 +301,7 @@ Update an existing payment method.
 {
   "name": "Chase Debit Updated",
   "description": "Updated description",
+  "last_4_digits": "4242",
   "active": true
 }
 ```
@@ -308,6 +314,7 @@ Update an existing payment method.
   "method_type": "debit",
   "default_currency": "USD",
   "description": "Updated description",
+  "last_4_digits": "4242",
   "active": true,
   "created_at": "2025-01-01T00:00:00Z",
   "updated_at": "2025-01-01T12:30:00Z"

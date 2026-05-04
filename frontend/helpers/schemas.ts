@@ -28,6 +28,11 @@ export const PaymentMethodSchema = Yup.object({
   default_currency: Yup.string()
     .oneOf(["USD", "MXN"])
     .required("Currency is required"),
+  last_4_digits: Yup.string()
+    .nullable()
+    .optional()
+    .matches(/^\d{4}$/, "Must be exactly 4 digits")
+    .transform((v: string) => (v === "" ? null : v)),
 });
 
 const recurrenceConfigShape = Yup.object()

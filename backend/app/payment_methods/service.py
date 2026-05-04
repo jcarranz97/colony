@@ -92,6 +92,8 @@ class PaymentMethodService:
                 and_(
                     models.PaymentMethod.household_id == household_id,
                     models.PaymentMethod.name == payment_method_data.name,
+                    models.PaymentMethod.last_4_digits
+                    == payment_method_data.last_4_digits,
                     models.PaymentMethod.active,
                 )
             )
@@ -108,6 +110,7 @@ class PaymentMethodService:
                 method_type=payment_method_data.method_type,
                 default_currency=payment_method_data.default_currency,
                 description=payment_method_data.description,
+                last_4_digits=payment_method_data.last_4_digits,
             )
 
             db.add(payment_method)
@@ -144,14 +147,28 @@ class PaymentMethodService:
             extra={"payment_method_id": str(payment_method.id)},
         )
 
-        if payment_method_data.name and payment_method_data.name != payment_method.name:
+        incoming_name = (
+            payment_method_data.name
+            if payment_method_data.name is not None
+            else payment_method.name
+        )
+        incoming_digits = (
+            payment_method_data.last_4_digits
+            if "last_4_digits" in payment_method_data.model_fields_set
+            else payment_method.last_4_digits
+        )
+        name_changed = incoming_name != payment_method.name
+        digits_changed = incoming_digits != payment_method.last_4_digits
+
+        if name_changed or digits_changed:
             existing_method = (
                 db.query(models.PaymentMethod)
                 .filter(
                     and_(
                         models.PaymentMethod.household_id
                         == payment_method.household_id,
-                        models.PaymentMethod.name == payment_method_data.name,
+                        models.PaymentMethod.name == incoming_name,
+                        models.PaymentMethod.last_4_digits == incoming_digits,
                         models.PaymentMethod.active,
                         models.PaymentMethod.id != payment_method.id,
                     )
@@ -160,7 +177,7 @@ class PaymentMethodService:
             )
 
             if existing_method:
-                raise PaymentMethodNameExistsExceptionError(payment_method_data.name)
+                raise PaymentMethodNameExistsExceptionError(incoming_name)
 
         try:
             update_data = payment_method_data.model_dump(exclude_unset=True)
