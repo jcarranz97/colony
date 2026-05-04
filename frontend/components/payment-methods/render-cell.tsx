@@ -1,6 +1,7 @@
 import { Button, Chip } from "@heroui/react";
 import { CurrencyBadge } from "@/components/shared/currency-badge";
 import type { PaymentMethod, PaymentMethodType } from "@/helpers/types";
+import { formatPaymentMethodName } from "@/helpers/formatters";
 
 const TYPE_LABEL: Record<PaymentMethodType, string> = {
   debit: "Debit",
@@ -26,7 +27,9 @@ export function renderCell({
 }: RenderCellProps) {
   switch (columnKey) {
     case "name":
-      return <span className="font-medium">{method.name}</span>;
+      return (
+        <span className="font-medium">{formatPaymentMethodName(method)}</span>
+      );
     case "type":
       return (
         <span className="text-sm text-default-600">

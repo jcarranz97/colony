@@ -6,7 +6,9 @@ import type {
   CurrencyCode,
   RecurrenceType,
   RecurrenceConfig,
+  PaymentMethodType,
 } from "@/helpers/types";
+import { formatPaymentMethodName } from "@/helpers/formatters";
 import {
   getCurrentUserAction,
   getRecurrentIncomes,
@@ -20,6 +22,13 @@ import { getPaymentMethods } from "@/components/payment-methods/actions";
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+const METHOD_LABEL: Record<PaymentMethodType, string> = {
+  debit: "Debit",
+  credit: "Credit",
+  cash: "Cash",
+  transfer: "Transfer",
+};
 
 function fmtAmount(amount: string, currency: string): string {
   return new Intl.NumberFormat("en-US", {
@@ -125,7 +134,9 @@ function IncomeCard({
           <span>
             {fmtRecurrence(income.recurrence_type, income.recurrence_config)}
           </span>
-          {income.payment_method && <span>{income.payment_method.name}</span>}
+          {income.payment_method && (
+            <span>{formatPaymentMethodName(income.payment_method)}</span>
+          )}
         </div>
       </div>
 
@@ -673,7 +684,7 @@ function IncomeModal({
               .filter((m) => m.active)
               .map((m) => (
                 <option key={m.id} value={m.id}>
-                  {m.name} — {m.method_type}
+                  {formatPaymentMethodName(m)} — {METHOD_LABEL[m.method_type]}
                 </option>
               ))}
           </select>

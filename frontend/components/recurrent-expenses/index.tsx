@@ -7,7 +7,9 @@ import type {
   ExpenseCategory,
   RecurrenceType,
   RecurrenceConfig,
+  PaymentMethodType,
 } from "@/helpers/types";
+import { formatPaymentMethodName } from "@/helpers/formatters";
 import {
   getCurrentUserAction,
   getRecurrentExpenses,
@@ -21,6 +23,13 @@ import { getPaymentMethods } from "@/components/payment-methods/actions";
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+const METHOD_LABEL: Record<PaymentMethodType, string> = {
+  debit: "Debit",
+  credit: "Credit",
+  cash: "Cash",
+  transfer: "Transfer",
+};
 
 function fmtAmount(amount: string, currency: string): string {
   return new Intl.NumberFormat("en-US", {
@@ -137,7 +146,7 @@ function TemplateCard({
             )}
           </span>
           {template.payment_method && (
-            <span>{template.payment_method.name}</span>
+            <span>{formatPaymentMethodName(template.payment_method)}</span>
           )}
           {template.autopay && (
             <span style={{ color: "#276838" }}>⚡ Auto-pay enabled</span>
@@ -699,7 +708,7 @@ function TemplateModal({
                 .filter((m) => m.active)
                 .map((m) => (
                   <option key={m.id} value={m.id}>
-                    {m.name} — {m.method_type}
+                    {formatPaymentMethodName(m)} — {METHOD_LABEL[m.method_type]}
                   </option>
                 ))}
             </select>
