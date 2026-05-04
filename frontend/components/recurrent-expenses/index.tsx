@@ -9,6 +9,7 @@ import type {
   RecurrenceConfig,
 } from "@/helpers/types";
 import {
+  getCurrentUserAction,
   getRecurrentExpenses,
   addRecurrentExpense,
   editRecurrentExpense,
@@ -73,21 +74,16 @@ function TemplateCard({
   template,
   onEdit,
   onDuplicate,
-  onToggle,
-  toggling,
+  onTrash,
 }: {
   template: RecurrentExpense;
   onEdit: (t: RecurrentExpense) => void;
   onDuplicate: (t: RecurrentExpense) => void;
-  onToggle: (t: RecurrentExpense) => void;
-  toggling: boolean;
+  onTrash: (t: RecurrentExpense) => void;
 }) {
   const isFixed = template.category === "fixed";
   return (
-    <div
-      className="nb-template-card"
-      style={{ opacity: template.active ? 1 : 0.5 }}
-    >
+    <div className="nb-template-card">
       {/* Category icon */}
       <div
         style={{
@@ -196,15 +192,205 @@ function TemplateCard({
         <button
           style={{
             ...iconBtn,
-            ...(template.active
-              ? { color: "var(--hl-overdue-border)" }
-              : { color: "var(--hl-paid-border)" }),
+            color: "rgba(220,53,69,0.7)",
+            border: "1px solid rgba(220,53,69,0.35)",
           }}
-          onClick={() => onToggle(template)}
-          disabled={toggling}
+          onClick={() => onTrash(template)}
+          title="Move to trash"
         >
-          {template.active ? "Deactivate" : "Activate"}
+          🗑 Trash
         </button>
+      </div>
+    </div>
+  );
+}
+
+// ── Trashed Template Card (admin only) ────────────────────────────────────────
+
+function TrashedTemplateCard({
+  template,
+  onRestore,
+  restoring,
+}: {
+  template: RecurrentExpense;
+  onRestore: (t: RecurrentExpense) => void;
+  restoring: boolean;
+}) {
+  const isFixed = template.category === "fixed";
+  return (
+    <div
+      style={{
+        border: "1px dashed rgba(180,180,180,0.5)",
+        borderRadius: 6,
+        padding: "10px 14px",
+        background: "rgba(180,180,180,0.07)",
+        opacity: 0.7,
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        marginBottom: 8,
+      }}
+    >
+      <div
+        style={{
+          width: 32,
+          height: 32,
+          borderRadius: "50%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 14,
+          flexShrink: 0,
+          background: "rgba(180,180,180,0.15)",
+        }}
+      >
+        {isFixed ? "📌" : "🛒"}
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            fontFamily: "var(--font-title)",
+            fontSize: 15,
+            color: "var(--ink)",
+            textDecoration: "line-through",
+            opacity: 0.55,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {template.description}
+        </div>
+        <div
+          style={{
+            fontFamily: "var(--font-hand)",
+            fontSize: 12,
+            color: "var(--ink-light)",
+            opacity: 0.45,
+          }}
+        >
+          {fmtAmount(template.base_amount, template.currency)} ·{" "}
+          {template.category}
+        </div>
+      </div>
+      <span
+        style={{
+          fontFamily: "var(--font-hand)",
+          fontSize: 11,
+          background: "rgba(180,180,180,0.28)",
+          color: "var(--ink-light)",
+          borderRadius: 3,
+          padding: "2px 8px",
+          flexShrink: 0,
+        }}
+      >
+        trashed
+      </span>
+      <button
+        style={{
+          fontFamily: "var(--font-hand)",
+          fontSize: 12,
+          fontWeight: 600,
+          background: "transparent",
+          border: "1px solid var(--hl-paid-border, rgba(80,200,100,0.6))",
+          borderRadius: 4,
+          padding: "3px 10px",
+          cursor: "pointer",
+          color: "var(--hl-paid-border, rgba(80,200,100,0.8))",
+          flexShrink: 0,
+        }}
+        onClick={() => onRestore(template)}
+        disabled={restoring}
+      >
+        ↩ Restore
+      </button>
+    </div>
+  );
+}
+
+// ── Confirm Trash Modal ───────────────────────────────────────────────────────
+
+function ConfirmTrashModal({
+  isOpen,
+  onClose,
+  template,
+  onConfirmed,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  template: RecurrentExpense | null;
+  onConfirmed: (id: string) => void;
+}) {
+  const [trashing, setTrashing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isOpen) setError(null);
+  }, [isOpen]);
+
+  const handleConfirm = async () => {
+    if (!template) return;
+    setTrashing(true);
+    setError(null);
+    const res = await deactivateRecurrentExpense(template.id);
+    if (res.success) {
+      onConfirmed(template.id);
+      onClose();
+    } else {
+      setError(res.error.message);
+    }
+    setTrashing(false);
+  };
+
+  if (!isOpen || !template) return null;
+
+  return (
+    <div
+      className="nb-modal-backdrop"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div className="nb-modal">
+        <button className="nb-modal-close" onClick={onClose}>
+          ✕
+        </button>
+        <div className="nb-modal-title">Move to Trash?</div>
+        <p
+          style={{
+            fontFamily: "var(--font-hand)",
+            fontSize: 15,
+            color: "var(--ink)",
+            marginBottom: 8,
+            lineHeight: 1.5,
+          }}
+        >
+          <strong>{template.description}</strong> will be deactivated and moved
+          to trash. It will no longer generate expenses in new cycles. Contact
+          your admin if you need it restored.
+        </p>
+        {error && (
+          <p
+            style={{
+              fontFamily: "var(--font-hand)",
+              color: "var(--hl-overdue-border)",
+              fontSize: 14,
+              marginBottom: 8,
+            }}
+          >
+            {error}
+          </p>
+        )}
+        <div className="nb-modal-actions">
+          <button className="nb-btn-cancel" onClick={onClose}>
+            Cancel
+          </button>
+          <button
+            className="nb-btn-danger"
+            onClick={handleConfirm}
+            disabled={trashing}
+          >
+            {trashing ? "Moving…" : "Move to Trash 🗑"}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -593,44 +779,53 @@ function templateToForm(t: RecurrentExpense): TemplateForm {
 export function RecurrentExpenses() {
   const [templates, setTemplates] = useState<RecurrentExpense[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<FilterType>("all");
   const [addOpen, setAddOpen] = useState(false);
   const [addInitial, setAddInitial] = useState<TemplateForm>(BLANK_FORM);
   const [editTarget, setEditTarget] = useState<RecurrentExpense | null>(null);
-  const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [trashTarget, setTrashTarget] = useState<RecurrentExpense | null>(null);
+  const [restoringId, setRestoringId] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([getRecurrentExpenses(), getPaymentMethods()]).then(
-      ([tRes, mRes]) => {
-        if (tRes.success) setTemplates(tRes.data);
-        if (mRes.success) setPaymentMethods(mRes.data);
-        setLoading(false);
-      },
-    );
+    getCurrentUserAction().then(async (userRes) => {
+      const admin = userRes.success && userRes.data.role === "admin";
+      setIsAdmin(admin);
+      const [tRes, mRes] = await Promise.all([
+        getRecurrentExpenses(admin),
+        getPaymentMethods(),
+      ]);
+      if (tRes.success) setTemplates(tRes.data);
+      if (mRes.success) setPaymentMethods(mRes.data);
+      setLoading(false);
+    });
   }, []);
 
   const applyFilter = (list: RecurrentExpense[]) =>
     filter === "all" ? list : list.filter((t) => t.category === filter);
 
-  const active = applyFilter(templates.filter((t) => t.active));
-  const inactive = applyFilter(templates.filter((t) => !t.active));
+  const activeTemplates = applyFilter(templates.filter((t) => t.active));
+  const trashedTemplates = applyFilter(templates.filter((t) => !t.active));
   const allActive = templates.filter((t) => t.active);
-  const allInactive = templates.filter((t) => !t.active);
+  const allTrashed = templates.filter((t) => !t.active);
 
-  const handleToggle = async (template: RecurrentExpense) => {
-    setTogglingId(template.id);
-    const res = template.active
-      ? await deactivateRecurrentExpense(template.id)
-      : await activateRecurrentExpense(template.id);
+  const handleTrashed = (id: string) => {
+    setTemplates((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, active: false } : t)),
+    );
+    setTrashTarget(null);
+  };
+
+  const handleRestore = async (template: RecurrentExpense) => {
+    setRestoringId(template.id);
+    const res = await activateRecurrentExpense(template.id);
     if (res.success) {
       setTemplates((prev) =>
-        prev.map((t) =>
-          t.id === template.id ? { ...t, active: !template.active } : t,
-        ),
+        prev.map((t) => (t.id === template.id ? { ...t, active: true } : t)),
       );
     }
-    setTogglingId(null);
+    setRestoringId(null);
   };
 
   const handleDuplicate = (template: RecurrentExpense) => {
@@ -727,41 +922,21 @@ export function RecurrentExpenses() {
             marginLeft: "auto",
           }}
         >
-          {allActive.length} active · {allInactive.length} inactive
+          {allActive.length} active · {allTrashed.length} trashed
         </span>
       </div>
 
       {/* Active templates */}
-      {active.length > 0 && (
+      {activeTemplates.length > 0 && (
         <>
           <div className="nb-section-title">✓ Active</div>
-          {active.map((t) => (
+          {activeTemplates.map((t) => (
             <TemplateCard
               key={t.id}
               template={t}
               onEdit={setEditTarget}
               onDuplicate={handleDuplicate}
-              onToggle={handleToggle}
-              toggling={togglingId === t.id}
-            />
-          ))}
-        </>
-      )}
-
-      {/* Inactive templates */}
-      {inactive.length > 0 && (
-        <>
-          <div className="nb-section-title" style={{ marginTop: 24 }}>
-            ○ Inactive
-          </div>
-          {inactive.map((t) => (
-            <TemplateCard
-              key={t.id}
-              template={t}
-              onEdit={setEditTarget}
-              onDuplicate={handleDuplicate}
-              onToggle={handleToggle}
-              toggling={togglingId === t.id}
+              onTrash={setTrashTarget}
             />
           ))}
         </>
@@ -786,6 +961,26 @@ export function RecurrentExpenses() {
         + New Template
       </button>
 
+      {/* Trashed section (admin only) */}
+      {isAdmin && trashedTemplates.length > 0 && (
+        <div style={{ marginTop: 32 }}>
+          <div
+            className="nb-section-title"
+            style={{ opacity: 0.55, marginBottom: 12 }}
+          >
+            🗑 Trashed Templates
+          </div>
+          {trashedTemplates.map((t) => (
+            <TrashedTemplateCard
+              key={t.id}
+              template={t}
+              onRestore={handleRestore}
+              restoring={restoringId === t.id}
+            />
+          ))}
+        </div>
+      )}
+
       {/* Add modal */}
       <TemplateModal
         isOpen={addOpen}
@@ -808,6 +1003,14 @@ export function RecurrentExpenses() {
         paymentMethods={paymentMethods}
         onClose={() => setEditTarget(null)}
         onSave={handleEdit}
+      />
+
+      {/* Confirm trash modal */}
+      <ConfirmTrashModal
+        isOpen={trashTarget !== null}
+        onClose={() => setTrashTarget(null)}
+        template={trashTarget}
+        onConfirmed={handleTrashed}
       />
     </>
   );

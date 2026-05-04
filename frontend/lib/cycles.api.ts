@@ -20,6 +20,9 @@ export const fetchCycles = (token: string, includeInactive = false) =>
     { token },
   );
 
+export const restoreCycle = (id: string, token: string) =>
+  apiClient<Cycle>(`/cycles/${id}/restore`, { method: "PUT", token });
+
 export const createCycle = (payload: CreateCycleRequest, token: string) =>
   apiClient<Cycle>("/cycles", {
     method: "POST",

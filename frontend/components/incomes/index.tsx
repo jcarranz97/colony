@@ -8,6 +8,7 @@ import type {
   RecurrenceConfig,
 } from "@/helpers/types";
 import {
+  getCurrentUserAction,
   getRecurrentIncomes,
   addRecurrentIncome,
   editRecurrentIncome,
@@ -70,20 +71,15 @@ function IncomeCard({
   income,
   onEdit,
   onDuplicate,
-  onToggle,
-  toggling,
+  onTrash,
 }: {
   income: RecurrentIncome;
   onEdit: (i: RecurrentIncome) => void;
   onDuplicate: (i: RecurrentIncome) => void;
-  onToggle: (i: RecurrentIncome) => void;
-  toggling: boolean;
+  onTrash: (i: RecurrentIncome) => void;
 }) {
   return (
-    <div
-      className="nb-template-card"
-      style={{ opacity: income.active ? 1 : 0.5 }}
-    >
+    <div className="nb-template-card">
       <div
         style={{
           width: 36,
@@ -177,15 +173,203 @@ function IncomeCard({
         <button
           style={{
             ...iconBtn,
-            ...(income.active
-              ? { color: "var(--hl-overdue-border)" }
-              : { color: "var(--hl-paid-border)" }),
+            color: "rgba(220,53,69,0.7)",
+            border: "1px solid rgba(220,53,69,0.35)",
           }}
-          onClick={() => onToggle(income)}
-          disabled={toggling}
+          onClick={() => onTrash(income)}
+          title="Move to trash"
         >
-          {income.active ? "Deactivate" : "Activate"}
+          🗑 Trash
         </button>
+      </div>
+    </div>
+  );
+}
+
+// ── Trashed Income Card (admin only) ─────────────────────────────────────────
+
+function TrashedIncomeCard({
+  income,
+  onRestore,
+  restoring,
+}: {
+  income: RecurrentIncome;
+  onRestore: (i: RecurrentIncome) => void;
+  restoring: boolean;
+}) {
+  return (
+    <div
+      style={{
+        border: "1px dashed rgba(180,180,180,0.5)",
+        borderRadius: 6,
+        padding: "10px 14px",
+        background: "rgba(180,180,180,0.07)",
+        opacity: 0.7,
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        marginBottom: 8,
+      }}
+    >
+      <div
+        style={{
+          width: 32,
+          height: 32,
+          borderRadius: "50%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 14,
+          flexShrink: 0,
+          background: "rgba(180,180,180,0.15)",
+        }}
+      >
+        💰
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            fontFamily: "var(--font-title)",
+            fontSize: 15,
+            color: "var(--ink)",
+            textDecoration: "line-through",
+            opacity: 0.55,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {income.description}
+        </div>
+        <div
+          style={{
+            fontFamily: "var(--font-hand)",
+            fontSize: 12,
+            color: "var(--ink-light)",
+            opacity: 0.45,
+          }}
+        >
+          {fmtAmount(income.base_amount, income.currency)}
+        </div>
+      </div>
+      <span
+        style={{
+          fontFamily: "var(--font-hand)",
+          fontSize: 11,
+          background: "rgba(180,180,180,0.28)",
+          color: "var(--ink-light)",
+          borderRadius: 3,
+          padding: "2px 8px",
+          flexShrink: 0,
+        }}
+      >
+        trashed
+      </span>
+      <button
+        style={{
+          fontFamily: "var(--font-hand)",
+          fontSize: 12,
+          fontWeight: 600,
+          background: "transparent",
+          border: "1px solid var(--hl-paid-border, rgba(80,200,100,0.6))",
+          borderRadius: 4,
+          padding: "3px 10px",
+          cursor: "pointer",
+          color: "var(--hl-paid-border, rgba(80,200,100,0.8))",
+          flexShrink: 0,
+        }}
+        onClick={() => onRestore(income)}
+        disabled={restoring}
+      >
+        ↩ Restore
+      </button>
+    </div>
+  );
+}
+
+// ── Confirm Trash Modal ───────────────────────────────────────────────────────
+
+function ConfirmTrashModal({
+  isOpen,
+  onClose,
+  income,
+  onConfirmed,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  income: RecurrentIncome | null;
+  onConfirmed: (id: string) => void;
+}) {
+  const [trashing, setTrashing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isOpen) setError(null);
+  }, [isOpen]);
+
+  const handleConfirm = async () => {
+    if (!income) return;
+    setTrashing(true);
+    setError(null);
+    const res = await deactivateRecurrentIncome(income.id);
+    if (res.success) {
+      onConfirmed(income.id);
+      onClose();
+    } else {
+      setError(res.error.message);
+    }
+    setTrashing(false);
+  };
+
+  if (!isOpen || !income) return null;
+
+  return (
+    <div
+      className="nb-modal-backdrop"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div className="nb-modal">
+        <button className="nb-modal-close" onClick={onClose}>
+          ✕
+        </button>
+        <div className="nb-modal-title">Move to Trash?</div>
+        <p
+          style={{
+            fontFamily: "var(--font-hand)",
+            fontSize: 15,
+            color: "var(--ink)",
+            marginBottom: 8,
+            lineHeight: 1.5,
+          }}
+        >
+          <strong>{income.description}</strong> will be deactivated and moved to
+          trash. It will no longer generate incomes in new cycles. Contact your
+          admin if you need it restored.
+        </p>
+        {error && (
+          <p
+            style={{
+              fontFamily: "var(--font-hand)",
+              color: "var(--hl-overdue-border)",
+              fontSize: 14,
+              marginBottom: 8,
+            }}
+          >
+            {error}
+          </p>
+        )}
+        <div className="nb-modal-actions">
+          <button className="nb-btn-cancel" onClick={onClose}>
+            Cancel
+          </button>
+          <button
+            className="nb-btn-danger"
+            onClick={handleConfirm}
+            disabled={trashing}
+          >
+            {trashing ? "Moving…" : "Move to Trash 🗑"}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -530,38 +714,47 @@ function incomeToForm(i: RecurrentIncome): IncomeForm {
 export function Incomes() {
   const [incomes, setIncomes] = useState<RecurrentIncome[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [addOpen, setAddOpen] = useState(false);
   const [addInitial, setAddInitial] = useState<IncomeForm>(BLANK_FORM);
   const [editTarget, setEditTarget] = useState<RecurrentIncome | null>(null);
-  const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [trashTarget, setTrashTarget] = useState<RecurrentIncome | null>(null);
+  const [restoringId, setRestoringId] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([getRecurrentIncomes(), getPaymentMethods()]).then(
-      ([iRes, mRes]) => {
-        if (iRes.success) setIncomes(iRes.data);
-        if (mRes.success) setPaymentMethods(mRes.data);
-        setLoading(false);
-      },
-    );
+    getCurrentUserAction().then(async (userRes) => {
+      const admin = userRes.success && userRes.data.role === "admin";
+      setIsAdmin(admin);
+      const [iRes, mRes] = await Promise.all([
+        getRecurrentIncomes(admin),
+        getPaymentMethods(),
+      ]);
+      if (iRes.success) setIncomes(iRes.data);
+      if (mRes.success) setPaymentMethods(mRes.data);
+      setLoading(false);
+    });
   }, []);
 
-  const active = incomes.filter((i) => i.active);
-  const inactive = incomes.filter((i) => !i.active);
+  const activeIncomes = incomes.filter((i) => i.active);
+  const trashedIncomes = incomes.filter((i) => !i.active);
 
-  const handleToggle = async (income: RecurrentIncome) => {
-    setTogglingId(income.id);
-    const res = income.active
-      ? await deactivateRecurrentIncome(income.id)
-      : await activateRecurrentIncome(income.id);
+  const handleTrashed = (id: string) => {
+    setIncomes((prev) =>
+      prev.map((i) => (i.id === id ? { ...i, active: false } : i)),
+    );
+    setTrashTarget(null);
+  };
+
+  const handleRestore = async (income: RecurrentIncome) => {
+    setRestoringId(income.id);
+    const res = await activateRecurrentIncome(income.id);
     if (res.success) {
       setIncomes((prev) =>
-        prev.map((i) =>
-          i.id === income.id ? { ...i, active: !income.active } : i,
-        ),
+        prev.map((i) => (i.id === income.id ? { ...i, active: true } : i)),
       );
     }
-    setTogglingId(null);
+    setRestoringId(null);
   };
 
   const handleDuplicate = (income: RecurrentIncome) => {
@@ -636,38 +829,19 @@ export function Incomes() {
           marginBottom: 18,
         }}
       >
-        {active.length} active · {inactive.length} inactive
+        {activeIncomes.length} active · {trashedIncomes.length} trashed
       </div>
 
-      {active.length > 0 && (
+      {activeIncomes.length > 0 && (
         <>
           <div className="nb-section-title">✓ Active</div>
-          {active.map((i) => (
+          {activeIncomes.map((i) => (
             <IncomeCard
               key={i.id}
               income={i}
               onEdit={setEditTarget}
               onDuplicate={handleDuplicate}
-              onToggle={handleToggle}
-              toggling={togglingId === i.id}
-            />
-          ))}
-        </>
-      )}
-
-      {inactive.length > 0 && (
-        <>
-          <div className="nb-section-title" style={{ marginTop: 24 }}>
-            ○ Inactive
-          </div>
-          {inactive.map((i) => (
-            <IncomeCard
-              key={i.id}
-              income={i}
-              onEdit={setEditTarget}
-              onDuplicate={handleDuplicate}
-              onToggle={handleToggle}
-              toggling={togglingId === i.id}
+              onTrash={setTrashTarget}
             />
           ))}
         </>
@@ -692,6 +866,26 @@ export function Incomes() {
         + New Recurrent Income
       </button>
 
+      {/* Trashed section (admin only) */}
+      {isAdmin && trashedIncomes.length > 0 && (
+        <div style={{ marginTop: 32 }}>
+          <div
+            className="nb-section-title"
+            style={{ opacity: 0.55, marginBottom: 12 }}
+          >
+            🗑 Trashed Recurrent Incomes
+          </div>
+          {trashedIncomes.map((i) => (
+            <TrashedIncomeCard
+              key={i.id}
+              income={i}
+              onRestore={handleRestore}
+              restoring={restoringId === i.id}
+            />
+          ))}
+        </div>
+      )}
+
       <IncomeModal
         isOpen={addOpen}
         title={
@@ -712,6 +906,13 @@ export function Incomes() {
         paymentMethods={paymentMethods}
         onClose={() => setEditTarget(null)}
         onSave={handleEdit}
+      />
+
+      <ConfirmTrashModal
+        isOpen={trashTarget !== null}
+        onClose={() => setTrashTarget(null)}
+        income={trashTarget}
+        onConfirmed={handleTrashed}
       />
     </>
   );

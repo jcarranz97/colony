@@ -5,8 +5,13 @@ import type {
   UpdatePaymentMethodRequest,
 } from "@/helpers/types";
 
-export const fetchPaymentMethods = (token: string) =>
-  apiClient<PaymentMethod[]>("/payment-methods/", { token });
+export const fetchPaymentMethods = (token: string, includeInactive = false) =>
+  apiClient<PaymentMethod[]>(
+    includeInactive
+      ? "/payment-methods/?include_inactive=true"
+      : "/payment-methods/",
+    { token },
+  );
 
 export const createPaymentMethod = (
   payload: CreatePaymentMethodRequest,

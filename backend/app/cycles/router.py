@@ -4,7 +4,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
-from app.dependencies import CurrentActiveUser, get_db
+from app.dependencies import CurrentActiveUser, CurrentAdminUser, get_db
 from app.households.dependencies import CurrentActiveHousehold
 
 from . import schemas, service
@@ -144,6 +144,30 @@ async def update_cycle(
 async def delete_cycle(cycle: CycleDep, db: DatabaseDep) -> None:
     """Soft-delete a cycle."""
     service.cycle_service.delete_cycle(db, cycle)
+
+
+@router.put(
+    "/{cycle_id}/restore",
+    response_model=schemas.CycleResponse,
+    summary="Restore a deleted cycle",
+    description="Restore a soft-deleted cycle (admin only).",
+)
+async def restore_cycle(
+    cycle_id: str,
+    current_household: CurrentActiveHousehold,
+    _current_admin: CurrentAdminUser,
+    db: DatabaseDep,
+) -> schemas.CycleResponse:
+    """Restore a soft-deleted cycle (admin only)."""
+    cycle = service.cycle_service.restore_cycle(
+        db, cycle_id, str(current_household.id)
+    )
+    if not cycle:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Cycle not found in trash",
+        )
+    return schemas.CycleResponse.model_validate(cycle)
 
 
 @router.get(

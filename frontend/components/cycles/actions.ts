@@ -4,6 +4,7 @@ import {
   createCycle,
   updateCycle,
   deleteCycle,
+  restoreCycle,
   getCycleSummary,
   fetchCycleExpenses,
   createCycleExpense,
@@ -73,3 +74,6 @@ export const editIncome = async (
 
 export const removeIncome = async (cycleId: string, incomeId: string) =>
   deleteCycleIncome(cycleId, incomeId, await token());
+
+export const restoreCycleAction = async (id: string) =>
+  restoreCycle(id, await token());

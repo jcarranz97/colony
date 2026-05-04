@@ -5,8 +5,16 @@ import type {
   UpdateRecurrentExpenseRequest,
 } from "@/helpers/types";
 
-export const fetchRecurrentExpenses = (token: string) =>
-  apiClient<RecurrentExpense[]>("/recurrent-expenses", { token });
+export const fetchRecurrentExpenses = (
+  token: string,
+  includeInactive = false,
+) =>
+  apiClient<RecurrentExpense[]>(
+    includeInactive
+      ? "/recurrent-expenses?include_inactive=true"
+      : "/recurrent-expenses",
+    { token },
+  );
 
 export const createRecurrentExpense = (
   payload: CreateRecurrentExpenseRequest,

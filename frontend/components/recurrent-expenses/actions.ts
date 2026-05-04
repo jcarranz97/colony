@@ -5,6 +5,7 @@ import {
   updateRecurrentExpense,
   deleteRecurrentExpense,
 } from "@/lib/recurrent-expenses.api";
+import { getCurrentUser } from "@/lib/auth.api";
 import type {
   CreateRecurrentExpenseRequest,
   UpdateRecurrentExpenseRequest,
@@ -14,8 +15,10 @@ async function token() {
   return (await getAuthToken()) ?? "";
 }
 
-export const getRecurrentExpenses = async () =>
-  fetchRecurrentExpenses(await token());
+export const getCurrentUserAction = async () => getCurrentUser(await token());
+
+export const getRecurrentExpenses = async (includeInactive = false) =>
+  fetchRecurrentExpenses(await token(), includeInactive);
 
 export const addRecurrentExpense = async (
   payload: CreateRecurrentExpenseRequest,

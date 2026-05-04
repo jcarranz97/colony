@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
-from app.dependencies import get_db
+from app.dependencies import CurrentActiveUser, get_db
 from app.households.dependencies import CurrentActiveHousehold
 
 from . import schemas, service
@@ -40,12 +40,21 @@ async def recurrent_expenses_health_check() -> dict[str, str]:
 )
 async def get_recurrent_expenses(
     current_household: CurrentActiveHousehold,
+    current_user: CurrentActiveUser,
     db: DatabaseDep,
-    active: bool | None = Query(None, description="Filter by active status"),
+    include_inactive: bool = Query(
+        False, description="Include deactivated recurrent expenses (admin only)"
+    ),
     category: str | None = Query(None, description="Filter by category"),
     currency: str | None = Query(None, description="Filter by currency"),
 ) -> list[schemas.RecurrentExpenseResponse]:
     """Get all recurrent expenses for the active household."""
+    if include_inactive and current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required",
+        )
+    active: bool | None = None if include_inactive else True
     recurrent_expenses = service.recurrent_expense_service.get_recurrent_expenses(
         db,
         str(current_household.id),

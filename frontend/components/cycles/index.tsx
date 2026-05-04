@@ -15,6 +15,7 @@ import {
   addCycle,
   editCycle,
   removeCycle,
+  restoreCycleAction,
   fetchSummary,
   getExpenses,
   addExpense,
@@ -724,8 +725,8 @@ function ConfirmTrashModal({
           }}
         >
           <strong>{cycle.name}</strong> will be deactivated and moved to trash.
-          Regular users will no longer see it. Admins can still view it in the
-          Trashed Cycles section.
+          Regular users will no longer see it. Contact your admin if you need it
+          restored.
         </p>
         {error && (
           <p
@@ -1245,7 +1246,13 @@ function AddIncomeModal({
 
 // ── Trashed Cycle Card (admin view) ──────────────────────────────────────────
 
-function TrashedCycleCard({ cycle }: { cycle: Cycle }) {
+function TrashedCycleCard({
+  cycle,
+  onRestore,
+}: {
+  cycle: Cycle;
+  onRestore: (c: Cycle) => void;
+}) {
   return (
     <div
       style={{
@@ -1288,18 +1295,36 @@ function TrashedCycleCard({ cycle }: { cycle: Cycle }) {
             {fmtDateRange(cycle.start_date, cycle.end_date)}
           </div>
         </div>
-        <span
-          style={{
-            fontFamily: "var(--font-hand)",
-            fontSize: 11,
-            background: "rgba(180,180,180,0.28)",
-            color: "var(--ink-light)",
-            borderRadius: 3,
-            padding: "2px 8px",
-          }}
-        >
-          trashed
-        </span>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <span
+            style={{
+              fontFamily: "var(--font-hand)",
+              fontSize: 11,
+              background: "rgba(180,180,180,0.28)",
+              color: "var(--ink-light)",
+              borderRadius: 3,
+              padding: "2px 8px",
+            }}
+          >
+            trashed
+          </span>
+          <button
+            style={{
+              fontFamily: "var(--font-hand)",
+              fontSize: 12,
+              fontWeight: 600,
+              background: "transparent",
+              border: "1px solid var(--hl-paid-border, rgba(80,200,100,0.6))",
+              borderRadius: 4,
+              padding: "3px 10px",
+              cursor: "pointer",
+              color: "var(--hl-paid-border, rgba(80,200,100,0.8))",
+            }}
+            onClick={() => onRestore(cycle)}
+          >
+            ↩ Restore
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -1768,6 +1793,18 @@ export function Cycles() {
     setTrashCycle(null);
   };
 
+  const handleCycleRestored = async (cycle: Cycle) => {
+    const res = await restoreCycleAction(cycle.id);
+    if (res.success) {
+      setTrashedCycles((prev) => prev.filter((c) => c.id !== cycle.id));
+      setCycles((prev) => [res.data, ...prev]);
+      const summaryRes = await fetchSummary(res.data.id);
+      if (summaryRes.success) {
+        setSummaries((prev) => ({ ...prev, [res.data.id]: summaryRes.data }));
+      }
+    }
+  };
+
   const handleOpenCycle = (cycle: Cycle) => {
     setSelectedCycle(cycle);
     setCycleExpenses([]);
@@ -1989,7 +2026,11 @@ export function Cycles() {
           </div>
           <div className="nb-cycles-grid">
             {trashedCycles.map((c) => (
-              <TrashedCycleCard key={c.id} cycle={c} />
+              <TrashedCycleCard
+                key={c.id}
+                cycle={c}
+                onRestore={handleCycleRestored}
+              />
             ))}
           </div>
         </div>

@@ -632,6 +632,47 @@ class CycleService:
 
         logger.info("Cycle deleted", extra={"cycle_id": str(cycle.id)})
 
+    @staticmethod
+    def restore_cycle(
+        db: Session,
+        cycle_id: str,
+        household_id: str,
+    ) -> models.Cycle | None:
+        """Restore a soft-deleted cycle (admin only).
+
+        Args:
+            db: Active database session.
+            cycle_id: UUID string of the cycle to restore.
+            household_id: The active household's ID.
+
+        Returns:
+            The restored Cycle instance, or None if not found.
+        """
+        cycle = (
+            db.query(models.Cycle)
+            .filter(
+                and_(
+                    models.Cycle.id == cycle_id,
+                    models.Cycle.household_id == household_id,
+                    models.Cycle.active.is_(False),
+                )
+            )
+            .options(
+                selectinload(models.Cycle.expenses),
+                selectinload(models.Cycle.incomes),
+            )
+            .first()
+        )
+        if not cycle:
+            return None
+
+        logger.info("Restoring cycle", extra={"cycle_id": str(cycle.id)})
+        cycle.active = True
+        db.commit()
+        db.refresh(cycle)
+        logger.info("Cycle restored", extra={"cycle_id": str(cycle.id)})
+        return cycle
+
 
 # ---------------------------------------------------------------------------
 # Cycle expense service

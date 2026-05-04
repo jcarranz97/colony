@@ -5,6 +5,7 @@ import {
   updateRecurrentIncome,
   deleteRecurrentIncome,
 } from "@/lib/recurrent-incomes.api";
+import { getCurrentUser } from "@/lib/auth.api";
 import type {
   CreateRecurrentIncomeRequest,
   UpdateRecurrentIncomeRequest,
@@ -14,8 +15,10 @@ async function token() {
   return (await getAuthToken()) ?? "";
 }
 
-export const getRecurrentIncomes = async () =>
-  fetchRecurrentIncomes(await token());
+export const getCurrentUserAction = async () => getCurrentUser(await token());
+
+export const getRecurrentIncomes = async (includeInactive = false) =>
+  fetchRecurrentIncomes(await token(), includeInactive);
 
 export const addRecurrentIncome = async (
   payload: CreateRecurrentIncomeRequest,

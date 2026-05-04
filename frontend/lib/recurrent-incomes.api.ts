@@ -5,8 +5,13 @@ import type {
   UpdateRecurrentIncomeRequest,
 } from "@/helpers/types";
 
-export const fetchRecurrentIncomes = (token: string) =>
-  apiClient<RecurrentIncome[]>("/recurrent-incomes", { token });
+export const fetchRecurrentIncomes = (token: string, includeInactive = false) =>
+  apiClient<RecurrentIncome[]>(
+    includeInactive
+      ? "/recurrent-incomes?include_inactive=true"
+      : "/recurrent-incomes",
+    { token },
+  );
 
 export const createRecurrentIncome = (
   payload: CreateRecurrentIncomeRequest,
