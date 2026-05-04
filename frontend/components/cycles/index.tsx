@@ -770,10 +770,12 @@ function AddCycleModal({
   isOpen,
   onClose,
   onAdd,
+  existingNames,
 }: {
   isOpen: boolean;
   onClose: () => void;
   onAdd: (c: Cycle) => void;
+  existingNames: string[];
 }) {
   const [form, setForm] = useState<AddCycleForm>({
     name: "",
@@ -786,6 +788,15 @@ function AddCycleModal({
 
   const set = <K extends keyof AddCycleForm>(k: K, v: AddCycleForm[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
+
+  const nameSuggestions =
+    form.name.trim().length > 0
+      ? existingNames
+          .filter((n) =>
+            n.toLowerCase().includes(form.name.trim().toLowerCase()),
+          )
+          .slice(0, 5)
+      : [];
 
   const handleSubmit = async () => {
     if (!form.name || !form.start_date || !form.end_date) return;
@@ -834,6 +845,17 @@ function AddCycleModal({
             onChange={(e) => set("name", e.target.value)}
           />
         </div>
+
+        {nameSuggestions.length > 0 && (
+          <div className="nb-similar-items">
+            <span>Similar:</span>
+            {nameSuggestions.map((n, i) => (
+              <span key={i} className="nb-similar-item-chip">
+                {n}
+              </span>
+            ))}
+          </div>
+        )}
 
         <div className="nb-form-row">
           <div className="nb-form-group">
@@ -912,12 +934,14 @@ function AddExpenseModal({
   cycleId,
   paymentMethods,
   onAdded,
+  existingExpenses,
 }: {
   isOpen: boolean;
   onClose: () => void;
   cycleId: string;
   paymentMethods: PaymentMethod[];
   onAdded: (e: CycleExpense) => void;
+  existingExpenses: CycleExpense[];
 }) {
   const [form, setForm] = useState<AddExpenseForm>({
     description: "",
@@ -932,6 +956,18 @@ function AddExpenseModal({
 
   const set = <K extends keyof AddExpenseForm>(k: K, v: AddExpenseForm[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
+
+  const descriptionSuggestions =
+    form.description.trim().length > 0
+      ? existingExpenses
+          .filter((e) =>
+            e.description
+              .toLowerCase()
+              .includes(form.description.trim().toLowerCase()),
+          )
+          .slice(0, 5)
+          .map((e) => e.description)
+      : [];
 
   const handleSubmit = async () => {
     if (!form.description || !form.amount) return;
@@ -984,6 +1020,17 @@ function AddExpenseModal({
             onChange={(e) => set("description", e.target.value)}
           />
         </div>
+
+        {descriptionSuggestions.length > 0 && (
+          <div className="nb-similar-items">
+            <span>Similar:</span>
+            {descriptionSuggestions.map((n, i) => (
+              <span key={i} className="nb-similar-item-chip">
+                {n}
+              </span>
+            ))}
+          </div>
+        )}
 
         <div className="nb-form-row">
           <div className="nb-form-group">
@@ -1099,11 +1146,13 @@ function AddIncomeModal({
   onClose,
   cycleId,
   onAdded,
+  existingIncomes,
 }: {
   isOpen: boolean;
   onClose: () => void;
   cycleId: string;
   onAdded: (i: CycleIncome) => void;
+  existingIncomes: CycleIncome[];
 }) {
   const [form, setForm] = useState<AddIncomeForm>({
     description: "",
@@ -1117,6 +1166,18 @@ function AddIncomeModal({
 
   const set = <K extends keyof AddIncomeForm>(k: K, v: AddIncomeForm[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
+
+  const descriptionSuggestions =
+    form.description.trim().length > 0
+      ? existingIncomes
+          .filter((i) =>
+            i.description
+              .toLowerCase()
+              .includes(form.description.trim().toLowerCase()),
+          )
+          .slice(0, 5)
+          .map((i) => i.description)
+      : [];
 
   const handleSubmit = async () => {
     if (!form.description || !form.amount || !form.income_date) return;
@@ -1167,6 +1228,17 @@ function AddIncomeModal({
             onChange={(e) => set("description", e.target.value)}
           />
         </div>
+
+        {descriptionSuggestions.length > 0 && (
+          <div className="nb-similar-items">
+            <span>Similar:</span>
+            {descriptionSuggestions.map((n, i) => (
+              <span key={i} className="nb-similar-item-chip">
+                {n}
+              </span>
+            ))}
+          </div>
+        )}
 
         <div className="nb-form-row">
           <div className="nb-form-group">
@@ -1666,6 +1738,7 @@ function CycleDetail({
         onClose={() => setAddIncomeOpen(false)}
         cycleId={cycle.id}
         onAdded={onIncomeAdded}
+        existingIncomes={incomes}
       />
 
       <AddExpenseModal
@@ -1674,6 +1747,7 @@ function CycleDetail({
         cycleId={cycle.id}
         paymentMethods={paymentMethods}
         onAdded={onExpenseAdded}
+        existingExpenses={expenses}
       />
 
       <EditExpenseModal
@@ -2040,6 +2114,7 @@ export function Cycles() {
         isOpen={addCycleOpen}
         onClose={() => setAddCycleOpen(false)}
         onAdd={handleCycleAdded}
+        existingNames={cycles.map((c) => c.name)}
       />
 
       <RenameCycleModal

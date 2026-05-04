@@ -320,12 +320,14 @@ function MethodModal({
   initial,
   onClose,
   onSave,
+  existingNames,
 }: {
   isOpen: boolean;
   title: string;
   initial: MethodForm;
   onClose: () => void;
   onSave: (form: MethodForm) => Promise<string | null>;
+  existingNames?: string[];
 }) {
   const [form, setForm] = useState<MethodForm>(initial);
   const [saving, setSaving] = useState(false);
@@ -340,6 +342,15 @@ function MethodModal({
 
   const set = <K extends keyof MethodForm>(k: K, v: MethodForm[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
+
+  const nameSuggestions =
+    existingNames && form.name.trim().length > 0
+      ? existingNames
+          .filter((n) =>
+            n.toLowerCase().includes(form.name.trim().toLowerCase()),
+          )
+          .slice(0, 5)
+      : [];
 
   const handleSubmit = async () => {
     if (!form.name.trim()) return;
@@ -371,6 +382,17 @@ function MethodModal({
             onChange={(e) => set("name", e.target.value)}
           />
         </div>
+
+        {nameSuggestions.length > 0 && (
+          <div className="nb-similar-items">
+            <span>Similar:</span>
+            {nameSuggestions.map((n, i) => (
+              <span key={i} className="nb-similar-item-chip">
+                {n}
+              </span>
+            ))}
+          </div>
+        )}
 
         <div className="nb-form-row">
           <div className="nb-form-group">
@@ -609,6 +631,7 @@ export function PaymentMethods() {
         initial={{ name: "", method_type: "debit", default_currency: "USD" }}
         onClose={() => setAddOpen(false)}
         onSave={handleAdd}
+        existingNames={activeMethods.map((m) => m.name)}
       />
 
       {/* Edit modal */}
