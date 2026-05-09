@@ -62,10 +62,20 @@ Backup OK (1.4M).
 | `COLONY_NAMESPACE` | `colony-app`                           | Target namespace.                  |
 | `COLONY_PG_LABEL`  | `app.kubernetes.io/name=postgresql`    | Label selector for the pod lookup. |
 
+| Flag       | Default    | Purpose                                                  |
+| ---------- | ---------- | -------------------------------------------------------- |
+| `--keep N` | _keep all_ | Prune older archives for this database so only the `N` most recent remain. Use it for scheduled runs that would otherwise fill the disk. |
+
 Example — back up a staging cluster in a different namespace:
 
 ```bash
 COLONY_NAMESPACE=colony-staging ./scripts/backup-db.sh
+```
+
+Example — back up and keep only the 30 most recent archives:
+
+```bash
+./scripts/backup-db.sh --keep 30
 ```
 
 ### Recommended Cadence
@@ -76,7 +86,9 @@ Run the script:
 - Before running destructive scripts or one-off `psql` sessions.
 - On a regular cadence you're comfortable with (cron / systemd timer
   / manual). Backups are small — keeping daily archives for a few
-  weeks is cheap.
+  weeks is cheap. See
+  [Scheduling Daily Backups](#scheduling-daily-backups-systemd-timer)
+  for a ready-to-paste systemd user timer.
 
 ## Restoring from a Backup
 
@@ -235,10 +247,122 @@ gunzip -c ~/.colony/db-backup/colony_db-20260504T091522Z.sql.gz \
 A healthy file starts with a `-- PostgreSQL database dump` comment
 block and lists `SET` statements before any `CREATE TABLE` lines.
 
+## Scheduling Daily Backups (systemd timer)
+
+For an unattended daily backup that also caps disk usage, wire the
+script into a **systemd user timer** that calls it with `--keep 30`.
+The user timer runs as your Linux user, so it inherits the same
+`kubectl` config you use interactively — no extra credentials or
+service accounts.
+
+> **WSL2 users:** systemd must be enabled. Add the following to
+> `/etc/wsl.conf` (creating the file if needed) and run
+> `wsl --shutdown` from PowerShell to apply:
+>
+> ```ini
+> [boot]
+> systemd=true
+> ```
+
+### 1. Create the service unit
+
+`~/.config/systemd/user/colony-backup.service`:
+
+```ini
+[Unit]
+Description=Colony PostgreSQL daily backup
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+# Adjust the path if your clone lives somewhere other than ~/repos/colony.
+ExecStart=%h/repos/colony/scripts/backup-db.sh --keep 30
+
+# User services inherit your shell environment, so kubectl and
+# KUBECONFIG usually resolve automatically. Uncomment and adjust if
+# kubectl is in a non-standard location or you use a custom kubeconfig:
+# Environment=PATH=/usr/local/bin:/usr/bin:/bin
+# Environment=KUBECONFIG=%h/.kube/config
+```
+
+### 2. Create the timer unit
+
+`~/.config/systemd/user/colony-backup.timer`:
+
+```ini
+[Unit]
+Description=Run Colony PostgreSQL backup daily
+Requires=colony-backup.service
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+RandomizedDelaySec=10m
+
+[Install]
+WantedBy=timers.target
+```
+
+`Persistent=true` makes systemd run a missed backup as soon as the
+machine wakes up (e.g. after the laptop was closed past midnight).
+`RandomizedDelaySec` jitters the start time so concurrent timers don't
+all fire at exactly 00:00.
+
+### 3. Enable the timer
+
+```bash
+systemctl --user daemon-reload
+systemctl --user enable --now colony-backup.timer
+```
+
+If you want backups to keep running while you're logged out, enable
+linger for your user (this only needs to be done once):
+
+```bash
+sudo loginctl enable-linger "$USER"
+```
+
+### 4. Verify
+
+```bash
+# Show next/previous run times
+systemctl --user list-timers colony-backup.timer
+
+# Trigger a run now to confirm the unit works end-to-end
+systemctl --user start colony-backup.service
+
+# Tail the most recent run's logs
+journalctl --user -u colony-backup.service -n 50 --no-pager
+```
+
+A healthy run ends with `Backup OK (...)` and, once you have more than
+30 archives, a `Pruning N old backup(s) (keeping 30).` line.
+
+### Targeting a different namespace
+
+The unit hard-codes the default `colony-app` namespace. To back up a
+different one, drop a unit override:
+
+```bash
+systemctl --user edit colony-backup.service
+```
+
+```ini
+[Service]
+Environment=COLONY_NAMESPACE=colony-staging
+```
+
+Then `systemctl --user daemon-reload` and the next run will use it.
+
 ## Housekeeping
 
-The script never deletes old backups. Periodically prune the folder
-to reclaim disk:
+When you run the script with `--keep N` (as the systemd timer above
+does), pruning happens automatically after each successful backup —
+nothing else to do.
+
+For ad-hoc / manual runs the script keeps every archive forever, so
+periodically prune the folder by hand:
 
 ```bash
 # Keep the 30 most recent archives, delete the rest
