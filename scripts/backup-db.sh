@@ -5,11 +5,45 @@
 # Reads DB credentials from the pod's own environment so it works for
 # both the Bitnami chart and the vanilla postgres image.
 #
-# Usage:   ./scripts/backup-db.sh
+# Usage:   ./scripts/backup-db.sh [--keep N]
 # Env:     COLONY_NAMESPACE  (default: colony-app)
 #          COLONY_PG_LABEL   (default: app.kubernetes.io/name=postgresql)
+# Flags:
+#   --keep N   After a successful backup, keep only the N most recent
+#              archives for this database; older ones are deleted.
+#              Default: keep all archives (no pruning).
 
 set -euo pipefail
+
+KEEP=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --keep)
+      KEEP="${2:-}"
+      shift 2
+      ;;
+    --keep=*)
+      KEEP="${1#--keep=}"
+      shift
+      ;;
+    -h|--help)
+      sed -n '2,8p' "$0" | sed 's/^# \{0,1\}//'
+      exit 0
+      ;;
+    *)
+      echo "Unknown argument: $1" >&2
+      echo "Usage: $0 [--keep N]" >&2
+      exit 2
+      ;;
+  esac
+done
+
+if [[ -n "$KEEP" ]]; then
+  if ! [[ "$KEEP" =~ ^[0-9]+$ ]] || (( KEEP < 1 )); then
+    echo "--keep must be a positive integer (got: '$KEEP')" >&2
+    exit 2
+  fi
+fi
 
 NAMESPACE="${COLONY_NAMESPACE:-colony-app}"
 PG_LABEL="${COLONY_PG_LABEL:-app.kubernetes.io/name=postgresql}"
@@ -75,3 +109,14 @@ fi
 
 SIZE="$(du -h "$OUTPUT" | awk '{print $1}')"
 echo "Backup OK ($SIZE)."
+
+if [[ -n "$KEEP" ]]; then
+  mapfile -t OLD < <(
+    ls -1t "$BACKUP_DIR/${DB_NAME}-"*.sql.gz 2>/dev/null \
+      | tail -n +"$((KEEP + 1))"
+  )
+  if (( ${#OLD[@]} > 0 )); then
+    echo "Pruning ${#OLD[@]} old backup(s) (keeping $KEEP)."
+    rm -f -- "${OLD[@]}"
+  fi
+fi
