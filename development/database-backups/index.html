@@ -1074,6 +1074,78 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#scheduling-daily-backups-systemd-timer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scheduling Daily Backups (systemd timer)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scheduling Daily Backups (systemd timer)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-create-the-service-unit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Create the service unit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-create-the-timer-unit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Create the timer unit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-enable-the-timer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Enable the timer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-verify" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Verify
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#targeting-a-different-namespace" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Targeting a different namespace
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#housekeeping" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1189,8 +1261,27 @@ the partial file is removed.</p>
 </tr>
 </tbody>
 </table>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Default</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--keep N</code></td>
+<td><em>keep all</em></td>
+<td>Prune older archives for this database so only the <code>N</code> most recent remain. Use it for scheduled runs that would otherwise fill the disk.</td>
+</tr>
+</tbody>
+</table>
 <p>Example — back up a staging cluster in a different namespace:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">COLONY_NAMESPACE</span><span class="o">=</span>colony-staging<span class="w"> </span>./scripts/backup-db.sh
+</code></pre></div>
+<p>Example — back up and keep only the 30 most recent archives:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>./scripts/backup-db.sh<span class="w"> </span>--keep<span class="w"> </span><span class="m">30</span>
 </code></pre></div>
 <h3 id="recommended-cadence">Recommended Cadence</h3>
 <p>Run the script:</p>
@@ -1199,7 +1290,9 @@ the partial file is removed.</p>
 <li>Before running destructive scripts or one-off <code>psql</code> sessions.</li>
 <li>On a regular cadence you're comfortable with (cron / systemd timer
   / manual). Backups are small — keeping daily archives for a few
-  weeks is cheap.</li>
+  weeks is cheap. See
+  <a href="#scheduling-daily-backups-systemd-timer">Scheduling Daily Backups</a>
+  for a ready-to-paste systemd user timer.</li>
 </ul>
 <h2 id="restoring-from-a-backup">Restoring from a Backup</h2>
 <p>The dumps are plain <code>pg_dump</code> SQL gzipped. Use <code>scripts/restore-db.sh</code>
@@ -1217,23 +1310,23 @@ recreating it. Restoring into the wrong namespace is destructive — the
 script prints the target and prompts you to type the namespace name to
 confirm.</p>
 <p>From the repo root:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>./scripts/restore-db.sh<span class="w"> </span>~/.colony/db-backup/colony_db-20260504T091522Z.sql.gz
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>./scripts/restore-db.sh<span class="w"> </span>~/.colony/db-backup/colony_db-20260504T091522Z.sql.gz
 </code></pre></div>
 <p>Output:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>  ====================================================================
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>   RESTORE TARGET
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>  ====================================================================
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>   Namespace:  colony-dev
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>   Pod:        colony-dev-postgresql-5856895896-6tj5s
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>   Database:   colony_db (user: colony_user)
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>   Backup:     /home/&lt;you&gt;/.colony/db-backup/colony_db-...sql.gz
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>  ====================================================================
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>  This will DROP and recreate every table in &#39;colony_db&#39;, wiping all
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>  current data in namespace &#39;colony-dev&#39;.
-<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>
-<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>Type the namespace name to confirm: colony-dev
-<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>Restore OK into namespace &#39;colony-dev&#39;.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>  ====================================================================
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>   RESTORE TARGET
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>  ====================================================================
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>   Namespace:  colony-dev
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>   Pod:        colony-dev-postgresql-5856895896-6tj5s
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>   Database:   colony_db (user: colony_user)
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>   Backup:     /home/&lt;you&gt;/.colony/db-backup/colony_db-...sql.gz
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>  ====================================================================
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>  This will DROP and recreate every table in &#39;colony_db&#39;, wiping all
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>  current data in namespace &#39;colony-dev&#39;.
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>Type the namespace name to confirm: colony-dev
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>Restore OK into namespace &#39;colony-dev&#39;.
 </code></pre></div>
 <h4 id="overrides_1">Overrides</h4>
 <table>
@@ -1272,25 +1365,25 @@ confirm.</p>
 </tbody>
 </table>
 <p>Example — restore into a staging cluster unattended:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nv">COLONY_NAMESPACE</span><span class="o">=</span>colony-staging<span class="w"> </span>./scripts/restore-db.sh<span class="w"> </span>-y<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span>~/.colony/db-backup/colony_db-20260504T091522Z.sql.gz
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nv">COLONY_NAMESPACE</span><span class="o">=</span>colony-staging<span class="w"> </span>./scripts/restore-db.sh<span class="w"> </span>-y<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span>~/.colony/db-backup/colony_db-20260504T091522Z.sql.gz
 </code></pre></div>
 <div class="admonition warning">
 <p class="admonition-title">Stop the backend first when restoring into prod</p>
 <p>Restoring while <code>colony-backend</code> is serving traffic can leave the
 app in an inconsistent state and may fight with table drops.
 Scale the deployment to zero, restore, then scale back up:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>kubectl<span class="w"> </span>scale<span class="w"> </span>-n<span class="w"> </span>colony-app<span class="w"> </span>deploy/colony-backend<span class="w"> </span>--replicas<span class="o">=</span><span class="m">0</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nv">COLONY_NAMESPACE</span><span class="o">=</span>colony-app<span class="w"> </span>./scripts/restore-db.sh<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span>~/.colony/db-backup/colony_db-20260504T091522Z.sql.gz
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>kubectl<span class="w"> </span>scale<span class="w"> </span>-n<span class="w"> </span>colony-app<span class="w"> </span>deploy/colony-backend<span class="w"> </span>--replicas<span class="o">=</span><span class="m">1</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>kubectl<span class="w"> </span>scale<span class="w"> </span>-n<span class="w"> </span>colony-app<span class="w"> </span>deploy/colony-backend<span class="w"> </span>--replicas<span class="o">=</span><span class="m">0</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nv">COLONY_NAMESPACE</span><span class="o">=</span>colony-app<span class="w"> </span>./scripts/restore-db.sh<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span>~/.colony/db-backup/colony_db-20260504T091522Z.sql.gz
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>kubectl<span class="w"> </span>scale<span class="w"> </span>-n<span class="w"> </span>colony-app<span class="w"> </span>deploy/colony-backend<span class="w"> </span>--replicas<span class="o">=</span><span class="m">1</span>
 </code></pre></div>
 </div>
 <h3 id="restore-into-a-local-postgres-eg-to-inspect-the-dump">Restore into a local Postgres (e.g., to inspect the dump)</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Create a throwaway DB and load the dump into it</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>createdb<span class="w"> </span>colony_inspect
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>gunzip<span class="w"> </span>-c<span class="w"> </span>~/.colony/db-backup/colony_db-20260504T091522Z.sql.gz<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>psql<span class="w"> </span>-d<span class="w"> </span>colony_inspect
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Create a throwaway DB and load the dump into it</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>createdb<span class="w"> </span>colony_inspect
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>gunzip<span class="w"> </span>-c<span class="w"> </span>~/.colony/db-backup/colony_db-20260504T091522Z.sql.gz<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>psql<span class="w"> </span>-d<span class="w"> </span>colony_inspect
 </code></pre></div>
 <h2 id="using-the-claude-code-skills">Using the Claude Code Skills</h2>
 <p>If you're working in <a href="https://claude.com/claude-code">Claude Code</a>, the
@@ -1300,22 +1393,22 @@ when Claude Code is invoked from the repo root.</p>
 <h3 id="backup-db"><code>/backup-db</code></h3>
 <p>Asks which namespace to back up (defaults to <code>colony-app</code>), then runs
 <code>scripts/backup-db.sh</code> and reports the output path and size.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>/backup-db
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>/backup-db
 </code></pre></div>
 <p>You can pre-fill the namespace as a free-form argument and skip the
 prompt:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>/backup-db from my colony-app (production) namespace
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>/backup-db colony-dev
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>/backup-db from my colony-app (production) namespace
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>/backup-db colony-dev
 </code></pre></div>
 <h3 id="restore-db"><code>/restore-db</code></h3>
 <p>Asks which namespace to restore into (defaults to <code>colony-dev</code>), then
 asks which backup file to use (most recent first), then runs
 <code>scripts/restore-db.sh -y</code> against your selection.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>/restore-db
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>/restore-db
 </code></pre></div>
 <p>Pre-fill both choices as a free-form argument to skip the prompts —
 useful for the common "restore the latest prod backup into dev" case:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>/restore-db restore the latest database backup to my dev environment
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>/restore-db restore the latest database backup to my dev environment
 </code></pre></div>
 <p>Picking <code>colony-app</code> will trigger an extra confirmation step before the
 script runs, since it wipes production data.</p>
@@ -1332,21 +1425,103 @@ script runs, since it wipes production data.</p>
 </ul>
 <h2 id="verifying-a-backup">Verifying a Backup</h2>
 <p>Quick sanity checks that don't require a restore:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># Make sure the file is non-empty and is a valid gzip stream</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>gzip<span class="w"> </span>-t<span class="w"> </span>~/.colony/db-backup/colony_db-20260504T091522Z.sql.gz<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;gzip OK&quot;</span>
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="c1"># Peek at the SQL header to confirm pg_dump produced it</span>
-<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>gunzip<span class="w"> </span>-c<span class="w"> </span>~/.colony/db-backup/colony_db-20260504T091522Z.sql.gz<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-20
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># Make sure the file is non-empty and is a valid gzip stream</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>gzip<span class="w"> </span>-t<span class="w"> </span>~/.colony/db-backup/colony_db-20260504T091522Z.sql.gz<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;gzip OK&quot;</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="c1"># Peek at the SQL header to confirm pg_dump produced it</span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>gunzip<span class="w"> </span>-c<span class="w"> </span>~/.colony/db-backup/colony_db-20260504T091522Z.sql.gz<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-20
 </code></pre></div>
 <p>A healthy file starts with a <code>-- PostgreSQL database dump</code> comment
 block and lists <code>SET</code> statements before any <code>CREATE TABLE</code> lines.</p>
+<h2 id="scheduling-daily-backups-systemd-timer">Scheduling Daily Backups (systemd timer)</h2>
+<p>For an unattended daily backup that also caps disk usage, wire the
+script into a <strong>systemd user timer</strong> that calls it with <code>--keep 30</code>.
+The user timer runs as your Linux user, so it inherits the same
+<code>kubectl</code> config you use interactively — no extra credentials or
+service accounts.</p>
+<blockquote>
+<p><strong>WSL2 users:</strong> systemd must be enabled. Add the following to
+<code>/etc/wsl.conf</code> (creating the file if needed) and run
+<code>wsl --shutdown</code> from PowerShell to apply:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">[boot]</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="na">systemd</span><span class="o">=</span><span class="s">true</span>
+</code></pre></div>
+</blockquote>
+<h3 id="1-create-the-service-unit">1. Create the service unit</h3>
+<p><code>~/.config/systemd/user/colony-backup.service</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">[Unit]</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="na">Description</span><span class="o">=</span><span class="s">Colony PostgreSQL daily backup</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="na">Wants</span><span class="o">=</span><span class="s">network-online.target</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="na">After</span><span class="o">=</span><span class="s">network-online.target</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="k">[Service]</span>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="na">Type</span><span class="o">=</span><span class="s">oneshot</span>
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="c1"># Adjust the path if your clone lives somewhere other than ~/repos/colony.</span>
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="na">ExecStart</span><span class="o">=</span><span class="s">%h/repos/colony/scripts/backup-db.sh --keep 30</span>
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="c1"># User services inherit your shell environment, so kubectl and</span>
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a><span class="c1"># KUBECONFIG usually resolve automatically. Uncomment and adjust if</span>
+<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a><span class="c1"># kubectl is in a non-standard location or you use a custom kubeconfig:</span>
+<a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a><span class="c1"># Environment=PATH=/usr/local/bin:/usr/bin:/bin</span>
+<a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a><span class="c1"># Environment=KUBECONFIG=%h/.kube/config</span>
+</code></pre></div>
+<h3 id="2-create-the-timer-unit">2. Create the timer unit</h3>
+<p><code>~/.config/systemd/user/colony-backup.timer</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">[Unit]</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="na">Description</span><span class="o">=</span><span class="s">Run Colony PostgreSQL backup daily</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="na">Requires</span><span class="o">=</span><span class="s">colony-backup.service</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="k">[Timer]</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="na">OnCalendar</span><span class="o">=</span><span class="s">daily</span>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="na">Persistent</span><span class="o">=</span><span class="s">true</span>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="na">RandomizedDelaySec</span><span class="o">=</span><span class="s">10m</span>
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="k">[Install]</span>
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a><span class="na">WantedBy</span><span class="o">=</span><span class="s">timers.target</span>
+</code></pre></div>
+<p><code>Persistent=true</code> makes systemd run a missed backup as soon as the
+machine wakes up (e.g. after the laptop was closed past midnight).
+<code>RandomizedDelaySec</code> jitters the start time so concurrent timers don't
+all fire at exactly 00:00.</p>
+<h3 id="3-enable-the-timer">3. Enable the timer</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>systemctl<span class="w"> </span>--user<span class="w"> </span>daemon-reload
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>systemctl<span class="w"> </span>--user<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>--now<span class="w"> </span>colony-backup.timer
+</code></pre></div>
+<p>If you want backups to keep running while you're logged out, enable
+linger for your user (this only needs to be done once):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>sudo<span class="w"> </span>loginctl<span class="w"> </span>enable-linger<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$USER</span><span class="s2">&quot;</span>
+</code></pre></div>
+<h3 id="4-verify">4. Verify</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1"># Show next/previous run times</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>systemctl<span class="w"> </span>--user<span class="w"> </span>list-timers<span class="w"> </span>colony-backup.timer
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="c1"># Trigger a run now to confirm the unit works end-to-end</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>systemctl<span class="w"> </span>--user<span class="w"> </span>start<span class="w"> </span>colony-backup.service
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="c1"># Tail the most recent run&#39;s logs</span>
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>journalctl<span class="w"> </span>--user<span class="w"> </span>-u<span class="w"> </span>colony-backup.service<span class="w"> </span>-n<span class="w"> </span><span class="m">50</span><span class="w"> </span>--no-pager
+</code></pre></div>
+<p>A healthy run ends with <code>Backup OK (...)</code> and, once you have more than
+30 archives, a <code>Pruning N old backup(s) (keeping 30).</code> line.</p>
+<h3 id="targeting-a-different-namespace">Targeting a different namespace</h3>
+<p>The unit hard-codes the default <code>colony-app</code> namespace. To back up a
+different one, drop a unit override:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>systemctl<span class="w"> </span>--user<span class="w"> </span>edit<span class="w"> </span>colony-backup.service
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">[Service]</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="na">Environment</span><span class="o">=</span><span class="s">COLONY_NAMESPACE=colony-staging</span>
+</code></pre></div>
+<p>Then <code>systemctl --user daemon-reload</code> and the next run will use it.</p>
 <h2 id="housekeeping">Housekeeping</h2>
-<p>The script never deletes old backups. Periodically prune the folder
-to reclaim disk:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># Keep the 30 most recent archives, delete the rest</span>
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>ls<span class="w"> </span>-1t<span class="w"> </span>~/.colony/db-backup/*.sql.gz<span class="w"> </span><span class="p">|</span><span class="w"> </span>tail<span class="w"> </span>-n<span class="w"> </span>+31<span class="w"> </span><span class="p">|</span><span class="w"> </span>xargs<span class="w"> </span>-r<span class="w"> </span>rm<span class="w"> </span>--
+<p>When you run the script with <code>--keep N</code> (as the systemd timer above
+does), pruning happens automatically after each successful backup —
+nothing else to do.</p>
+<p>For ad-hoc / manual runs the script keeps every archive forever, so
+periodically prune the folder by hand:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1"># Keep the 30 most recent archives, delete the rest</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>ls<span class="w"> </span>-1t<span class="w"> </span>~/.colony/db-backup/*.sql.gz<span class="w"> </span><span class="p">|</span><span class="w"> </span>tail<span class="w"> </span>-n<span class="w"> </span>+31<span class="w"> </span><span class="p">|</span><span class="w"> </span>xargs<span class="w"> </span>-r<span class="w"> </span>rm<span class="w"> </span>--
 </code></pre></div>
 
 
