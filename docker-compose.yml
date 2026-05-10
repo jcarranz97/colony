@@ -74,6 +74,17 @@ services:
       - backend
     restart: unless-stopped
 
+  docs:
+    image: squidfunk/mkdocs-material:latest
+    container_name: colony-docs
+    volumes:
+      - ./docs:/docs/docs
+      - ./mkdocs.yml:/docs/mkdocs.yml
+    ports:
+      - "2011:2011"
+    command: serve --dev-addr=0.0.0.0:2011
+    restart: unless-stopped
+
   # Optional: pgAdmin for database management
   # pgadmin:
   #   image: dpage/pgadmin4:latest
