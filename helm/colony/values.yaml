@@ -94,6 +94,29 @@ frontend:
     cookieSecure: "false"
 
 # ---------------------------------------------------------------------------
+# Ingress (Traefik on k3s)
+# ---------------------------------------------------------------------------
+# When enabled, creates Ingress resources for the frontend and backend
+# Services so they can be reached by hostname (e.g. http://colony.dev.lan)
+# instead of by IP and NodePort.
+#
+# Hostnames must resolve to the ingress controller's external IP — set this
+# up via Pi-hole (recommended for LAN-wide coverage) or per-host /etc/hosts
+# entries on each client machine.
+#
+# When enabling, you typically also need to:
+#   - point frontend.env.apiUrl at the backend hostname
+#     (e.g. "http://api.colony.dev.lan/api/v1")
+#   - add the frontend hostname to backend.env.allowedHosts
+ingress:
+  enabled: false
+  ingressClassName: traefik
+  frontend:
+    host: ""   # e.g. colony.dev.lan
+  backend:
+    host: ""   # e.g. api.colony.dev.lan
+
+# ---------------------------------------------------------------------------
 # PostgreSQL
 # ---------------------------------------------------------------------------
 postgresql:
