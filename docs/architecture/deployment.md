@@ -305,28 +305,28 @@ docker push 192.168.1.206:30002/colony/colony-frontend:1.0.0
 
 ### Step 3 — Install with Helm
 
-Create the namespace and install the chart. Override the three sensitive
-values on the command line (or use a custom `values.yaml` file):
+Configuration goes in a custom `my-values.yaml` file. Two starting
+templates follow — **Option 1** with Ingress for hostname-based access,
+**Option 2** with NodePort-only access. Both are valid; you can migrate
+from one to the other later via `helm upgrade`.
 
-```bash
-helm install colony ./helm/colony \
-  --namespace colony-app \
-  --create-namespace \
-  --set image.registry=192.168.1.206:30002 \
-  --set backend.image.repository=colony/colony-backend \
-  --set backend.image.tag=1.0.0 \
-  --set frontend.image.repository=colony/colony-frontend \
-  --set frontend.image.tag=1.0.0 \
-  --set backend.env.secretKey="$(python3 -c 'import secrets; print(secrets.token_hex(32))')" \
-  --set postgresql.password="your-strong-db-password" \
-  --set backend.env.defaultAdminPassword="your-admin-password" \
-  --set backend.env.allowedHosts='["http://192.168.1.206:30080"]'
-```
+> **Why a values file rather than `--set` flags?** Helm's `--set` parser
+> treats commas as key/value delimiters, so settings that contain commas
+> (notably the JSON `allowedHosts` array) fail to parse with
+> `Error: failed parsing --set data: key "..." has no value`. A values
+> file is immune to this and to most shell-quoting traps. Same on Helm
+> 3.x and 4.x.
 
-Or with a custom values file (recommended for reproducibility):
+#### Option 1 — NodePort + Ingress (recommended)
 
-```yaml
-# my-values.yaml
+Reach the app at clean hostnames like `http://colony.dev.lan` and
+`http://api.colony.dev.lan`, served by Traefik (which ships with k3s by
+default). Requires DNS resolution for those names — see
+[*Step 7 — Switching Between NodePort and Ingress*](#step-7--optional-switching-between-nodeport-and-ingress)
+for `/etc/hosts` setup or the homelab's
+[Pi-hole guide](https://github.com/jcarranz97/homelab/blob/main/docs/guides/pi-hole-setup.md).
+
+```yaml title="my-values.yaml — with Ingress"
 image:
   registry: "192.168.1.206:30002"
 
@@ -334,6 +334,58 @@ backend:
   image:
     repository: colony/colony-backend
     tag: "1.0.0"
+  port: 8000
+  service:
+    type: NodePort
+    nodePort: 30800
+  env:
+    secretKey: "your-long-random-secret-here"
+    # CORS: include both Ingress hostname and NodePort URL during transition.
+    allowedHosts: '["http://colony.dev.lan","http://192.168.1.206:30080"]'
+    defaultAdminPassword: "your-admin-password"
+
+frontend:
+  image:
+    repository: colony/colony-frontend
+    tag: "1.0.0"
+  port: 3000
+  service:
+    type: NodePort
+    nodePort: 30080
+  env:
+    # Browser-side URL the JS calls. Use the Ingress hostname.
+    apiUrl: "http://api.colony.dev.lan/api/v1"
+
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  frontend:
+    host: colony.dev.lan
+  backend:
+    host: api.colony.dev.lan
+
+postgresql:
+  password: "your-strong-db-password"
+```
+
+#### Option 2 — NodePort only (no Ingress)
+
+Reach the app at `http://<node-ip>:<nodePort>`. Simpler — no DNS or
+ingress controller assumptions. This is also the default if you omit the
+`ingress` block entirely.
+
+```yaml title="my-values.yaml — NodePort only"
+image:
+  registry: "192.168.1.206:30002"
+
+backend:
+  image:
+    repository: colony/colony-backend
+    tag: "1.0.0"
+  port: 8000
+  service:
+    type: NodePort
+    nodePort: 30800
   env:
     secretKey: "your-long-random-secret-here"
     allowedHosts: '["http://192.168.1.206:30080"]'
@@ -343,6 +395,10 @@ frontend:
   image:
     repository: colony/colony-frontend
     tag: "1.0.0"
+  port: 3000
+  service:
+    type: NodePort
+    nodePort: 30080
   env:
     apiUrl: "http://192.168.1.206:30800/api/v1"
 
@@ -350,12 +406,26 @@ postgresql:
   password: "your-strong-db-password"
 ```
 
+#### Install
+
+Whichever file you used:
+
 ```bash
 helm install colony ./helm/colony \
   --namespace colony-app \
   --create-namespace \
   -f my-values.yaml
 ```
+
+> **Tip — separate values files per environment.** Keep distinct files
+> for dev and prod (e.g. `~/homelab/colony-dev/my-values.yaml` and
+> `~/homelab/colony-prod/my-values.yaml`) with their own NodePort numbers,
+> hostnames, and image tags. They install with the same chart but
+> different `--namespace` and `-f`. To make dev/prod resource names
+> distinct in the cluster, use distinct release names too —
+> `helm install colony-dev …` vs `helm install colony-prod …` — which
+> propagates through every templated resource via
+> `{{ include "colony.fullname" . }}`.
 
 #### Step 4 — Optional: Harbor Pull Secret
 
@@ -407,6 +477,112 @@ kubectl get svc -n colony-app
 The default admin credentials are whatever you set in
 `backend.env.defaultAdminUsername` / `backend.env.defaultAdminPassword`
 (defaults: `admin` / `colony-admin`).
+
+---
+
+### Step 7 — Optional: Switching Between NodePort and Ingress
+
+If you installed with **Option 1** (Ingress already enabled in
+`my-values.yaml`), the chart has already created the Ingress resources;
+skip ahead to *7b* for DNS setup.
+
+If you installed with **Option 2** (NodePort-only) and later want
+hostname access, edit `my-values.yaml` to enable the Ingress block and
+update the URLs the frontend and backend use:
+
+```yaml
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  frontend:
+    host: colony.dev.lan
+  backend:
+    host: api.colony.dev.lan
+
+backend:
+  env:
+    # Both Ingress hostname and NodePort URL — coexist during the switch.
+    allowedHosts: '["http://colony.dev.lan","http://192.168.1.206:30080"]'
+
+frontend:
+  env:
+    apiUrl: "http://api.colony.dev.lan/api/v1"
+```
+
+Apply:
+
+```bash
+helm upgrade colony ./helm/colony \
+  --namespace colony-app \
+  -f my-values.yaml
+```
+
+#### 7a. Verify Traefik and the Ingress resources
+
+k3s ships Traefik preinstalled — no extra install is needed. Sanity check
+the controller and the Ingresses created by the chart:
+
+```bash
+kubectl get ingressclass
+# NAME      CONTROLLER                      AGE
+# traefik   traefik.io/ingress-controller   ...
+
+kubectl get svc -n kube-system traefik
+# TYPE           EXTERNAL-IP                   PORT(S)
+# LoadBalancer   192.168.1.206,192.168.1.208   80:32103/TCP,443:32192/TCP
+
+kubectl get ingress -n colony-app
+# NAME              CLASS     HOSTS                ADDRESS                       PORTS
+# colony-frontend   traefik   colony.dev.lan       192.168.1.206,192.168.1.208   80
+# colony-backend    traefik   api.colony.dev.lan   192.168.1.206,192.168.1.208   80
+```
+
+The Ingress resource names follow `{{ release-name }}-frontend` /
+`-backend`, so a release named `colony-dev` would produce
+`colony-dev-frontend` / `colony-dev-backend`.
+
+#### 7b. Resolve the hostnames
+
+Until a LAN-wide DNS server is in place, add entries on each client
+machine that needs access. **`/etc/hosts` does not support wildcards** —
+list each hostname explicitly, one per line (or space-separated on a
+single line):
+
+```text
+192.168.1.206  colony.dev.lan api.colony.dev.lan
+```
+
+For a permanent solution that covers every device on the network with a
+single `*.dev.lan` wildcard rule, see the homelab guide
+[Pi-hole Local DNS Setup](https://github.com/jcarranz97/homelab/blob/main/docs/guides/pi-hole-setup.md).
+
+#### 7c. Verify end-to-end
+
+```bash
+getent hosts colony.dev.lan          # → 192.168.1.206
+getent hosts api.colony.dev.lan      # → 192.168.1.206
+
+curl -I http://colony.dev.lan        # → HTTP/1.1 200 OK
+curl http://api.colony.dev.lan/health
+```
+
+Open `http://colony.dev.lan` in a browser and log in. The frontend's
+JavaScript will call the backend at `http://api.colony.dev.lan/api/v1`.
+
+> **NodePort still works — but only if the browser has DNS for the
+> hostname.** Once `apiUrl` points at `api.colony.dev.lan`, accessing the
+> frontend via `http://192.168.1.206:30080` still serves the page, but
+> its API calls will fail unless that browser can also resolve
+> `api.colony.dev.lan` (via `/etc/hosts` or Pi-hole). For machines without
+> DNS for the new names, keep using the NodePort URLs end-to-end.
+
+> **HTTPS and `cookieSecure`.** This Ingress serves plain HTTP, so leave
+> `frontend.env.cookieSecure: "false"` (the chart default) — `Secure`
+> cookies are dropped over HTTP and break login. When you later add TLS
+> to Traefik (cert-manager + Let's Encrypt, or self-signed via mkcert),
+> flip `cookieSecure` to `"true"`. See *Login succeeds (backend returns
+> 200) but the app redirects back to login* in the troubleshooting
+> section below for context.
 
 ---
 
@@ -537,6 +713,7 @@ The chart lives at `helm/colony/`. Key files:
 | `templates/postgres-*.yaml` | PostgreSQL Deployment, Service, PVC |
 | `templates/backend-*.yaml` | FastAPI Deployment + NodePort Service |
 | `templates/frontend-*.yaml` | Next.js Deployment + NodePort Service |
+| `templates/ingress.yaml` | Frontend + backend Ingresses (gated by `ingress.enabled`) |
 | `templates/seeder-job.yaml` | Optional seed data Job (post-install) |
 
 #### Key values
@@ -553,6 +730,9 @@ The chart lives at `helm/colony/`. Key files:
 | `backend.env.allowedHosts` | `["http://192.168.1.206:30080"]` | CORS origins |
 | `postgresql.password` | *(must set)* | Database password |
 | `postgresql.persistence.size` | `5Gi` | PVC size for Postgres |
+| `ingress.enabled` | `false` | Create Ingress resources for frontend + backend |
+| `ingress.frontend.host` | `""` | Frontend hostname (e.g. `colony.dev.lan`) |
+| `ingress.backend.host` | `""` | Backend hostname (e.g. `api.colony.dev.lan`) |
 | `seeder.enabled` | `false` | Enable sample data seeder |
 
 ---

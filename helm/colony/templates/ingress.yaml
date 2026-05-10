@@ -1,0 +1,45 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "colony.fullname" . }}-frontend
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "colony.labels" . | nindent 4 }}
+    app.kubernetes.io/component: frontend
+spec:
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
+  rules:
+    - host: {{ required "ingress.frontend.host is required when ingress.enabled is true" .Values.ingress.frontend.host | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "colony.fullname" . }}-frontend
+                port:
+                  number: {{ .Values.frontend.port }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "colony.fullname" . }}-backend
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "colony.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backend
+spec:
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
+  rules:
+    - host: {{ required "ingress.backend.host is required when ingress.enabled is true" .Values.ingress.backend.host | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "colony.fullname" . }}-backend
+                port:
+                  number: {{ .Values.backend.port }}
+{{- end }}
