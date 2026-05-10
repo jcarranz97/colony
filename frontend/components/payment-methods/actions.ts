@@ -1,6 +1,7 @@
 import { getAuthToken } from "@/actions/auth.action";
 import {
   fetchPaymentMethods,
+  fetchPaymentMethod,
   createPaymentMethod,
   updatePaymentMethod,
   deletePaymentMethod,
@@ -19,6 +20,9 @@ export const getCurrentUserAction = async () => getCurrentUser(await token());
 
 export const getPaymentMethods = async (includeInactive = false) =>
   fetchPaymentMethods(await token(), includeInactive);
+
+export const getPaymentMethod = async (id: string) =>
+  fetchPaymentMethod(id, await token());
 
 export const addPaymentMethod = async (payload: CreatePaymentMethodRequest) =>
   createPaymentMethod(payload, await token());

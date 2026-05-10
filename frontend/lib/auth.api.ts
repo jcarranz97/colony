@@ -58,6 +58,13 @@ export async function listUsers(
   return apiClient<UserResponse[]>("/auth/users", { token });
 }
 
+export async function getUser(
+  token: string,
+  userId: string,
+): Promise<ApiResponse<UserResponse>> {
+  return apiClient<UserResponse>(`/auth/users/${userId}`, { token });
+}
+
 export async function createUser(
   token: string,
   data: AdminCreateUserRequest,

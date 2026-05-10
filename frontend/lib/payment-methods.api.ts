@@ -13,6 +13,9 @@ export const fetchPaymentMethods = (token: string, includeInactive = false) =>
     { token },
   );
 
+export const fetchPaymentMethod = (id: string, token: string) =>
+  apiClient<PaymentMethod>(`/payment-methods/${id}`, { token });
+
 export const createPaymentMethod = (
   payload: CreatePaymentMethodRequest,
   token: string,

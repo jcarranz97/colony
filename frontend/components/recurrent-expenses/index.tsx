@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type {
   RecurrentExpense,
@@ -93,7 +94,11 @@ function TemplateCard({
 }) {
   const isFixed = template.category === "fixed";
   return (
-    <div className="nb-template-card">
+    <Link
+      href={`/recurrent-expenses/${template.id}`}
+      className="nb-template-card"
+      style={{ textDecoration: "none", color: "inherit", cursor: "pointer" }}
+    >
       {/* Category icon */}
       <div
         style={{
@@ -187,14 +192,24 @@ function TemplateCard({
         </div>
       </div>
 
-      {/* Action buttons */}
       <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-        <button style={iconBtn} onClick={() => onEdit(template)}>
+        <button
+          style={iconBtn}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onEdit(template);
+          }}
+        >
           Edit
         </button>
         <button
           style={{ ...iconBtn, color: "var(--cover-bg)" }}
-          onClick={() => onDuplicate(template)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onDuplicate(template);
+          }}
           title="Duplicate this template"
         >
           Duplicate
@@ -205,13 +220,17 @@ function TemplateCard({
             color: "rgba(220,53,69,0.7)",
             border: "1px solid rgba(220,53,69,0.35)",
           }}
-          onClick={() => onTrash(template)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onTrash(template);
+          }}
           title="Move to trash"
         >
           🗑 Trash
         </button>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -320,7 +339,7 @@ function TrashedTemplateCard({
 
 // ── Confirm Trash Modal ───────────────────────────────────────────────────────
 
-function ConfirmTrashModal({
+export function ConfirmTrashModal({
   isOpen,
   onClose,
   template,
@@ -504,7 +523,7 @@ function RecurrenceFields({
 
 // ── Template Modal (Add / Edit) ───────────────────────────────────────────────
 
-interface TemplateForm {
+export interface TemplateForm {
   description: string;
   base_amount: string;
   currency: CurrencyCode;
@@ -523,7 +542,7 @@ const DEFAULT_CONFIG: Record<RecurrenceType, Record<string, unknown>> = {
   custom: { interval: 1, unit: "days" },
 };
 
-function TemplateModal({
+export function TemplateModal({
   isOpen,
   title,
   initial,
@@ -802,7 +821,7 @@ function TemplateModal({
 
 type FilterType = "all" | "fixed" | "variable";
 
-const BLANK_FORM: TemplateForm = {
+export const BLANK_FORM: TemplateForm = {
   description: "",
   base_amount: "",
   currency: "USD",
@@ -814,7 +833,7 @@ const BLANK_FORM: TemplateForm = {
   payment_method_id: "",
 };
 
-function templateToForm(t: RecurrentExpense): TemplateForm {
+export function templateToForm(t: RecurrentExpense): TemplateForm {
   return {
     description: t.description,
     base_amount: t.base_amount,
@@ -870,6 +889,14 @@ export function RecurrentExpenses() {
     setTrashTarget(null);
   };
 
+  const handleDuplicate = (template: RecurrentExpense) => {
+    setAddInitial({
+      ...templateToForm(template),
+      description: `Copy of ${template.description}`,
+    });
+    setAddOpen(true);
+  };
+
   const handleRestore = async (template: RecurrentExpense) => {
     setRestoringId(template.id);
     setRestoreError(null);
@@ -882,14 +909,6 @@ export function RecurrentExpenses() {
       setRestoreError(res.error.message);
     }
     setRestoringId(null);
-  };
-
-  const handleDuplicate = (template: RecurrentExpense) => {
-    setAddInitial({
-      ...templateToForm(template),
-      description: `Copy of ${template.description}`,
-    });
-    setAddOpen(true);
   };
 
   const handleAdd = async (form: TemplateForm): Promise<string | null> => {
@@ -1050,11 +1069,11 @@ export function RecurrentExpenses() {
         </div>
       )}
 
-      {/* Add modal */}
+      {/* Add modal (also used for Duplicate via prefilled initial) */}
       <TemplateModal
         isOpen={addOpen}
         title={
-          addInitial.description && addInitial.description.startsWith("Copy of")
+          addInitial.description.startsWith("Copy of")
             ? "Duplicate Template"
             : "New Template"
         }
@@ -1067,7 +1086,7 @@ export function RecurrentExpenses() {
           .map((t) => t.description)}
       />
 
-      {/* Edit modal */}
+      {/* Edit modal — quick inline edit from list */}
       <TemplateModal
         isOpen={!!editTarget}
         title="Edit Template"

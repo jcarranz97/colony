@@ -1,6 +1,7 @@
 import { getAuthToken } from "@/actions/auth.action";
 import {
   listUsers,
+  getUser,
   createUser,
   updateUser,
   deactivateUser,
@@ -19,6 +20,16 @@ export async function getUsersAction() {
       error: { code: "UNAUTHORIZED", message: "Not authenticated" },
     };
   return listUsers(token);
+}
+
+export async function getUserAction(userId: string) {
+  const token = await getAuthToken();
+  if (!token)
+    return {
+      success: false as const,
+      error: { code: "UNAUTHORIZED", message: "Not authenticated" },
+    };
+  return getUser(token, userId);
 }
 
 export async function createUserAction(data: AdminCreateUserRequest) {

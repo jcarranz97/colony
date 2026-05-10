@@ -13,6 +13,9 @@ export const fetchRecurrentIncomes = (token: string, includeInactive = false) =>
     { token },
   );
 
+export const fetchRecurrentIncome = (id: string, token: string) =>
+  apiClient<RecurrentIncome>(`/recurrent-incomes/${id}`, { token });
+
 export const createRecurrentIncome = (
   payload: CreateRecurrentIncomeRequest,
   token: string,

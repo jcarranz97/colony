@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import type {
   HouseholdResponse,
@@ -7,8 +8,6 @@ import type {
 import {
   listHouseholdsAction,
   createHouseholdAction,
-  updateHouseholdAction,
-  deleteHouseholdAction,
   getHouseholdMembersAction,
   addHouseholdMemberAction,
   removeHouseholdMemberAction,
@@ -16,7 +15,7 @@ import {
 
 // ── Member panel ──────────────────────────────────────────────────────────────
 
-function MemberPanel({
+export function MemberPanel({
   household,
   onClose,
 }: {
@@ -174,15 +173,6 @@ export function HouseholdsManager() {
   const [createError, setCreateError] = useState<string | null>(null);
   const [createLoading, setCreateLoading] = useState(false);
 
-  const [editTarget, setEditTarget] = useState<HouseholdResponse | null>(null);
-  const [editName, setEditName] = useState("");
-  const [editError, setEditError] = useState<string | null>(null);
-  const [editLoading, setEditLoading] = useState(false);
-
-  const [membersTarget, setMembersTarget] = useState<HouseholdResponse | null>(
-    null,
-  );
-
   const load = async () => {
     setLoading(true);
     const res = await listHouseholdsAction();
@@ -198,12 +188,6 @@ export function HouseholdsManager() {
     load();
   }, []);
 
-  const openEdit = (h: HouseholdResponse) => {
-    setEditTarget(h);
-    setEditName(h.name);
-    setEditError(null);
-  };
-
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     setCreateError(null);
@@ -217,28 +201,6 @@ export function HouseholdsManager() {
     } else {
       setCreateError(res.error.message);
     }
-  };
-
-  const handleEdit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editTarget) return;
-    setEditError(null);
-    setEditLoading(true);
-    const res = await updateHouseholdAction(editTarget.id, {
-      name: editName.trim(),
-    });
-    setEditLoading(false);
-    if (res.success) {
-      setEditTarget(null);
-      load();
-    } else {
-      setEditError(res.error.message);
-    }
-  };
-
-  const handleDelete = async (h: HouseholdResponse) => {
-    await deleteHouseholdAction(h.id);
-    load();
   };
 
   return (
@@ -261,7 +223,16 @@ export function HouseholdsManager() {
       )}
 
       {households.map((h) => (
-        <div key={h.id} className="nb-payment-card">
+        <Link
+          key={h.id}
+          href={`/households/${h.id}`}
+          className="nb-payment-card"
+          style={{
+            textDecoration: "none",
+            color: "inherit",
+            cursor: "pointer",
+          }}
+        >
           <div style={{ flex: 1 }}>
             <strong>{h.name}</strong>
             {!h.active && (
@@ -280,32 +251,18 @@ export function HouseholdsManager() {
               </span>
             )}
           </div>
-          <div style={{ display: "flex", gap: 8 }}>
-            <button
-              className="nb-btn-cancel"
-              onClick={() => setMembersTarget(h)}
-              style={{ fontSize: "0.85em" }}
-            >
-              Members
-            </button>
-            <button
-              className="nb-btn-cancel"
-              onClick={() => openEdit(h)}
-              style={{ fontSize: "0.85em" }}
-            >
-              Edit
-            </button>
-            {h.active && (
-              <button
-                className="nb-btn-cancel"
-                onClick={() => handleDelete(h)}
-                style={{ fontSize: "0.85em", color: "#c0392b" }}
-              >
-                Deactivate
-              </button>
-            )}
-          </div>
-        </div>
+          <span
+            style={{
+              fontFamily: "var(--font-hand)",
+              fontSize: 12,
+              fontWeight: 600,
+              color: "var(--ink-light)",
+              pointerEvents: "none",
+            }}
+          >
+            Open →
+          </span>
+        </Link>
       ))}
 
       {/* Create modal */}
@@ -352,57 +309,6 @@ export function HouseholdsManager() {
             </form>
           </div>
         </div>
-      )}
-
-      {/* Edit modal */}
-      {editTarget && (
-        <div className="nb-modal-backdrop">
-          <div className="nb-modal">
-            <h2 className="nb-modal-title">Edit Household</h2>
-            <form onSubmit={handleEdit}>
-              <div className="nb-form-group">
-                <label className="nb-form-label">Name *</label>
-                <input
-                  className="nb-form-input"
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  required
-                  maxLength={100}
-                />
-              </div>
-              {editError && (
-                <p style={{ color: "red", fontSize: "0.85em" }}>{editError}</p>
-              )}
-              <div className="nb-modal-actions">
-                <button
-                  type="button"
-                  className="nb-btn-cancel"
-                  onClick={() => {
-                    setEditTarget(null);
-                    setEditError(null);
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="nb-btn-primary"
-                  disabled={editLoading}
-                >
-                  {editLoading ? "Saving…" : "Save"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Members panel */}
-      {membersTarget && (
-        <MemberPanel
-          household={membersTarget}
-          onClose={() => setMembersTarget(null)}
-        />
       )}
     </div>
   );

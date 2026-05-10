@@ -2,6 +2,7 @@ import { getAuthToken } from "@/actions/auth.action";
 import {
   listHouseholds,
   createHousehold,
+  getHousehold,
   updateHousehold,
   deleteHousehold,
   getHouseholdMembers,
@@ -21,6 +22,9 @@ async function token() {
 }
 
 export const listHouseholdsAction = async () => listHouseholds(await token());
+
+export const getHouseholdAction = async (id: string) =>
+  getHousehold(id, await token());
 
 export const createHouseholdAction = async (payload: CreateHouseholdRequest) =>
   createHousehold(payload, await token());

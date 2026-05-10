@@ -20,6 +20,9 @@ export const fetchCycles = (token: string, includeInactive = false) =>
     { token },
   );
 
+export const fetchCycle = (id: string, token: string) =>
+  apiClient<Cycle>(`/cycles/${id}`, { token });
+
 export const restoreCycle = (id: string, token: string) =>
   apiClient<Cycle>(`/cycles/${id}/restore`, { method: "PUT", token });
 
