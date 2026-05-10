@@ -1940,8 +1940,8 @@ export function Cycles() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [addCycleOpen, setAddCycleOpen] = useState(false);
-  const [renameTarget, setRenameTarget] = useState<Cycle | null>(null);
-  const [trashTarget, setTrashTarget] = useState<Cycle | null>(null);
+  const [renameCycle, setRenameCycle] = useState<Cycle | null>(null);
+  const [trashCycle, setTrashCycle] = useState<Cycle | null>(null);
 
   useEffect(() => {
     getCurrentUserAction().then(async (userRes) => {
@@ -1979,7 +1979,7 @@ export function Cycles() {
 
   const handleCycleRenamed = (updated: Cycle) => {
     setCycles((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
-    setRenameTarget(null);
+    setRenameCycle(null);
   };
 
   const handleCycleTrashed = (cycleId: string) => {
@@ -1988,7 +1988,7 @@ export function Cycles() {
     if (trashed && isAdmin) {
       setTrashedCycles((prev) => [{ ...trashed, active: false }, ...prev]);
     }
-    setTrashTarget(null);
+    setTrashCycle(null);
   };
 
   const handleCycleRestored = async (cycle: Cycle) => {
@@ -2033,8 +2033,8 @@ export function Cycles() {
               key={c.id}
               cycle={c}
               summary={summaries[c.id] ?? null}
-              onRename={setRenameTarget}
-              onTrash={setTrashTarget}
+              onRename={setRenameCycle}
+              onTrash={setTrashCycle}
             />
           ))}
         </div>
@@ -2071,19 +2071,17 @@ export function Cycles() {
         existingNames={cycles.map((c) => c.name)}
       />
 
-      {/* Rename modal — quick inline rename from list */}
       <RenameCycleModal
-        isOpen={renameTarget !== null}
-        onClose={() => setRenameTarget(null)}
-        cycle={renameTarget}
+        isOpen={renameCycle !== null}
+        onClose={() => setRenameCycle(null)}
+        cycle={renameCycle}
         onRenamed={handleCycleRenamed}
       />
 
-      {/* Confirm trash modal — quick inline trash from list */}
       <ConfirmTrashModal
-        isOpen={trashTarget !== null}
-        onClose={() => setTrashTarget(null)}
-        cycle={trashTarget}
+        isOpen={trashCycle !== null}
+        onClose={() => setTrashCycle(null)}
+        cycle={trashCycle}
         onConfirmed={handleCycleTrashed}
       />
     </>

@@ -889,14 +889,6 @@ export function RecurrentExpenses() {
     setTrashTarget(null);
   };
 
-  const handleDuplicate = (template: RecurrentExpense) => {
-    setAddInitial({
-      ...templateToForm(template),
-      description: `Copy of ${template.description}`,
-    });
-    setAddOpen(true);
-  };
-
   const handleRestore = async (template: RecurrentExpense) => {
     setRestoringId(template.id);
     setRestoreError(null);
@@ -909,6 +901,14 @@ export function RecurrentExpenses() {
       setRestoreError(res.error.message);
     }
     setRestoringId(null);
+  };
+
+  const handleDuplicate = (template: RecurrentExpense) => {
+    setAddInitial({
+      ...templateToForm(template),
+      description: `Copy of ${template.description}`,
+    });
+    setAddOpen(true);
   };
 
   const handleAdd = async (form: TemplateForm): Promise<string | null> => {
@@ -1069,11 +1069,11 @@ export function RecurrentExpenses() {
         </div>
       )}
 
-      {/* Add modal (also used for Duplicate via prefilled initial) */}
+      {/* Add modal */}
       <TemplateModal
         isOpen={addOpen}
         title={
-          addInitial.description.startsWith("Copy of")
+          addInitial.description && addInitial.description.startsWith("Copy of")
             ? "Duplicate Template"
             : "New Template"
         }
@@ -1086,7 +1086,7 @@ export function RecurrentExpenses() {
           .map((t) => t.description)}
       />
 
-      {/* Edit modal — quick inline edit from list */}
+      {/* Edit modal */}
       <TemplateModal
         isOpen={!!editTarget}
         title="Edit Template"

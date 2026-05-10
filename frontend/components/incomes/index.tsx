@@ -800,14 +800,6 @@ export function Incomes() {
     setTrashTarget(null);
   };
 
-  const handleDuplicate = (income: RecurrentIncome) => {
-    setAddInitial({
-      ...incomeToForm(income),
-      description: `Copy of ${income.description}`,
-    });
-    setAddOpen(true);
-  };
-
   const handleRestore = async (income: RecurrentIncome) => {
     setRestoringId(income.id);
     setRestoreError(null);
@@ -820,6 +812,14 @@ export function Incomes() {
       setRestoreError(res.error.message);
     }
     setRestoringId(null);
+  };
+
+  const handleDuplicate = (income: RecurrentIncome) => {
+    setAddInitial({
+      ...incomeToForm(income),
+      description: `Copy of ${income.description}`,
+    });
+    setAddOpen(true);
   };
 
   const handleAdd = async (form: IncomeForm): Promise<string | null> => {
@@ -956,7 +956,6 @@ export function Incomes() {
         </div>
       )}
 
-      {/* Add modal (also used for Duplicate via prefilled initial) */}
       <IncomeModal
         isOpen={addOpen}
         title={
@@ -971,7 +970,6 @@ export function Incomes() {
         existingNames={activeIncomes.map((i) => i.description)}
       />
 
-      {/* Edit modal — quick inline edit from list */}
       <IncomeModal
         isOpen={!!editTarget}
         title="Edit Recurrent Income"
@@ -981,7 +979,6 @@ export function Incomes() {
         onSave={handleEdit}
       />
 
-      {/* Confirm trash modal */}
       <ConfirmTrashModal
         isOpen={trashTarget !== null}
         onClose={() => setTrashTarget(null)}
