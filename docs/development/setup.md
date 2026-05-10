@@ -75,10 +75,10 @@ log in and start using the app immediately without making any manual API calls.
 
 ### Default dev credentials
 
-| Field    | Value              |
-|----------|--------------------|
-| Email    | `dev@colony.local` |
-| Password | `colony123`        |
+| Field    | Value       |
+|----------|-------------|
+| Username | `devuser`   |
+| Password | `colony123` |
 
 These credentials are ready to use as-is for local development. If you prefer
 your own, edit `seed_data.yaml` **before** running `docker-compose up` for the
