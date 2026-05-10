@@ -124,12 +124,8 @@ export default function PaymentMethodDetailPage() {
 
   return (
     <>
-      <button
-        className="nb-btn-cancel"
-        onClick={handleBack}
-        style={{ marginBottom: 16 }}
-      >
-        ← Back
+      <button className="nb-back-btn" onClick={handleBack}>
+        ← Back to payment methods
       </button>
 
       <div className="nb-page-title">{formatPaymentMethodName(method)}</div>

@@ -186,12 +186,8 @@ export default function RecurrentExpenseDetailPage() {
 
   return (
     <>
-      <button
-        className="nb-btn-cancel"
-        onClick={handleBack}
-        style={{ marginBottom: 16 }}
-      >
-        ← Back
+      <button className="nb-back-btn" onClick={handleBack}>
+        ← Back to recurrent expenses
       </button>
 
       <div className="nb-page-title">{template.description}</div>

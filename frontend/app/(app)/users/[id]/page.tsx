@@ -136,12 +136,8 @@ export default function UserDetailPage() {
 
   return (
     <>
-      <button
-        className="nb-btn-cancel"
-        onClick={handleBack}
-        style={{ marginBottom: 16 }}
-      >
-        ← Back
+      <button className="nb-back-btn" onClick={handleBack}>
+        ← Back to users
       </button>
 
       <div className="nb-page-title">{displayName()}</div>

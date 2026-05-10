@@ -114,12 +114,8 @@ export default function HouseholdDetailPage() {
 
   return (
     <>
-      <button
-        className="nb-btn-cancel"
-        onClick={handleBack}
-        style={{ marginBottom: 16 }}
-      >
-        ← Back
+      <button className="nb-back-btn" onClick={handleBack}>
+        ← Back to households
       </button>
 
       <div className="nb-page-title">{household.name}</div>
