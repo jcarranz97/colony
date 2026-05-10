@@ -992,6 +992,39 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#option-1-nodeport-ingress-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 1 — NodePort + Ingress (recommended)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-2-nodeport-only-no-ingress" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 2 — NodePort only (no Ingress)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#install" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#step-4-optional-harbor-pull-secret" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1026,6 +1059,56 @@
       
     </span>
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-7-optional-switching-between-nodeport-and-ingress" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 7 — Optional: Switching Between NodePort and Ingress
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 7 — Optional: Switching Between NodePort and Ingress">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#7a-verify-traefik-and-the-ingress-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7a. Verify Traefik and the Ingress resources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7b-resolve-the-hostnames" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7b. Resolve the hostnames
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7c-verify-end-to-end" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7c. Verify end-to-end
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1653,50 +1736,117 @@ by Helm as a container environment variable.</p>
 </code></pre></div>
 <hr />
 <h3 id="step-3-install-with-helm">Step 3 — Install with Helm</h3>
-<p>Create the namespace and install the chart. Override the three sensitive
-values on the command line (or use a custom <code>values.yaml</code> file):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>helm<span class="w"> </span>install<span class="w"> </span>colony<span class="w"> </span>./helm/colony<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span>--namespace<span class="w"> </span>colony-app<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span>--create-namespace<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">  </span>--set<span class="w"> </span>image.registry<span class="o">=</span><span class="m">192</span>.168.1.206:30002<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">  </span>--set<span class="w"> </span>backend.image.repository<span class="o">=</span>colony/colony-backend<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="w">  </span>--set<span class="w"> </span>backend.image.tag<span class="o">=</span><span class="m">1</span>.0.0<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="w">  </span>--set<span class="w"> </span>frontend.image.repository<span class="o">=</span>colony/colony-frontend<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="w">  </span>--set<span class="w"> </span>frontend.image.tag<span class="o">=</span><span class="m">1</span>.0.0<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="w">  </span>--set<span class="w"> </span>backend.env.secretKey<span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span>python3<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;import secrets; print(secrets.token_hex(32))&#39;</span><span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="w">  </span>--set<span class="w"> </span>postgresql.password<span class="o">=</span><span class="s2">&quot;your-strong-db-password&quot;</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="w">  </span>--set<span class="w"> </span>backend.env.defaultAdminPassword<span class="o">=</span><span class="s2">&quot;your-admin-password&quot;</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a><span class="w">  </span>--set<span class="w"> </span>backend.env.allowedHosts<span class="o">=</span><span class="s1">&#39;[&quot;http://192.168.1.206:30080&quot;]&#39;</span>
+<p>Configuration goes in a custom <code>my-values.yaml</code> file. Two starting
+templates follow — <strong>Option 1</strong> with Ingress for hostname-based access,
+<strong>Option 2</strong> with NodePort-only access. Both are valid; you can migrate
+from one to the other later via <code>helm upgrade</code>.</p>
+<blockquote>
+<p><strong>Why a values file rather than <code>--set</code> flags?</strong> Helm's <code>--set</code> parser
+treats commas as key/value delimiters, so settings that contain commas
+(notably the JSON <code>allowedHosts</code> array) fail to parse with
+<code>Error: failed parsing --set data: key "..." has no value</code>. A values
+file is immune to this and to most shell-quoting traps. Same on Helm
+3.x and 4.x.</p>
+</blockquote>
+<h4 id="option-1-nodeport-ingress-recommended">Option 1 — NodePort + Ingress (recommended)</h4>
+<p>Reach the app at clean hostnames like <code>http://colony.dev.lan</code> and
+<code>http://api.colony.dev.lan</code>, served by Traefik (which ships with k3s by
+default). Requires DNS resolution for those names — see
+<a href="#step-7--optional-switching-between-nodeport-and-ingress"><em>Step 7 — Switching Between NodePort and Ingress</em></a>
+for <code>/etc/hosts</code> setup or the homelab's
+<a href="https://github.com/jcarranz97/homelab/blob/main/docs/guides/pi-hole-setup.md">Pi-hole guide</a>.</p>
+<div class="highlight"><span class="filename">my-values.yaml — with Ingress</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nt">image</span><span class="p">:</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="nt">registry</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;192.168.1.206:30002&quot;</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="nt">backend</span><span class="p">:</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">  </span><span class="nt">image</span><span class="p">:</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="w">    </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">colony/colony-backend</span>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="w">    </span><span class="nt">tag</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0.0&quot;</span>
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="w">  </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8000</span>
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="w">  </span><span class="nt">service</span><span class="p">:</span>
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NodePort</span>
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="w">    </span><span class="nt">nodePort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30800</span>
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a><span class="w">  </span><span class="nt">env</span><span class="p">:</span>
+<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a><span class="w">    </span><span class="nt">secretKey</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;your-long-random-secret-here&quot;</span>
+<a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a><span class="w">    </span><span class="c1"># CORS: include both Ingress hostname and NodePort URL during transition.</span>
+<a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a><span class="w">    </span><span class="nt">allowedHosts</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;[&quot;http://colony.dev.lan&quot;,&quot;http://192.168.1.206:30080&quot;]&#39;</span>
+<a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a><span class="w">    </span><span class="nt">defaultAdminPassword</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;your-admin-password&quot;</span>
+<a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a>
+<a id="__codelineno-15-18" name="__codelineno-15-18" href="#__codelineno-15-18"></a><span class="nt">frontend</span><span class="p">:</span>
+<a id="__codelineno-15-19" name="__codelineno-15-19" href="#__codelineno-15-19"></a><span class="w">  </span><span class="nt">image</span><span class="p">:</span>
+<a id="__codelineno-15-20" name="__codelineno-15-20" href="#__codelineno-15-20"></a><span class="w">    </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">colony/colony-frontend</span>
+<a id="__codelineno-15-21" name="__codelineno-15-21" href="#__codelineno-15-21"></a><span class="w">    </span><span class="nt">tag</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0.0&quot;</span>
+<a id="__codelineno-15-22" name="__codelineno-15-22" href="#__codelineno-15-22"></a><span class="w">  </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3000</span>
+<a id="__codelineno-15-23" name="__codelineno-15-23" href="#__codelineno-15-23"></a><span class="w">  </span><span class="nt">service</span><span class="p">:</span>
+<a id="__codelineno-15-24" name="__codelineno-15-24" href="#__codelineno-15-24"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NodePort</span>
+<a id="__codelineno-15-25" name="__codelineno-15-25" href="#__codelineno-15-25"></a><span class="w">    </span><span class="nt">nodePort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30080</span>
+<a id="__codelineno-15-26" name="__codelineno-15-26" href="#__codelineno-15-26"></a><span class="w">  </span><span class="nt">env</span><span class="p">:</span>
+<a id="__codelineno-15-27" name="__codelineno-15-27" href="#__codelineno-15-27"></a><span class="w">    </span><span class="c1"># Browser-side URL the JS calls. Use the Ingress hostname.</span>
+<a id="__codelineno-15-28" name="__codelineno-15-28" href="#__codelineno-15-28"></a><span class="w">    </span><span class="nt">apiUrl</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;http://api.colony.dev.lan/api/v1&quot;</span>
+<a id="__codelineno-15-29" name="__codelineno-15-29" href="#__codelineno-15-29"></a>
+<a id="__codelineno-15-30" name="__codelineno-15-30" href="#__codelineno-15-30"></a><span class="nt">ingress</span><span class="p">:</span>
+<a id="__codelineno-15-31" name="__codelineno-15-31" href="#__codelineno-15-31"></a><span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<a id="__codelineno-15-32" name="__codelineno-15-32" href="#__codelineno-15-32"></a><span class="w">  </span><span class="nt">ingressClassName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">traefik</span>
+<a id="__codelineno-15-33" name="__codelineno-15-33" href="#__codelineno-15-33"></a><span class="w">  </span><span class="nt">frontend</span><span class="p">:</span>
+<a id="__codelineno-15-34" name="__codelineno-15-34" href="#__codelineno-15-34"></a><span class="w">    </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">colony.dev.lan</span>
+<a id="__codelineno-15-35" name="__codelineno-15-35" href="#__codelineno-15-35"></a><span class="w">  </span><span class="nt">backend</span><span class="p">:</span>
+<a id="__codelineno-15-36" name="__codelineno-15-36" href="#__codelineno-15-36"></a><span class="w">    </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">api.colony.dev.lan</span>
+<a id="__codelineno-15-37" name="__codelineno-15-37" href="#__codelineno-15-37"></a>
+<a id="__codelineno-15-38" name="__codelineno-15-38" href="#__codelineno-15-38"></a><span class="nt">postgresql</span><span class="p">:</span>
+<a id="__codelineno-15-39" name="__codelineno-15-39" href="#__codelineno-15-39"></a><span class="w">  </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;your-strong-db-password&quot;</span>
 </code></pre></div>
-<p>Or with a custom values file (recommended for reproducibility):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># my-values.yaml</span>
-<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="nt">image</span><span class="p">:</span>
-<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="nt">registry</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;192.168.1.206:30002&quot;</span>
-<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>
-<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="nt">backend</span><span class="p">:</span>
-<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">  </span><span class="nt">image</span><span class="p">:</span>
-<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="w">    </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">colony/colony-backend</span>
-<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="w">    </span><span class="nt">tag</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0.0&quot;</span>
-<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="w">  </span><span class="nt">env</span><span class="p">:</span>
-<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="w">    </span><span class="nt">secretKey</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;your-long-random-secret-here&quot;</span>
-<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a><span class="w">    </span><span class="nt">allowedHosts</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;[&quot;http://192.168.1.206:30080&quot;]&#39;</span>
-<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a><span class="w">    </span><span class="nt">defaultAdminPassword</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;your-admin-password&quot;</span>
-<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a>
-<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a><span class="nt">frontend</span><span class="p">:</span>
-<a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a><span class="w">  </span><span class="nt">image</span><span class="p">:</span>
-<a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a><span class="w">    </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">colony/colony-frontend</span>
-<a id="__codelineno-16-17" name="__codelineno-16-17" href="#__codelineno-16-17"></a><span class="w">    </span><span class="nt">tag</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0.0&quot;</span>
-<a id="__codelineno-16-18" name="__codelineno-16-18" href="#__codelineno-16-18"></a><span class="w">  </span><span class="nt">env</span><span class="p">:</span>
-<a id="__codelineno-16-19" name="__codelineno-16-19" href="#__codelineno-16-19"></a><span class="w">    </span><span class="nt">apiUrl</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;http://192.168.1.206:30800/api/v1&quot;</span>
-<a id="__codelineno-16-20" name="__codelineno-16-20" href="#__codelineno-16-20"></a>
-<a id="__codelineno-16-21" name="__codelineno-16-21" href="#__codelineno-16-21"></a><span class="nt">postgresql</span><span class="p">:</span>
-<a id="__codelineno-16-22" name="__codelineno-16-22" href="#__codelineno-16-22"></a><span class="w">  </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;your-strong-db-password&quot;</span>
+<h4 id="option-2-nodeport-only-no-ingress">Option 2 — NodePort only (no Ingress)</h4>
+<p>Reach the app at <code>http://&lt;node-ip&gt;:&lt;nodePort&gt;</code>. Simpler — no DNS or
+ingress controller assumptions. This is also the default if you omit the
+<code>ingress</code> block entirely.</p>
+<div class="highlight"><span class="filename">my-values.yaml — NodePort only</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nt">image</span><span class="p">:</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="nt">registry</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;192.168.1.206:30002&quot;</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="nt">backend</span><span class="p">:</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">  </span><span class="nt">image</span><span class="p">:</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">    </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">colony/colony-backend</span>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="w">    </span><span class="nt">tag</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0.0&quot;</span>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="w">  </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8000</span>
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="w">  </span><span class="nt">service</span><span class="p">:</span>
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NodePort</span>
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a><span class="w">    </span><span class="nt">nodePort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30800</span>
+<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a><span class="w">  </span><span class="nt">env</span><span class="p">:</span>
+<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a><span class="w">    </span><span class="nt">secretKey</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;your-long-random-secret-here&quot;</span>
+<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a><span class="w">    </span><span class="nt">allowedHosts</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;[&quot;http://192.168.1.206:30080&quot;]&#39;</span>
+<a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a><span class="w">    </span><span class="nt">defaultAdminPassword</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;your-admin-password&quot;</span>
+<a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a>
+<a id="__codelineno-16-17" name="__codelineno-16-17" href="#__codelineno-16-17"></a><span class="nt">frontend</span><span class="p">:</span>
+<a id="__codelineno-16-18" name="__codelineno-16-18" href="#__codelineno-16-18"></a><span class="w">  </span><span class="nt">image</span><span class="p">:</span>
+<a id="__codelineno-16-19" name="__codelineno-16-19" href="#__codelineno-16-19"></a><span class="w">    </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">colony/colony-frontend</span>
+<a id="__codelineno-16-20" name="__codelineno-16-20" href="#__codelineno-16-20"></a><span class="w">    </span><span class="nt">tag</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0.0&quot;</span>
+<a id="__codelineno-16-21" name="__codelineno-16-21" href="#__codelineno-16-21"></a><span class="w">  </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3000</span>
+<a id="__codelineno-16-22" name="__codelineno-16-22" href="#__codelineno-16-22"></a><span class="w">  </span><span class="nt">service</span><span class="p">:</span>
+<a id="__codelineno-16-23" name="__codelineno-16-23" href="#__codelineno-16-23"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NodePort</span>
+<a id="__codelineno-16-24" name="__codelineno-16-24" href="#__codelineno-16-24"></a><span class="w">    </span><span class="nt">nodePort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30080</span>
+<a id="__codelineno-16-25" name="__codelineno-16-25" href="#__codelineno-16-25"></a><span class="w">  </span><span class="nt">env</span><span class="p">:</span>
+<a id="__codelineno-16-26" name="__codelineno-16-26" href="#__codelineno-16-26"></a><span class="w">    </span><span class="nt">apiUrl</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;http://192.168.1.206:30800/api/v1&quot;</span>
+<a id="__codelineno-16-27" name="__codelineno-16-27" href="#__codelineno-16-27"></a>
+<a id="__codelineno-16-28" name="__codelineno-16-28" href="#__codelineno-16-28"></a><span class="nt">postgresql</span><span class="p">:</span>
+<a id="__codelineno-16-29" name="__codelineno-16-29" href="#__codelineno-16-29"></a><span class="w">  </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;your-strong-db-password&quot;</span>
 </code></pre></div>
+<h4 id="install">Install</h4>
+<p>Whichever file you used:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>helm<span class="w"> </span>install<span class="w"> </span>colony<span class="w"> </span>./helm/colony<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">  </span>--namespace<span class="w"> </span>colony-app<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">  </span>--create-namespace<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">  </span>-f<span class="w"> </span>my-values.yaml
 </code></pre></div>
+<blockquote>
+<p><strong>Tip — separate values files per environment.</strong> Keep distinct files
+for dev and prod (e.g. <code>~/homelab/colony-dev/my-values.yaml</code> and
+<code>~/homelab/colony-prod/my-values.yaml</code>) with their own NodePort numbers,
+hostnames, and image tags. They install with the same chart but
+different <code>--namespace</code> and <code>-f</code>. To make dev/prod resource names
+distinct in the cluster, use distinct release names too —
+<code>helm install colony-dev …</code> vs <code>helm install colony-prod …</code> — which
+propagates through every templated resource via
+<code>{{ include "colony.fullname" . }}</code>.</p>
+</blockquote>
 <h4 id="step-4-optional-harbor-pull-secret">Step 4 — Optional: Harbor Pull Secret</h4>
 <p>If your Harbor project is private, create a pull secret so k3s can
 authenticate:</p>
@@ -1751,45 +1901,128 @@ authenticate:</p>
 <code>backend.env.defaultAdminUsername</code> / <code>backend.env.defaultAdminPassword</code>
 (defaults: <code>admin</code> / <code>colony-admin</code>).</p>
 <hr />
+<h3 id="step-7-optional-switching-between-nodeport-and-ingress">Step 7 — Optional: Switching Between NodePort and Ingress</h3>
+<p>If you installed with <strong>Option 1</strong> (Ingress already enabled in
+<code>my-values.yaml</code>), the chart has already created the Ingress resources;
+skip ahead to <em>7b</em> for DNS setup.</p>
+<p>If you installed with <strong>Option 2</strong> (NodePort-only) and later want
+hostname access, edit <code>my-values.yaml</code> to enable the Ingress block and
+update the URLs the frontend and backend use:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="nt">ingress</span><span class="p">:</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">  </span><span class="nt">ingressClassName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">traefik</span>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="w">  </span><span class="nt">frontend</span><span class="p">:</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="w">    </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">colony.dev.lan</span>
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="w">  </span><span class="nt">backend</span><span class="p">:</span>
+<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="w">    </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">api.colony.dev.lan</span>
+<a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a>
+<a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a><span class="nt">backend</span><span class="p">:</span>
+<a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a><span class="w">  </span><span class="nt">env</span><span class="p">:</span>
+<a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a><span class="w">    </span><span class="c1"># Both Ingress hostname and NodePort URL — coexist during the switch.</span>
+<a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a><span class="w">    </span><span class="nt">allowedHosts</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;[&quot;http://colony.dev.lan&quot;,&quot;http://192.168.1.206:30080&quot;]&#39;</span>
+<a id="__codelineno-21-13" name="__codelineno-21-13" href="#__codelineno-21-13"></a>
+<a id="__codelineno-21-14" name="__codelineno-21-14" href="#__codelineno-21-14"></a><span class="nt">frontend</span><span class="p">:</span>
+<a id="__codelineno-21-15" name="__codelineno-21-15" href="#__codelineno-21-15"></a><span class="w">  </span><span class="nt">env</span><span class="p">:</span>
+<a id="__codelineno-21-16" name="__codelineno-21-16" href="#__codelineno-21-16"></a><span class="w">    </span><span class="nt">apiUrl</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;http://api.colony.dev.lan/api/v1&quot;</span>
+</code></pre></div>
+<p>Apply:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>colony<span class="w"> </span>./helm/colony<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">  </span>--namespace<span class="w"> </span>colony-app<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">  </span>-f<span class="w"> </span>my-values.yaml
+</code></pre></div>
+<h4 id="7a-verify-traefik-and-the-ingress-resources">7a. Verify Traefik and the Ingress resources</h4>
+<p>k3s ships Traefik preinstalled — no extra install is needed. Sanity check
+the controller and the Ingresses created by the chart:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>ingressclass
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="c1"># NAME      CONTROLLER                      AGE</span>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="c1"># traefik   traefik.io/ingress-controller   ...</span>
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a>
+<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>kubectl<span class="w"> </span>get<span class="w"> </span>svc<span class="w"> </span>-n<span class="w"> </span>kube-system<span class="w"> </span>traefik
+<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="c1"># TYPE           EXTERNAL-IP                   PORT(S)</span>
+<a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="c1"># LoadBalancer   192.168.1.206,192.168.1.208   80:32103/TCP,443:32192/TCP</span>
+<a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a>
+<a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a>kubectl<span class="w"> </span>get<span class="w"> </span>ingress<span class="w"> </span>-n<span class="w"> </span>colony-app
+<a id="__codelineno-23-10" name="__codelineno-23-10" href="#__codelineno-23-10"></a><span class="c1"># NAME              CLASS     HOSTS                ADDRESS                       PORTS</span>
+<a id="__codelineno-23-11" name="__codelineno-23-11" href="#__codelineno-23-11"></a><span class="c1"># colony-frontend   traefik   colony.dev.lan       192.168.1.206,192.168.1.208   80</span>
+<a id="__codelineno-23-12" name="__codelineno-23-12" href="#__codelineno-23-12"></a><span class="c1"># colony-backend    traefik   api.colony.dev.lan   192.168.1.206,192.168.1.208   80</span>
+</code></pre></div>
+<p>The Ingress resource names follow <code>{{ release-name }}-frontend</code> /
+<code>-backend</code>, so a release named <code>colony-dev</code> would produce
+<code>colony-dev-frontend</code> / <code>colony-dev-backend</code>.</p>
+<h4 id="7b-resolve-the-hostnames">7b. Resolve the hostnames</h4>
+<p>Until a LAN-wide DNS server is in place, add entries on each client
+machine that needs access. <strong><code>/etc/hosts</code> does not support wildcards</strong> —
+list each hostname explicitly, one per line (or space-separated on a
+single line):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>192.168.1.206  colony.dev.lan api.colony.dev.lan
+</code></pre></div>
+<p>For a permanent solution that covers every device on the network with a
+single <code>*.dev.lan</code> wildcard rule, see the homelab guide
+<a href="https://github.com/jcarranz97/homelab/blob/main/docs/guides/pi-hole-setup.md">Pi-hole Local DNS Setup</a>.</p>
+<h4 id="7c-verify-end-to-end">7c. Verify end-to-end</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>getent<span class="w"> </span>hosts<span class="w"> </span>colony.dev.lan<span class="w">          </span><span class="c1"># → 192.168.1.206</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>getent<span class="w"> </span>hosts<span class="w"> </span>api.colony.dev.lan<span class="w">      </span><span class="c1"># → 192.168.1.206</span>
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a>curl<span class="w"> </span>-I<span class="w"> </span>http://colony.dev.lan<span class="w">        </span><span class="c1"># → HTTP/1.1 200 OK</span>
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>curl<span class="w"> </span>http://api.colony.dev.lan/health
+</code></pre></div>
+<p>Open <code>http://colony.dev.lan</code> in a browser and log in. The frontend's
+JavaScript will call the backend at <code>http://api.colony.dev.lan/api/v1</code>.</p>
+<blockquote>
+<p><strong>NodePort still works — but only if the browser has DNS for the
+hostname.</strong> Once <code>apiUrl</code> points at <code>api.colony.dev.lan</code>, accessing the
+frontend via <code>http://192.168.1.206:30080</code> still serves the page, but
+its API calls will fail unless that browser can also resolve
+<code>api.colony.dev.lan</code> (via <code>/etc/hosts</code> or Pi-hole). For machines without
+DNS for the new names, keep using the NodePort URLs end-to-end.</p>
+<p><strong>HTTPS and <code>cookieSecure</code>.</strong> This Ingress serves plain HTTP, so leave
+<code>frontend.env.cookieSecure: "false"</code> (the chart default) — <code>Secure</code>
+cookies are dropped over HTTP and break login. When you later add TLS
+to Traefik (cert-manager + Let's Encrypt, or self-signed via mkcert),
+flip <code>cookieSecure</code> to <code>"true"</code>. See <em>Login succeeds (backend returns
+200) but the app redirects back to login</em> in the troubleshooting
+section below for context.</p>
+</blockquote>
+<hr />
 <h3 id="updating-the-application">Updating the Application</h3>
 <h4 id="update-the-backend">Update the backend</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c1"># 1. Build and push the new image</span>
-<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span><span class="m">192</span>.168.1.206:30002/colony/colony-backend:1.1.0<span class="w"> </span>./backend
-<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>docker<span class="w"> </span>push<span class="w"> </span><span class="m">192</span>.168.1.206:30002/colony/colony-backend:1.1.0
-<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>
-<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="c1"># 2. Upgrade the release</span>
-<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>colony<span class="w"> </span>./helm/colony<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="w">  </span>--namespace<span class="w"> </span>colony-app<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a><span class="w">  </span>--reuse-values<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a><span class="w">  </span>--set<span class="w"> </span>backend.image.tag<span class="o">=</span><span class="m">1</span>.1.0
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="c1"># 1. Build and push the new image</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span><span class="m">192</span>.168.1.206:30002/colony/colony-backend:1.1.0<span class="w"> </span>./backend
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>docker<span class="w"> </span>push<span class="w"> </span><span class="m">192</span>.168.1.206:30002/colony/colony-backend:1.1.0
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a>
+<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="c1"># 2. Upgrade the release</span>
+<a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>colony<span class="w"> </span>./helm/colony<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="w">  </span>--namespace<span class="w"> </span>colony-app<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a><span class="w">  </span>--reuse-values<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="w">  </span>--set<span class="w"> </span>backend.image.tag<span class="o">=</span><span class="m">1</span>.1.0
 </code></pre></div>
 <h4 id="update-the-frontend">Update the frontend</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1"># 1. Build and push the new image (no build args needed)</span>
-<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>docker<span class="w"> </span>build<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">  </span>-t<span class="w"> </span><span class="m">192</span>.168.1.206:30002/colony/colony-frontend:1.1.0<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="w">  </span>./frontend
-<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>docker<span class="w"> </span>push<span class="w"> </span><span class="m">192</span>.168.1.206:30002/colony/colony-frontend:1.1.0
-<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>
-<a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="c1"># 2. Upgrade the release</span>
-<a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>colony<span class="w"> </span>./helm/colony<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="w">  </span>--namespace<span class="w"> </span>colony-app<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a><span class="w">  </span>--reuse-values<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a><span class="w">  </span>--set<span class="w"> </span>frontend.image.tag<span class="o">=</span><span class="m">1</span>.1.0
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="c1"># 1. Build and push the new image (no build args needed)</span>
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>docker<span class="w"> </span>build<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="w">  </span>-t<span class="w"> </span><span class="m">192</span>.168.1.206:30002/colony/colony-frontend:1.1.0<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="w">  </span>./frontend
+<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a>docker<span class="w"> </span>push<span class="w"> </span><span class="m">192</span>.168.1.206:30002/colony/colony-frontend:1.1.0
+<a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a>
+<a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a><span class="c1"># 2. Upgrade the release</span>
+<a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>colony<span class="w"> </span>./helm/colony<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a><span class="w">  </span>--namespace<span class="w"> </span>colony-app<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-27-10" name="__codelineno-27-10" href="#__codelineno-27-10"></a><span class="w">  </span>--reuse-values<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-27-11" name="__codelineno-27-11" href="#__codelineno-27-11"></a><span class="w">  </span>--set<span class="w"> </span>frontend.image.tag<span class="o">=</span><span class="m">1</span>.1.0
 </code></pre></div>
 <p>To change the backend URL the frontend points to (e.g. after moving to a
 different node or port), no image rebuild is required — just update the
 value and upgrade:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>colony<span class="w"> </span>./helm/colony<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="w">  </span>--namespace<span class="w"> </span>colony-app<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="w">  </span>--reuse-values<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="w">  </span>--set<span class="w"> </span>frontend.env.apiUrl<span class="o">=</span><span class="s2">&quot;http://192.168.1.206:30800/api/v1&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>colony<span class="w"> </span>./helm/colony<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="w">  </span>--namespace<span class="w"> </span>colony-app<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="w">  </span>--reuse-values<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="w">  </span>--set<span class="w"> </span>frontend.env.apiUrl<span class="o">=</span><span class="s2">&quot;http://192.168.1.206:30800/api/v1&quot;</span>
 </code></pre></div>
 <h4 id="update-both-at-once">Update both at once</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>colony<span class="w"> </span>./helm/colony<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">  </span>--namespace<span class="w"> </span>colony-app<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">  </span>--reuse-values<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="w">  </span>--set<span class="w"> </span>backend.image.tag<span class="o">=</span><span class="m">1</span>.1.0<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="w">  </span>--set<span class="w"> </span>frontend.image.tag<span class="o">=</span><span class="m">1</span>.1.0
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>colony<span class="w"> </span>./helm/colony<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="w">  </span>--namespace<span class="w"> </span>colony-app<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="w">  </span>--reuse-values<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="w">  </span>--set<span class="w"> </span>backend.image.tag<span class="o">=</span><span class="m">1</span>.1.0<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a><span class="w">  </span>--set<span class="w"> </span>frontend.image.tag<span class="o">=</span><span class="m">1</span>.1.0
 </code></pre></div>
 <blockquote>
 <p><strong>Note on <code>--reuse-values</code></strong>: This flag carries forward all values from
@@ -1799,40 +2032,40 @@ the values you want to change.</p>
 <hr />
 <h3 id="rolling-back">Rolling Back</h3>
 <p>If an upgrade introduces a problem, roll back to the previous release:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="c1"># See the release history</span>
-<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>helm<span class="w"> </span><span class="nb">history</span><span class="w"> </span>colony<span class="w"> </span>-n<span class="w"> </span>colony-app
-<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>
-<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="c1"># Roll back to the previous revision</span>
-<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>helm<span class="w"> </span>rollback<span class="w"> </span>colony<span class="w"> </span>-n<span class="w"> </span>colony-app
-<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>
-<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="c1"># Roll back to a specific revision number</span>
-<a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a>helm<span class="w"> </span>rollback<span class="w"> </span>colony<span class="w"> </span><span class="m">2</span><span class="w"> </span>-n<span class="w"> </span>colony-app
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="c1"># See the release history</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>helm<span class="w"> </span><span class="nb">history</span><span class="w"> </span>colony<span class="w"> </span>-n<span class="w"> </span>colony-app
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="c1"># Roll back to the previous revision</span>
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a>helm<span class="w"> </span>rollback<span class="w"> </span>colony<span class="w"> </span>-n<span class="w"> </span>colony-app
+<a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a>
+<a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a><span class="c1"># Roll back to a specific revision number</span>
+<a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a>helm<span class="w"> </span>rollback<span class="w"> </span>colony<span class="w"> </span><span class="m">2</span><span class="w"> </span>-n<span class="w"> </span>colony-app
 </code></pre></div>
 <hr />
 <h3 id="seeding-sample-data-optional">Seeding Sample Data (optional)</h3>
 <p>The backend automatically creates the admin user on first startup via the
 <code>DEFAULT_ADMIN_*</code> environment variables. Seeding is only needed if you want
 to pre-populate sample payment methods, cycles, and expenses.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>colony<span class="w"> </span>./helm/colony<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="w">  </span>--namespace<span class="w"> </span>colony-app<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="w">  </span>--reuse-values<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="w">  </span>--set<span class="w"> </span>seeder.enabled<span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="w">  </span>--set-file<span class="w"> </span>seeder.seedDataContent<span class="o">=</span>./seed_data.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>colony<span class="w"> </span>./helm/colony<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="w">  </span>--namespace<span class="w"> </span>colony-app<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="w">  </span>--reuse-values<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="w">  </span>--set<span class="w"> </span>seeder.enabled<span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="w">  </span>--set-file<span class="w"> </span>seeder.seedDataContent<span class="o">=</span>./seed_data.yaml
 </code></pre></div>
 <p>The seeder runs once as a Kubernetes Job (Helm post-install hook) and
 self-deletes after it succeeds.</p>
 <hr />
 <h3 id="uninstalling">Uninstalling</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>helm<span class="w"> </span>uninstall<span class="w"> </span>colony<span class="w"> </span>-n<span class="w"> </span>colony-app
-<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>
-<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="c1"># Optionally delete the namespace (removes all remaining resources)</span>
-<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>namespace<span class="w"> </span>colony-app
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>helm<span class="w"> </span>uninstall<span class="w"> </span>colony<span class="w"> </span>-n<span class="w"> </span>colony-app
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>
+<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="c1"># Optionally delete the namespace (removes all remaining resources)</span>
+<a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>namespace<span class="w"> </span>colony-app
 </code></pre></div>
 <blockquote>
 <p>The PostgreSQL PersistentVolumeClaim is <strong>not</strong> deleted by
 <code>helm uninstall</code> because Helm does not delete PVCs by default. Delete it
 manually if you want to wipe the data:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>pvc<span class="w"> </span>colony-postgres-data<span class="w"> </span>-n<span class="w"> </span>colony-app
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>pvc<span class="w"> </span>colony-postgres-data<span class="w"> </span>-n<span class="w"> </span>colony-app
 </code></pre></div>
 </blockquote>
 <hr />
@@ -1873,6 +2106,10 @@ manually if you want to wipe the data:</p>
 <tr>
 <td><code>templates/frontend-*.yaml</code></td>
 <td>Next.js Deployment + NodePort Service</td>
+</tr>
+<tr>
+<td><code>templates/ingress.yaml</code></td>
+<td>Frontend + backend Ingresses (gated by <code>ingress.enabled</code>)</td>
 </tr>
 <tr>
 <td><code>templates/seeder-job.yaml</code></td>
@@ -1941,6 +2178,21 @@ manually if you want to wipe the data:</p>
 <td>PVC size for Postgres</td>
 </tr>
 <tr>
+<td><code>ingress.enabled</code></td>
+<td><code>false</code></td>
+<td>Create Ingress resources for frontend + backend</td>
+</tr>
+<tr>
+<td><code>ingress.frontend.host</code></td>
+<td><code>""</code></td>
+<td>Frontend hostname (e.g. <code>colony.dev.lan</code>)</td>
+</tr>
+<tr>
+<td><code>ingress.backend.host</code></td>
+<td><code>""</code></td>
+<td>Backend hostname (e.g. <code>api.colony.dev.lan</code>)</td>
+</tr>
+<tr>
 <td><code>seeder.enabled</code></td>
 <td><code>false</code></td>
 <td>Enable sample data seeder</td>
@@ -1952,8 +2204,8 @@ manually if you want to wipe the data:</p>
 <h3 id="backend-pod-crashes-on-startup-with-psycopg2operationalerror">Backend pod crashes on startup with <code>psycopg2.OperationalError</code></h3>
 <p><strong>Symptom:</strong> The backend pod enters a crash loop immediately after the
 init container exits. The logs show a connection error like:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>psycopg2.OperationalError: connection to server on socket
-<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>&quot;@##@colony-postgresql/.s.PGSQL.5432&quot; failed: Connection refused
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>psycopg2.OperationalError: connection to server on socket
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>&quot;@##@colony-postgresql/.s.PGSQL.5432&quot; failed: Connection refused
 </code></pre></div>
 <p><strong>Cause:</strong> The <code>postgresql.password</code> (or <code>postgresql.username</code>) in your
 <code>values.yaml</code> contains URL-special characters — most commonly <code>@</code> or <code>#</code>.
@@ -1968,8 +2220,8 @@ These break the <code>DATABASE_URL</code> connection string:</p>
 if you are using an older revision of the chart (before this fix) you will
 hit this issue.</p>
 <p><strong>Fix:</strong> Upgrade to the latest chart revision and restart the backend:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>colony<span class="w"> </span>./helm/colony<span class="w"> </span>--namespace<span class="w"> </span>colony-app<span class="w"> </span>-f<span class="w"> </span>my-values.yaml
-<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>kubectl<span class="w"> </span>rollout<span class="w"> </span>restart<span class="w"> </span>deployment<span class="w"> </span>colony-backend<span class="w"> </span>-n<span class="w"> </span>colony-app
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>colony<span class="w"> </span>./helm/colony<span class="w"> </span>--namespace<span class="w"> </span>colony-app<span class="w"> </span>-f<span class="w"> </span>my-values.yaml
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>kubectl<span class="w"> </span>rollout<span class="w"> </span>restart<span class="w"> </span>deployment<span class="w"> </span>colony-backend<span class="w"> </span>-n<span class="w"> </span>colony-app
 </code></pre></div>
 <p><strong>Prevention:</strong> Any password that works in a URL is fine. Characters to
 avoid unless you are on the fixed chart version: <code>@</code>, <code>#</code>, <code>%</code>, <code>?</code>, <code>&amp;</code>.</p>
@@ -1988,11 +2240,11 @@ not already exist. Simply deploying the updated image is enough.</p>
 and the tables are already created but empty, exec into the running backend
 pod and run the seeder in <code>auth_only</code> mode — this creates only the admin
 user and household without touching any sample data:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-n<span class="w"> </span>colony-app<span class="w"> </span>deployment/colony-backend<span class="w"> </span>--<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="w">  </span>sh<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;echo &#39;{}&#39; &gt; /tmp/seed.yaml &amp;&amp; \</span>
-<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="s2">         SEED_FILE=/tmp/seed.yaml \</span>
-<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="s2">         SEED_MODE=auth_only \</span>
-<a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="s2">         uv run python scripts/seed_db.py&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-n<span class="w"> </span>colony-app<span class="w"> </span>deployment/colony-backend<span class="w"> </span>--<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="w">  </span>sh<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;echo &#39;{}&#39; &gt; /tmp/seed.yaml &amp;&amp; \</span>
+<a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a><span class="s2">         SEED_FILE=/tmp/seed.yaml \</span>
+<a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a><span class="s2">         SEED_MODE=auth_only \</span>
+<a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a><span class="s2">         uv run python scripts/seed_db.py&quot;</span>
 </code></pre></div>
 <p><strong>Prevention:</strong> Build and deploy the updated backend image which includes
 the <code>_bootstrap_admin()</code> lifespan call in <code>app/main.py</code>.</p>
@@ -2008,13 +2260,13 @@ and redirects back to <code>/login</code>.</p>
 default in <code>values.yaml</code>). Then rebuild and deploy the frontend image with
 the updated <code>actions/auth.action.ts</code> that reads <code>COOKIE_SECURE</code> instead of
 <code>NODE_ENV</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span><span class="m">192</span>.168.1.206:30002/colony/colony-frontend:1.0.1<span class="w"> </span>./frontend
-<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>docker<span class="w"> </span>push<span class="w"> </span><span class="m">192</span>.168.1.206:30002/colony/colony-frontend:1.0.1
-<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>
-<a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>colony<span class="w"> </span>./helm/colony<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a><span class="w">  </span>--namespace<span class="w"> </span>colony-app<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a><span class="w">  </span>-f<span class="w"> </span>my-values.yaml<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-32-7" name="__codelineno-32-7" href="#__codelineno-32-7"></a><span class="w">  </span>--set<span class="w"> </span>frontend.image.tag<span class="o">=</span><span class="m">1</span>.0.1
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span><span class="m">192</span>.168.1.206:30002/colony/colony-frontend:1.0.1<span class="w"> </span>./frontend
+<a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a>docker<span class="w"> </span>push<span class="w"> </span><span class="m">192</span>.168.1.206:30002/colony/colony-frontend:1.0.1
+<a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a>
+<a id="__codelineno-37-4" name="__codelineno-37-4" href="#__codelineno-37-4"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>colony<span class="w"> </span>./helm/colony<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-37-5" name="__codelineno-37-5" href="#__codelineno-37-5"></a><span class="w">  </span>--namespace<span class="w"> </span>colony-app<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-37-6" name="__codelineno-37-6" href="#__codelineno-37-6"></a><span class="w">  </span>-f<span class="w"> </span>my-values.yaml<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-37-7" name="__codelineno-37-7" href="#__codelineno-37-7"></a><span class="w">  </span>--set<span class="w"> </span>frontend.image.tag<span class="o">=</span><span class="m">1</span>.0.1
 </code></pre></div>
 <p><strong>Note:</strong> If you ever add HTTPS to the cluster (e.g. via a TLS ingress),
 set <code>frontend.env.cookieSecure: "true"</code> in your values file so session
