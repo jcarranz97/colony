@@ -1015,7 +1015,7 @@ export function RecurrentExpenses() {
           setAddOpen(true);
         }}
       >
-        + New Template
+        + New Recurrent Expense
       </button>
 
       {/* Trashed section (admin only) */}
