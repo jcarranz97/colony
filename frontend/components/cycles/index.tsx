@@ -1,4 +1,10 @@
 "use client";
+import Link from "next/link";
+import {
+  useRouter,
+  useSearchParams,
+  usePathname,
+} from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import type {
   Cycle,
@@ -16,16 +22,12 @@ import {
   removeCycle,
   restoreCycleAction,
   fetchSummary,
-  getExpenses,
   addExpense,
   editExpense,
-  getIncomes,
   addIncome,
   editIncome,
-  removeIncome,
   getCurrentUserAction,
 } from "./actions";
-import { getPaymentMethods } from "@/components/payment-methods/actions";
 import { formatPaymentMethodName } from "@/helpers/formatters";
 import { DiscardChangesDialog } from "@/components/shared/discard-changes-dialog";
 
@@ -67,13 +69,11 @@ function StatusPill({ status }: { status: string }) {
 function CycleCard({
   cycle,
   summary,
-  onOpen,
   onRename,
   onTrash,
 }: {
   cycle: Cycle;
   summary: CycleSummary | null;
-  onOpen: (c: Cycle) => void;
   onRename: (c: Cycle) => void;
   onTrash: (c: Cycle) => void;
 }) {
@@ -89,8 +89,10 @@ function CycleCard({
   const net = summary ? parseFloat(summary.financial.net_balance) : 0;
 
   return (
-    <div
+    <Link
+      href={`/cycles/${cycle.id}`}
       className={`nb-cycle-card${cycle.status === "active" ? " nb-cycle-active" : ""}`}
+      style={{ textDecoration: "none", color: "inherit", cursor: "pointer" }}
     >
       <div className="nb-cycle-header">
         <div>
@@ -101,9 +103,6 @@ function CycleCard({
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
           <StatusPill status={cycle.status} />
-          <button className="nb-open-btn" onClick={() => onOpen(cycle)}>
-            Open →
-          </button>
           <button
             title="Rename cycle"
             style={{
@@ -118,6 +117,7 @@ function CycleCard({
               opacity: 0.7,
             }}
             onClick={(e) => {
+              e.preventDefault();
               e.stopPropagation();
               onRename(cycle);
             }}
@@ -137,6 +137,7 @@ function CycleCard({
               color: "rgba(220,53,69,0.7)",
             }}
             onClick={(e) => {
+              e.preventDefault();
               e.stopPropagation();
               onTrash(cycle);
             }}
@@ -184,7 +185,7 @@ function CycleCard({
           <div className="nb-overdue-badge">⚠ {overdue} overdue</div>
         )}
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -681,7 +682,7 @@ function EditIncomeModal({
 
 // ── Rename Cycle Modal ────────────────────────────────────────────────────────
 
-function RenameCycleModal({
+export function RenameCycleModal({
   isOpen,
   onClose,
   cycle,
@@ -787,7 +788,7 @@ function RenameCycleModal({
 
 // ── Confirm Trash Modal ───────────────────────────────────────────────────────
 
-function ConfirmTrashModal({
+export function ConfirmTrashModal({
   isOpen,
   onClose,
   cycle,
@@ -1514,12 +1515,13 @@ function TrashedCycleCard({
 
 // ── Cycle Detail View ─────────────────────────────────────────────────────────
 
-function CycleDetail({
+export function CycleDetail({
   cycle,
   expenses,
   incomes,
   summary,
   paymentMethods,
+  headerActions,
   onBack,
   onToggleExpense,
   onStatusChange,
@@ -1534,6 +1536,7 @@ function CycleDetail({
   incomes: CycleIncome[];
   summary: CycleSummary | null;
   paymentMethods: PaymentMethod[];
+  headerActions?: React.ReactNode;
   onBack: () => void;
   onToggleExpense: (id: string) => void;
   onStatusChange: (id: string, status: ExpenseStatus) => void;
@@ -1543,23 +1546,50 @@ function CycleDetail({
   onIncomeRemoved: (id: string) => void;
   onIncomeEdited: (updated: CycleIncome) => void;
 }) {
-  const [addExpenseOpen, setAddExpenseOpen] = useState(false);
-  const [editExpenseOpen, setEditExpenseOpen] = useState(false);
-  const [editingExpense, setEditingExpense] = useState<CycleExpense | null>(
-    null,
-  );
-  const [addIncomeOpen, setAddIncomeOpen] = useState(false);
-  const [editIncomeOpen, setEditIncomeOpen] = useState(false);
-  const [editingIncome, setEditingIncome] = useState<CycleIncome | null>(null);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const expenseParam = searchParams.get("expense");
+  const incomeParam = searchParams.get("income");
+
+  const addExpenseOpen = expenseParam === "new";
+  const addIncomeOpen = incomeParam === "new";
+  const editingExpense =
+    expenseParam && expenseParam !== "new"
+      ? (expenses.find((e) => e.id === expenseParam) ?? null)
+      : null;
+  const editingIncome =
+    incomeParam && incomeParam !== "new"
+      ? (incomes.find((i) => i.id === incomeParam) ?? null)
+      : null;
+  const editExpenseOpen = !!editingExpense;
+  const editIncomeOpen = !!editingIncome;
+
+  const setUrlParam = (
+    key: "expense" | "income",
+    value: string | null,
+  ) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value) params.set(key, value);
+    else params.delete(key);
+    const qs = params.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname);
+  };
+
+  const setAddExpenseOpen = (open: boolean) =>
+    setUrlParam("expense", open ? "new" : null);
+  const setAddIncomeOpen = (open: boolean) =>
+    setUrlParam("income", open ? "new" : null);
+  const closeEditExpense = () => setUrlParam("expense", null);
+  const closeEditIncome = () => setUrlParam("income", null);
 
   const handleEditExpense = (expense: CycleExpense) => {
-    setEditingExpense(expense);
-    setEditExpenseOpen(true);
+    setUrlParam("expense", expense.id);
   };
 
   const handleEditIncome = (income: CycleIncome) => {
-    setEditingIncome(income);
-    setEditIncomeOpen(true);
+    setUrlParam("income", income.id);
   };
 
   const fixedExp = expenses.filter((e) => e.category === "fixed");
@@ -1588,7 +1618,17 @@ function CycleDetail({
             {fmtDateRange(cycle.start_date, cycle.end_date)}
           </div>
         </div>
-        <StatusPill status={cycle.status} />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-end",
+            gap: 8,
+          }}
+        >
+          <StatusPill status={cycle.status} />
+          {headerActions}
+        </div>
       </div>
 
       {/* Summary strip */}
@@ -1868,31 +1908,23 @@ function CycleDetail({
 
       <EditExpenseModal
         isOpen={editExpenseOpen}
-        onClose={() => {
-          setEditExpenseOpen(false);
-          setEditingExpense(null);
-        }}
+        onClose={closeEditExpense}
         expense={editingExpense}
         cycleId={cycle.id}
         onEdited={(updated) => {
           onExpenseEdited(updated);
-          setEditExpenseOpen(false);
-          setEditingExpense(null);
+          closeEditExpense();
         }}
       />
 
       <EditIncomeModal
         isOpen={editIncomeOpen}
-        onClose={() => {
-          setEditIncomeOpen(false);
-          setEditingIncome(null);
-        }}
+        onClose={closeEditIncome}
         income={editingIncome}
         cycleId={cycle.id}
         onEdited={(updated) => {
           onIncomeEdited(updated);
-          setEditIncomeOpen(false);
-          setEditingIncome(null);
+          closeEditIncome();
         }}
       />
     </>
@@ -1905,60 +1937,37 @@ export function Cycles() {
   const [cycles, setCycles] = useState<Cycle[]>([]);
   const [trashedCycles, setTrashedCycles] = useState<Cycle[]>([]);
   const [summaries, setSummaries] = useState<Record<string, CycleSummary>>({});
-  const [selectedCycle, setSelectedCycle] = useState<Cycle | null>(null);
-  const [cycleExpenses, setCycleExpenses] = useState<CycleExpense[]>([]);
-  const [cycleIncomes, setCycleIncomes] = useState<CycleIncome[]>([]);
-  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [expensesLoading, setExpensesLoading] = useState(false);
   const [addCycleOpen, setAddCycleOpen] = useState(false);
   const [renameCycle, setRenameCycle] = useState<Cycle | null>(null);
   const [trashCycle, setTrashCycle] = useState<Cycle | null>(null);
 
   useEffect(() => {
-    Promise.all([getPaymentMethods(), getCurrentUserAction()]).then(
-      async ([methodsRes, userRes]) => {
-        if (methodsRes.success) setPaymentMethods(methodsRes.data);
-        const admin = userRes.success && userRes.data.role === "admin";
-        setIsAdmin(admin);
+    getCurrentUserAction().then(async (userRes) => {
+      const admin = userRes.success && userRes.data.role === "admin";
+      setIsAdmin(admin);
 
-        const cyclesRes = await getCycles(admin);
-        if (cyclesRes.success) {
-          const all = cyclesRes.data.cycles;
-          const active = all.filter((c) => c.active);
-          const trashed = all.filter((c) => !c.active);
-          setCycles(active);
-          if (admin) setTrashedCycles(trashed);
+      const cyclesRes = await getCycles(admin);
+      if (cyclesRes.success) {
+        const all = cyclesRes.data.cycles;
+        const active = all.filter((c) => c.active);
+        const trashed = all.filter((c) => !c.active);
+        setCycles(active);
+        if (admin) setTrashedCycles(trashed);
 
-          const summaryResults = await Promise.all(
-            active.map((c) =>
-              fetchSummary(c.id).then((r) => ({ id: c.id, r })),
-            ),
-          );
-          const map: Record<string, CycleSummary> = {};
-          summaryResults.forEach(({ id, r }) => {
-            if (r.success) map[id] = r.data;
-          });
-          setSummaries(map);
-        }
-        setLoading(false);
-      },
-    );
-  }, []);
-
-  useEffect(() => {
-    if (!selectedCycle) return;
-    setExpensesLoading(true);
-    Promise.all([
-      getExpenses(selectedCycle.id),
-      getIncomes(selectedCycle.id),
-    ]).then(([expRes, incRes]) => {
-      if (expRes.success) setCycleExpenses(expRes.data.expenses);
-      if (incRes.success) setCycleIncomes(incRes.data);
-      setExpensesLoading(false);
+        const summaryResults = await Promise.all(
+          active.map((c) => fetchSummary(c.id).then((r) => ({ id: c.id, r }))),
+        );
+        const map: Record<string, CycleSummary> = {};
+        summaryResults.forEach(({ id, r }) => {
+          if (r.success) map[id] = r.data;
+        });
+        setSummaries(map);
+      }
+      setLoading(false);
     });
-  }, [selectedCycle]);
+  }, []);
 
   const handleCycleAdded = async (cycle: Cycle) => {
     setCycles((prev) => [cycle, ...prev]);
@@ -1970,7 +1979,6 @@ export function Cycles() {
 
   const handleCycleRenamed = (updated: Cycle) => {
     setCycles((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
-    if (selectedCycle?.id === updated.id) setSelectedCycle(updated);
     setRenameCycle(null);
   };
 
@@ -1995,181 +2003,12 @@ export function Cycles() {
     }
   };
 
-  const handleOpenCycle = (cycle: Cycle) => {
-    setSelectedCycle(cycle);
-    setCycleExpenses([]);
-    setCycleIncomes([]);
-  };
-
-  const handleBack = () => {
-    if (selectedCycle) {
-      fetchSummary(selectedCycle.id).then((r) => {
-        if (r.success)
-          setSummaries((prev) => ({ ...prev, [selectedCycle.id]: r.data }));
-      });
-    }
-    setSelectedCycle(null);
-    setCycleExpenses([]);
-    setCycleIncomes([]);
-  };
-
-  const handleStatusChange = async (
-    expenseId: string,
-    status: ExpenseStatus,
-  ) => {
-    if (!selectedCycle) return;
-    const expense = cycleExpenses.find((e) => e.id === expenseId);
-    if (!expense) return;
-
-    setCycleExpenses((prev) =>
-      prev.map((e) => (e.id === expenseId ? { ...e, status } : e)),
-    );
-
-    const res = await editExpense(selectedCycle.id, expenseId, { status });
-    if (!res.success) {
-      setCycleExpenses((prev) =>
-        prev.map((e) =>
-          e.id === expenseId ? { ...e, status: expense.status } : e,
-        ),
-      );
-    } else {
-      const summaryRes = await fetchSummary(selectedCycle.id);
-      if (summaryRes.success) {
-        setSummaries((prev) => ({
-          ...prev,
-          [selectedCycle.id]: summaryRes.data,
-        }));
-      }
-    }
-  };
-
-  const handleToggleExpense = async (expenseId: string) => {
-    if (!selectedCycle) return;
-    const expense = cycleExpenses.find((e) => e.id === expenseId);
-    if (
-      !expense ||
-      expense.status === "cancelled" ||
-      expense.status === "paid_other" ||
-      expense.status === "skipped"
-    )
-      return;
-
-    const nextStatus: ExpenseStatus =
-      expense.status === "pending" || expense.status === "overdue"
-        ? "paid"
-        : expense.status === "paid"
-          ? "pending"
-          : expense.status;
-
-    setCycleExpenses((prev) =>
-      prev.map((e) => (e.id === expenseId ? { ...e, status: nextStatus } : e)),
-    );
-
-    const res = await editExpense(selectedCycle.id, expenseId, {
-      status: nextStatus,
-    });
-    if (!res.success) {
-      setCycleExpenses((prev) =>
-        prev.map((e) =>
-          e.id === expenseId ? { ...e, status: expense.status } : e,
-        ),
-      );
-    }
-  };
-
-  const handleExpenseAdded = (expense: CycleExpense) => {
-    setCycleExpenses((prev) => [...prev, expense]);
-  };
-
-  const handleExpenseEdited = async (updated: CycleExpense) => {
-    setCycleExpenses((prev) =>
-      prev.map((e) => (e.id === updated.id ? updated : e)),
-    );
-    if (selectedCycle) {
-      const summaryRes = await fetchSummary(selectedCycle.id);
-      if (summaryRes.success) {
-        setSummaries((prev) => ({
-          ...prev,
-          [selectedCycle.id]: summaryRes.data,
-        }));
-      }
-    }
-  };
-
-  const handleIncomeEdited = async (updated: CycleIncome) => {
-    setCycleIncomes((prev) =>
-      prev.map((i) => (i.id === updated.id ? updated : i)),
-    );
-    if (selectedCycle) {
-      const summaryRes = await fetchSummary(selectedCycle.id);
-      if (summaryRes.success) {
-        setSummaries((prev) => ({
-          ...prev,
-          [selectedCycle.id]: summaryRes.data,
-        }));
-      }
-    }
-  };
-
-  const handleIncomeAdded = async (income: CycleIncome) => {
-    setCycleIncomes((prev) => [...prev, income]);
-    if (selectedCycle) {
-      const summaryRes = await fetchSummary(selectedCycle.id);
-      if (summaryRes.success) {
-        setSummaries((prev) => ({
-          ...prev,
-          [selectedCycle.id]: summaryRes.data,
-        }));
-      }
-    }
-  };
-
-  const handleIncomeRemoved = async (incomeId: string) => {
-    if (!selectedCycle) return;
-    const res = await removeIncome(selectedCycle.id, incomeId);
-    if (res.success) {
-      setCycleIncomes((prev) => prev.filter((i) => i.id !== incomeId));
-      const summaryRes = await fetchSummary(selectedCycle.id);
-      if (summaryRes.success) {
-        setSummaries((prev) => ({
-          ...prev,
-          [selectedCycle.id]: summaryRes.data,
-        }));
-      }
-    }
-  };
-
   if (loading) {
     return (
       <div className="nb-empty">
         <div className="nb-empty-icon">📖</div>
         <div className="nb-empty-text">Loading cycles…</div>
       </div>
-    );
-  }
-
-  if (selectedCycle) {
-    return expensesLoading ? (
-      <div className="nb-empty">
-        <div className="nb-empty-icon">📖</div>
-        <div className="nb-empty-text">Loading expenses…</div>
-      </div>
-    ) : (
-      <CycleDetail
-        cycle={selectedCycle}
-        expenses={cycleExpenses}
-        incomes={cycleIncomes}
-        summary={summaries[selectedCycle.id] ?? null}
-        paymentMethods={paymentMethods}
-        onBack={handleBack}
-        onToggleExpense={handleToggleExpense}
-        onStatusChange={handleStatusChange}
-        onExpenseAdded={handleExpenseAdded}
-        onExpenseEdited={handleExpenseEdited}
-        onIncomeAdded={handleIncomeAdded}
-        onIncomeRemoved={handleIncomeRemoved}
-        onIncomeEdited={handleIncomeEdited}
-      />
     );
   }
 
@@ -2194,7 +2033,6 @@ export function Cycles() {
               key={c.id}
               cycle={c}
               summary={summaries[c.id] ?? null}
-              onOpen={handleOpenCycle}
               onRename={setRenameCycle}
               onTrash={setTrashCycle}
             />

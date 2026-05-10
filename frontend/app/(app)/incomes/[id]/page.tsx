@@ -3,25 +3,25 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import type {
   PaymentMethod,
-  RecurrentExpense,
+  RecurrentIncome,
   RecurrenceConfig,
   RecurrenceType,
 } from "@/helpers/types";
 import { formatPaymentMethodName } from "@/helpers/formatters";
 import {
   getCurrentUserAction,
-  getRecurrentExpense,
-  addRecurrentExpense,
-  editRecurrentExpense,
-  activateRecurrentExpense,
-} from "@/components/recurrent-expenses/actions";
+  getRecurrentIncome,
+  addRecurrentIncome,
+  editRecurrentIncome,
+  activateRecurrentIncome,
+} from "@/components/incomes/actions";
 import { getPaymentMethods } from "@/components/payment-methods/actions";
 import {
-  TemplateModal,
+  IncomeModal,
   ConfirmTrashModal,
-  templateToForm,
-  type TemplateForm,
-} from "@/components/recurrent-expenses";
+  incomeToForm,
+  type IncomeForm,
+} from "@/components/incomes";
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -56,12 +56,12 @@ function fmtRecurrence(type: RecurrenceType, config: RecurrenceConfig): string {
   }
 }
 
-export default function RecurrentExpenseDetailPage() {
+export default function RecurrentIncomeDetailPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
 
-  const [template, setTemplate] = useState<RecurrentExpense | null>(null);
+  const [income, setIncome] = useState<RecurrentIncome | null>(null);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -76,12 +76,12 @@ export default function RecurrentExpenseDetailPage() {
     let cancelled = false;
     Promise.all([
       getCurrentUserAction(),
-      getRecurrentExpense(id),
+      getRecurrentIncome(id),
       getPaymentMethods(),
-    ]).then(([userRes, tplRes, pmRes]) => {
+    ]).then(([userRes, incRes, pmRes]) => {
       if (cancelled) return;
       if (userRes.success) setIsAdmin(userRes.data.role === "admin");
-      if (tplRes.success) setTemplate(tplRes.data);
+      if (incRes.success) setIncome(incRes.data);
       else setNotFound(true);
       if (pmRes.success) setPaymentMethods(pmRes.data);
       setLoading(false);
@@ -93,24 +93,22 @@ export default function RecurrentExpenseDetailPage() {
 
   const handleBack = () => {
     if (window.history.length > 1) router.back();
-    else router.push("/recurrent-expenses");
+    else router.push("/incomes");
   };
 
-  const handleEditSave = async (form: TemplateForm): Promise<string | null> => {
-    if (!template) return null;
-    const res = await editRecurrentExpense(template.id, {
+  const handleEditSave = async (form: IncomeForm): Promise<string | null> => {
+    if (!income) return null;
+    const res = await editRecurrentIncome(income.id, {
       description: form.description,
       base_amount: form.base_amount,
       currency: form.currency,
-      category: form.category,
       recurrence_type: form.recurrence_type,
       recurrence_config: form.recurrence_config as RecurrenceConfig,
       reference_date: form.reference_date,
-      autopay: form.autopay,
-      payment_method_id: form.payment_method_id || null,
+      payment_method_id: form.payment_method_id,
     });
     if (res.success) {
-      setTemplate(res.data);
+      setIncome(res.data);
       setEditOpen(false);
       return null;
     }
@@ -118,34 +116,32 @@ export default function RecurrentExpenseDetailPage() {
   };
 
   const handleDuplicateSave = async (
-    form: TemplateForm,
+    form: IncomeForm,
   ): Promise<string | null> => {
-    const res = await addRecurrentExpense({
+    const res = await addRecurrentIncome({
       description: form.description,
       base_amount: form.base_amount,
       currency: form.currency,
-      category: form.category,
       recurrence_type: form.recurrence_type,
       recurrence_config: form.recurrence_config as RecurrenceConfig,
       reference_date: form.reference_date,
-      autopay: form.autopay,
-      payment_method_id: form.payment_method_id || null,
+      payment_method_id: form.payment_method_id,
     });
     if (res.success) {
       setDuplicateOpen(false);
-      router.push(`/recurrent-expenses/${res.data.id}`);
+      router.push(`/incomes/${res.data.id}`);
       return null;
     }
     return res.error.message;
   };
 
   const handleRestore = async () => {
-    if (!template) return;
+    if (!income) return;
     setRestoring(true);
     setRestoreError(null);
-    const res = await activateRecurrentExpense(template.id);
+    const res = await activateRecurrentIncome(income.id);
     if (res.success) {
-      setTemplate({ ...template, active: true });
+      setIncome({ ...income, active: true });
     } else {
       setRestoreError(res.error.message);
     }
@@ -161,37 +157,35 @@ export default function RecurrentExpenseDetailPage() {
     );
   }
 
-  if (notFound || !template) {
+  if (notFound || !income) {
     return (
       <>
-        <div className="nb-page-title">Recurrent Expense</div>
+        <div className="nb-page-title">Recurrent Income</div>
         <div className="nb-empty">
           <div className="nb-empty-icon">🔍</div>
           <div className="nb-empty-text">
-            This recurrent expense does not exist or you don&apos;t have access.
+            This recurrent income does not exist or you don&apos;t have access.
           </div>
           <button
             className="nb-btn-cancel"
             style={{ marginTop: 16 }}
             onClick={handleBack}
           >
-            ← Back to Recurrent Expenses
+            ← Back to Recurrent Incomes
           </button>
         </div>
       </>
     );
   }
 
-  const isFixed = template.category === "fixed";
-
   return (
     <>
       <button className="nb-back-btn" onClick={handleBack}>
-        ← Back to recurrent expenses
+        ← Back to recurrent incomes
       </button>
 
-      <div className="nb-page-title">{template.description}</div>
-      <div className="nb-page-subtitle">Recurrent expense template</div>
+      <div className="nb-page-title">{income.description}</div>
+      <div className="nb-page-subtitle">Recurrent income source</div>
 
       <div
         style={{
@@ -214,12 +208,10 @@ export default function RecurrentExpenseDetailPage() {
             justifyContent: "center",
             fontSize: 26,
             flexShrink: 0,
-            background: isFixed
-              ? "var(--stat-card-bg, rgba(44,74,62,0.10))"
-              : "var(--add-btn-hover, rgba(201,168,76,0.15))",
+            background: "var(--stat-card-bg, rgba(44,74,62,0.10))",
           }}
         >
-          {isFixed ? "📌" : "🛒"}
+          💰
         </div>
         <div style={{ flex: 1 }}>
           <div
@@ -230,7 +222,7 @@ export default function RecurrentExpenseDetailPage() {
               color: "var(--ink)",
             }}
           >
-            {fmtAmount(template.base_amount, template.currency)}
+            {fmtAmount(income.base_amount, income.currency)}
           </div>
           <div
             style={{
@@ -245,16 +237,15 @@ export default function RecurrentExpenseDetailPage() {
             }}
           >
             <span
-              className={`nb-template-badge ${isFixed ? "nb-badge-fixed" : "nb-badge-variable"}`}
+              className="nb-template-badge nb-badge-fixed"
+              style={{
+                background: "rgba(44,74,62,0.12)",
+                color: "var(--cover-bg)",
+              }}
             >
-              {template.category}
+              {income.currency}
             </span>
-            {template.autopay && (
-              <span className="nb-template-badge nb-badge-autopay">
-                autopay
-              </span>
-            )}
-            {!template.active && (
+            {!income.active && (
               <span
                 style={{
                   fontFamily: "var(--font-hand)",
@@ -284,20 +275,17 @@ export default function RecurrentExpenseDetailPage() {
       >
         <div>
           <strong>Recurrence:</strong>{" "}
-          {fmtRecurrence(template.recurrence_type, template.recurrence_config)}
+          {fmtRecurrence(income.recurrence_type, income.recurrence_config)}
         </div>
         <div>
-          <strong>Start date:</strong> {template.reference_date}
+          <strong>Start date:</strong> {income.reference_date}
         </div>
-        {template.payment_method && (
+        {income.payment_method && (
           <div>
             <strong>Payment method:</strong>{" "}
-            {formatPaymentMethodName(template.payment_method)}
+            {formatPaymentMethodName(income.payment_method)}
           </div>
         )}
-        <div>
-          <strong>Autopay:</strong> {template.autopay ? "Yes ⚡" : "No"}
-        </div>
       </div>
 
       {restoreError && (
@@ -314,7 +302,7 @@ export default function RecurrentExpenseDetailPage() {
       )}
 
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-        {template.active ? (
+        {income.active ? (
           <>
             <button
               className="nb-btn-primary"
@@ -352,21 +340,21 @@ export default function RecurrentExpenseDetailPage() {
         )}
       </div>
 
-      <TemplateModal
+      <IncomeModal
         isOpen={editOpen}
-        title="Edit Template"
-        initial={templateToForm(template)}
+        title="Edit Recurrent Income"
+        initial={incomeToForm(income)}
         paymentMethods={paymentMethods}
         onClose={() => setEditOpen(false)}
         onSave={handleEditSave}
       />
 
-      <TemplateModal
+      <IncomeModal
         isOpen={duplicateOpen}
-        title="Duplicate Template"
+        title="Duplicate Recurrent Income"
         initial={{
-          ...templateToForm(template),
-          description: `Copy of ${template.description}`,
+          ...incomeToForm(income),
+          description: `Copy of ${income.description}`,
         }}
         paymentMethods={paymentMethods}
         onClose={() => setDuplicateOpen(false)}
@@ -376,10 +364,10 @@ export default function RecurrentExpenseDetailPage() {
       <ConfirmTrashModal
         isOpen={trashOpen}
         onClose={() => setTrashOpen(false)}
-        template={template}
+        income={income}
         onConfirmed={() => {
           setTrashOpen(false);
-          router.push("/recurrent-expenses");
+          router.push("/incomes");
         }}
       />
     </>

@@ -1,6 +1,7 @@
 import { getAuthToken } from "@/actions/auth.action";
 import {
   fetchRecurrentExpenses,
+  fetchRecurrentExpense,
   createRecurrentExpense,
   updateRecurrentExpense,
   deleteRecurrentExpense,
@@ -19,6 +20,9 @@ export const getCurrentUserAction = async () => getCurrentUser(await token());
 
 export const getRecurrentExpenses = async (includeInactive = false) =>
   fetchRecurrentExpenses(await token(), includeInactive);
+
+export const getRecurrentExpense = async (id: string) =>
+  fetchRecurrentExpense(id, await token());
 
 export const addRecurrentExpense = async (
   payload: CreateRecurrentExpenseRequest,

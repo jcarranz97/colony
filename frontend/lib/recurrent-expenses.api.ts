@@ -16,6 +16,9 @@ export const fetchRecurrentExpenses = (
     { token },
   );
 
+export const fetchRecurrentExpense = (id: string, token: string) =>
+  apiClient<RecurrentExpense>(`/recurrent-expenses/${id}`, { token });
+
 export const createRecurrentExpense = (
   payload: CreateRecurrentExpenseRequest,
   token: string,

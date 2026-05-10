@@ -1,13 +1,8 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { UserResponse, UserRole } from "@/helpers/types";
-import {
-  getUsersAction,
-  createUserAction,
-  updateUserAction,
-  deactivateUserAction,
-  reactivateUserAction,
-} from "./actions";
+import { getUsersAction, createUserAction } from "./actions";
 
 type CreateForm = {
   username: string;
@@ -17,7 +12,7 @@ type CreateForm = {
   role: UserRole;
 };
 
-type EditForm = {
+export type EditForm = {
   first_name: string;
   last_name: string;
   role: UserRole;
@@ -32,7 +27,7 @@ const EMPTY_CREATE: CreateForm = {
   role: "user",
 };
 
-function CopyIdButton({ id }: { id: string }) {
+export function CopyIdButton({ id }: { id: string }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -73,16 +68,6 @@ export function UsersManager() {
   const [createError, setCreateError] = useState<string | null>(null);
   const [createLoading, setCreateLoading] = useState(false);
 
-  const [editUser, setEditUser] = useState<UserResponse | null>(null);
-  const [editForm, setEditForm] = useState<EditForm>({
-    first_name: "",
-    last_name: "",
-    role: "user",
-    active: true,
-  });
-  const [editError, setEditError] = useState<string | null>(null);
-  const [editLoading, setEditLoading] = useState(false);
-
   const load = async () => {
     setLoading(true);
     const result = await getUsersAction();
@@ -97,17 +82,6 @@ export function UsersManager() {
   useEffect(() => {
     load();
   }, []);
-
-  const openEdit = (user: UserResponse) => {
-    setEditUser(user);
-    setEditForm({
-      first_name: user.first_name ?? "",
-      last_name: user.last_name ?? "",
-      role: user.role,
-      active: user.active,
-    });
-    setEditError(null);
-  };
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -128,35 +102,6 @@ export function UsersManager() {
     } else {
       setCreateError(result.error.message);
     }
-  };
-
-  const handleEdit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editUser) return;
-    setEditError(null);
-    setEditLoading(true);
-    const result = await updateUserAction(editUser.id, {
-      first_name: editForm.first_name || null,
-      last_name: editForm.last_name || null,
-      role: editForm.role,
-      active: editForm.active,
-    });
-    setEditLoading(false);
-    if (result.success) {
-      setEditUser(null);
-      load();
-    } else {
-      setEditError(result.error.message);
-    }
-  };
-
-  const handleToggleActive = async (user: UserResponse) => {
-    if (user.active) {
-      await deactivateUserAction(user.id);
-    } else {
-      await reactivateUserAction(user.id);
-    }
-    load();
   };
 
   const displayName = (u: UserResponse) => {
@@ -185,7 +130,16 @@ export function UsersManager() {
       )}
 
       {users.map((user) => (
-        <div key={user.id} className="nb-payment-card">
+        <Link
+          key={user.id}
+          href={`/users/${user.id}`}
+          className="nb-payment-card"
+          style={{
+            textDecoration: "none",
+            color: "inherit",
+            cursor: "pointer",
+          }}
+        >
           <div style={{ flex: 1 }}>
             <strong>{displayName(user)}</strong>
             {user.first_name || user.last_name ? (
@@ -224,24 +178,18 @@ export function UsersManager() {
               </span>
             )}
           </div>
-          <div style={{ display: "flex", gap: 8 }}>
-            <CopyIdButton id={user.id} />
-            <button
-              className="nb-btn-cancel"
-              onClick={() => openEdit(user)}
-              style={{ fontSize: "0.85em" }}
-            >
-              Edit
-            </button>
-            <button
-              className={user.active ? "nb-btn-cancel" : "nb-btn-primary"}
-              onClick={() => handleToggleActive(user)}
-              style={{ fontSize: "0.85em" }}
-            >
-              {user.active ? "Deactivate" : "Reactivate"}
-            </button>
-          </div>
-        </div>
+          <span
+            style={{
+              fontFamily: "var(--font-hand)",
+              fontSize: 12,
+              fontWeight: 600,
+              color: "var(--ink-light)",
+              pointerEvents: "none",
+            }}
+          >
+            Open →
+          </span>
+        </Link>
       ))}
 
       {/* Create modal */}
@@ -350,92 +298,6 @@ export function UsersManager() {
         </div>
       )}
 
-      {/* Edit modal */}
-      {editUser && (
-        <div className="nb-modal-backdrop">
-          <div className="nb-modal">
-            <h2 className="nb-modal-title">Edit User — {editUser.username}</h2>
-            <form onSubmit={handleEdit}>
-              <div className="nb-form-row">
-                <div className="nb-form-group">
-                  <label className="nb-form-label">First Name</label>
-                  <input
-                    className="nb-form-input"
-                    value={editForm.first_name}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, first_name: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="nb-form-group">
-                  <label className="nb-form-label">Last Name</label>
-                  <input
-                    className="nb-form-input"
-                    value={editForm.last_name}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, last_name: e.target.value })
-                    }
-                  />
-                </div>
-              </div>
-              <div className="nb-form-group">
-                <label className="nb-form-label">Role</label>
-                <select
-                  className="nb-form-select"
-                  value={editForm.role}
-                  onChange={(e) =>
-                    setEditForm({
-                      ...editForm,
-                      role: e.target.value as UserRole,
-                    })
-                  }
-                >
-                  <option value="user">User</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
-              <div className="nb-form-group">
-                <label className="nb-form-label">Status</label>
-                <select
-                  className="nb-form-select"
-                  value={editForm.active ? "active" : "inactive"}
-                  onChange={(e) =>
-                    setEditForm({
-                      ...editForm,
-                      active: e.target.value === "active",
-                    })
-                  }
-                >
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                </select>
-              </div>
-              {editError && (
-                <p style={{ color: "red", fontSize: "0.85em" }}>{editError}</p>
-              )}
-              <div className="nb-modal-actions">
-                <button
-                  type="button"
-                  className="nb-btn-cancel"
-                  onClick={() => {
-                    setEditUser(null);
-                    setEditError(null);
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="nb-btn-primary"
-                  disabled={editLoading}
-                >
-                  {editLoading ? "Saving…" : "Save"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

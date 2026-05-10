@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type {
   PaymentMethod,
@@ -59,7 +60,15 @@ function PaymentCard({
   onTrash: (m: PaymentMethod) => void;
 }) {
   return (
-    <div className="nb-payment-card">
+    <Link
+      href={`/payment-methods/${method.id}`}
+      className="nb-payment-card"
+      style={{
+        textDecoration: "none",
+        color: "inherit",
+        cursor: "pointer",
+      }}
+    >
       <div
         style={{
           width: 44,
@@ -105,7 +114,14 @@ function PaymentCard({
       </div>
 
       <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-        <button style={iconBtn} onClick={() => onEdit(method)}>
+        <button
+          style={iconBtn}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onEdit(method);
+          }}
+        >
           Edit
         </button>
         <button
@@ -114,13 +130,17 @@ function PaymentCard({
             color: "rgba(220,53,69,0.7)",
             border: "1px solid rgba(220,53,69,0.35)",
           }}
-          onClick={() => onTrash(method)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onTrash(method);
+          }}
           title="Move to trash"
         >
           🗑 Trash
         </button>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -222,7 +242,7 @@ function TrashedPaymentCard({
 
 // ── Confirm Trash Modal ───────────────────────────────────────────────────────
 
-function ConfirmTrashModal({
+export function ConfirmTrashModal({
   isOpen,
   onClose,
   method,
@@ -310,14 +330,14 @@ function ConfirmTrashModal({
 
 // ── Add / Edit Modal ──────────────────────────────────────────────────────────
 
-interface MethodForm {
+export interface MethodForm {
   name: string;
   method_type: PaymentMethodType;
   default_currency: CurrencyCode;
   last_4_digits: string;
 }
 
-function MethodModal({
+export function MethodModal({
   isOpen,
   title,
   initial,
@@ -689,7 +709,7 @@ export function PaymentMethods() {
         existingNames={activeMethods.map((m) => formatPaymentMethodName(m))}
       />
 
-      {/* Edit modal */}
+      {/* Edit modal — quick inline edit from list */}
       <MethodModal
         isOpen={!!editTarget}
         title="Edit Payment Method"

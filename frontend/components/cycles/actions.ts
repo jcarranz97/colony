@@ -1,6 +1,7 @@
 import { getAuthToken } from "@/actions/auth.action";
 import {
   fetchCycles,
+  fetchCycle,
   createCycle,
   updateCycle,
   deleteCycle,
@@ -30,6 +31,8 @@ async function token() {
 
 export const getCycles = async (includeInactive = false) =>
   fetchCycles(await token(), includeInactive);
+
+export const getCycle = async (id: string) => fetchCycle(id, await token());
 
 export const getCurrentUserAction = async () => getCurrentUser(await token());
 

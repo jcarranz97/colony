@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import type {
   RecurrentIncome,
@@ -88,7 +89,11 @@ function IncomeCard({
   onTrash: (i: RecurrentIncome) => void;
 }) {
   return (
-    <div className="nb-template-card">
+    <Link
+      href={`/incomes/${income.id}`}
+      className="nb-template-card"
+      style={{ textDecoration: "none", color: "inherit", cursor: "pointer" }}
+    >
       <div
         style={{
           width: 36,
@@ -171,12 +176,23 @@ function IncomeCard({
       </div>
 
       <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-        <button style={iconBtn} onClick={() => onEdit(income)}>
+        <button
+          style={iconBtn}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onEdit(income);
+          }}
+        >
           Edit
         </button>
         <button
           style={{ ...iconBtn, color: "var(--cover-bg)" }}
-          onClick={() => onDuplicate(income)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onDuplicate(income);
+          }}
           title="Duplicate"
         >
           Duplicate
@@ -187,13 +203,17 @@ function IncomeCard({
             color: "rgba(220,53,69,0.7)",
             border: "1px solid rgba(220,53,69,0.35)",
           }}
-          onClick={() => onTrash(income)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onTrash(income);
+          }}
           title="Move to trash"
         >
           🗑 Trash
         </button>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -300,7 +320,7 @@ function TrashedIncomeCard({
 
 // ── Confirm Trash Modal ───────────────────────────────────────────────────────
 
-function ConfirmTrashModal({
+export function ConfirmTrashModal({
   isOpen,
   onClose,
   income,
@@ -484,7 +504,7 @@ function RecurrenceFields({
 
 // ── Income Modal (Add / Edit) ─────────────────────────────────────────────────
 
-interface IncomeForm {
+export interface IncomeForm {
   description: string;
   base_amount: string;
   currency: CurrencyCode;
@@ -501,7 +521,7 @@ const DEFAULT_CONFIG: Record<RecurrenceType, Record<string, unknown>> = {
   custom: { interval: 1, unit: "days" },
 };
 
-function IncomeModal({
+export function IncomeModal({
   isOpen,
   title,
   initial,
@@ -722,7 +742,7 @@ function IncomeModal({
 
 // ── Main Component ────────────────────────────────────────────────────────────
 
-const BLANK_FORM: IncomeForm = {
+export const BLANK_FORM: IncomeForm = {
   description: "",
   base_amount: "",
   currency: "USD",
@@ -732,7 +752,7 @@ const BLANK_FORM: IncomeForm = {
   payment_method_id: "",
 };
 
-function incomeToForm(i: RecurrentIncome): IncomeForm {
+export function incomeToForm(i: RecurrentIncome): IncomeForm {
   return {
     description: i.description,
     base_amount: i.base_amount,

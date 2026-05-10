@@ -1,213 +1,288 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Formik } from "formik";
+import type { PaymentMethod, PaymentMethodType } from "@/helpers/types";
+import { formatPaymentMethodName } from "@/helpers/formatters";
 import {
-  Button,
-  FieldError,
-  Input,
-  Label,
-  ListBox,
-  Select,
-  Spinner,
-  TextField,
-} from "@heroui/react";
-import { PaymentMethodSchema } from "@/helpers/schemas";
-import {
-  getPaymentMethods,
+  getCurrentUserAction,
+  getPaymentMethod,
   editPaymentMethod,
+  activatePaymentMethod,
 } from "@/components/payment-methods/actions";
-import type { PaymentMethod } from "@/helpers/types";
+import {
+  MethodModal,
+  ConfirmTrashModal,
+  type MethodForm,
+} from "@/components/payment-methods";
 
-export default function EditPaymentMethodPage() {
+const METHOD_ICON: Record<PaymentMethodType, string> = {
+  debit: "🏦",
+  credit: "💳",
+  cash: "💵",
+  transfer: "🔁",
+};
+
+const METHOD_LABEL: Record<PaymentMethodType, string> = {
+  debit: "Debit",
+  credit: "Credit",
+  cash: "Cash",
+  transfer: "Transfer",
+};
+
+export default function PaymentMethodDetailPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
 
   const [method, setMethod] = useState<PaymentMethod | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [notFound, setNotFound] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [trashOpen, setTrashOpen] = useState(false);
+  const [restoring, setRestoring] = useState(false);
+  const [restoreError, setRestoreError] = useState<string | null>(null);
 
   useEffect(() => {
-    getPaymentMethods().then((res) => {
-      if (res.success) {
-        setMethod(res.data.find((m) => m.id === id) ?? null);
-      }
-      setLoading(false);
-    });
+    let cancelled = false;
+    Promise.all([getCurrentUserAction(), getPaymentMethod(id)]).then(
+      ([userRes, methodRes]) => {
+        if (cancelled) return;
+        if (userRes.success) setIsAdmin(userRes.data.role === "admin");
+        if (methodRes.success) setMethod(methodRes.data);
+        else setNotFound(true);
+        setLoading(false);
+      },
+    );
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
+
+  const handleBack = () => {
+    if (window.history.length > 1) router.back();
+    else router.push("/payment-methods");
+  };
+
+  const handleEditSave = async (form: MethodForm): Promise<string | null> => {
+    if (!method) return null;
+    const payload = {
+      ...form,
+      last_4_digits: form.last_4_digits.trim() || null,
+    };
+    const res = await editPaymentMethod(method.id, payload);
+    if (res.success) {
+      setMethod(res.data);
+      setEditOpen(false);
+      return null;
+    }
+    return res.error.message;
+  };
+
+  const handleRestore = async () => {
+    if (!method) return;
+    setRestoring(true);
+    setRestoreError(null);
+    const res = await activatePaymentMethod(method.id);
+    if (res.success) {
+      setMethod({ ...method, active: true });
+    } else {
+      setRestoreError(res.error.message);
+    }
+    setRestoring(false);
+  };
 
   if (loading) {
     return (
-      <div className="flex justify-center py-16">
-        <Spinner />
+      <div className="nb-empty">
+        <div className="nb-empty-icon">📖</div>
+        <div className="nb-empty-text">Loading…</div>
       </div>
     );
   }
 
-  if (!method) {
+  if (notFound || !method) {
     return (
-      <div className="flex flex-col items-center gap-4 py-16">
-        <p className="text-default-500">Payment method not found.</p>
-        <Button variant="ghost" onPress={() => router.push("/payment-methods")}>
-          Back
-        </Button>
-      </div>
+      <>
+        <div className="nb-page-title">Payment Method</div>
+        <div className="nb-empty">
+          <div className="nb-empty-icon">🔍</div>
+          <div className="nb-empty-text">
+            This payment method does not exist or you don&apos;t have access.
+          </div>
+          <button
+            className="nb-btn-cancel"
+            style={{ marginTop: 16 }}
+            onClick={handleBack}
+          >
+            ← Back to Payment Methods
+          </button>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="max-w-md flex flex-col gap-6">
-      <div className="flex items-center gap-3">
-        <Button
-          size="sm"
-          variant="ghost"
-          onPress={() => router.push("/payment-methods")}
+    <>
+      <button className="nb-back-btn" onClick={handleBack}>
+        ← Back to payment methods
+      </button>
+
+      <div className="nb-page-title">{formatPaymentMethodName(method)}</div>
+      <div className="nb-page-subtitle">Payment method details</div>
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
+          marginBottom: 24,
+          padding: "16px 18px",
+          border: "1px solid var(--paper-line, rgba(140,140,140,0.25))",
+          borderRadius: 8,
+          background: "var(--paper-bg, transparent)",
+        }}
+      >
+        <div
+          style={{
+            width: 56,
+            height: 56,
+            borderRadius: 12,
+            background: "var(--stat-card-bg, rgba(44,74,62,0.08))",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 28,
+            flexShrink: 0,
+          }}
         >
-          ← Back
-        </Button>
-        <h1 className="text-2xl font-bold">Edit Payment Method</h1>
+          {METHOD_ICON[method.method_type]}
+        </div>
+        <div style={{ flex: 1 }}>
+          <div
+            style={{
+              fontFamily: "var(--font-hand)",
+              fontSize: 13,
+              color: "var(--ink-light)",
+              opacity: 0.7,
+            }}
+          >
+            {METHOD_LABEL[method.method_type]} · {method.default_currency}
+            {method.last_4_digits ? ` · •••• ${method.last_4_digits}` : ""}
+          </div>
+          {!method.active && (
+            <span
+              style={{
+                display: "inline-block",
+                marginTop: 6,
+                fontFamily: "var(--font-hand)",
+                fontSize: 11,
+                background: "rgba(180,180,180,0.28)",
+                color: "var(--ink-light)",
+                borderRadius: 3,
+                padding: "2px 8px",
+              }}
+            >
+              trashed
+            </span>
+          )}
+        </div>
       </div>
 
-      <Formik
-        initialValues={{
+      <div className="nb-section-title">Details</div>
+      <div
+        style={{
+          fontFamily: "var(--font-hand)",
+          fontSize: 14,
+          color: "var(--ink)",
+          lineHeight: 1.8,
+          marginBottom: 24,
+        }}
+      >
+        <div>
+          <strong>Name:</strong> {method.name}
+        </div>
+        <div>
+          <strong>Type:</strong> {METHOD_LABEL[method.method_type]}
+        </div>
+        <div>
+          <strong>Default currency:</strong> {method.default_currency}
+        </div>
+        {method.last_4_digits && (
+          <div>
+            <strong>Last 4 digits:</strong> {method.last_4_digits}
+          </div>
+        )}
+      </div>
+
+      {restoreError && (
+        <p
+          style={{
+            fontFamily: "var(--font-hand)",
+            color: "var(--hl-overdue-border)",
+            fontSize: 14,
+            marginBottom: 12,
+          }}
+        >
+          {restoreError}
+        </p>
+      )}
+
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        {method.active ? (
+          <>
+            <button
+              className="nb-btn-primary"
+              onClick={() => setEditOpen(true)}
+            >
+              Edit
+            </button>
+            <button
+              className="nb-btn-cancel"
+              style={{
+                color: "rgba(220,53,69,0.7)",
+                border: "1px solid rgba(220,53,69,0.35)",
+              }}
+              onClick={() => setTrashOpen(true)}
+            >
+              🗑 Move to Trash
+            </button>
+          </>
+        ) : (
+          isAdmin && (
+            <button
+              className="nb-btn-primary"
+              onClick={handleRestore}
+              disabled={restoring}
+            >
+              {restoring ? "Restoring…" : "↩ Restore"}
+            </button>
+          )
+        )}
+      </div>
+
+      <MethodModal
+        isOpen={editOpen}
+        title="Edit Payment Method"
+        initial={{
           name: method.name,
           method_type: method.method_type,
           default_currency: method.default_currency,
+          last_4_digits: method.last_4_digits ?? "",
         }}
-        validationSchema={PaymentMethodSchema}
-        onSubmit={async (values, { setSubmitting }) => {
-          setError(null);
-          const result = await editPaymentMethod(method.id, {
-            name: values.name,
-          });
-          if (result.success) {
-            router.push("/payment-methods");
-          } else {
-            setError(result.error.message);
-          }
-          setSubmitting(false);
+        onClose={() => setEditOpen(false)}
+        onSave={handleEditSave}
+      />
+
+      <ConfirmTrashModal
+        isOpen={trashOpen}
+        onClose={() => setTrashOpen(false)}
+        method={method}
+        onConfirmed={() => {
+          setTrashOpen(false);
+          router.push("/payment-methods");
         }}
-      >
-        {({
-          values,
-          errors,
-          touched,
-          setFieldValue,
-          handleSubmit,
-          isSubmitting,
-        }) => (
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <TextField
-              isInvalid={!!errors.name && !!touched.name}
-              value={values.name}
-              onChange={(v) => setFieldValue("name", v)}
-            >
-              <Label>Name</Label>
-              <Input />
-              {touched.name && errors.name && (
-                <FieldError>{errors.name}</FieldError>
-              )}
-            </TextField>
-
-            <Select.Root
-              selectedKey={values.method_type || null}
-              onSelectionChange={(key) =>
-                setFieldValue("method_type", String(key))
-              }
-              isInvalid={!!errors.method_type && !!touched.method_type}
-              fullWidth
-            >
-              <Label>Type</Label>
-              <Select.Trigger>
-                <Select.Value>
-                  {({ isPlaceholder, selectedText }: any) =>
-                    isPlaceholder ? (
-                      <span className="text-default-400">Select type...</span>
-                    ) : (
-                      selectedText
-                    )
-                  }
-                </Select.Value>
-                <Select.Indicator />
-              </Select.Trigger>
-              {touched.method_type && errors.method_type && (
-                <p className="text-xs text-danger">{errors.method_type}</p>
-              )}
-              <Select.Popover>
-                <ListBox>
-                  <ListBox.Item id="debit" textValue="Debit">
-                    Debit
-                  </ListBox.Item>
-                  <ListBox.Item id="credit" textValue="Credit">
-                    Credit
-                  </ListBox.Item>
-                  <ListBox.Item id="cash" textValue="Cash">
-                    Cash
-                  </ListBox.Item>
-                  <ListBox.Item id="transfer" textValue="Transfer">
-                    Transfer
-                  </ListBox.Item>
-                </ListBox>
-              </Select.Popover>
-            </Select.Root>
-
-            <Select.Root
-              selectedKey={values.default_currency || null}
-              onSelectionChange={(key) =>
-                setFieldValue("default_currency", String(key))
-              }
-              isInvalid={
-                !!errors.default_currency && !!touched.default_currency
-              }
-              fullWidth
-            >
-              <Label>Currency</Label>
-              <Select.Trigger>
-                <Select.Value>
-                  {({ isPlaceholder, selectedText }: any) =>
-                    isPlaceholder ? (
-                      <span className="text-default-400">
-                        Select currency...
-                      </span>
-                    ) : (
-                      selectedText
-                    )
-                  }
-                </Select.Value>
-                <Select.Indicator />
-              </Select.Trigger>
-              {touched.default_currency && errors.default_currency && (
-                <p className="text-xs text-danger">{errors.default_currency}</p>
-              )}
-              <Select.Popover>
-                <ListBox>
-                  <ListBox.Item id="USD" textValue="USD">
-                    USD
-                  </ListBox.Item>
-                  <ListBox.Item id="MXN" textValue="MXN">
-                    MXN
-                  </ListBox.Item>
-                </ListBox>
-              </Select.Popover>
-            </Select.Root>
-
-            {error && <p className="text-sm text-danger">{error}</p>}
-
-            <div className="flex gap-2">
-              <Button
-                variant="ghost"
-                onPress={() => router.push("/payment-methods")}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" variant="primary" isDisabled={isSubmitting}>
-                {isSubmitting ? <Spinner size="sm" /> : "Save Changes"}
-              </Button>
-            </div>
-          </form>
-        )}
-      </Formik>
-    </div>
+      />
+    </>
   );
 }

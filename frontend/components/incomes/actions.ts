@@ -1,6 +1,7 @@
 import { getAuthToken } from "@/actions/auth.action";
 import {
   fetchRecurrentIncomes,
+  fetchRecurrentIncome,
   createRecurrentIncome,
   updateRecurrentIncome,
   deleteRecurrentIncome,
@@ -19,6 +20,9 @@ export const getCurrentUserAction = async () => getCurrentUser(await token());
 
 export const getRecurrentIncomes = async (includeInactive = false) =>
   fetchRecurrentIncomes(await token(), includeInactive);
+
+export const getRecurrentIncome = async (id: string) =>
+  fetchRecurrentIncome(id, await token());
 
 export const addRecurrentIncome = async (
   payload: CreateRecurrentIncomeRequest,
