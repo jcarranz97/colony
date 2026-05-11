@@ -68,12 +68,13 @@ async def get_payment_methods(
 async def create_payment_method(
     payment_method_data: schemas.PaymentMethodCreate,
     current_household: CurrentActiveHousehold,
+    current_user: CurrentActiveUser,
     db: DatabaseDep,
 ) -> schemas.PaymentMethodResponse:
     """Create a new payment method."""
     try:
         payment_method = service.payment_method_service.create_payment_method(
-            db, payment_method_data, str(current_household.id)
+            db, payment_method_data, str(current_household.id), actor=current_user
         )
         return schemas.PaymentMethodResponse.model_validate(payment_method)
     except PaymentMethodNameExistsExceptionError as e:
@@ -102,12 +103,13 @@ async def get_payment_method(
 async def update_payment_method(
     payment_method_data: schemas.PaymentMethodUpdate,
     payment_method: PaymentMethodDep,
+    current_user: CurrentActiveUser,
     db: DatabaseDep,
 ) -> schemas.PaymentMethodResponse:
     """Update an existing payment method."""
     try:
         updated_payment_method = service.payment_method_service.update_payment_method(
-            db, payment_method, payment_method_data
+            db, payment_method, payment_method_data, actor=current_user
         )
         return schemas.PaymentMethodResponse.model_validate(updated_payment_method)
     except PaymentMethodNameExistsExceptionError as e:
@@ -122,10 +124,13 @@ async def update_payment_method(
 )
 async def delete_payment_method(
     payment_method: PaymentMethodDep,
+    current_user: CurrentActiveUser,
     db: DatabaseDep,
 ) -> None:
     """Deactivate a payment method (soft delete)."""
     try:
-        service.payment_method_service.delete_payment_method(db, payment_method)
+        service.payment_method_service.delete_payment_method(
+            db, payment_method, actor=current_user
+        )
     except PaymentMethodInUseExceptionError as e:
         raise HTTPException(status_code=e.status_code, detail=e.message) from e

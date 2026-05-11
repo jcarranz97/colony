@@ -347,7 +347,12 @@ def seed_exchange_rate(db: Session, rate_data: dict[str, Any]) -> None:
     )
 
 
-def seed_cycle(db: Session, household: Household, cycle_data: dict[str, Any]) -> None:
+def seed_cycle(
+    db: Session,
+    household: Household,
+    cycle_data: dict[str, Any],
+    actor: User,
+) -> None:
     """Create a cycle (with generated expenses) for the household if not existing.
 
     Uses the cycle service so that template generation, remaining balance
@@ -357,6 +362,7 @@ def seed_cycle(db: Session, household: Household, cycle_data: dict[str, Any]) ->
         db: Active SQLAlchemy session.
         household: The Household instance to associate the cycle with.
         cycle_data: Dict of cycle fields from the seed YAML.
+        actor: The seed user attributed as the creator in the activity log.
     """
     name = cycle_data["name"]
     existing = (
@@ -382,7 +388,7 @@ def seed_cycle(db: Session, household: Household, cycle_data: dict[str, Any]) ->
 
     try:
         cycle = cycle_service_module.cycle_service.create_cycle(
-            db, create_schema, str(household.id)
+            db, create_schema, str(household.id), actor=actor
         )
     except Exception as exc:
         print(f"    ⚠️  Failed to create cycle '{name}': {exc}")
@@ -402,7 +408,10 @@ def seed_cycle(db: Session, household: Household, cycle_data: dict[str, Any]) ->
 
 
 def _seed_household_full_data(
-    db: Session, household: Household, user_data: dict[str, Any]
+    db: Session,
+    household: Household,
+    user_data: dict[str, Any],
+    actor: User,
 ) -> None:
     """Seed payment methods, recurrent expenses, and cycles for a household."""
     payment_methods: dict[str, PaymentMethod] = {}
@@ -435,7 +444,7 @@ def _seed_household_full_data(
     db.commit()  # commit templates before generating cycle expenses
 
     for cycle_data in user_data.get("cycles", []):
-        seed_cycle(db, household, cycle_data)
+        seed_cycle(db, household, cycle_data, actor)
 
 
 def seed_database(seed_file: Path, auth_only: bool = False) -> None:
@@ -493,11 +502,11 @@ def seed_database(seed_file: Path, auth_only: bool = False) -> None:
         for user_data in users_data:
             household_name = user_data.get("household", default_household_name)
             household = households.get(household_name or "", default_household)
-            seed_user(db, user_data, household)
+            user = seed_user(db, user_data, household)
             if auth_only:
                 db.commit()
                 continue
-            _seed_household_full_data(db, household, user_data)
+            _seed_household_full_data(db, household, user_data, actor=user)
 
         db.commit()
 

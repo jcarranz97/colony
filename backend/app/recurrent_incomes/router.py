@@ -69,12 +69,13 @@ async def get_recurrent_incomes(
 async def create_recurrent_income(
     data: schemas.RecurrentIncomeCreate,
     current_household: CurrentActiveHousehold,
+    current_user: CurrentActiveUser,
     db: DatabaseDep,
 ) -> schemas.RecurrentIncomeResponse:
     """Create a new recurrent income."""
     try:
         income = service.recurrent_income_service.create_recurrent_income(
-            db, data, str(current_household.id)
+            db, data, str(current_household.id), actor=current_user
         )
         return schemas.RecurrentIncomeResponse.model_validate(income)
     except PaymentMethodNotFoundExceptionError as e:
@@ -104,12 +105,17 @@ async def update_recurrent_income(
     data: schemas.RecurrentIncomeUpdate,
     recurrent_income: RecurrentIncomeDep,
     current_household: CurrentActiveHousehold,
+    current_user: CurrentActiveUser,
     db: DatabaseDep,
 ) -> schemas.RecurrentIncomeResponse:
     """Update an existing recurrent income."""
     try:
         updated = service.recurrent_income_service.update_recurrent_income(
-            db, recurrent_income, data, str(current_household.id)
+            db,
+            recurrent_income,
+            data,
+            str(current_household.id),
+            actor=current_user,
         )
         return schemas.RecurrentIncomeResponse.model_validate(updated)
     except PaymentMethodNotFoundExceptionError as e:
@@ -126,10 +132,13 @@ async def update_recurrent_income(
 )
 async def delete_recurrent_income(
     recurrent_income: RecurrentIncomeDep,
+    current_user: CurrentActiveUser,
     db: DatabaseDep,
 ) -> None:
     """Soft delete a recurrent income."""
     try:
-        service.recurrent_income_service.delete_recurrent_income(db, recurrent_income)
+        service.recurrent_income_service.delete_recurrent_income(
+            db, recurrent_income, actor=current_user
+        )
     except RecurrentIncomeNotFoundExceptionError as e:
         raise HTTPException(status_code=e.status_code, detail=e.message) from e

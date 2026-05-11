@@ -4,6 +4,10 @@ from uuid import UUID
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
+from app.activity.constants import ActivityAction, EntityType
+from app.activity.helpers import compute_diff
+from app.activity.service import activity_service
+from app.auth.models import User
 from app.payment_methods import models as pm_models
 
 from . import models, schemas
@@ -120,6 +124,7 @@ class RecurrentExpenseService:
         db: Session,
         data: schemas.RecurrentExpenseCreate,
         household_id: str,
+        actor: User,
     ) -> models.RecurrentExpense:
         """Create a new recurrent expense for a household.
 
@@ -127,6 +132,7 @@ class RecurrentExpenseService:
             db: Active database session.
             data: Validated creation schema.
             household_id: The active household's ID.
+            actor: The user performing the creation (recorded in activity log).
 
         Returns:
             The newly created RecurrentExpense.
@@ -160,6 +166,17 @@ class RecurrentExpenseService:
         )
 
         db.add(recurrent_expense)
+        db.flush()
+
+        activity_service.record(
+            db,
+            household_id=recurrent_expense.household_id,
+            entity_type=EntityType.RECURRENT_EXPENSE,
+            entity_id=recurrent_expense.id,
+            actor_user_id=actor.id,
+            action=ActivityAction.CREATED,
+        )
+
         db.commit()
         db.refresh(recurrent_expense)
 
@@ -179,6 +196,7 @@ class RecurrentExpenseService:
         recurrent_expense: models.RecurrentExpense,
         data: schemas.RecurrentExpenseUpdate,
         household_id: str,
+        actor: User,
     ) -> models.RecurrentExpense:
         """Update an existing recurrent expense.
 
@@ -187,6 +205,7 @@ class RecurrentExpenseService:
             recurrent_expense: The existing recurrent expense ORM instance.
             data: Validated update schema (partial).
             household_id: The active household's ID.
+            actor: The user performing the update (recorded in activity log).
 
         Returns:
             The updated RecurrentExpense.
@@ -215,8 +234,32 @@ class RecurrentExpenseService:
                 except ValueError as exc:
                     raise InvalidRecurrenceConfigExceptionError(str(exc)) from exc
 
+        before = {field: getattr(recurrent_expense, field) for field in update_data}
+
         for field, value in update_data.items():
             setattr(recurrent_expense, field, value)
+
+        db.flush()
+
+        after = {field: getattr(recurrent_expense, field) for field in update_data}
+        diff = compute_diff(before, after)
+        if diff:
+            action = ActivityAction.UPDATED
+            if "active" in diff and len(diff) == 1:
+                action = (
+                    ActivityAction.REACTIVATED
+                    if diff["active"]["to"]
+                    else ActivityAction.DEACTIVATED
+                )
+            activity_service.record(
+                db,
+                household_id=recurrent_expense.household_id,
+                entity_type=EntityType.RECURRENT_EXPENSE,
+                entity_id=recurrent_expense.id,
+                actor_user_id=actor.id,
+                action=action,
+                changes=diff,
+            )
 
         db.commit()
         db.refresh(recurrent_expense)
@@ -232,12 +275,14 @@ class RecurrentExpenseService:
     def delete_recurrent_expense(
         db: Session,
         recurrent_expense: models.RecurrentExpense,
+        actor: User,
     ) -> None:
         """Soft delete a recurrent expense by setting active to False.
 
         Args:
             db: Active database session.
             recurrent_expense: The recurrent expense ORM instance to deactivate.
+            actor: The user performing the deletion (recorded in activity log).
         """
         logger.info(
             "Deactivating recurrent expense",
@@ -245,6 +290,17 @@ class RecurrentExpenseService:
         )
 
         recurrent_expense.active = False
+        db.flush()
+
+        activity_service.record(
+            db,
+            household_id=recurrent_expense.household_id,
+            entity_type=EntityType.RECURRENT_EXPENSE,
+            entity_id=recurrent_expense.id,
+            actor_user_id=actor.id,
+            action=ActivityAction.DEACTIVATED,
+        )
+
         db.commit()
 
         logger.info(

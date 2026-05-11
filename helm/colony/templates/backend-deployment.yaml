@@ -36,6 +36,25 @@ spec:
                 sleep 2;
               done
               echo "PostgreSQL is ready."
+        - name: run-migrations
+          image: {{ include "colony.image" (dict "registry" .Values.image.registry "repository" .Values.backend.image.repository "tag" .Values.backend.image.tag) }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          workingDir: /app
+          command:
+            - sh
+            - -c
+            - |
+              echo "Running Alembic migrations..."
+              uv run alembic upgrade head
+              echo "Migrations complete."
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "colony.fullname" . }}-secret
+                  key: database-url
+            - name: PYTHONPATH
+              value: /app
       containers:
         - name: backend
           image: {{ include "colony.image" (dict "registry" .Values.image.registry "repository" .Values.backend.image.repository "tag" .Values.backend.image.tag) }}

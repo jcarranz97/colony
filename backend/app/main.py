@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.activity.router import comments_router, router as activity_router
 from app.auth.models import User
 from app.auth.router import router as auth_router
 from app.auth.utils import get_password_hash
@@ -80,7 +81,15 @@ def _bootstrap_admin() -> None:
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI) -> AsyncGenerator[None]:
-    """Create database tables and bootstrap the admin user on startup."""
+    """Ensure schema exists and bootstrap the default admin user on startup.
+
+    Production schema management is owned by Alembic — the Helm chart's
+    init container runs ``alembic upgrade head`` before the API starts,
+    so by the time this lifespan runs, every table already exists and
+    ``create_all`` is a no-op. We keep the ``create_all`` call here as a
+    dev/docker-compose safety net so a fresh ``docker compose up`` works
+    without a manual migration step.
+    """
     Base.metadata.create_all(bind=engine)
     _bootstrap_admin()
     yield
@@ -120,6 +129,8 @@ def create_app() -> FastAPI:
     app.include_router(cycles_router, prefix="/api/v1")
     app.include_router(exchange_rates_router, prefix="/api/v1")
     app.include_router(households_router, prefix="/api/v1")
+    app.include_router(activity_router, prefix="/api/v1")
+    app.include_router(comments_router, prefix="/api/v1")
 
     @app.get("/")
     async def root() -> dict[str, str]:

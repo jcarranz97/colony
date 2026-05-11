@@ -77,12 +77,13 @@ async def get_recurrent_expenses(
 async def create_recurrent_expense(
     data: schemas.RecurrentExpenseCreate,
     current_household: CurrentActiveHousehold,
+    current_user: CurrentActiveUser,
     db: DatabaseDep,
 ) -> schemas.RecurrentExpenseResponse:
     """Create a new recurrent expense."""
     try:
         recurrent_expense = service.recurrent_expense_service.create_recurrent_expense(
-            db, data, str(current_household.id)
+            db, data, str(current_household.id), actor=current_user
         )
         return schemas.RecurrentExpenseResponse.model_validate(recurrent_expense)
     except PaymentMethodNotFoundExceptionError as e:
@@ -112,12 +113,17 @@ async def update_recurrent_expense(
     data: schemas.RecurrentExpenseUpdate,
     recurrent_expense: RecurrentExpenseDep,
     current_household: CurrentActiveHousehold,
+    current_user: CurrentActiveUser,
     db: DatabaseDep,
 ) -> schemas.RecurrentExpenseResponse:
     """Update an existing recurrent expense."""
     try:
         updated = service.recurrent_expense_service.update_recurrent_expense(
-            db, recurrent_expense, data, str(current_household.id)
+            db,
+            recurrent_expense,
+            data,
+            str(current_household.id),
+            actor=current_user,
         )
         return schemas.RecurrentExpenseResponse.model_validate(updated)
     except PaymentMethodNotFoundExceptionError as e:
@@ -134,12 +140,13 @@ async def update_recurrent_expense(
 )
 async def delete_recurrent_expense(
     recurrent_expense: RecurrentExpenseDep,
+    current_user: CurrentActiveUser,
     db: DatabaseDep,
 ) -> None:
     """Soft delete a recurrent expense."""
     try:
         service.recurrent_expense_service.delete_recurrent_expense(
-            db, recurrent_expense
+            db, recurrent_expense, actor=current_user
         )
     except RecurrentExpenseNotFoundExceptionError as e:
         raise HTTPException(status_code=e.status_code, detail=e.message) from e

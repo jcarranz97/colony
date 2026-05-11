@@ -1,3 +1,5 @@
+import uuid
+
 from sqlalchemy import ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import ENUM, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -12,7 +14,7 @@ class PaymentMethod(BaseModel):
 
     __tablename__ = "payment_methods"
 
-    household_id: Mapped[UUID] = mapped_column(
+    household_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("households.id", ondelete="CASCADE"),
         nullable=False,

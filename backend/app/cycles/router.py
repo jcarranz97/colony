@@ -91,11 +91,14 @@ async def list_cycles(
 async def create_cycle(
     data: schemas.CycleCreate,
     current_household: CurrentActiveHousehold,
+    current_user: CurrentActiveUser,
     db: DatabaseDep,
 ) -> schemas.CycleResponse:
     """Create a new expense cycle."""
     try:
-        cycle = service.cycle_service.create_cycle(db, data, str(current_household.id))
+        cycle = service.cycle_service.create_cycle(
+            db, data, str(current_household.id), actor=current_user
+        )
         return schemas.CycleResponse.model_validate(cycle)
     except CycleNameExistsExceptionError as exc:
         raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
@@ -125,11 +128,14 @@ async def get_cycle(cycle: CycleDep) -> schemas.CycleResponse:
 async def update_cycle(
     data: schemas.CycleUpdate,
     cycle: CycleDep,
+    current_user: CurrentActiveUser,
     db: DatabaseDep,
 ) -> schemas.CycleResponse:
     """Partially update a cycle."""
     try:
-        updated = service.cycle_service.update_cycle(db, cycle, data)
+        updated = service.cycle_service.update_cycle(
+            db, cycle, data, actor=current_user
+        )
         return schemas.CycleResponse.model_validate(updated)
     except CycleNameExistsExceptionError as exc:
         raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
@@ -141,9 +147,13 @@ async def update_cycle(
     summary="Delete a cycle",
     description="Soft-delete a cycle and all its associated expenses.",
 )
-async def delete_cycle(cycle: CycleDep, db: DatabaseDep) -> None:
+async def delete_cycle(
+    cycle: CycleDep,
+    current_user: CurrentActiveUser,
+    db: DatabaseDep,
+) -> None:
     """Soft-delete a cycle."""
-    service.cycle_service.delete_cycle(db, cycle)
+    service.cycle_service.delete_cycle(db, cycle, actor=current_user)
 
 
 @router.put(
@@ -247,6 +257,7 @@ async def list_cycle_expenses(
 async def create_cycle_expense(
     data: schemas.CycleExpenseCreate,
     current_household: CurrentActiveHousehold,
+    current_user: CurrentActiveUser,
     db: DatabaseDep,
     cycle_id: str,
 ) -> schemas.CycleExpenseResponse:
@@ -261,7 +272,7 @@ async def create_cycle_expense(
 
     try:
         expense = service.cycle_expense_service.create_expense(
-            db, cycle, data, str(current_household.id)
+            db, cycle, data, str(current_household.id), actor=current_user
         )
         return schemas.CycleExpenseResponse.model_validate(expense)
     except PaymentMethodNotFoundExceptionError as exc:
@@ -295,6 +306,7 @@ async def update_cycle_expense(
     expense: CycleExpenseDep,
     cycle_id: str,
     current_household: CurrentActiveHousehold,
+    current_user: CurrentActiveUser,
     db: DatabaseDep,
 ) -> schemas.CycleExpenseResponse:
     """Partially update a cycle expense."""
@@ -307,7 +319,9 @@ async def update_cycle_expense(
         )
 
     try:
-        updated = service.cycle_expense_service.update_expense(db, cycle, expense, data)
+        updated = service.cycle_expense_service.update_expense(
+            db, cycle, expense, data, actor=current_user
+        )
         return schemas.CycleExpenseResponse.model_validate(updated)
     except ExchangeRateNotFoundExceptionError as exc:
         raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
@@ -323,6 +337,7 @@ async def delete_cycle_expense(
     expense: CycleExpenseDep,
     cycle_id: str,
     current_household: CurrentActiveHousehold,
+    current_user: CurrentActiveUser,
     db: DatabaseDep,
 ) -> None:
     """Soft-delete a cycle expense."""
@@ -334,7 +349,7 @@ async def delete_cycle_expense(
             status_code=status.HTTP_404_NOT_FOUND, detail="Cycle not found"
         )
 
-    service.cycle_expense_service.delete_expense(db, cycle, expense)
+    service.cycle_expense_service.delete_expense(db, cycle, expense, actor=current_user)
 
 
 # ---------------------------------------------------------------------------
@@ -376,6 +391,7 @@ async def list_cycle_incomes(
 async def create_cycle_income(
     data: schemas.CycleIncomeCreate,
     current_household: CurrentActiveHousehold,
+    current_user: CurrentActiveUser,
     db: DatabaseDep,
     cycle_id: str,
 ) -> schemas.CycleIncomeResponse:
@@ -390,7 +406,7 @@ async def create_cycle_income(
 
     try:
         income = service.cycle_income_service.create_income(
-            db, cycle, data, str(current_household.id)
+            db, cycle, data, str(current_household.id), actor=current_user
         )
         return schemas.CycleIncomeResponse.model_validate(income)
     except PaymentMethodNotFoundExceptionError as exc:
@@ -421,6 +437,7 @@ async def update_cycle_income(
     income: CycleIncomeDep,
     cycle_id: str,
     current_household: CurrentActiveHousehold,
+    current_user: CurrentActiveUser,
     db: DatabaseDep,
 ) -> schemas.CycleIncomeResponse:
     """Partially update a cycle income."""
@@ -434,7 +451,7 @@ async def update_cycle_income(
 
     try:
         updated = service.cycle_income_service.update_income(
-            db, cycle, income, data, str(current_household.id)
+            db, cycle, income, data, str(current_household.id), actor=current_user
         )
         return schemas.CycleIncomeResponse.model_validate(updated)
     except PaymentMethodNotFoundExceptionError as exc:
@@ -453,6 +470,7 @@ async def delete_cycle_income(
     income: CycleIncomeDep,
     cycle_id: str,
     current_household: CurrentActiveHousehold,
+    current_user: CurrentActiveUser,
     db: DatabaseDep,
 ) -> None:
     """Soft-delete a cycle income."""
@@ -465,6 +483,8 @@ async def delete_cycle_income(
         )
 
     try:
-        service.cycle_income_service.delete_income(db, cycle, income)
+        service.cycle_income_service.delete_income(
+            db, cycle, income, actor=current_user
+        )
     except CycleIncomeNotFoundExceptionError as exc:
         raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
