@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.activity.constants import ActivityAction, EntityType
 from app.activity.helpers import compute_diff
-from app.activity.service import activity_service, comment_service
+from app.activity.service import activity_service
 from app.auth.models import User
 from app.payment_methods import models as pm_models
 from app.recurrent_expenses import models as recurrent_expense_models
@@ -846,11 +846,6 @@ class CycleExpenseService:
         rate = _get_usd_rate(db, data.currency.value)
         amount_usd = (data.amount * rate).quantize(Decimal("0.01"))
 
-        # Route any free-form text from the form's "Comments" field through
-        # the polymorphic comments table so it shows up as a real comment in
-        # the activity feed instead of a static field update.
-        initial_comment = (data.comments or "").strip() or None
-
         expense = models.CycleExpense(
             cycle_id=cycle.id,
             payment_method_id=data.payment_method_id,
@@ -860,7 +855,7 @@ class CycleExpenseService:
             amount_usd=amount_usd,
             due_date=data.due_date,
             category=data.category,
-            comments=None,
+            comments=data.comments,
             autopay=data.autopay,
             paid=data.paid,
             status=ExpenseStatus.PAID if data.paid else ExpenseStatus.PENDING,
@@ -883,18 +878,6 @@ class CycleExpenseService:
         )
 
         db.commit()
-
-        if initial_comment is not None:
-            comment_service.create(
-                db,
-                household_id=cycle.household_id,
-                entity_type=EntityType.CYCLE_EXPENSE,
-                entity_id=expense.id,
-                body=initial_comment,
-                actor=actor,
-                cycle_id=cycle.id,
-            )
-
         db.refresh(expense)
 
         logger.info(
@@ -904,7 +887,7 @@ class CycleExpenseService:
         return expense
 
     @staticmethod
-    def update_expense(  # noqa: C901, PLR0912 - one branch per derived semantic action
+    def update_expense(  # noqa: C901 - one branch per derived semantic action
         db: Session,
         cycle: models.Cycle,
         expense: models.CycleExpense,
@@ -930,16 +913,6 @@ class CycleExpenseService:
         logger.info("Updating cycle expense", extra={"expense_id": str(expense.id)})
 
         update_data = data.model_dump(exclude_unset=True)
-
-        # The form's "Comments" field is routed through the polymorphic
-        # comments table — see create_expense for rationale. Pop the value
-        # out of the diff so it doesn't get written to the legacy column
-        # or appear as a generic `comments: null → "..."` update event.
-        new_comment_body: str | None = None
-        if "comments" in update_data:
-            raw = update_data.pop("comments")
-            stripped = (raw or "").strip()
-            new_comment_body = stripped or None
 
         # Keep paid / status / paid_at in sync
         if "paid" in update_data:
@@ -1003,18 +976,6 @@ class CycleExpenseService:
             )
 
         db.commit()
-
-        if new_comment_body is not None:
-            comment_service.create(
-                db,
-                household_id=cycle.household_id,
-                entity_type=EntityType.CYCLE_EXPENSE,
-                entity_id=expense.id,
-                body=new_comment_body,
-                actor=actor,
-                cycle_id=cycle.id,
-            )
-
         db.refresh(expense)
 
         logger.info("Cycle expense updated", extra={"expense_id": str(expense.id)})
@@ -1302,10 +1263,6 @@ class CycleIncomeService:
         rate = _get_usd_rate(db, data.currency.value)
         amount_usd = (data.amount * rate).quantize(Decimal("0.01"))
 
-        # See create_expense for rationale on routing form comments through
-        # the polymorphic comments table.
-        initial_comment = (data.comments or "").strip() or None
-
         income = models.CycleIncome(
             cycle_id=cycle.id,
             payment_method_id=data.payment_method_id,
@@ -1314,7 +1271,7 @@ class CycleIncomeService:
             amount=data.amount,
             amount_usd=amount_usd,
             income_date=data.income_date,
-            comments=None,
+            comments=data.comments,
         )
 
         db.add(income)
@@ -1333,18 +1290,6 @@ class CycleIncomeService:
         )
 
         db.commit()
-
-        if initial_comment is not None:
-            comment_service.create(
-                db,
-                household_id=cycle.household_id,
-                entity_type=EntityType.CYCLE_INCOME,
-                entity_id=income.id,
-                body=initial_comment,
-                actor=actor,
-                cycle_id=cycle.id,
-            )
-
         db.refresh(income)
 
         logger.info(
@@ -1378,13 +1323,6 @@ class CycleIncomeService:
         logger.info("Updating cycle income", extra={"income_id": str(income.id)})
 
         update_data = data.model_dump(exclude_unset=True)
-
-        # See update_expense for rationale.
-        new_comment_body: str | None = None
-        if "comments" in update_data:
-            raw = update_data.pop("comments")
-            stripped = (raw or "").strip()
-            new_comment_body = stripped or None
 
         if update_data.get("payment_method_id"):
             _verify_payment_method(db, update_data["payment_method_id"], household_id)
@@ -1423,18 +1361,6 @@ class CycleIncomeService:
             )
 
         db.commit()
-
-        if new_comment_body is not None:
-            comment_service.create(
-                db,
-                household_id=cycle.household_id,
-                entity_type=EntityType.CYCLE_INCOME,
-                entity_id=income.id,
-                body=new_comment_body,
-                actor=actor,
-                cycle_id=cycle.id,
-            )
-
         db.refresh(income)
 
         logger.info("Cycle income updated", extra={"income_id": str(income.id)})
