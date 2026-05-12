@@ -673,6 +673,7 @@
 .nb-expense-check {
   width: 20px;
   height: 20px;
+  padding: 0;
   border-radius: 50%;
   border: 2px solid currentColor;
   flex-shrink: 0;
@@ -680,9 +681,17 @@
   align-items: center;
   justify-content: center;
   font-size: 11px;
+  font-family: inherit;
+  line-height: 1;
   background: rgba(255, 255, 255, 0.5);
   cursor: pointer;
   transition: all 0.15s;
+}
+.nb-expense-check:hover:not(:disabled) {
+  transform: scale(1.15);
+}
+.nb-expense-check:disabled {
+  cursor: default;
 }
 .nb-check-paid {
   background: var(--hl-paid-border);

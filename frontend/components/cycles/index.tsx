@@ -263,11 +263,21 @@ function ExpenseRow({
   };
 
   return (
-    <div
-      className={`nb-expense-row ${statusCls}`}
-      onClick={() => !isLocked && onToggle(expense.id)}
-    >
-      <div className={`nb-expense-check ${checkCls}`}>{checkIcon}</div>
+    <div className={`nb-expense-row ${statusCls}`}>
+      <button
+        type="button"
+        className={`nb-expense-check ${checkCls}`}
+        aria-label={
+          expense.status === "paid" ? "Mark as pending" : "Mark as paid"
+        }
+        disabled={isLocked}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (!isLocked) onToggle(expense.id);
+        }}
+      >
+        {checkIcon}
+      </button>
       <div
         style={{
           width: 24,
