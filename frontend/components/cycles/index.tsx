@@ -263,7 +263,18 @@ function ExpenseRow({
   };
 
   return (
-    <div className={`nb-expense-row ${statusCls}`}>
+    <div
+      className={`nb-expense-row ${statusCls}`}
+      role="button"
+      tabIndex={0}
+      onClick={() => onEdit(expense)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onEdit(expense);
+        }
+      }}
+    >
       <button
         type="button"
         className={`nb-expense-check ${checkCls}`}
@@ -353,16 +364,6 @@ function ExpenseRow({
           </button>
         </>
       )}
-      <button
-        className="nb-expense-edit-btn"
-        title="Edit expense"
-        onClick={(e) => {
-          e.stopPropagation();
-          onEdit(expense);
-        }}
-      >
-        ✎
-      </button>
     </div>
   );
 }
@@ -439,8 +440,17 @@ function EditExpenseModal({
       due_date: form.due_date || null,
     });
     if (res.success) {
+      // Keep the modal open so the user can confirm the change landed in
+      // the activity feed below. Refresh the feed and reset the dirty
+      // baseline so the close button doesn't prompt "discard changes?"
+      // for a save that already succeeded.
       onEdited(res.data);
-      onClose();
+      initialFormRef.current = {
+        amount: res.data.amount,
+        due_date: res.data.due_date ?? "",
+      };
+      setForm(initialFormRef.current);
+      setActivityRefresh((n) => n + 1);
     } else {
       setError(res.error.message);
     }
@@ -1967,10 +1977,7 @@ export function CycleDetail({
         expense={editingExpense}
         cycleId={cycle.id}
         currentUser={currentUser ?? null}
-        onEdited={(updated) => {
-          onExpenseEdited(updated);
-          closeEditExpense();
-        }}
+        onEdited={onExpenseEdited}
         onActivityChanged={onActivityChanged}
       />
 
