@@ -190,7 +190,6 @@ export function ActivityFeed({
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
     const load = async () => {
       const activityResponse =
         scope.kind === "entity"
@@ -216,14 +215,17 @@ export function ActivityFeed({
     return () => {
       cancelled = true;
     };
-  }, [
-    scope.kind,
-    entityType,
-    entityId,
-    cycleId,
-    refreshKey,
-    scope,
-  ]);
+    // `scope` itself is intentionally NOT in the deps — it's an inline
+    // object that gets a fresh reference on every parent render, which
+    // would refetch the feed on every keystroke in sibling inputs. The
+    // primitive fields below already cover every meaningful change.
+    //
+    // We also do NOT reset `loading` to true here — that's only true on
+    // the initial mount. Refetches after refreshKey bumps swap the data
+    // in place, leaving the prior entries on screen until the new ones
+    // arrive (which avoids the "Loading activity…" flash on every save
+    // or comment post).
+  }, [scope.kind, entityType, entityId, cycleId, refreshKey]);
 
   const handleSaveEdit = async (id: string) => {
     if (!editingBody.trim()) return;
