@@ -14,7 +14,13 @@ import type {
   PaymentMethod,
   ExpenseStatus,
   CurrencyCode,
+  UserResponse,
 } from "@/helpers/types";
+import {
+  ActivityFeed,
+  ActivityFilter,
+  CommentComposer,
+} from "@/components/activity";
 import {
   getCycles,
   addCycle,
@@ -356,7 +362,6 @@ function ExpenseRow({
 interface EditExpenseForm {
   amount: string;
   due_date: string;
-  comments: string;
 }
 
 function EditExpenseModal({
@@ -364,26 +369,30 @@ function EditExpenseModal({
   onClose,
   expense,
   cycleId,
+  currentUser,
   onEdited,
+  onActivityChanged,
 }: {
   isOpen: boolean;
   onClose: () => void;
   expense: CycleExpense | null;
   cycleId: string;
+  currentUser: UserResponse | null;
   onEdited: (updated: CycleExpense) => void;
+  onActivityChanged?: () => void;
 }) {
   const [form, setForm] = useState<EditExpenseForm>({
     amount: "",
     due_date: "",
-    comments: "",
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
+  const [activityMode, setActivityMode] = useState<"all" | "comments">("all");
+  const [activityRefresh, setActivityRefresh] = useState(0);
   const initialFormRef = useRef<EditExpenseForm>({
     amount: "",
     due_date: "",
-    comments: "",
   });
 
   useEffect(() => {
@@ -391,7 +400,6 @@ function EditExpenseModal({
       const initial = {
         amount: expense.amount,
         due_date: expense.due_date ?? "",
-        comments: "",
       };
       setForm(initial);
       initialFormRef.current = initial;
@@ -402,8 +410,7 @@ function EditExpenseModal({
 
   const isDirty =
     form.amount !== initialFormRef.current.amount ||
-    form.due_date !== initialFormRef.current.due_date ||
-    form.comments !== initialFormRef.current.comments;
+    form.due_date !== initialFormRef.current.due_date;
 
   const handleAttemptClose = () => {
     if (isDirty) setConfirmDiscard(true);
@@ -420,7 +427,6 @@ function EditExpenseModal({
     const res = await editExpense(cycleId, expense.id, {
       amount: form.amount,
       due_date: form.due_date || null,
-      comments: form.comments || null,
     });
     if (res.success) {
       onEdited(res.data);
@@ -438,7 +444,10 @@ function EditExpenseModal({
       className="nb-modal-backdrop"
       onClick={(e) => e.target === e.currentTarget && handleAttemptClose()}
     >
-      <div className="nb-modal">
+      <div
+        className="nb-modal"
+        style={{ maxWidth: 640, width: "100%", maxHeight: "90vh", overflowY: "auto" }}
+      >
         <button className="nb-modal-close" onClick={handleAttemptClose}>
           ✕
         </button>
@@ -476,18 +485,6 @@ function EditExpenseModal({
           </div>
         </div>
 
-        <div className="nb-form-group">
-          <label className="nb-form-label">Comments</label>
-          <textarea
-            className="nb-form-input"
-            placeholder="e.g. price increase this month…"
-            rows={2}
-            value={form.comments}
-            onChange={(e) => set("comments", e.target.value)}
-            style={{ resize: "vertical" }}
-          />
-        </div>
-
         {error && (
           <p
             style={{
@@ -513,6 +510,34 @@ function EditExpenseModal({
             {saving ? "Saving…" : "Save ✓"}
           </button>
         </div>
+
+        <div className="nb-section-title" style={{ marginTop: 24 }}>
+          Activity & Comments
+        </div>
+        <ActivityFilter mode={activityMode} onChange={setActivityMode} />
+        <CommentComposer
+          entityType="cycle_expense"
+          entityId={expense.id}
+          onPosted={() => {
+            setActivityRefresh((n) => n + 1);
+            onActivityChanged?.();
+          }}
+        />
+        <ActivityFeed
+          scope={{
+            kind: "entity",
+            entityType: "cycle_expense",
+            entityId: expense.id,
+          }}
+          mode={activityMode}
+          currentUser={currentUser}
+          refreshKey={activityRefresh}
+          onCommentMutated={() => {
+            setActivityRefresh((n) => n + 1);
+            onActivityChanged?.();
+          }}
+          expenses={[expense]}
+        />
       </div>
       <DiscardChangesDialog
         isOpen={confirmDiscard}
@@ -1538,6 +1563,7 @@ export function CycleDetail({
   summary,
   paymentMethods,
   headerActions,
+  currentUser,
   onBack,
   onToggleExpense,
   onStatusChange,
@@ -1546,6 +1572,7 @@ export function CycleDetail({
   onIncomeAdded,
   onIncomeRemoved,
   onIncomeEdited,
+  onActivityChanged,
 }: {
   cycle: Cycle;
   expenses: CycleExpense[];
@@ -1553,6 +1580,7 @@ export function CycleDetail({
   summary: CycleSummary | null;
   paymentMethods: PaymentMethod[];
   headerActions?: React.ReactNode;
+  currentUser?: UserResponse | null;
   onBack: () => void;
   onToggleExpense: (id: string) => void;
   onStatusChange: (id: string, status: ExpenseStatus) => void;
@@ -1561,6 +1589,7 @@ export function CycleDetail({
   onIncomeAdded: (i: CycleIncome) => void;
   onIncomeRemoved: (id: string) => void;
   onIncomeEdited: (updated: CycleIncome) => void;
+  onActivityChanged?: () => void;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -1927,10 +1956,12 @@ export function CycleDetail({
         onClose={closeEditExpense}
         expense={editingExpense}
         cycleId={cycle.id}
+        currentUser={currentUser ?? null}
         onEdited={(updated) => {
           onExpenseEdited(updated);
           closeEditExpense();
         }}
+        onActivityChanged={onActivityChanged}
       />
 
       <EditIncomeModal

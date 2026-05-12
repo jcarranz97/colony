@@ -317,6 +317,7 @@ export default function CycleDetailPage() {
         summary={summary}
         paymentMethods={paymentMethods}
         headerActions={headerActions}
+        currentUser={currentUser}
         onBack={handleBack}
         onToggleExpense={handleToggleExpense}
         onStatusChange={handleStatusChange}
@@ -325,6 +326,7 @@ export default function CycleDetailPage() {
         onIncomeAdded={handleIncomeAdded}
         onIncomeRemoved={handleIncomeRemoved}
         onIncomeEdited={handleIncomeEdited}
+        onActivityChanged={() => setActivityRefresh((n) => n + 1)}
       />
 
       {cycle && (
