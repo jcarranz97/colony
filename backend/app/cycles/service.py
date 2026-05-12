@@ -867,6 +867,15 @@ class CycleExpenseService:
 
         _recalculate_remaining_balance(db, cycle)
 
+        # Stash the initial `comments` value on the created event so the
+        # activity feed can surface it next to the entity card. Entity
+        # fields like description/amount/status are already visible via
+        # the hydrated card; comments is the one piece of context that
+        # would otherwise be invisible after creation.
+        initial_changes: dict[str, str] = {}
+        if data.comments and data.comments.strip():
+            initial_changes["comments"] = data.comments.strip()
+
         activity_service.record(
             db,
             household_id=cycle.household_id,
@@ -875,6 +884,7 @@ class CycleExpenseService:
             cycle_id=cycle.id,
             actor_user_id=actor.id,
             action=ActivityAction.CREATED,
+            changes=initial_changes,
         )
 
         db.commit()
@@ -1279,6 +1289,11 @@ class CycleIncomeService:
 
         _recalculate_remaining_balance(db, cycle)
 
+        # See create_expense for rationale on stashing initial comments.
+        initial_changes: dict[str, str] = {}
+        if data.comments and data.comments.strip():
+            initial_changes["comments"] = data.comments.strip()
+
         activity_service.record(
             db,
             household_id=cycle.household_id,
@@ -1287,6 +1302,7 @@ class CycleIncomeService:
             cycle_id=cycle.id,
             actor_user_id=actor.id,
             action=ActivityAction.CREATED,
+            changes=initial_changes,
         )
 
         db.commit()

@@ -1043,6 +1043,7 @@ interface AddExpenseForm {
   due_date: string;
   payment_method_id: string;
   paid: boolean;
+  comments: string;
 }
 
 function AddExpenseModal({
@@ -1067,6 +1068,7 @@ function AddExpenseModal({
     due_date: new Date().toISOString().split("T")[0],
     payment_method_id: "",
     paid: false,
+    comments: "",
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -1097,6 +1099,7 @@ function AddExpenseModal({
       due_date: form.due_date || null,
       payment_method_id: form.payment_method_id || null,
       paid: form.paid,
+      comments: form.comments || null,
     });
     if (res.success) {
       onAdded(res.data);
@@ -1107,6 +1110,7 @@ function AddExpenseModal({
         due_date: new Date().toISOString().split("T")[0],
         payment_method_id: "",
         paid: false,
+        comments: "",
       });
       onClose();
     } else {
@@ -1211,6 +1215,18 @@ function AddExpenseModal({
           />
           Already paid
         </label>
+
+        <div className="nb-form-group">
+          <label className="nb-form-label">Comments (optional)</label>
+          <textarea
+            className="nb-form-input"
+            placeholder="Why this expense is in this cycle…"
+            rows={2}
+            value={form.comments}
+            onChange={(e) => set("comments", e.target.value)}
+            style={{ resize: "vertical" }}
+          />
+        </div>
 
         {error && (
           <p

@@ -272,6 +272,7 @@ export interface CreateCycleExpenseRequest {
   due_date?: string | null;
   payment_method_id?: string | null;
   paid?: boolean;
+  comments?: string | null;
 }
 
 export interface UpdateCycleExpenseRequest extends Partial<CreateCycleExpenseRequest> {
