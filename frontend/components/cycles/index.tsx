@@ -583,13 +583,17 @@ function EditIncomeModal({
   onClose,
   income,
   cycleId,
+  currentUser,
   onEdited,
+  onActivityChanged,
 }: {
   isOpen: boolean;
   onClose: () => void;
   income: CycleIncome | null;
   cycleId: string;
+  currentUser: UserResponse | null;
   onEdited: (updated: CycleIncome) => void;
+  onActivityChanged?: () => void;
 }) {
   const [form, setForm] = useState<EditIncomeForm>({
     amount: "",
@@ -598,6 +602,8 @@ function EditIncomeModal({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
+  const [activityMode, setActivityMode] = useState<"all" | "comments">("all");
+  const [activityRefresh, setActivityRefresh] = useState(0);
   const initialFormRef = useRef<EditIncomeForm>({
     amount: "",
     income_date: "",
@@ -637,8 +643,15 @@ function EditIncomeModal({
       income_date: form.income_date || undefined,
     });
     if (res.success) {
+      // Keep the modal open so the user can confirm the change landed
+      // in the activity feed; reset the dirty baseline.
       onEdited(res.data);
-      onClose();
+      initialFormRef.current = {
+        amount: res.data.amount,
+        income_date: res.data.income_date ?? "",
+      };
+      setForm(initialFormRef.current);
+      setActivityRefresh((n) => n + 1);
     } else {
       setError(res.error.message);
     }
@@ -652,7 +665,10 @@ function EditIncomeModal({
       className="nb-modal-backdrop"
       onClick={(e) => e.target === e.currentTarget && handleAttemptClose()}
     >
-      <div className="nb-modal">
+      <div
+        className="nb-modal"
+        style={{ maxWidth: 640, width: "100%", maxHeight: "90vh", overflowY: "auto" }}
+      >
         <button className="nb-modal-close" onClick={handleAttemptClose}>
           ✕
         </button>
@@ -712,6 +728,34 @@ function EditIncomeModal({
             {saving ? "Saving…" : "Save ✓"}
           </button>
         </div>
+
+        <div className="nb-section-title" style={{ marginTop: 24 }}>
+          Activity & Comments
+        </div>
+        <ActivityFilter mode={activityMode} onChange={setActivityMode} />
+        <CommentComposer
+          entityType="cycle_income"
+          entityId={income.id}
+          onPosted={() => {
+            setActivityRefresh((n) => n + 1);
+            onActivityChanged?.();
+          }}
+        />
+        <ActivityFeed
+          scope={{
+            kind: "entity",
+            entityType: "cycle_income",
+            entityId: income.id,
+          }}
+          mode={activityMode}
+          currentUser={currentUser}
+          refreshKey={activityRefresh}
+          onCommentMutated={() => {
+            setActivityRefresh((n) => n + 1);
+            onActivityChanged?.();
+          }}
+          incomes={[income]}
+        />
       </div>
       <DiscardChangesDialog
         isOpen={confirmDiscard}
@@ -1989,10 +2033,9 @@ export function CycleDetail({
         onClose={closeEditIncome}
         income={editingIncome}
         cycleId={cycle.id}
-        onEdited={(updated) => {
-          onIncomeEdited(updated);
-          closeEditIncome();
-        }}
+        currentUser={currentUser ?? null}
+        onEdited={onIncomeEdited}
+        onActivityChanged={onActivityChanged}
       />
     </>
   );
