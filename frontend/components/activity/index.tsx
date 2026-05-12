@@ -330,6 +330,16 @@ export function ActivityFeed({
                 </div>
               ) : isCommentEvent ? (
                 <>
+                  {entry.entity_type === "cycle_expense" &&
+                    expenseById.get(entry.entity_id) && (
+                      <ExpenseCard
+                        expense={expenseById.get(entry.entity_id)!}
+                      />
+                    )}
+                  {entry.entity_type === "cycle_income" &&
+                    incomeById.get(entry.entity_id) && (
+                      <IncomeCard income={incomeById.get(entry.entity_id)!} />
+                    )}
                   <div className="nb-comment-body">
                     <Markdown source={comment.body} />
                   </div>
