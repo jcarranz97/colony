@@ -1782,9 +1782,24 @@ export function CycleDetail({
       </div>
 
       {incomes.length > 0 ? (
-        incomes.map((income) => (
+        incomes.map((income) => {
+          const editable = cycle.status !== "completed";
+          return (
           <div
             key={income.id}
+            role={editable ? "button" : undefined}
+            tabIndex={editable ? 0 : undefined}
+            onClick={editable ? () => handleEditIncome(income) : undefined}
+            onKeyDown={
+              editable
+                ? (e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleEditIncome(income);
+                    }
+                  }
+                : undefined
+            }
             style={{
               display: "flex",
               alignItems: "center",
@@ -1795,6 +1810,7 @@ export function CycleDetail({
               background: "rgba(80,200,100,0.10)",
               border: "1px solid rgba(80,200,100,0.25)",
               fontFamily: "var(--font-hand)",
+              cursor: editable ? "pointer" : "default",
             }}
           >
             <span style={{ fontSize: 14, color: "var(--ink)", flex: 1 }}>
@@ -1837,42 +1853,29 @@ export function CycleDetail({
             >
               {fmtDate(income.income_date)}
             </span>
-            {cycle.status !== "completed" && (
-              <>
-                <button
-                  style={{
-                    background: "transparent",
-                    border: "none",
-                    cursor: "pointer",
-                    color: "var(--ink-light)",
-                    fontSize: 14,
-                    padding: "0 4px",
-                    opacity: 0.5,
-                  }}
-                  title="Edit income"
-                  onClick={() => handleEditIncome(income)}
-                >
-                  ✎
-                </button>
-                <button
-                  style={{
-                    background: "transparent",
-                    border: "none",
-                    cursor: "pointer",
-                    color: "var(--ink-light)",
-                    fontSize: 14,
-                    padding: "0 4px",
-                    opacity: 0.5,
-                  }}
-                  title="Remove income"
-                  onClick={() => onIncomeRemoved(income.id)}
-                >
-                  ✕
-                </button>
-              </>
+            {editable && (
+              <button
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "var(--ink-light)",
+                  fontSize: 14,
+                  padding: "0 4px",
+                  opacity: 0.5,
+                }}
+                title="Remove income"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onIncomeRemoved(income.id);
+                }}
+              >
+                ✕
+              </button>
             )}
           </div>
-        ))
+          );
+        })
       ) : (
         <div
           style={{
