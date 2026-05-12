@@ -32,6 +32,7 @@ export type FeedMode = "all" | "comments";
 
 interface ActivityFeedProps {
   scope: FeedScope;
+  /** Filter mode. Pair with <ActivityFilter> to let users toggle. */
   mode?: FeedMode;
   currentUser: UserResponse | null;
   /** Increment to force a refetch from the parent (e.g. after a write). */
@@ -134,6 +135,39 @@ function renderChanges(changes: Record<string, ActivityChange>): string | null {
     .join(", ");
 }
 
+export function ActivityFilter({
+  mode,
+  onChange,
+}: {
+  mode: FeedMode;
+  onChange: (next: FeedMode) => void;
+}) {
+  return (
+    <div className="nb-activity-filter">
+      <button
+        type="button"
+        className={
+          mode === "all" ? "nb-filter-pill nb-pill-selected" : "nb-filter-pill"
+        }
+        onClick={() => onChange("all")}
+      >
+        All activity
+      </button>
+      <button
+        type="button"
+        className={
+          mode === "comments"
+            ? "nb-filter-pill nb-pill-selected"
+            : "nb-filter-pill"
+        }
+        onClick={() => onChange("comments")}
+      >
+        Comments only
+      </button>
+    </div>
+  );
+}
+
 export function ActivityFeed({
   scope,
   mode = "all",
@@ -210,6 +244,8 @@ export function ActivityFeed({
     }
   };
 
+  const showOnlyComments = mode === "comments";
+
   if (loading) {
     return <div className="nb-activity-empty">Loading activity…</div>;
   }
@@ -220,7 +256,6 @@ export function ActivityFeed({
   const expenseById = new Map(expenses.map((e) => [e.id, e]));
   const incomeById = new Map(incomes.map((i) => [i.id, i]));
 
-  const showOnlyComments = mode === "comments";
   const filtered = showOnlyComments
     ? entries.filter((e) => e.action === "commented")
     : entries;

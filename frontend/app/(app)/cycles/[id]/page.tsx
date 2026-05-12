@@ -26,7 +26,11 @@ import {
   RenameCycleModal,
   ConfirmTrashModal,
 } from "@/components/cycles";
-import { ActivityFeed, CommentComposer } from "@/components/activity";
+import {
+  ActivityFeed,
+  ActivityFilter,
+  CommentComposer,
+} from "@/components/activity";
 
 export default function CycleDetailPage() {
   const params = useParams();
@@ -47,8 +51,8 @@ export default function CycleDetailPage() {
   const [trashOpen, setTrashOpen] = useState(false);
   const [restoring, setRestoring] = useState(false);
   const [restoreError, setRestoreError] = useState<string | null>(null);
-  const [activityMode, setActivityMode] = useState<"all" | "comments">("all");
   const [activityRefresh, setActivityRefresh] = useState(0);
+  const [activityMode, setActivityMode] = useState<"all" | "comments">("all");
 
   useEffect(() => {
     let cancelled = false;
@@ -328,30 +332,7 @@ export default function CycleDetailPage() {
           <div className="nb-section-title" style={{ marginTop: 32 }}>
             Activity & Comments
           </div>
-          <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-            <button
-              type="button"
-              className={
-                activityMode === "all"
-                  ? "nb-filter-pill nb-pill-selected"
-                  : "nb-filter-pill"
-              }
-              onClick={() => setActivityMode("all")}
-            >
-              All activity
-            </button>
-            <button
-              type="button"
-              className={
-                activityMode === "comments"
-                  ? "nb-filter-pill nb-pill-selected"
-                  : "nb-filter-pill"
-              }
-              onClick={() => setActivityMode("comments")}
-            >
-              Comments only
-            </button>
-          </div>
+          <ActivityFilter mode={activityMode} onChange={setActivityMode} />
           <CommentComposer
             entityType="cycle"
             entityId={cycle.id}

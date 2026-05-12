@@ -8,7 +8,11 @@ import type {
   RecurrenceType,
   UserResponse,
 } from "@/helpers/types";
-import { ActivityFeed, CommentComposer } from "@/components/activity";
+import {
+  ActivityFeed,
+  ActivityFilter,
+  CommentComposer,
+} from "@/components/activity";
 import { formatPaymentMethodName } from "@/helpers/formatters";
 import {
   getCurrentUserAction,
@@ -75,6 +79,7 @@ export default function RecurrentExpenseDetailPage() {
   const [restoring, setRestoring] = useState(false);
   const [restoreError, setRestoreError] = useState<string | null>(null);
   const [activityRefresh, setActivityRefresh] = useState(0);
+  const [activityMode, setActivityMode] = useState<"all" | "comments">("all");
 
   useEffect(() => {
     let cancelled = false;
@@ -362,6 +367,7 @@ export default function RecurrentExpenseDetailPage() {
       <div className="nb-section-title" style={{ marginTop: 32 }}>
         Activity & Comments
       </div>
+      <ActivityFilter mode={activityMode} onChange={setActivityMode} />
       <CommentComposer
         entityType="recurrent_expense"
         entityId={template.id}
@@ -373,6 +379,7 @@ export default function RecurrentExpenseDetailPage() {
           entityType: "recurrent_expense",
           entityId: template.id,
         }}
+        mode={activityMode}
         currentUser={currentUser}
         refreshKey={activityRefresh}
         onCommentMutated={() => setActivityRefresh((n) => n + 1)}

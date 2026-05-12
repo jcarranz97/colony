@@ -18,7 +18,11 @@ import {
   ConfirmTrashModal,
   type MethodForm,
 } from "@/components/payment-methods";
-import { ActivityFeed, CommentComposer } from "@/components/activity";
+import {
+  ActivityFeed,
+  ActivityFilter,
+  CommentComposer,
+} from "@/components/activity";
 
 const METHOD_ICON: Record<PaymentMethodType, string> = {
   debit: "🏦",
@@ -49,6 +53,7 @@ export default function PaymentMethodDetailPage() {
   const [restoring, setRestoring] = useState(false);
   const [restoreError, setRestoreError] = useState<string | null>(null);
   const [activityRefresh, setActivityRefresh] = useState(0);
+  const [activityMode, setActivityMode] = useState<"all" | "comments">("all");
 
   useEffect(() => {
     let cancelled = false;
@@ -274,6 +279,7 @@ export default function PaymentMethodDetailPage() {
       <div className="nb-section-title" style={{ marginTop: 32 }}>
         Activity & Comments
       </div>
+      <ActivityFilter mode={activityMode} onChange={setActivityMode} />
       <CommentComposer
         entityType="payment_method"
         entityId={method.id}
@@ -285,6 +291,7 @@ export default function PaymentMethodDetailPage() {
           entityType: "payment_method",
           entityId: method.id,
         }}
+        mode={activityMode}
         currentUser={currentUser}
         refreshKey={activityRefresh}
         onCommentMutated={() => setActivityRefresh((n) => n + 1)}

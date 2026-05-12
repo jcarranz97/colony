@@ -1218,6 +1218,12 @@
 }
 
 /* ── Activity feed & comments ───────────────────────────────────────────── */
+.nb-activity-filter {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
 .nb-activity-feed {
   display: flex;
   flex-direction: column;
