@@ -29,8 +29,8 @@ uv run alembic current           # show the applied revision
 ## How the init container handles deploys
 
 The Helm chart's `run-migrations` init container invokes
-[`scripts/run_migrations.py`](../../backend/scripts/run_migrations.py)
-before the backend starts. That script:
+`backend/scripts/run_migrations.py` before the backend starts. That
+script:
 
 1. Inspects the database for an `alembic_version` table.
 2. If absent **and** legacy tables (e.g. `households`) already exist —

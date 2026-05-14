@@ -38,9 +38,7 @@ def main() -> int:
         )
         command.stamp(alembic_cfg, BASELINE_REVISION)
     elif not has_alembic_state:
-        print(
-            "Fresh database — running every migration from zero."
-        )
+        print("Fresh database — running every migration from zero.")
     else:
         print("Alembic state present — applying any pending migrations.")
 
