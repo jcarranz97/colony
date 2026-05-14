@@ -36,6 +36,25 @@ spec:
                 sleep 2;
               done
               echo "PostgreSQL is ready."
+        - name: run-migrations
+          image: {{ include "colony.image" (dict "registry" .Values.image.registry "repository" .Values.backend.image.repository "tag" .Values.backend.image.tag) }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          workingDir: /app
+          # Auto-stamps the baseline on pre-Alembic environments, then
+          # applies pending migrations. See backend/scripts/run_migrations.py.
+          command:
+            - sh
+            - -c
+            - |
+              uv run python scripts/run_migrations.py
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "colony.fullname" . }}-secret
+                  key: database-url
+            - name: PYTHONPATH
+              value: /app
       containers:
         - name: backend
           image: {{ include "colony.image" (dict "registry" .Values.image.registry "repository" .Values.backend.image.repository "tag" .Values.backend.image.tag) }}

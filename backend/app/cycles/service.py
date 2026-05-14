@@ -9,12 +9,16 @@ from sqlalchemy import and_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
+from app.activity.constants import ActivityAction, EntityType
+from app.activity.helpers import compute_diff
+from app.activity.service import activity_service, comment_service
+from app.auth.models import User
 from app.payment_methods import models as pm_models
 from app.recurrent_expenses import models as recurrent_expense_models
 from app.recurrent_incomes import models as recurrent_income_models
 
 from . import models, schemas
-from .constants import CurrencyCode, ExpenseCategory, ExpenseStatus
+from .constants import CurrencyCode, CycleStatus, ExpenseCategory, ExpenseStatus
 from .exceptions import (
     CycleGenerationExceptionError,
     CycleNameExistsExceptionError,
@@ -225,6 +229,7 @@ class CycleService:
         db: Session,
         data: schemas.CycleCreate,
         household_id: str,
+        actor: User,
     ) -> models.Cycle:
         """Create a new cycle and optionally generate expenses from templates.
 
@@ -236,6 +241,7 @@ class CycleService:
             db: Active database session.
             data: Validated cycle creation schema.
             household_id: The active household's ID.
+            actor: The user performing the creation (recorded in activity log).
 
         Returns:
             The newly created Cycle instance with expenses loaded.
@@ -274,6 +280,17 @@ class CycleService:
             CycleService._generate_incomes_from_templates(db, cycle, household_id)
 
         _recalculate_remaining_balance(db, cycle)
+
+        activity_service.record(
+            db,
+            household_id=cycle.household_id,
+            entity_type=EntityType.CYCLE,
+            entity_id=cycle.id,
+            cycle_id=cycle.id,
+            actor_user_id=actor.id,
+            action=ActivityAction.CREATED,
+        )
+
         db.commit()
         db.refresh(cycle)
 
@@ -441,6 +458,7 @@ class CycleService:
         db: Session,
         cycle: models.Cycle,
         data: schemas.CycleUpdate,
+        actor: User,
     ) -> models.Cycle:
         """Apply a partial update to *cycle*.
 
@@ -450,6 +468,7 @@ class CycleService:
             db: Active database session.
             cycle: The Cycle ORM instance to update.
             data: Validated partial update schema.
+            actor: The user performing the update (recorded in activity log).
 
         Returns:
             The updated Cycle instance.
@@ -460,6 +479,7 @@ class CycleService:
         logger.info("Updating cycle", extra={"cycle_id": str(cycle.id)})
 
         update_data = data.model_dump(exclude_unset=True)
+        before = {field: getattr(cycle, field) for field in update_data}
 
         try:
             for field, value in update_data.items():
@@ -470,6 +490,30 @@ class CycleService:
             raise CycleNameExistsExceptionError(data.name or cycle.name) from exc
 
         _recalculate_remaining_balance(db, cycle)
+
+        after = {field: getattr(cycle, field) for field in update_data}
+        diff = compute_diff(before, after)
+        if diff:
+            action = ActivityAction.UPDATED
+            status_diff = diff.get("status")
+            if status_diff and status_diff["to"] == CycleStatus.COMPLETED.value:
+                action = ActivityAction.COMPLETED
+            elif "active" in diff and len(diff) == 1:
+                action = (
+                    ActivityAction.REACTIVATED
+                    if diff["active"]["to"]
+                    else ActivityAction.DEACTIVATED
+                )
+            activity_service.record(
+                db,
+                household_id=cycle.household_id,
+                entity_type=EntityType.CYCLE,
+                entity_id=cycle.id,
+                cycle_id=cycle.id,
+                actor_user_id=actor.id,
+                action=action,
+                changes=diff,
+            )
 
         db.commit()
         db.refresh(cycle)
@@ -617,12 +661,13 @@ class CycleService:
         )
 
     @staticmethod
-    def delete_cycle(db: Session, cycle: models.Cycle) -> None:
+    def delete_cycle(db: Session, cycle: models.Cycle, actor: User) -> None:
         """Soft-delete a cycle and all its active expenses.
 
         Args:
             db: Active database session.
             cycle: The Cycle ORM instance to deactivate.
+            actor: The user performing the deletion (recorded in activity log).
         """
         logger.info("Deleting cycle", extra={"cycle_id": str(cycle.id)})
 
@@ -633,6 +678,18 @@ class CycleService:
             income.active = False
 
         cycle.active = False
+        db.flush()
+
+        activity_service.record(
+            db,
+            household_id=cycle.household_id,
+            entity_type=EntityType.CYCLE,
+            entity_id=cycle.id,
+            cycle_id=cycle.id,
+            actor_user_id=actor.id,
+            action=ActivityAction.DEACTIVATED,
+        )
+
         db.commit()
 
         logger.info("Cycle deleted", extra={"cycle_id": str(cycle.id)})
@@ -761,6 +818,7 @@ class CycleExpenseService:
         cycle: models.Cycle,
         data: schemas.CycleExpenseCreate,
         household_id: str,
+        actor: User,
     ) -> models.CycleExpense:
         """Add a manual expense to *cycle*.
 
@@ -769,6 +827,7 @@ class CycleExpenseService:
             cycle: The parent Cycle ORM instance.
             data: Validated expense creation schema.
             household_id: The active household's ID.
+            actor: The user performing the creation (recorded in activity log).
 
         Returns:
             The newly created CycleExpense instance.
@@ -787,6 +846,13 @@ class CycleExpenseService:
         rate = _get_usd_rate(db, data.currency.value)
         amount_usd = (data.amount * rate).quantize(Decimal("0.01"))
 
+        # The form's "Comments" field is stored as a real comment in the
+        # polymorphic comments table — the activity feed renders it next
+        # to the entity card (description/amount/status) so the context
+        # is preserved, and the comment is editable, deletable, and
+        # discoverable in "Comments only" filters.
+        initial_comment = (data.comments or "").strip() or None
+
         expense = models.CycleExpense(
             cycle_id=cycle.id,
             payment_method_id=data.payment_method_id,
@@ -796,7 +862,7 @@ class CycleExpenseService:
             amount_usd=amount_usd,
             due_date=data.due_date,
             category=data.category,
-            comments=data.comments,
+            comments=None,
             autopay=data.autopay,
             paid=data.paid,
             status=ExpenseStatus.PAID if data.paid else ExpenseStatus.PENDING,
@@ -807,7 +873,30 @@ class CycleExpenseService:
         db.flush()
 
         _recalculate_remaining_balance(db, cycle)
+
+        activity_service.record(
+            db,
+            household_id=cycle.household_id,
+            entity_type=EntityType.CYCLE_EXPENSE,
+            entity_id=expense.id,
+            cycle_id=cycle.id,
+            actor_user_id=actor.id,
+            action=ActivityAction.CREATED,
+        )
+
         db.commit()
+
+        if initial_comment is not None:
+            comment_service.create(
+                db,
+                household_id=cycle.household_id,
+                entity_type=EntityType.CYCLE_EXPENSE,
+                entity_id=expense.id,
+                body=initial_comment,
+                actor=actor,
+                cycle_id=cycle.id,
+            )
+
         db.refresh(expense)
 
         logger.info(
@@ -817,11 +906,12 @@ class CycleExpenseService:
         return expense
 
     @staticmethod
-    def update_expense(
+    def update_expense(  # noqa: C901, PLR0912 - one branch per derived semantic action
         db: Session,
         cycle: models.Cycle,
         expense: models.CycleExpense,
         data: schemas.CycleExpenseUpdate,
+        actor: User,
     ) -> models.CycleExpense:
         """Apply a partial update to *expense*.
 
@@ -834,6 +924,7 @@ class CycleExpenseService:
             cycle: Parent Cycle ORM instance (used for balance recalculation).
             expense: The CycleExpense ORM instance to update.
             data: Validated partial update schema.
+            actor: The user performing the update (recorded in activity log).
 
         Returns:
             The updated CycleExpense instance.
@@ -841,6 +932,16 @@ class CycleExpenseService:
         logger.info("Updating cycle expense", extra={"expense_id": str(expense.id)})
 
         update_data = data.model_dump(exclude_unset=True)
+
+        # The form's "Comments" field is routed through the polymorphic
+        # comments table — see create_expense for rationale. Pop the value
+        # out of the diff so it doesn't get written to the legacy column
+        # or appear as a generic `comments: null → "..."` update event.
+        new_comment_body: str | None = None
+        if "comments" in update_data:
+            raw = update_data.pop("comments")
+            stripped = (raw or "").strip()
+            new_comment_body = stripped or None
 
         # Keep paid / status / paid_at in sync
         if "paid" in update_data:
@@ -851,6 +952,8 @@ class CycleExpenseService:
             elif not update_data["paid"] and "status" not in update_data:
                 update_data["status"] = ExpenseStatus.PENDING
                 update_data["paid_at"] = None
+
+        before = {field: getattr(expense, field) for field in update_data}
 
         for field, value in update_data.items():
             setattr(expense, field, value)
@@ -870,7 +973,50 @@ class CycleExpenseService:
         if "status" in update_data and update_data["status"] in _balance_statuses:
             _recalculate_remaining_balance(db, cycle)
 
+        db.flush()
+
+        after = {field: getattr(expense, field) for field in update_data}
+        diff = compute_diff(before, after)
+        if diff:
+            action = ActivityAction.UPDATED
+            if "paid" in diff:
+                action = (
+                    ActivityAction.MARKED_PAID
+                    if diff["paid"]["to"]
+                    else ActivityAction.MARKED_UNPAID
+                )
+            elif "status" in diff:
+                action = ActivityAction.STATUS_CHANGED
+            elif "active" in diff and len(diff) == 1:
+                action = (
+                    ActivityAction.REACTIVATED
+                    if diff["active"]["to"]
+                    else ActivityAction.DEACTIVATED
+                )
+            activity_service.record(
+                db,
+                household_id=cycle.household_id,
+                entity_type=EntityType.CYCLE_EXPENSE,
+                entity_id=expense.id,
+                cycle_id=cycle.id,
+                actor_user_id=actor.id,
+                action=action,
+                changes=diff,
+            )
+
         db.commit()
+
+        if new_comment_body is not None:
+            comment_service.create(
+                db,
+                household_id=cycle.household_id,
+                entity_type=EntityType.CYCLE_EXPENSE,
+                entity_id=expense.id,
+                body=new_comment_body,
+                actor=actor,
+                cycle_id=cycle.id,
+            )
+
         db.refresh(expense)
 
         logger.info("Cycle expense updated", extra={"expense_id": str(expense.id)})
@@ -881,6 +1027,7 @@ class CycleExpenseService:
         db: Session,
         cycle: models.Cycle,
         expense: models.CycleExpense,
+        actor: User,
     ) -> None:
         """Soft-delete an expense and update the cycle's remaining balance.
 
@@ -888,6 +1035,7 @@ class CycleExpenseService:
             db: Active database session.
             cycle: Parent Cycle ORM instance.
             expense: The CycleExpense ORM instance to deactivate.
+            actor: The user performing the deletion (recorded in activity log).
         """
         logger.info("Deleting cycle expense", extra={"expense_id": str(expense.id)})
 
@@ -895,6 +1043,17 @@ class CycleExpenseService:
         db.flush()
 
         _recalculate_remaining_balance(db, cycle)
+
+        activity_service.record(
+            db,
+            household_id=cycle.household_id,
+            entity_type=EntityType.CYCLE_EXPENSE,
+            entity_id=expense.id,
+            cycle_id=cycle.id,
+            actor_user_id=actor.id,
+            action=ActivityAction.DEACTIVATED,
+        )
+
         db.commit()
 
         logger.info("Cycle expense deleted", extra={"expense_id": str(expense.id)})
@@ -1115,6 +1274,7 @@ class CycleIncomeService:
         cycle: models.Cycle,
         data: schemas.CycleIncomeCreate,
         household_id: str,
+        actor: User,
     ) -> models.CycleIncome:
         """Add a manual income to *cycle*.
 
@@ -1123,6 +1283,7 @@ class CycleIncomeService:
             cycle: The parent Cycle ORM instance.
             data: Validated income creation schema.
             household_id: The active household's ID.
+            actor: The user performing the creation (recorded in activity log).
 
         Returns:
             The newly created CycleIncome instance.
@@ -1143,6 +1304,10 @@ class CycleIncomeService:
         rate = _get_usd_rate(db, data.currency.value)
         amount_usd = (data.amount * rate).quantize(Decimal("0.01"))
 
+        # See create_expense for rationale on routing comments through the
+        # polymorphic comments table.
+        initial_comment = (data.comments or "").strip() or None
+
         income = models.CycleIncome(
             cycle_id=cycle.id,
             payment_method_id=data.payment_method_id,
@@ -1151,14 +1316,37 @@ class CycleIncomeService:
             amount=data.amount,
             amount_usd=amount_usd,
             income_date=data.income_date,
-            comments=data.comments,
+            comments=None,
         )
 
         db.add(income)
         db.flush()
 
         _recalculate_remaining_balance(db, cycle)
+
+        activity_service.record(
+            db,
+            household_id=cycle.household_id,
+            entity_type=EntityType.CYCLE_INCOME,
+            entity_id=income.id,
+            cycle_id=cycle.id,
+            actor_user_id=actor.id,
+            action=ActivityAction.CREATED,
+        )
+
         db.commit()
+
+        if initial_comment is not None:
+            comment_service.create(
+                db,
+                household_id=cycle.household_id,
+                entity_type=EntityType.CYCLE_INCOME,
+                entity_id=income.id,
+                body=initial_comment,
+                actor=actor,
+                cycle_id=cycle.id,
+            )
+
         db.refresh(income)
 
         logger.info(
@@ -1174,6 +1362,7 @@ class CycleIncomeService:
         income: models.CycleIncome,
         data: schemas.CycleIncomeUpdate,
         household_id: str,
+        actor: User,
     ) -> models.CycleIncome:
         """Apply a partial update to *income*.
 
@@ -1183,6 +1372,7 @@ class CycleIncomeService:
             income: The CycleIncome ORM instance to update.
             data: Validated partial update schema.
             household_id: The active household's ID.
+            actor: The user performing the update (recorded in activity log).
 
         Returns:
             The updated CycleIncome instance.
@@ -1191,8 +1381,17 @@ class CycleIncomeService:
 
         update_data = data.model_dump(exclude_unset=True)
 
+        # See update_expense for rationale.
+        new_comment_body: str | None = None
+        if "comments" in update_data:
+            raw = update_data.pop("comments")
+            stripped = (raw or "").strip()
+            new_comment_body = stripped or None
+
         if update_data.get("payment_method_id"):
             _verify_payment_method(db, update_data["payment_method_id"], household_id)
+
+        before = {field: getattr(income, field) for field in update_data}
 
         for field, value in update_data.items():
             setattr(income, field, value)
@@ -1202,7 +1401,42 @@ class CycleIncomeService:
             income.amount_usd = (income.amount * rate).quantize(Decimal("0.01"))
             _recalculate_remaining_balance(db, cycle)
 
+        db.flush()
+
+        after = {field: getattr(income, field) for field in update_data}
+        diff = compute_diff(before, after)
+        if diff:
+            action = ActivityAction.UPDATED
+            if "active" in diff and len(diff) == 1:
+                action = (
+                    ActivityAction.REACTIVATED
+                    if diff["active"]["to"]
+                    else ActivityAction.DEACTIVATED
+                )
+            activity_service.record(
+                db,
+                household_id=cycle.household_id,
+                entity_type=EntityType.CYCLE_INCOME,
+                entity_id=income.id,
+                cycle_id=cycle.id,
+                actor_user_id=actor.id,
+                action=action,
+                changes=diff,
+            )
+
         db.commit()
+
+        if new_comment_body is not None:
+            comment_service.create(
+                db,
+                household_id=cycle.household_id,
+                entity_type=EntityType.CYCLE_INCOME,
+                entity_id=income.id,
+                body=new_comment_body,
+                actor=actor,
+                cycle_id=cycle.id,
+            )
+
         db.refresh(income)
 
         logger.info("Cycle income updated", extra={"income_id": str(income.id)})
@@ -1213,6 +1447,7 @@ class CycleIncomeService:
         db: Session,
         cycle: models.Cycle,
         income: models.CycleIncome,
+        actor: User,
     ) -> None:
         """Soft-delete an income and update the cycle's remaining balance.
 
@@ -1220,6 +1455,7 @@ class CycleIncomeService:
             db: Active database session.
             cycle: Parent Cycle ORM instance.
             income: The CycleIncome ORM instance to deactivate.
+            actor: The user performing the deletion (recorded in activity log).
         """
         logger.info("Deleting cycle income", extra={"income_id": str(income.id)})
 
@@ -1227,6 +1463,17 @@ class CycleIncomeService:
         db.flush()
 
         _recalculate_remaining_balance(db, cycle)
+
+        activity_service.record(
+            db,
+            household_id=cycle.household_id,
+            entity_type=EntityType.CYCLE_INCOME,
+            entity_id=income.id,
+            cycle_id=cycle.id,
+            actor_user_id=actor.id,
+            action=ActivityAction.DEACTIVATED,
+        )
+
         db.commit()
 
         logger.info("Cycle income deleted", extra={"income_id": str(income.id)})

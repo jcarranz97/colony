@@ -4,6 +4,10 @@ from uuid import UUID
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
+from app.activity.constants import ActivityAction, EntityType
+from app.activity.helpers import compute_diff
+from app.activity.service import activity_service
+from app.auth.models import User
 from app.payment_methods import models as pm_models
 
 from . import models, schemas
@@ -115,6 +119,7 @@ class RecurrentIncomeService:
         db: Session,
         data: schemas.RecurrentIncomeCreate,
         household_id: str,
+        actor: User,
     ) -> models.RecurrentIncome:
         """Create a new recurrent income for a household.
 
@@ -122,6 +127,7 @@ class RecurrentIncomeService:
             db: Active database session.
             data: Validated creation schema.
             household_id: The active household's ID.
+            actor: The user performing the creation (recorded in activity log).
 
         Returns:
             The newly created RecurrentIncome.
@@ -153,6 +159,17 @@ class RecurrentIncomeService:
         )
 
         db.add(recurrent_income)
+        db.flush()
+
+        activity_service.record(
+            db,
+            household_id=recurrent_income.household_id,
+            entity_type=EntityType.RECURRENT_INCOME,
+            entity_id=recurrent_income.id,
+            actor_user_id=actor.id,
+            action=ActivityAction.CREATED,
+        )
+
         db.commit()
         db.refresh(recurrent_income)
 
@@ -172,6 +189,7 @@ class RecurrentIncomeService:
         recurrent_income: models.RecurrentIncome,
         data: schemas.RecurrentIncomeUpdate,
         household_id: str,
+        actor: User,
     ) -> models.RecurrentIncome:
         """Update an existing recurrent income.
 
@@ -180,6 +198,7 @@ class RecurrentIncomeService:
             recurrent_income: The existing recurrent income ORM instance.
             data: Validated update schema (partial).
             household_id: The active household's ID.
+            actor: The user performing the update (recorded in activity log).
 
         Returns:
             The updated RecurrentIncome.
@@ -208,8 +227,32 @@ class RecurrentIncomeService:
                 except ValueError as exc:
                     raise InvalidRecurrenceConfigExceptionError(str(exc)) from exc
 
+        before = {field: getattr(recurrent_income, field) for field in update_data}
+
         for field, value in update_data.items():
             setattr(recurrent_income, field, value)
+
+        db.flush()
+
+        after = {field: getattr(recurrent_income, field) for field in update_data}
+        diff = compute_diff(before, after)
+        if diff:
+            action = ActivityAction.UPDATED
+            if "active" in diff and len(diff) == 1:
+                action = (
+                    ActivityAction.REACTIVATED
+                    if diff["active"]["to"]
+                    else ActivityAction.DEACTIVATED
+                )
+            activity_service.record(
+                db,
+                household_id=recurrent_income.household_id,
+                entity_type=EntityType.RECURRENT_INCOME,
+                entity_id=recurrent_income.id,
+                actor_user_id=actor.id,
+                action=action,
+                changes=diff,
+            )
 
         db.commit()
         db.refresh(recurrent_income)
@@ -225,12 +268,14 @@ class RecurrentIncomeService:
     def delete_recurrent_income(
         db: Session,
         recurrent_income: models.RecurrentIncome,
+        actor: User,
     ) -> None:
         """Soft delete a recurrent income by setting active to False.
 
         Args:
             db: Active database session.
             recurrent_income: The recurrent income ORM instance to deactivate.
+            actor: The user performing the deletion (recorded in activity log).
         """
         logger.info(
             "Deactivating recurrent income",
@@ -238,6 +283,17 @@ class RecurrentIncomeService:
         )
 
         recurrent_income.active = False
+        db.flush()
+
+        activity_service.record(
+            db,
+            household_id=recurrent_income.household_id,
+            entity_type=EntityType.RECURRENT_INCOME,
+            entity_id=recurrent_income.id,
+            actor_user_id=actor.id,
+            action=ActivityAction.DEACTIVATED,
+        )
+
         db.commit()
 
         logger.info(

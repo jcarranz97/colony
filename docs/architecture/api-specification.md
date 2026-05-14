@@ -915,7 +915,60 @@ Get detailed cycle summary and analytics.
 > **Note on `net_balance`:**
 > `net_balance = total_incomes_usd − total_expenses_usd`
 
-### 6. Reports & Analytics
+### 6. Activity & Comments
+
+JIRA-style history feed and Markdown comments attached polymorphically
+to any entity (payment_method, recurrent_expense, recurrent_income,
+cycle, cycle_expense, cycle_income). See
+[`activity-log.md`](activity-log.md) for the full data model.
+
+#### GET /activity
+
+Activity feed filtered by entity or cycle.
+
+**Query Parameters:**
+
+- `entity_type` (string, optional) — combined with `entity_id`
+- `entity_id` (uuid, optional)
+- `cycle_id` (uuid, optional) — alternative scope
+- `before` (datetime, optional) — cursor; returns rows with
+  `created_at < before`
+- `limit` (int, default 50, max 200)
+
+Requires at least one scope (entity or cycle); requests with no scope
+return `[]` to avoid leaking the household-wide feed.
+
+#### GET /comments
+
+Same query parameters as `/activity` but only returns user comments.
+
+#### POST /comments
+
+Create a comment.
+
+**Body:**
+
+```json
+{
+  "entity_type": "cycle_expense",
+  "entity_id": "<uuid>",
+  "body": "**markdown** body"
+}
+```
+
+Returns `201 CREATED` with the created comment. Records a
+`commented` activity event.
+
+#### PATCH /comments/{comment_id}
+
+Edit a comment body. Author only — non-authors get `403`.
+
+#### DELETE /comments/{comment_id}
+
+Soft-delete a comment (sets `active=False`). Allowed for the author or
+any user with `role == "admin"`. Returns `204 NO CONTENT`.
+
+### 7. Reports & Analytics
 
 #### GET /reports/cycles-comparison
 Compare multiple cycles.
@@ -949,7 +1002,7 @@ Compare multiple cycles.
 }
 ```
 
-### 7. System Endpoints
+### 8. System Endpoints
 
 #### GET /enums
 Get all system enums for form validation.
@@ -1060,6 +1113,12 @@ System health check.
 | `CYCLE_GENERATION_ERROR` | 422 | Failed to generate cycle expenses |
 | `EXCHANGE_RATE_NOT_FOUND` | 422 | No exchange rate available for the currency pair |
 | `EXCHANGE_RATE_DATE_EXISTS` | 409 | Rate for that currency pair and date already exists |
+| `COMMENT_NOT_FOUND` | 404 | Comment not found |
+| `COMMENT_NOT_AUTHOR` | 403 | Only the author can edit this comment |
+| `COMMENT_DELETE_FORBIDDEN` | 403 | Only the author or an admin can delete this comment |
+| `INVALID_ENTITY_TYPE` | 400 | Polymorphic entity_type is not commentable |
+| `INVALID_ENTITY_REFERENCE` | 404 | (entity_type, entity_id) does not exist in this household |
+| `COMMENT_BODY_REQUIRED` | 400 | Comment body cannot be empty |
 | `INTERNAL_SERVER_ERROR` | 500 | Server error |
 
 ## HTTP Status Codes

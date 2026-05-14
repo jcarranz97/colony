@@ -8,6 +8,7 @@ import type {
   CycleSummary,
   ExpenseStatus,
   PaymentMethod,
+  UserResponse,
 } from "@/helpers/types";
 import {
   getCycle,
@@ -25,6 +26,11 @@ import {
   RenameCycleModal,
   ConfirmTrashModal,
 } from "@/components/cycles";
+import {
+  ActivityFeed,
+  ActivityFilter,
+  CommentComposer,
+} from "@/components/activity";
 
 export default function CycleDetailPage() {
   const params = useParams();
@@ -39,11 +45,14 @@ export default function CycleDetailPage() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [currentUser, setCurrentUser] = useState<UserResponse | null>(null);
 
   const [renameOpen, setRenameOpen] = useState(false);
   const [trashOpen, setTrashOpen] = useState(false);
   const [restoring, setRestoring] = useState(false);
   const [restoreError, setRestoreError] = useState<string | null>(null);
+  const [activityRefresh, setActivityRefresh] = useState(0);
+  const [activityMode, setActivityMode] = useState<"all" | "comments">("all");
 
   useEffect(() => {
     let cancelled = false;
@@ -56,7 +65,10 @@ export default function CycleDetailPage() {
       getPaymentMethods(),
     ]).then(([userRes, cycleRes, sumRes, expRes, incRes, pmRes]) => {
       if (cancelled) return;
-      if (userRes.success) setIsAdmin(userRes.data.role === "admin");
+      if (userRes.success) {
+        setIsAdmin(userRes.data.role === "admin");
+        setCurrentUser(userRes.data);
+      }
       if (cycleRes.success) setCycle(cycleRes.data);
       else setNotFound(true);
       if (sumRes.success) setSummary(sumRes.data);
@@ -100,6 +112,7 @@ export default function CycleDetailPage() {
       );
     } else {
       refreshSummary();
+      setActivityRefresh((n) => n + 1);
     }
   };
 
@@ -131,27 +144,32 @@ export default function CycleDetailPage() {
       );
     } else {
       refreshSummary();
+      setActivityRefresh((n) => n + 1);
     }
   };
 
   const handleExpenseAdded = (expense: CycleExpense) => {
     setExpenses((prev) => [...prev, expense]);
     refreshSummary();
+    setActivityRefresh((n) => n + 1);
   };
 
   const handleExpenseEdited = (updated: CycleExpense) => {
     setExpenses((prev) => prev.map((e) => (e.id === updated.id ? updated : e)));
     refreshSummary();
+    setActivityRefresh((n) => n + 1);
   };
 
   const handleIncomeAdded = (income: CycleIncome) => {
     setIncomes((prev) => [...prev, income]);
     refreshSummary();
+    setActivityRefresh((n) => n + 1);
   };
 
   const handleIncomeEdited = (updated: CycleIncome) => {
     setIncomes((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
     refreshSummary();
+    setActivityRefresh((n) => n + 1);
   };
 
   const handleIncomeRemoved = async (incomeId: string) => {
@@ -160,6 +178,7 @@ export default function CycleDetailPage() {
     if (res.success) {
       setIncomes((prev) => prev.filter((i) => i.id !== incomeId));
       refreshSummary();
+      setActivityRefresh((n) => n + 1);
     }
   };
 
@@ -298,6 +317,7 @@ export default function CycleDetailPage() {
         summary={summary}
         paymentMethods={paymentMethods}
         headerActions={headerActions}
+        currentUser={currentUser}
         onBack={handleBack}
         onToggleExpense={handleToggleExpense}
         onStatusChange={handleStatusChange}
@@ -306,7 +326,31 @@ export default function CycleDetailPage() {
         onIncomeAdded={handleIncomeAdded}
         onIncomeRemoved={handleIncomeRemoved}
         onIncomeEdited={handleIncomeEdited}
+        onActivityChanged={() => setActivityRefresh((n) => n + 1)}
       />
+
+      {cycle && (
+        <>
+          <div className="nb-section-title" style={{ marginTop: 32 }}>
+            Activity & Comments
+          </div>
+          <ActivityFilter mode={activityMode} onChange={setActivityMode} />
+          <CommentComposer
+            entityType="cycle"
+            entityId={cycle.id}
+            onPosted={() => setActivityRefresh((n) => n + 1)}
+          />
+          <ActivityFeed
+            scope={{ kind: "cycle", cycleId: cycle.id }}
+            mode={activityMode}
+            currentUser={currentUser}
+            refreshKey={activityRefresh}
+            onCommentMutated={() => setActivityRefresh((n) => n + 1)}
+            expenses={expenses}
+            incomes={incomes}
+          />
+        </>
+      )}
 
       <RenameCycleModal
         isOpen={renameOpen}

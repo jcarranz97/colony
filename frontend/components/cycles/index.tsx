@@ -14,7 +14,13 @@ import type {
   PaymentMethod,
   ExpenseStatus,
   CurrencyCode,
+  UserResponse,
 } from "@/helpers/types";
+import {
+  ActivityFeed,
+  ActivityFilter,
+  CommentComposer,
+} from "@/components/activity";
 import {
   getCycles,
   addCycle,
@@ -259,9 +265,30 @@ function ExpenseRow({
   return (
     <div
       className={`nb-expense-row ${statusCls}`}
-      onClick={() => !isLocked && onToggle(expense.id)}
+      role="button"
+      tabIndex={0}
+      onClick={() => onEdit(expense)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onEdit(expense);
+        }
+      }}
     >
-      <div className={`nb-expense-check ${checkCls}`}>{checkIcon}</div>
+      <button
+        type="button"
+        className={`nb-expense-check ${checkCls}`}
+        aria-label={
+          expense.status === "paid" ? "Mark as pending" : "Mark as paid"
+        }
+        disabled={isLocked}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (!isLocked) onToggle(expense.id);
+        }}
+      >
+        {checkIcon}
+      </button>
       <div
         style={{
           width: 24,
@@ -337,16 +364,6 @@ function ExpenseRow({
           </button>
         </>
       )}
-      <button
-        className="nb-expense-edit-btn"
-        title="Edit expense"
-        onClick={(e) => {
-          e.stopPropagation();
-          onEdit(expense);
-        }}
-      >
-        ✎
-      </button>
     </div>
   );
 }
@@ -356,7 +373,6 @@ function ExpenseRow({
 interface EditExpenseForm {
   amount: string;
   due_date: string;
-  comments: string;
 }
 
 function EditExpenseModal({
@@ -364,26 +380,30 @@ function EditExpenseModal({
   onClose,
   expense,
   cycleId,
+  currentUser,
   onEdited,
+  onActivityChanged,
 }: {
   isOpen: boolean;
   onClose: () => void;
   expense: CycleExpense | null;
   cycleId: string;
+  currentUser: UserResponse | null;
   onEdited: (updated: CycleExpense) => void;
+  onActivityChanged?: () => void;
 }) {
   const [form, setForm] = useState<EditExpenseForm>({
     amount: "",
     due_date: "",
-    comments: "",
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
+  const [activityMode, setActivityMode] = useState<"all" | "comments">("all");
+  const [activityRefresh, setActivityRefresh] = useState(0);
   const initialFormRef = useRef<EditExpenseForm>({
     amount: "",
     due_date: "",
-    comments: "",
   });
 
   useEffect(() => {
@@ -391,7 +411,6 @@ function EditExpenseModal({
       const initial = {
         amount: expense.amount,
         due_date: expense.due_date ?? "",
-        comments: "",
       };
       setForm(initial);
       initialFormRef.current = initial;
@@ -402,8 +421,7 @@ function EditExpenseModal({
 
   const isDirty =
     form.amount !== initialFormRef.current.amount ||
-    form.due_date !== initialFormRef.current.due_date ||
-    form.comments !== initialFormRef.current.comments;
+    form.due_date !== initialFormRef.current.due_date;
 
   const handleAttemptClose = () => {
     if (isDirty) setConfirmDiscard(true);
@@ -420,11 +438,19 @@ function EditExpenseModal({
     const res = await editExpense(cycleId, expense.id, {
       amount: form.amount,
       due_date: form.due_date || null,
-      comments: form.comments || null,
     });
     if (res.success) {
+      // Keep the modal open so the user can confirm the change landed in
+      // the activity feed below. Refresh the feed and reset the dirty
+      // baseline so the close button doesn't prompt "discard changes?"
+      // for a save that already succeeded.
       onEdited(res.data);
-      onClose();
+      initialFormRef.current = {
+        amount: res.data.amount,
+        due_date: res.data.due_date ?? "",
+      };
+      setForm(initialFormRef.current);
+      setActivityRefresh((n) => n + 1);
     } else {
       setError(res.error.message);
     }
@@ -438,7 +464,10 @@ function EditExpenseModal({
       className="nb-modal-backdrop"
       onClick={(e) => e.target === e.currentTarget && handleAttemptClose()}
     >
-      <div className="nb-modal">
+      <div
+        className="nb-modal"
+        style={{ maxWidth: 640, width: "100%", maxHeight: "90vh", overflowY: "auto" }}
+      >
         <button className="nb-modal-close" onClick={handleAttemptClose}>
           ✕
         </button>
@@ -476,18 +505,6 @@ function EditExpenseModal({
           </div>
         </div>
 
-        <div className="nb-form-group">
-          <label className="nb-form-label">Comments</label>
-          <textarea
-            className="nb-form-input"
-            placeholder="e.g. price increase this month…"
-            rows={2}
-            value={form.comments}
-            onChange={(e) => set("comments", e.target.value)}
-            style={{ resize: "vertical" }}
-          />
-        </div>
-
         {error && (
           <p
             style={{
@@ -513,6 +530,34 @@ function EditExpenseModal({
             {saving ? "Saving…" : "Save ✓"}
           </button>
         </div>
+
+        <div className="nb-section-title" style={{ marginTop: 24 }}>
+          Activity & Comments
+        </div>
+        <ActivityFilter mode={activityMode} onChange={setActivityMode} />
+        <CommentComposer
+          entityType="cycle_expense"
+          entityId={expense.id}
+          onPosted={() => {
+            setActivityRefresh((n) => n + 1);
+            onActivityChanged?.();
+          }}
+        />
+        <ActivityFeed
+          scope={{
+            kind: "entity",
+            entityType: "cycle_expense",
+            entityId: expense.id,
+          }}
+          mode={activityMode}
+          currentUser={currentUser}
+          refreshKey={activityRefresh}
+          onCommentMutated={() => {
+            setActivityRefresh((n) => n + 1);
+            onActivityChanged?.();
+          }}
+          expenses={[expense]}
+        />
       </div>
       <DiscardChangesDialog
         isOpen={confirmDiscard}
@@ -538,13 +583,17 @@ function EditIncomeModal({
   onClose,
   income,
   cycleId,
+  currentUser,
   onEdited,
+  onActivityChanged,
 }: {
   isOpen: boolean;
   onClose: () => void;
   income: CycleIncome | null;
   cycleId: string;
+  currentUser: UserResponse | null;
   onEdited: (updated: CycleIncome) => void;
+  onActivityChanged?: () => void;
 }) {
   const [form, setForm] = useState<EditIncomeForm>({
     amount: "",
@@ -553,6 +602,8 @@ function EditIncomeModal({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
+  const [activityMode, setActivityMode] = useState<"all" | "comments">("all");
+  const [activityRefresh, setActivityRefresh] = useState(0);
   const initialFormRef = useRef<EditIncomeForm>({
     amount: "",
     income_date: "",
@@ -592,8 +643,15 @@ function EditIncomeModal({
       income_date: form.income_date || undefined,
     });
     if (res.success) {
+      // Keep the modal open so the user can confirm the change landed
+      // in the activity feed; reset the dirty baseline.
       onEdited(res.data);
-      onClose();
+      initialFormRef.current = {
+        amount: res.data.amount,
+        income_date: res.data.income_date ?? "",
+      };
+      setForm(initialFormRef.current);
+      setActivityRefresh((n) => n + 1);
     } else {
       setError(res.error.message);
     }
@@ -607,7 +665,10 @@ function EditIncomeModal({
       className="nb-modal-backdrop"
       onClick={(e) => e.target === e.currentTarget && handleAttemptClose()}
     >
-      <div className="nb-modal">
+      <div
+        className="nb-modal"
+        style={{ maxWidth: 640, width: "100%", maxHeight: "90vh", overflowY: "auto" }}
+      >
         <button className="nb-modal-close" onClick={handleAttemptClose}>
           ✕
         </button>
@@ -667,6 +728,34 @@ function EditIncomeModal({
             {saving ? "Saving…" : "Save ✓"}
           </button>
         </div>
+
+        <div className="nb-section-title" style={{ marginTop: 24 }}>
+          Activity & Comments
+        </div>
+        <ActivityFilter mode={activityMode} onChange={setActivityMode} />
+        <CommentComposer
+          entityType="cycle_income"
+          entityId={income.id}
+          onPosted={() => {
+            setActivityRefresh((n) => n + 1);
+            onActivityChanged?.();
+          }}
+        />
+        <ActivityFeed
+          scope={{
+            kind: "entity",
+            entityType: "cycle_income",
+            entityId: income.id,
+          }}
+          mode={activityMode}
+          currentUser={currentUser}
+          refreshKey={activityRefresh}
+          onCommentMutated={() => {
+            setActivityRefresh((n) => n + 1);
+            onActivityChanged?.();
+          }}
+          incomes={[income]}
+        />
       </div>
       <DiscardChangesDialog
         isOpen={confirmDiscard}
@@ -1043,6 +1132,7 @@ interface AddExpenseForm {
   due_date: string;
   payment_method_id: string;
   paid: boolean;
+  comments: string;
 }
 
 function AddExpenseModal({
@@ -1067,6 +1157,7 @@ function AddExpenseModal({
     due_date: new Date().toISOString().split("T")[0],
     payment_method_id: "",
     paid: false,
+    comments: "",
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -1097,6 +1188,7 @@ function AddExpenseModal({
       due_date: form.due_date || null,
       payment_method_id: form.payment_method_id || null,
       paid: form.paid,
+      comments: form.comments || null,
     });
     if (res.success) {
       onAdded(res.data);
@@ -1107,6 +1199,7 @@ function AddExpenseModal({
         due_date: new Date().toISOString().split("T")[0],
         payment_method_id: "",
         paid: false,
+        comments: "",
       });
       onClose();
     } else {
@@ -1211,6 +1304,18 @@ function AddExpenseModal({
           />
           Already paid
         </label>
+
+        <div className="nb-form-group">
+          <label className="nb-form-label">Comments (optional)</label>
+          <textarea
+            className="nb-form-input"
+            placeholder="Why this expense is in this cycle…"
+            rows={2}
+            value={form.comments}
+            onChange={(e) => set("comments", e.target.value)}
+            style={{ resize: "vertical" }}
+          />
+        </div>
 
         {error && (
           <p
@@ -1522,6 +1627,7 @@ export function CycleDetail({
   summary,
   paymentMethods,
   headerActions,
+  currentUser,
   onBack,
   onToggleExpense,
   onStatusChange,
@@ -1530,6 +1636,7 @@ export function CycleDetail({
   onIncomeAdded,
   onIncomeRemoved,
   onIncomeEdited,
+  onActivityChanged,
 }: {
   cycle: Cycle;
   expenses: CycleExpense[];
@@ -1537,6 +1644,7 @@ export function CycleDetail({
   summary: CycleSummary | null;
   paymentMethods: PaymentMethod[];
   headerActions?: React.ReactNode;
+  currentUser?: UserResponse | null;
   onBack: () => void;
   onToggleExpense: (id: string) => void;
   onStatusChange: (id: string, status: ExpenseStatus) => void;
@@ -1545,6 +1653,7 @@ export function CycleDetail({
   onIncomeAdded: (i: CycleIncome) => void;
   onIncomeRemoved: (id: string) => void;
   onIncomeEdited: (updated: CycleIncome) => void;
+  onActivityChanged?: () => void;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -1717,9 +1826,24 @@ export function CycleDetail({
       </div>
 
       {incomes.length > 0 ? (
-        incomes.map((income) => (
+        incomes.map((income) => {
+          const editable = cycle.status !== "completed";
+          return (
           <div
             key={income.id}
+            role={editable ? "button" : undefined}
+            tabIndex={editable ? 0 : undefined}
+            onClick={editable ? () => handleEditIncome(income) : undefined}
+            onKeyDown={
+              editable
+                ? (e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleEditIncome(income);
+                    }
+                  }
+                : undefined
+            }
             style={{
               display: "flex",
               alignItems: "center",
@@ -1730,6 +1854,7 @@ export function CycleDetail({
               background: "rgba(80,200,100,0.10)",
               border: "1px solid rgba(80,200,100,0.25)",
               fontFamily: "var(--font-hand)",
+              cursor: editable ? "pointer" : "default",
             }}
           >
             <span style={{ fontSize: 14, color: "var(--ink)", flex: 1 }}>
@@ -1772,42 +1897,29 @@ export function CycleDetail({
             >
               {fmtDate(income.income_date)}
             </span>
-            {cycle.status !== "completed" && (
-              <>
-                <button
-                  style={{
-                    background: "transparent",
-                    border: "none",
-                    cursor: "pointer",
-                    color: "var(--ink-light)",
-                    fontSize: 14,
-                    padding: "0 4px",
-                    opacity: 0.5,
-                  }}
-                  title="Edit income"
-                  onClick={() => handleEditIncome(income)}
-                >
-                  ✎
-                </button>
-                <button
-                  style={{
-                    background: "transparent",
-                    border: "none",
-                    cursor: "pointer",
-                    color: "var(--ink-light)",
-                    fontSize: 14,
-                    padding: "0 4px",
-                    opacity: 0.5,
-                  }}
-                  title="Remove income"
-                  onClick={() => onIncomeRemoved(income.id)}
-                >
-                  ✕
-                </button>
-              </>
+            {editable && (
+              <button
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "var(--ink-light)",
+                  fontSize: 14,
+                  padding: "0 4px",
+                  opacity: 0.5,
+                }}
+                title="Remove income"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onIncomeRemoved(income.id);
+                }}
+              >
+                ✕
+              </button>
             )}
           </div>
-        ))
+          );
+        })
       ) : (
         <div
           style={{
@@ -1911,10 +2023,9 @@ export function CycleDetail({
         onClose={closeEditExpense}
         expense={editingExpense}
         cycleId={cycle.id}
-        onEdited={(updated) => {
-          onExpenseEdited(updated);
-          closeEditExpense();
-        }}
+        currentUser={currentUser ?? null}
+        onEdited={onExpenseEdited}
+        onActivityChanged={onActivityChanged}
       />
 
       <EditIncomeModal
@@ -1922,10 +2033,9 @@ export function CycleDetail({
         onClose={closeEditIncome}
         income={editingIncome}
         cycleId={cycle.id}
-        onEdited={(updated) => {
-          onIncomeEdited(updated);
-          closeEditIncome();
-        }}
+        currentUser={currentUser ?? null}
+        onEdited={onIncomeEdited}
+        onActivityChanged={onActivityChanged}
       />
     </>
   );

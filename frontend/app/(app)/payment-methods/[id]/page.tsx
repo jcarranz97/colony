@@ -1,7 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import type { PaymentMethod, PaymentMethodType } from "@/helpers/types";
+import type {
+  PaymentMethod,
+  PaymentMethodType,
+  UserResponse,
+} from "@/helpers/types";
 import { formatPaymentMethodName } from "@/helpers/formatters";
 import {
   getCurrentUserAction,
@@ -14,6 +18,11 @@ import {
   ConfirmTrashModal,
   type MethodForm,
 } from "@/components/payment-methods";
+import {
+  ActivityFeed,
+  ActivityFilter,
+  CommentComposer,
+} from "@/components/activity";
 
 const METHOD_ICON: Record<PaymentMethodType, string> = {
   debit: "🏦",
@@ -38,17 +47,23 @@ export default function PaymentMethodDetailPage() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [currentUser, setCurrentUser] = useState<UserResponse | null>(null);
   const [editOpen, setEditOpen] = useState(false);
   const [trashOpen, setTrashOpen] = useState(false);
   const [restoring, setRestoring] = useState(false);
   const [restoreError, setRestoreError] = useState<string | null>(null);
+  const [activityRefresh, setActivityRefresh] = useState(0);
+  const [activityMode, setActivityMode] = useState<"all" | "comments">("all");
 
   useEffect(() => {
     let cancelled = false;
     Promise.all([getCurrentUserAction(), getPaymentMethod(id)]).then(
       ([userRes, methodRes]) => {
         if (cancelled) return;
-        if (userRes.success) setIsAdmin(userRes.data.role === "admin");
+        if (userRes.success) {
+          setIsAdmin(userRes.data.role === "admin");
+          setCurrentUser(userRes.data);
+        }
         if (methodRes.success) setMethod(methodRes.data);
         else setNotFound(true);
         setLoading(false);
@@ -260,6 +275,27 @@ export default function PaymentMethodDetailPage() {
           )
         )}
       </div>
+
+      <div className="nb-section-title" style={{ marginTop: 32 }}>
+        Activity & Comments
+      </div>
+      <ActivityFilter mode={activityMode} onChange={setActivityMode} />
+      <CommentComposer
+        entityType="payment_method"
+        entityId={method.id}
+        onPosted={() => setActivityRefresh((n) => n + 1)}
+      />
+      <ActivityFeed
+        scope={{
+          kind: "entity",
+          entityType: "payment_method",
+          entityId: method.id,
+        }}
+        mode={activityMode}
+        currentUser={currentUser}
+        refreshKey={activityRefresh}
+        onCommentMutated={() => setActivityRefresh((n) => n + 1)}
+      />
 
       <MethodModal
         isOpen={editOpen}

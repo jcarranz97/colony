@@ -6,7 +6,13 @@ import type {
   RecurrentExpense,
   RecurrenceConfig,
   RecurrenceType,
+  UserResponse,
 } from "@/helpers/types";
+import {
+  ActivityFeed,
+  ActivityFilter,
+  CommentComposer,
+} from "@/components/activity";
 import { formatPaymentMethodName } from "@/helpers/formatters";
 import {
   getCurrentUserAction,
@@ -66,11 +72,14 @@ export default function RecurrentExpenseDetailPage() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [currentUser, setCurrentUser] = useState<UserResponse | null>(null);
   const [editOpen, setEditOpen] = useState(false);
   const [duplicateOpen, setDuplicateOpen] = useState(false);
   const [trashOpen, setTrashOpen] = useState(false);
   const [restoring, setRestoring] = useState(false);
   const [restoreError, setRestoreError] = useState<string | null>(null);
+  const [activityRefresh, setActivityRefresh] = useState(0);
+  const [activityMode, setActivityMode] = useState<"all" | "comments">("all");
 
   useEffect(() => {
     let cancelled = false;
@@ -80,7 +89,10 @@ export default function RecurrentExpenseDetailPage() {
       getPaymentMethods(),
     ]).then(([userRes, tplRes, pmRes]) => {
       if (cancelled) return;
-      if (userRes.success) setIsAdmin(userRes.data.role === "admin");
+      if (userRes.success) {
+        setIsAdmin(userRes.data.role === "admin");
+        setCurrentUser(userRes.data);
+      }
       if (tplRes.success) setTemplate(tplRes.data);
       else setNotFound(true);
       if (pmRes.success) setPaymentMethods(pmRes.data);
@@ -351,6 +363,27 @@ export default function RecurrentExpenseDetailPage() {
           )
         )}
       </div>
+
+      <div className="nb-section-title" style={{ marginTop: 32 }}>
+        Activity & Comments
+      </div>
+      <ActivityFilter mode={activityMode} onChange={setActivityMode} />
+      <CommentComposer
+        entityType="recurrent_expense"
+        entityId={template.id}
+        onPosted={() => setActivityRefresh((n) => n + 1)}
+      />
+      <ActivityFeed
+        scope={{
+          kind: "entity",
+          entityType: "recurrent_expense",
+          entityId: template.id,
+        }}
+        mode={activityMode}
+        currentUser={currentUser}
+        refreshKey={activityRefresh}
+        onCommentMutated={() => setActivityRefresh((n) => n + 1)}
+      />
 
       <TemplateModal
         isOpen={editOpen}

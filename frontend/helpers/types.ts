@@ -272,6 +272,7 @@ export interface CreateCycleExpenseRequest {
   due_date?: string | null;
   payment_method_id?: string | null;
   paid?: boolean;
+  comments?: string | null;
 }
 
 export interface UpdateCycleExpenseRequest extends Partial<CreateCycleExpenseRequest> {
@@ -349,6 +350,76 @@ export interface CreateExchangeRateRequest {
 
 export interface UpdateExchangeRateRequest {
   rate: number;
+}
+
+// Activity & Comments
+export type EntityType =
+  | "payment_method"
+  | "recurrent_expense"
+  | "recurrent_income"
+  | "cycle"
+  | "cycle_expense"
+  | "cycle_income"
+  | "comment";
+
+export type ActivityAction =
+  | "created"
+  | "updated"
+  | "deactivated"
+  | "reactivated"
+  | "marked_paid"
+  | "marked_unpaid"
+  | "status_changed"
+  | "completed"
+  | "commented"
+  | "comment_edited"
+  | "comment_deleted";
+
+export interface ActorSummary {
+  id: string;
+  username: string;
+}
+
+/**
+ * `changes` is a polymorphic JSONB blob:
+ *   - For `updated` / state-transition actions: `{field: {from, to}}` diff.
+ *   - For comment-lifecycle actions (`commented`, `comment_edited`,
+ *     `comment_deleted`): `{comment_id: "<uuid>"}`.
+ *   - For `created` / `deactivated` / `reactivated`: empty.
+ */
+export type ActivityChange = { from: unknown; to: unknown } | string;
+
+export interface ActivityEntry {
+  id: string;
+  entity_type: EntityType;
+  entity_id: string;
+  cycle_id: string | null;
+  actor: ActorSummary;
+  action: ActivityAction;
+  changes: Record<string, ActivityChange>;
+  created_at: string;
+}
+
+export interface Comment {
+  id: string;
+  entity_type: EntityType;
+  entity_id: string;
+  cycle_id: string | null;
+  author: ActorSummary;
+  body: string;
+  edited_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateCommentRequest {
+  entity_type: EntityType;
+  entity_id: string;
+  body: string;
+}
+
+export interface UpdateCommentRequest {
+  body: string;
 }
 
 // API response wrapper

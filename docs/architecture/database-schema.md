@@ -378,6 +378,58 @@ CREATE INDEX idx_exchange_rates_currencies ON exchange_rates(from_currency, to_c
 CREATE INDEX idx_exchange_rates_date ON exchange_rates(rate_date);
 ```
 
+### Activity Log
+
+Append-only audit trail. Polymorphic via `entity_type` + `entity_id`. See
+[`activity-log.md`](activity-log.md) for the data model and write/read
+paths.
+
+```sql
+CREATE TABLE activity_log (
+    id UUID PRIMARY KEY,
+    household_id UUID NOT NULL REFERENCES households(id) ON DELETE CASCADE,
+    entity_type VARCHAR(40) NOT NULL,
+    entity_id UUID NOT NULL,
+    cycle_id UUID REFERENCES cycles(id) ON DELETE CASCADE,
+    actor_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    action VARCHAR(40) NOT NULL,
+    changes JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    active BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+CREATE INDEX ix_activity_log_household_created ON activity_log(household_id, created_at);
+CREATE INDEX ix_activity_log_entity_created ON activity_log(entity_type, entity_id, created_at);
+CREATE INDEX ix_activity_log_cycle_created ON activity_log(cycle_id, created_at);
+CREATE INDEX ix_activity_log_actor_created ON activity_log(actor_user_id, created_at);
+```
+
+### Comments
+
+User-authored Markdown notes attached polymorphically to any entity.
+Soft-deletable; editable by the author only.
+
+```sql
+CREATE TABLE comments (
+    id UUID PRIMARY KEY,
+    household_id UUID NOT NULL REFERENCES households(id) ON DELETE CASCADE,
+    entity_type VARCHAR(40) NOT NULL,
+    entity_id UUID NOT NULL,
+    cycle_id UUID REFERENCES cycles(id) ON DELETE CASCADE,
+    author_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    body TEXT NOT NULL,
+    edited_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    active BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+CREATE INDEX ix_comments_entity_created ON comments(entity_type, entity_id, created_at);
+CREATE INDEX ix_comments_cycle_created ON comments(cycle_id, created_at);
+CREATE INDEX ix_comments_household_created ON comments(household_id, created_at);
+```
+
 ## Relationship Details
 
 ### User → Payment Methods (1:N)

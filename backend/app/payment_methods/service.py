@@ -4,6 +4,11 @@ from sqlalchemy import and_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app.activity.constants import ActivityAction, EntityType
+from app.activity.helpers import compute_diff
+from app.activity.service import activity_service
+from app.auth.models import User
+
 from . import models, schemas
 from .constants import MAX_PAYMENT_METHODS_PER_USER
 from .exceptions import (
@@ -60,6 +65,7 @@ class PaymentMethodService:
         db: Session,
         payment_method_data: schemas.PaymentMethodCreate,
         household_id: str,
+        actor: User,
     ) -> models.PaymentMethod:
         """Create a new payment method for a household."""
         logger.info(
@@ -114,6 +120,17 @@ class PaymentMethodService:
             )
 
             db.add(payment_method)
+            db.flush()
+
+            activity_service.record(
+                db,
+                household_id=payment_method.household_id,
+                entity_type=EntityType.PAYMENT_METHOD,
+                entity_id=payment_method.id,
+                actor_user_id=actor.id,
+                action=ActivityAction.CREATED,
+            )
+
             db.commit()
             db.refresh(payment_method)
 
@@ -140,6 +157,7 @@ class PaymentMethodService:
         db: Session,
         payment_method: models.PaymentMethod,
         payment_method_data: schemas.PaymentMethodUpdate,
+        actor: User,
     ) -> models.PaymentMethod:
         """Update an existing payment method."""
         logger.info(
@@ -181,9 +199,32 @@ class PaymentMethodService:
 
         try:
             update_data = payment_method_data.model_dump(exclude_unset=True)
+            before = {field: getattr(payment_method, field) for field in update_data}
 
             for field, value in update_data.items():
                 setattr(payment_method, field, value)
+
+            db.flush()
+
+            after = {field: getattr(payment_method, field) for field in update_data}
+            diff = compute_diff(before, after)
+            if diff:
+                action = ActivityAction.UPDATED
+                if "active" in diff and len(diff) == 1:
+                    action = (
+                        ActivityAction.REACTIVATED
+                        if diff["active"]["to"]
+                        else ActivityAction.DEACTIVATED
+                    )
+                activity_service.record(
+                    db,
+                    household_id=payment_method.household_id,
+                    entity_type=EntityType.PAYMENT_METHOD,
+                    entity_id=payment_method.id,
+                    actor_user_id=actor.id,
+                    action=action,
+                    changes=diff,
+                )
 
             db.commit()
             db.refresh(payment_method)
@@ -212,6 +253,7 @@ class PaymentMethodService:
     def delete_payment_method(
         db: Session,
         payment_method: models.PaymentMethod,
+        actor: User,
     ) -> None:
         """Soft delete a payment method (deactivate)."""
         logger.info(
@@ -220,6 +262,17 @@ class PaymentMethodService:
         )
 
         payment_method.active = False
+        db.flush()
+
+        activity_service.record(
+            db,
+            household_id=payment_method.household_id,
+            entity_type=EntityType.PAYMENT_METHOD,
+            entity_id=payment_method.id,
+            actor_user_id=actor.id,
+            action=ActivityAction.DEACTIVATED,
+        )
+
         db.commit()
 
         logger.info(

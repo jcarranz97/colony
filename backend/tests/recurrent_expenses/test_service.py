@@ -162,7 +162,7 @@ class TestGetRecurrentExpenseById:
 
 
 class TestCreateRecurrentExpense:
-    def test_create_success(self, db, test_household, test_payment_method):
+    def test_create_success(self, db, test_household, test_payment_method, test_user):
         data = RecurrentExpenseCreate(
             description="Rent",
             currency=CurrencyCode.USD,
@@ -174,13 +174,13 @@ class TestCreateRecurrentExpense:
             reference_date=date(2024, 12, 1),
         )
         recurrent_expense = recurrent_expense_service.create_recurrent_expense(
-            db, data, str(test_household.id)
+            db, data, str(test_household.id), actor=test_user
         )
         assert recurrent_expense.description == "Rent"
         assert recurrent_expense.active is True
 
     def test_raises_when_payment_method_not_owned(
-        self, db, test_household, other_payment_method
+        self, db, test_household, other_payment_method, test_user
     ):
         data = RecurrentExpenseCreate(
             description="Rent",
@@ -194,10 +194,12 @@ class TestCreateRecurrentExpense:
         )
         with pytest.raises(PaymentMethodNotFoundExceptionError):
             recurrent_expense_service.create_recurrent_expense(
-                db, data, str(test_household.id)
+                db, data, str(test_household.id), actor=test_user
             )
 
-    def test_raises_when_payment_method_nonexistent(self, db, test_household):
+    def test_raises_when_payment_method_nonexistent(
+        self, db, test_household, test_user
+    ):
         data = RecurrentExpenseCreate(
             description="Rent",
             currency=CurrencyCode.USD,
@@ -210,51 +212,57 @@ class TestCreateRecurrentExpense:
         )
         with pytest.raises(PaymentMethodNotFoundExceptionError):
             recurrent_expense_service.create_recurrent_expense(
-                db, data, str(test_household.id)
+                db, data, str(test_household.id), actor=test_user
             )
 
 
 class TestUpdateRecurrentExpense:
-    def test_partial_update(self, db, test_household, test_template):
+    def test_partial_update(self, db, test_household, test_template, test_user):
         data = RecurrentExpenseUpdate(description="Updated Groceries")
         updated = recurrent_expense_service.update_recurrent_expense(
-            db, test_template, data, str(test_household.id)
+            db, test_template, data, str(test_household.id), actor=test_user
         )
         assert updated.description == "Updated Groceries"
         assert updated.category == test_template.category
 
     def test_update_recurrence_config_validates_against_existing_type(
-        self, db, test_household, test_template
+        self, db, test_household, test_template, test_user
     ):
         # test_template has recurrence_type=weekly; send invalid config for weekly
         data = RecurrentExpenseUpdate(recurrence_config={"interval_days": 14})
         with pytest.raises(InvalidRecurrenceConfigExceptionError):
             recurrent_expense_service.update_recurrent_expense(
-                db, test_template, data, str(test_household.id)
+                db, test_template, data, str(test_household.id), actor=test_user
             )
 
-    def test_update_both_recurrence_fields(self, db, test_household, test_template):
+    def test_update_both_recurrence_fields(
+        self, db, test_household, test_template, test_user
+    ):
         data = RecurrentExpenseUpdate(
             recurrence_type=RecurrenceType.MONTHLY,
             recurrence_config={"day_of_month": 15},
         )
         updated = recurrent_expense_service.update_recurrent_expense(
-            db, test_template, data, str(test_household.id)
+            db, test_template, data, str(test_household.id), actor=test_user
         )
         assert updated.recurrence_type == RecurrenceType.MONTHLY
         assert updated.recurrence_config == {"day_of_month": 15}
 
 
 class TestDeleteRecurrentExpense:
-    def test_soft_delete_sets_active_false(self, db, test_template):
+    def test_soft_delete_sets_active_false(self, db, test_template, test_user):
         assert test_template.active is True
-        recurrent_expense_service.delete_recurrent_expense(db, test_template)
+        recurrent_expense_service.delete_recurrent_expense(
+            db, test_template, actor=test_user
+        )
         db.refresh(test_template)
         assert test_template.active is False
 
-    def test_soft_delete_does_not_remove_record(self, db, test_template):
+    def test_soft_delete_does_not_remove_record(self, db, test_template, test_user):
         recurrent_expense_id = test_template.id
-        recurrent_expense_service.delete_recurrent_expense(db, test_template)
+        recurrent_expense_service.delete_recurrent_expense(
+            db, test_template, actor=test_user
+        )
         record = (
             db.query(RecurrentExpense)
             .filter(RecurrentExpense.id == recurrent_expense_id)
