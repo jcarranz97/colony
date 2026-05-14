@@ -28,7 +28,14 @@ config = context.config
 
 # Override sqlalchemy.url from app settings so deployments don't need
 # to maintain a duplicate DB URL in alembic.ini.
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+#
+# `set_main_option` writes through Python's configparser, which treats
+# bare `%` as the start of an interpolation token (e.g. `%(here)s`).
+# Doubling them up bypasses the parser; SQLAlchemy reads the value back
+# verbatim, so passwords with URL-encoded specials like `%40` survive.
+config.set_main_option(
+    "sqlalchemy.url", settings.DATABASE_URL.replace("%", "%%")
+)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
