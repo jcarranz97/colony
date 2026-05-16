@@ -27,6 +27,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<UserResponse | null>(null);
   const [activeHouseholdName, setActiveHouseholdName] = useState<string | null>(
     null,
@@ -72,6 +73,14 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     <div className="nb-shell">
       {/* Cover bar */}
       <div className="nb-cover">
+        {/* Hamburger — hidden on desktop via CSS, shown ≤768px */}
+        <button
+          className="nb-hamburger"
+          aria-label="Open menu"
+          onClick={() => setNavOpen(true)}
+        >
+          ☰
+        </button>
         <span className="nb-logo">Colony</span>
         <span className="nb-subtitle">
           household budget tracker
@@ -114,15 +123,26 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           ))}
         </div>
 
+        {/* Backdrop — only rendered while the mobile drawer is open */}
+        {navOpen && (
+          <div
+            className="nb-nav-backdrop"
+            onClick={() => setNavOpen(false)}
+          />
+        )}
+
         {/* Navigation tabs */}
-        <nav className="nb-nav">
+        <nav className={`nb-nav${navOpen ? " nb-nav-open" : ""}`}>
           {navItems.map((item) => {
             const isActive = pathname.startsWith(item.href);
             return (
               <button
                 key={item.href}
                 className={`nb-tab${isActive ? " nb-tab-active" : ""}`}
-                onClick={() => router.push(item.href)}
+                onClick={() => {
+                  router.push(item.href);
+                  setNavOpen(false);
+                }}
               >
                 <span>{item.icon}</span>
                 {item.label}
