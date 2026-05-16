@@ -101,6 +101,7 @@ function TemplateCard({
     >
       {/* Category icon */}
       <div
+        className="nb-template-icon"
         style={{
           width: 36,
           height: 36,
@@ -119,7 +120,7 @@ function TemplateCard({
       </div>
 
       {/* Info */}
-      <div style={{ flex: 1, minWidth: 0 }}>
+      <div className="nb-template-info" style={{ flex: 1, minWidth: 0 }}>
         <div
           style={{
             fontFamily: "var(--font-title)",
@@ -162,6 +163,7 @@ function TemplateCard({
 
       {/* Right side: amount + badges */}
       <div
+        className="nb-template-aside"
         style={{
           display: "flex",
           flexDirection: "column",
@@ -192,7 +194,10 @@ function TemplateCard({
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+      <div
+        className="nb-template-actions"
+        style={{ display: "flex", gap: 6, flexShrink: 0 }}
+      >
         <button
           style={iconBtn}
           onClick={(e) => {
