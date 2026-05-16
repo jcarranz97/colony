@@ -174,7 +174,7 @@ function CycleCard({
                 className={`nb-stat-value ${net >= 0 ? "nb-stat-positive" : "nb-stat-negative"}`}
               >
                 {fmtAmount(Math.abs(net).toString(), "USD")}
-                {net < 0 ? " ↓" : " ↑"}
+                {net < 0 ? " ↓" : " ↑"}
               </span>
             </div>
           </>
@@ -290,6 +290,7 @@ function ExpenseRow({
         {checkIcon}
       </button>
       <div
+        className="nb-expense-icon"
         style={{
           width: 24,
           height: 24,
@@ -326,7 +327,10 @@ function ExpenseRow({
       <div className="nb-expense-amount">
         {fmtAmount(expense.amount, expense.currency)}
       </div>
-      <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
+      <div
+        className="nb-expense-badges"
+        style={{ display: "flex", gap: 4, flexShrink: 0 }}
+      >
         <span
           className={`nb-template-badge ${
             expense.category === "fixed"
@@ -1756,7 +1760,7 @@ export function CycleDetail({
             className={`nb-summary-value ${netBalance >= 0 ? "nb-stat-positive" : "nb-stat-negative"}`}
           >
             {fmtAmount(Math.abs(netBalance).toString(), "USD")}
-            {netBalance < 0 ? " ↓" : " ↑"}
+            {netBalance < 0 ? " ↓" : " ↑"}
           </span>
         </div>
         <div className="nb-summary-item">

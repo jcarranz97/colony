@@ -1475,3 +1475,264 @@
   border: 1px solid var(--card-border, rgba(0, 0, 0, 0.12));
   padding: 4px 8px;
 }
+
+/* ════════════════════════════════════════════════════════════════════════ */
+/* Mobile / responsive overrides                                            */
+/*                                                                          */
+/* Everything below is scoped inside @media (max-width: …) so the desktop   */
+/* layout above is byte-for-byte unchanged at ≥769px. Two new classes       */
+/* (.nb-hamburger, .nb-nav-backdrop) default to display:none here so they   */
+/* are inert on desktop and only the mobile block reveals them.             */
+/* ════════════════════════════════════════════════════════════════════════ */
+
+/* Inert on desktop — revealed only inside the ≤768px block. */
+.nb-hamburger,
+.nb-nav-backdrop {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* Kill any horizontal scroll caused by an overflowing child. */
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Shell: drop the fixed-viewport model so the document scrolls
+     naturally (avoids the iOS Safari dynamic-toolbar 100vh clip). */
+  .nb-shell {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+  .nb-body {
+    flex-direction: column;
+    min-height: 0;
+    overflow: visible;
+  }
+  .nb-page {
+    overflow: visible;
+  }
+  .nb-content {
+    flex: 1;
+    overflow-y: visible;
+    overflow-x: hidden;
+    /* Kill the 72px desktop indent (it existed for the spiral/margin);
+       respect iPhone safe-area insets on the remaining sides. */
+    padding: 16px max(14px, env(safe-area-inset-right))
+      max(24px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+  }
+
+  /* Hide purely decorative chrome to reclaim horizontal space. */
+  .nb-spiral,
+  .nb-margin,
+  .nb-cover::before {
+    display: none;
+  }
+
+  /* Cover bar: compact, wraps, respects the notch. */
+  .nb-cover {
+    padding: max(10px, env(safe-area-inset-top)) 14px 10px 14px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .nb-logo {
+    font-size: 20px;
+  }
+  /* Subtitle (and the inline active-household name it wraps) is dropped
+     on phones to keep the cover bar to a single compact row. */
+  .nb-subtitle {
+    display: none;
+  }
+
+  /* Hamburger toggle (≥44px tap target). */
+  .nb-hamburger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    font-size: 22px;
+    line-height: 1;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.85);
+    cursor: pointer;
+  }
+
+  /* Nav becomes a slide-in drawer. */
+  .nb-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: min(80vw, 260px);
+    padding: max(24px, env(safe-area-inset-top)) 0 24px 8px;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    overflow-y: auto;
+    z-index: 1100;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.28);
+  }
+  .nb-nav.nb-nav-open {
+    transform: translateX(0);
+  }
+  .nb-nav-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1099;
+  }
+  .nb-tab {
+    padding: 14px 16px;
+    min-height: 44px;
+    border-radius: 4px;
+  }
+
+  /* Modals: full-bleed. !important is deliberate — several components set
+     an inline style={{ width: 480 }} / maxWidth:640 that beats the class;
+     this is scoped to mobile only, so desktop modals keep inline widths. */
+  .nb-modal {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 100dvh;
+    margin: 0;
+    border-radius: 0;
+    padding: 20px 18px;
+    overflow-y: auto;
+    overflow-wrap: break-word;
+  }
+
+  /* Two-column modal fields stack — one rule fixes every form. */
+  .nb-form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* Cards / strips / rows: let them wrap instead of overflowing. */
+  .nb-cycle-card,
+  .nb-template-card,
+  .nb-payment-card {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .nb-cycle-footer {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .nb-cycle-stat,
+  .nb-payment-stat-card {
+    min-width: 0;
+  }
+  /* Summary strip: stack each stat full-width instead of cramming all
+     four into ~80px columns. This gives the value (and its trend arrow)
+     enough room and keeps it grouped under its own label, rather than
+     overflowing toward the next column. */
+  .nb-summary-strip {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .nb-summary-item {
+    flex: none;
+    width: 100%;
+    min-width: 0;
+  }
+  /* Cycle Expenses rows — a deterministic 2-line card so the description
+     never reflows the rest of the row and the action buttons always land
+     in the same place regardless of the name length.
+       Line 1: status check + icon + name (truncated) + amount (right)
+       Line 2: autopay · method · due · badges ……… Other · Skip (right)
+     A zero-height ::after with flex-basis:100% forces the line break;
+     `order` sequences the otherwise-flat sibling children into the two
+     lines (this is why .nb-expense-icon / .nb-expense-badges classes
+     were added to the JSX). */
+  .nb-expense-row {
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 8px;
+    row-gap: 6px;
+    padding: 10px 12px;
+  }
+  .nb-expense-row::after {
+    content: "";
+    flex: 0 0 100%;
+    height: 0;
+    order: 5;
+  }
+  .nb-expense-check {
+    order: 1;
+  }
+  .nb-expense-icon {
+    order: 2;
+  }
+  .nb-expense-name {
+    order: 3;
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .nb-expense-amount {
+    order: 4;
+    margin-left: auto;
+    min-width: 0;
+  }
+  .nb-expense-autopay {
+    order: 6;
+  }
+  .nb-expense-method {
+    order: 7;
+  }
+  .nb-expense-due {
+    order: 8;
+  }
+  .nb-expense-badges {
+    order: 9;
+  }
+  .nb-expense-action-btn.nb-btn-other {
+    order: 10;
+    margin-left: auto;
+  }
+  .nb-expense-action-btn.nb-btn-skip {
+    order: 11;
+  }
+
+  /* Touch devices have no reliable :hover — keep row actions visible. */
+  .nb-expense-edit-btn,
+  .nb-expense-action-btn {
+    opacity: 1;
+  }
+
+  /* ≥44px tap targets on interactive elements. */
+  .nb-tab,
+  .nb-signout,
+  .nb-add-btn,
+  .nb-btn-primary,
+  .nb-btn-cancel,
+  .nb-expense-edit-btn,
+  .nb-expense-action-btn {
+    min-height: 44px;
+  }
+  .nb-theme-toggle,
+  .nb-modal-close {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+/* Phones only — lighter typographic/padding tightening. */
+@media (max-width: 430px) {
+  .nb-content {
+    padding: 14px max(10px, env(safe-area-inset-right))
+      max(20px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+  }
+  .nb-page-title {
+    font-size: 22px;
+  }
+  .nb-section-title {
+    font-size: 15px;
+  }
+}

@@ -87,7 +87,7 @@ export function Register() {
                   <FieldError>{errors.password}</FieldError>
                 )}
               </TextField>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <TextField
                   isInvalid={!!errors.first_name && !!touched.first_name}
                   value={values.first_name}

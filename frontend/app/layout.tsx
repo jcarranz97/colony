@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { fontSans } from "@/config/fonts";
 import { Providers } from "./providers";
 import "./globals.css";
@@ -6,6 +6,15 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Colony",
   description: "Personal expense management",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  // viewportFit: cover lets the layout extend into the iPhone notch/home-bar
+  // area; combined with env(safe-area-inset-*) in globals.css. Zoom is left
+  // enabled (no maximumScale/userScalable) for accessibility.
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
