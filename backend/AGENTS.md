@@ -257,6 +257,14 @@ async def endpoint(current_user: CurrentActiveUser): ...
   created automatically on first deploy from the `DEFAULT_ADMIN_USERNAME`
   and `DEFAULT_ADMIN_PASSWORD` env vars (defaults: `admin` / `colony-admin`).
 - JWT `sub` claim holds the username.
+- **Production refuses repo-default secrets.** When `DEBUG=false`,
+  `validate_production_secrets()` (`app/config.py`, called first in the
+  `main.py` `lifespan`, before `_bootstrap_admin()`) aborts startup if
+  `SECRET_KEY`/`AUTH_SECRET_KEY` is a known repo default or `< 32` chars,
+  or if `DEFAULT_ADMIN_PASSWORD` is the default `colony-admin` or empty.
+  Defaults stay usable when `DEBUG=true` (local / docker-compose / pytest).
+  The repo defaults are intentionally kept; production is blocked instead
+  of removing them.
 
 ---
 

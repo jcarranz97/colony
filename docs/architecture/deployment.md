@@ -317,6 +317,20 @@ from one to the other later via `helm upgrade`.
 > file is immune to this and to most shell-quoting traps. Same on Helm
 > 3.x and 4.x.
 
+> **Production secret validation (fail-closed).** The chart runs the
+> backend with `DEBUG=false` in production. On startup the backend calls
+> `validate_production_secrets()` and **refuses to start** (the pod
+> crash-loops with a clear log message) if `backend.env.secretKey` is
+> still a repo default or shorter than 32 characters, or if
+> `backend.env.defaultAdminPassword` is still `colony-admin` or empty.
+> This is intentional — the repo ships placeholder defaults for local
+> dev, and a misconfigured production install is blocked rather than
+> silently running with a publicly-known JWT signing key or admin
+> password. Generate a strong secret with
+> `python -c "import secrets; print(secrets.token_hex(32))"` and set
+> **both** `secretKey` and `defaultAdminPassword` in the values below
+> before deploying.
+
 #### Option 1 — NodePort + Ingress (recommended)
 
 Reach the app at clean hostnames like `http://colony.dev.lan` and
@@ -475,8 +489,13 @@ kubectl get svc -n colony-app
 | Backend health | `http://192.168.1.206:30800/health` |
 
 The default admin credentials are whatever you set in
-`backend.env.defaultAdminUsername` / `backend.env.defaultAdminPassword`
-(defaults: `admin` / `colony-admin`).
+`backend.env.defaultAdminUsername` / `backend.env.defaultAdminPassword`.
+The chart defaults are `admin` / `colony-admin`, but a production install
+(`DEBUG=false`) **will not start** until `defaultAdminPassword` (and
+`secretKey`) are changed away from the repo defaults — see *Step 3*. If the
+backend pod is stuck in `CrashLoopBackOff`, check
+`kubectl logs -n <ns> deploy/colony-backend` for the secret-validation
+error.
 
 ---
 

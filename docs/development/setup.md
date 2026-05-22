@@ -280,6 +280,15 @@ ACCESS_TOKEN_EXPIRE_MINUTES=30
 DEBUG=true
 ```
 
+!!! warning "Placeholder secrets are dev-only"
+    `DEBUG=true` keeps these placeholder values working for local
+    development. In production the backend runs with `DEBUG=false` and
+    **refuses to start** if `SECRET_KEY`/`AUTH_SECRET_KEY` is a repo
+    default or shorter than 32 characters, or if `DEFAULT_ADMIN_PASSWORD`
+    is still `colony-admin`. Always set strong, unique values before
+    deploying — see
+    [Deployment → Step 3](../architecture/deployment.md).
+
 ## Development Workflow
 
 1. **Make changes** to your code

@@ -91,6 +91,10 @@ pre-commit run --files <changed files>
 `admin` / `colony-admin` (configurable via `DEFAULT_ADMIN_USERNAME` /
 `DEFAULT_ADMIN_PASSWORD` env vars on deploy).
 
+In production (`DEBUG=false`), the backend refuses to start while the JWT
+secret or admin password is still a repo default — see the Authentication
+section in `backend/AGENTS.md`.
+
 ## Docs
 
 - `docs/architecture/frontend.md` — frontend architecture

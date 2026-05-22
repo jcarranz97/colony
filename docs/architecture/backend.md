@@ -533,6 +533,31 @@ class AuthSettings(BaseSettings):
         env_prefix = "AUTH_"
 ```
 
+### Production Secret Validation
+
+The repo intentionally ships placeholder defaults for `SECRET_KEY` /
+`AUTH_SECRET_KEY` and the bootstrap admin password (`colony-admin`) so
+local dev and `docker-compose` work with zero configuration. To prevent
+those publicly-known values from ever reaching production, the backend
+validates secrets at startup:
+
+- `validate_production_secrets()` lives in `app/config.py` and is invoked
+  as the **first** statement of the `main.py` `lifespan`, before
+  `_bootstrap_admin()` runs.
+- It is a no-op when `DEBUG=true` (local / `docker-compose` / pytest).
+- When `DEBUG=false` (production — the Helm chart sets this), it raises a
+  fatal `RuntimeError` and aborts startup if any of:
+    - `SECRET_KEY` or `AUTH_SECRET_KEY` equals a known repo-default
+      placeholder, or is shorter than 32 characters.
+    - `DEFAULT_ADMIN_PASSWORD` equals the default `colony-admin`, or is
+      empty / whitespace-only.
+- The error message names the offending setting and remediation steps but
+  never echoes the secret value.
+
+Because the check runs before `_bootstrap_admin()`, a production
+deployment that still uses the default admin password fails closed
+*before* that account is ever created.
+
 ### Token Flow
 1. User authenticates via `/auth/login` with email/password
 2. System returns JWT token with user claims

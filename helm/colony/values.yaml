@@ -8,6 +8,11 @@
 #   backend.env.secretKey       — a strong random secret (≥32 chars)
 #   postgresql.password         — a strong database password
 #   backend.env.defaultAdminPassword — change from the default
+#
+# NOTE: With backend.env.debug="false" (production, the default below) the
+# backend refuses to start if backend.env.secretKey is still the placeholder
+# below or shorter than 32 chars, or if backend.env.defaultAdminPassword is
+# still the default "colony-admin" (or empty). You MUST override both.
 
 # ---------------------------------------------------------------------------
 # Image pull configuration
@@ -55,7 +60,9 @@ backend:
     # Set to "false" in production.
     debug: "false"
 
-    # MUST be changed — used to sign JWT tokens.
+    # MUST be changed — used to sign JWT tokens. The backend refuses to
+    # start in production (debug="false") while this placeholder is set or
+    # the value is shorter than 32 chars.
     # Generate with: python -c "import secrets; print(secrets.token_hex(32))"
     secretKey: "change-me-in-production-generate-a-strong-random-secret"
 
@@ -68,7 +75,8 @@ backend:
 
     # Default admin user created automatically on first startup.
     defaultAdminUsername: "admin"
-    # MUST be changed before deploying.
+    # MUST be changed before deploying. The backend refuses to start in
+    # production (debug="false") while this default is set.
     defaultAdminPassword: "colony-admin"
 
 # ---------------------------------------------------------------------------

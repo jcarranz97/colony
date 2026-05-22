@@ -8,7 +8,7 @@ from app.activity.router import comments_router, router as activity_router
 from app.auth.models import User
 from app.auth.router import router as auth_router
 from app.auth.utils import get_password_hash
-from app.config import settings
+from app.config import settings, validate_production_secrets
 from app.cycles.exchange_rates_router import router as exchange_rates_router
 from app.cycles.router import router as cycles_router
 from app.database import Base, SessionLocal, engine
@@ -81,7 +81,12 @@ def _bootstrap_admin() -> None:
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI) -> AsyncGenerator[None]:
-    """Ensure schema exists and bootstrap the default admin user on startup.
+    """Validate secrets, ensure schema exists, and bootstrap admin on startup.
+
+    ``validate_production_secrets()`` runs first so a production deployment
+    (``DEBUG=false``) that still uses a repo-default JWT secret or admin
+    password fails closed here — before ``_bootstrap_admin()`` could ever
+    create that default admin account.
 
     Production schema management is owned by Alembic — the Helm chart's
     init container runs ``alembic upgrade head`` before the API starts,
@@ -90,6 +95,7 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None]:
     dev/docker-compose safety net so a fresh ``docker compose up`` works
     without a manual migration step.
     """
+    validate_production_secrets()
     Base.metadata.create_all(bind=engine)
     _bootstrap_admin()
     yield
