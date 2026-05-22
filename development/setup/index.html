@@ -694,6 +694,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../architecture/mcp-server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../architecture/deployment/" class="md-nav__link">
         
   
@@ -1312,7 +1340,13 @@
 <li><strong>Backend API</strong>: http://localhost:8000</li>
 <li><strong>API Documentation (Swagger UI)</strong>: http://localhost:8000/docs</li>
 <li><strong>ReDoc</strong>: http://localhost:8000/redoc</li>
+<li><strong>Frontend</strong>: http://localhost:3000</li>
+<li><strong>MCP server</strong>: http://localhost:8002/mcp (health at <code>/health</code>)</li>
+<li><strong>Docs</strong>: http://localhost:2011</li>
 </ul>
+<p>The <code>mcp</code> service exposes the Colony API to agentic clients over the Model
+Context Protocol. See <a href="../../architecture/mcp-server/">MCP Server</a> for how to
+connect an agent.</p>
 <h3 id="hot-reload">Hot Reload</h3>
 <p>The backend service mounts the <code>backend/</code> directory as a volume, so any code
 changes you make locally are reflected immediately inside the container —
