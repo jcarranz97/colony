@@ -95,6 +95,7 @@ function IncomeCard({
       style={{ textDecoration: "none", color: "inherit", cursor: "pointer" }}
     >
       <div
+        className="nb-template-icon"
         style={{
           width: 36,
           height: 36,
@@ -110,7 +111,7 @@ function IncomeCard({
         💰
       </div>
 
-      <div style={{ flex: 1, minWidth: 0 }}>
+      <div className="nb-template-info" style={{ flex: 1, minWidth: 0 }}>
         <div
           style={{
             fontFamily: "var(--font-title)",
@@ -146,6 +147,7 @@ function IncomeCard({
       </div>
 
       <div
+        className="nb-template-aside"
         style={{
           display: "flex",
           flexDirection: "column",
@@ -175,7 +177,10 @@ function IncomeCard({
         </span>
       </div>
 
-      <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+      <div
+        className="nb-template-actions"
+        style={{ display: "flex", gap: 6, flexShrink: 0 }}
+      >
         <button
           style={iconBtn}
           onClick={(e) => {

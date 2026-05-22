@@ -1613,10 +1613,34 @@
 
   /* Cards / strips / rows: let them wrap instead of overflowing. */
   .nb-cycle-card,
-  .nb-template-card,
   .nb-payment-card {
     flex-wrap: wrap;
     gap: 10px;
+  }
+  /* Recurrent Expenses cards — deterministic 2-line layout on mobile so
+     the row never reflows with the description length:
+       Line 1: icon + info (name / meta) + amount & badges (right)
+       Line 2: Edit · Duplicate · Trash (full-width, right-aligned)
+     nb-template-* classes were added to the card's wrapper <div>s to
+     sequence the otherwise-unstructured children. */
+  .nb-template-card {
+    flex-wrap: wrap;
+    column-gap: 10px;
+    row-gap: 8px;
+  }
+  .nb-template-icon {
+    order: 1;
+  }
+  .nb-template-info {
+    order: 2;
+  }
+  .nb-template-aside {
+    order: 3;
+  }
+  .nb-template-actions {
+    order: 4;
+    flex: 1 0 100%;
+    justify-content: flex-end;
   }
   .nb-cycle-footer {
     flex-wrap: wrap;
