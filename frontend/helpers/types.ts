@@ -422,6 +422,28 @@ export interface UpdateCommentRequest {
   body: string;
 }
 
+// API tokens (personal access tokens)
+export interface ApiToken {
+  id: string;
+  name: string;
+  prefix: string;
+  last_used_at: string | null;
+  expires_at: string | null;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+// Returned only once, by the create endpoint — includes the secret.
+export interface ApiTokenWithSecret extends ApiToken {
+  token: string;
+}
+
+export interface CreateApiTokenRequest {
+  name: string;
+  expires_at?: string | null;
+}
+
 // API response wrapper
 export type ApiResponse<T> =
   | { success: true; data: T }

@@ -10,6 +10,7 @@ for domain-specific instructions.
 docker-compose up --build
 # Frontend → http://localhost:3000
 # API   → http://localhost:8000
+# MCP   → http://localhost:8002/mcp
 # Docs  → http://localhost:8001
 ```
 
@@ -50,13 +51,14 @@ Ruff and Pyright are **not** pre-commit hooks — run them directly via `uv run`
 
 ## Structure
 
-```
-backend/app/          # FastAPI domains: auth, households, payment_methods,
-                      #   recurrent_expenses, cycles
+```text
+backend/app/          # FastAPI domains: auth, api_tokens, households,
+                      #   payment_methods, recurrent_expenses, cycles
 frontend/app/         # (auth) = public, (app) = protected
 frontend/components/  # {feature}/index.tsx + actions.ts (single-file pattern)
 frontend/lib/         # apiClient + per-domain *.api.ts
 frontend/actions/     # auth.action.ts (only file with "use server")
+mcp-server/           # FastMCP server — agentic access to the Colony API
 docs/                 # MkDocs Material
 helm/                 # Kubernetes manifests
 ```
@@ -97,6 +99,7 @@ pre-commit run --files <changed files>
 - `docs/architecture/backend.md` — backend architecture
 - `docs/architecture/database-schema.md` — DB design + recurrence
 - `docs/architecture/api-specification.md` — API endpoints
+- `docs/architecture/mcp-server.md` — MCP server for agentic workflows
 - `docs/development/setup.md` — dev setup
 - `docs/development/code-quality.md` — code standards
 - `docs/requirements.md` — functional + non-functional requirements

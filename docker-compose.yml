@@ -74,6 +74,25 @@ services:
       - backend
     restart: unless-stopped
 
+  mcp:
+    build:
+      context: ./mcp-server
+      dockerfile: Dockerfile
+    container_name: colony-mcp
+    working_dir: /app
+    volumes:
+      - ./mcp-server:/app
+    environment:
+      COLONY_API_URL: http://backend:8000/api/v1
+      MCP_HOST: 0.0.0.0
+      MCP_PORT: 8002
+      MCP_TRANSPORT: http
+    ports:
+      - "8002:8002"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
   docs:
     image: squidfunk/mkdocs-material:latest
     container_name: colony-docs

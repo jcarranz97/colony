@@ -1096,12 +1096,86 @@ System health check.
 }
 ```
 
+### 9. API Tokens
+
+Personal access tokens (PATs) let users authenticate API clients — notably
+the [MCP server](mcp-server.md) — without exchanging a username and
+password. A PAT is prefixed `colony_pat_` and may be sent anywhere a JWT is
+accepted (`Authorization: Bearer <token>`). All endpoints below act on the
+current authenticated user.
+
+#### GET /api-tokens/
+
+List the current user's tokens (metadata only — the secret is never
+returned after creation).
+
+**Response:** `200 OK`
+```json
+[
+  {
+    "id": "123e4567-e89b-12d3-a456-426614174000",
+    "name": "My MCP",
+    "prefix": "colony_pat_AbC",
+    "last_used_at": "2026-05-22T10:00:00Z",
+    "expires_at": null,
+    "active": true,
+    "created_at": "2026-05-20T00:00:00Z",
+    "updated_at": "2026-05-22T10:00:00Z"
+  }
+]
+```
+
+#### POST /api-tokens/
+
+Create a token. The plaintext `token` is returned **once** and cannot be
+retrieved again.
+
+**Request Body:**
+```json
+{ "name": "My MCP", "expires_at": null }
+```
+
+**Response:** `201 Created`
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "name": "My MCP",
+  "prefix": "colony_pat_AbC",
+  "last_used_at": null,
+  "expires_at": null,
+  "active": true,
+  "created_at": "2026-05-22T00:00:00Z",
+  "updated_at": "2026-05-22T00:00:00Z",
+  "token": "colony_pat_AbC...full-secret-shown-once"
+}
+```
+
+#### DELETE /api-tokens/{token_id}
+
+Revoke a token (soft delete). **Response:** `204 No Content`.
+
+### 10. Multi-Household Queries
+
+The list endpoints `GET /cycles/`, `GET /payment-methods/`,
+`GET /recurrent-expenses/`, and `GET /recurrent-incomes/` accept an
+optional `household_id` query parameter:
+
+- **Omitted** — results are scoped to the user's active household
+  (default behaviour; unchanged).
+- **Provided** — results are scoped to that household. The user must be a
+  member of it, otherwise the request returns `403 HOUSEHOLD_FORBIDDEN`.
+
+This lets multi-household clients query — or aggregate across — any
+household a user belongs to without changing their active household.
+
 ## Error Codes
 
 | Code | HTTP Status | Description |
 |------|-------------|-------------|
 | `VALIDATION_ERROR` | 400 | Request validation failed |
 | `USER_NOT_FOUND` | 404 | User not found |
+| `API_TOKEN_NOT_FOUND` | 404 | API token not found |
+| `HOUSEHOLD_FORBIDDEN` | 403 | User is not a member of that household |
 | `USER_ALREADY_EXISTS` | 409 | User already exists |
 | `INVALID_CREDENTIALS` | 401 | Invalid email or password |
 | `INVALID_TOKEN` | 401 | Invalid or expired token |

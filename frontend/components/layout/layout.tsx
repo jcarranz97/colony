@@ -12,6 +12,7 @@ const BASE_NAV_ITEMS = [
   { href: "/payment-methods", label: "Payment Methods", icon: "💳" },
   { href: "/recurrent-expenses", label: "Recurrent Expenses", icon: "📋" },
   { href: "/incomes", label: "Incomes", icon: "💰" },
+  { href: "/api-tokens", label: "API Tokens", icon: "🔑" },
   { href: "/settings", label: "Settings", icon: "⚙️" },
 ];
 
@@ -125,10 +126,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
         {/* Backdrop — only rendered while the mobile drawer is open */}
         {navOpen && (
-          <div
-            className="nb-nav-backdrop"
-            onClick={() => setNavOpen(false)}
-          />
+          <div className="nb-nav-backdrop" onClick={() => setNavOpen(false)} />
         )}
 
         {/* Navigation tabs */}

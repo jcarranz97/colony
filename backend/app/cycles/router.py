@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.dependencies import CurrentActiveUser, CurrentAdminUser, get_db
-from app.households.dependencies import CurrentActiveHousehold
+from app.households.dependencies import TargetHousehold
 
 from . import schemas, service
 from .dependencies import CycleDep, CycleExpenseDep, CycleIncomeDep
@@ -37,7 +37,7 @@ DatabaseDep = Annotated[Session, Depends(get_db)]
     ),
 )
 async def list_cycles(
-    current_household: CurrentActiveHousehold,
+    current_household: TargetHousehold,
     current_user: CurrentActiveUser,
     db: DatabaseDep,
     status_filter: str | None = Query(
@@ -90,7 +90,7 @@ async def list_cycles(
 )
 async def create_cycle(
     data: schemas.CycleCreate,
-    current_household: CurrentActiveHousehold,
+    current_household: TargetHousehold,
     current_user: CurrentActiveUser,
     db: DatabaseDep,
 ) -> schemas.CycleResponse:
@@ -164,7 +164,7 @@ async def delete_cycle(
 )
 async def restore_cycle(
     cycle_id: str,
-    current_household: CurrentActiveHousehold,
+    current_household: TargetHousehold,
     _current_admin: CurrentAdminUser,
     db: DatabaseDep,
 ) -> schemas.CycleResponse:
@@ -205,7 +205,7 @@ async def get_cycle_summary(cycle: CycleDep) -> schemas.CycleSummaryResponse:
 )
 async def list_cycle_expenses(
     cycle_id: str,
-    current_household: CurrentActiveHousehold,
+    current_household: TargetHousehold,
     db: DatabaseDep,
     status_filter: str | None = Query(
         None,
@@ -256,7 +256,7 @@ async def list_cycle_expenses(
 )
 async def create_cycle_expense(
     data: schemas.CycleExpenseCreate,
-    current_household: CurrentActiveHousehold,
+    current_household: TargetHousehold,
     current_user: CurrentActiveUser,
     db: DatabaseDep,
     cycle_id: str,
@@ -305,7 +305,7 @@ async def update_cycle_expense(
     data: schemas.CycleExpenseUpdate,
     expense: CycleExpenseDep,
     cycle_id: str,
-    current_household: CurrentActiveHousehold,
+    current_household: TargetHousehold,
     current_user: CurrentActiveUser,
     db: DatabaseDep,
 ) -> schemas.CycleExpenseResponse:
@@ -336,7 +336,7 @@ async def update_cycle_expense(
 async def delete_cycle_expense(
     expense: CycleExpenseDep,
     cycle_id: str,
-    current_household: CurrentActiveHousehold,
+    current_household: TargetHousehold,
     current_user: CurrentActiveUser,
     db: DatabaseDep,
 ) -> None:
@@ -365,7 +365,7 @@ async def delete_cycle_expense(
 )
 async def list_cycle_incomes(
     cycle_id: str,
-    current_household: CurrentActiveHousehold,
+    current_household: TargetHousehold,
     db: DatabaseDep,
 ) -> list[schemas.CycleIncomeResponse]:
     """List all incomes for a specific cycle."""
@@ -390,7 +390,7 @@ async def list_cycle_incomes(
 )
 async def create_cycle_income(
     data: schemas.CycleIncomeCreate,
-    current_household: CurrentActiveHousehold,
+    current_household: TargetHousehold,
     current_user: CurrentActiveUser,
     db: DatabaseDep,
     cycle_id: str,
@@ -436,7 +436,7 @@ async def update_cycle_income(
     data: schemas.CycleIncomeUpdate,
     income: CycleIncomeDep,
     cycle_id: str,
-    current_household: CurrentActiveHousehold,
+    current_household: TargetHousehold,
     current_user: CurrentActiveUser,
     db: DatabaseDep,
 ) -> schemas.CycleIncomeResponse:
@@ -469,7 +469,7 @@ async def update_cycle_income(
 async def delete_cycle_income(
     income: CycleIncomeDep,
     cycle_id: str,
-    current_household: CurrentActiveHousehold,
+    current_household: TargetHousehold,
     current_user: CurrentActiveUser,
     db: DatabaseDep,
 ) -> None:

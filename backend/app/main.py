@@ -5,6 +5,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.activity.router import comments_router, router as activity_router
+from app.api_tokens.router import router as api_tokens_router
 from app.auth.models import User
 from app.auth.router import router as auth_router
 from app.auth.utils import get_password_hash
@@ -131,6 +132,7 @@ def create_app() -> FastAPI:
     app.include_router(households_router, prefix="/api/v1")
     app.include_router(activity_router, prefix="/api/v1")
     app.include_router(comments_router, prefix="/api/v1")
+    app.include_router(api_tokens_router, prefix="/api/v1")
 
     @app.get("/")
     async def root() -> dict[str, str]:

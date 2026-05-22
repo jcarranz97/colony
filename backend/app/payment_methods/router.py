@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.dependencies import CurrentActiveUser, get_db
-from app.households.dependencies import CurrentActiveHousehold
+from app.households.dependencies import CurrentActiveHousehold, TargetHousehold
 
 from . import schemas, service
 from .dependencies import PaymentMethodDep
@@ -37,7 +37,7 @@ async def payment_method_health_check() -> dict[str, str]:
     ),
 )
 async def get_payment_methods(
-    current_household: CurrentActiveHousehold,
+    current_household: TargetHousehold,
     current_user: CurrentActiveUser,
     db: DatabaseDep,
     include_inactive: bool = Query(
@@ -45,7 +45,7 @@ async def get_payment_methods(
     ),
     currency: str | None = Query(None, description="Filter by default currency"),
 ) -> list[schemas.PaymentMethodResponse]:
-    """Get all payment methods for the active household."""
+    """Get all payment methods for the target household."""
     if include_inactive and current_user.role != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

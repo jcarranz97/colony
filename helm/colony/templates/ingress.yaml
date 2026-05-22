@@ -42,4 +42,28 @@ spec:
                 name: {{ include "colony.fullname" . }}-backend
                 port:
                   number: {{ .Values.backend.port }}
+{{- if .Values.ingress.mcp.host }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "colony.fullname" . }}-mcp
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "colony.labels" . | nindent 4 }}
+    app.kubernetes.io/component: mcp
+spec:
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
+  rules:
+    - host: {{ .Values.ingress.mcp.host | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "colony.fullname" . }}-mcp
+                port:
+                  number: {{ .Values.mcp.port }}
+{{- end }}
 {{- end }}

@@ -67,6 +67,18 @@ class UserNotInHouseholdExceptionError(HouseholdExceptionError):
         )
 
 
+class HouseholdForbiddenExceptionError(HouseholdExceptionError):
+    """Raised when a user requests a household they are not a member of."""
+
+    def __init__(self, household_id: UUID | str) -> None:
+        super().__init__(
+            error_code=ErrorCode.HOUSEHOLD_FORBIDDEN,
+            message=f"You are not a member of household {household_id}.",
+            status_code=status.HTTP_403_FORBIDDEN,
+            details={"household_id": str(household_id)},
+        )
+
+
 class UserHasNoActiveHouseholdExceptionError(HouseholdExceptionError):
     """Raised when a user has no active household selected."""
 

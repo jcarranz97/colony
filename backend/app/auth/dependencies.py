@@ -4,6 +4,8 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
+from app.api_tokens.constants import TOKEN_PREFIX as API_TOKEN_PREFIX
+from app.api_tokens.service import api_token_service
 from app.database import get_db
 
 from . import models, service, utils
@@ -22,7 +24,23 @@ async def get_current_user(
     token: Annotated[str, Depends(oauth2_scheme)],
     db: Annotated[Session, Depends(get_db)],
 ) -> models.User:
-    """Get current authenticated user from JWT token."""
+    """Get the current authenticated user from a JWT or access token.
+
+    Bearer tokens come in two shapes: short-lived JWTs issued by
+    ``/auth/login``, and long-lived personal access tokens (PATs) the user
+    generates. PATs carry a fixed prefix, so they are resolved against the
+    ``api_tokens`` table; anything else is treated as a JWT.
+    """
+    if token.startswith(API_TOKEN_PREFIX):
+        user = api_token_service.resolve_token(db, token)
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Could not validate credentials",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        return user
+
     try:
         username = utils.extract_username_from_token(token)
     except InvalidTokenExceptionError as e:
