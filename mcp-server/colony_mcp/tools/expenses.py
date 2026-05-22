@@ -1,7 +1,8 @@
 """Expense tools: what is due, what is overdue, and safe mutations.
 
 Read tools aggregate across every household the user belongs to (unless a
-household name is given) by scanning the *active* cycle of each household.
+household name is given) by scanning every *open* cycle — active or draft —
+of each household. Completed cycles are treated as historical and skipped.
 Write tools are limited to cycle expenses — recurrent-expense templates
 are intentionally read-only through this server.
 """
@@ -12,17 +13,27 @@ from typing import Any
 from fastmcp import FastMCP
 
 from ..client import ColonyAPIError, colony_request
-from ..households import households_to_query, resolve_cycle_household_id
+from ..households import (
+    households_to_query,
+    resolve_cycle_household_id,
+    resolve_expense_location,
+)
 
 # Expense statuses that represent money the user still owes.
 _UNPAID_STATUSES = {"pending", "overdue"}
 
+# Cycle statuses whose expenses are still "live". Drafts are included so the
+# current cycle is visible before it is formally activated; only completed
+# cycles are excluded as historical.
+_OPEN_CYCLE_STATUSES = {"active", "draft"}
 
-async def _active_cycle_expenses(household: str | None) -> list[dict[str, Any]]:
-    """Collect expenses from every active cycle, annotated with context.
 
-    Each expense gains ``household``, ``cycle_id``, and ``cycle_name`` keys
-    so aggregated results stay traceable.
+async def _open_cycle_expenses(household: str | None) -> list[dict[str, Any]]:
+    """Collect expenses from every open cycle, annotated with context.
+
+    An *open* cycle is one that is active or draft; completed cycles are
+    skipped. Each expense gains ``household``, ``cycle_id``, and
+    ``cycle_name`` keys so aggregated results stay traceable.
     """
     expenses: list[dict[str, Any]] = []
     for household_id, household_name in await households_to_query(household):
@@ -31,11 +42,12 @@ async def _active_cycle_expenses(household: str | None) -> list[dict[str, Any]]:
             "/cycles/",
             params={
                 "household_id": household_id,
-                "status": "active",
                 "per_page": 100,
             },
         )
         for cycle in cycles["cycles"]:
+            if cycle["status"] not in _OPEN_CYCLE_STATUSES:
+                continue
             payload = await colony_request(
                 "GET",
                 f"/cycles/{cycle['id']}/expenses",
@@ -73,6 +85,37 @@ async def list_cycle_expenses(
     )
 
 
+async def find_expenses(
+    query: str,
+    household: str | None = None,
+    include_paid: bool = False,
+) -> list[dict[str, Any]]:
+    """Find expenses across open cycles by description.
+
+    Case-insensitive substring match on the expense description — use it to
+    locate an expense by name (e.g. "apples") without listing a whole
+    cycle. Each result carries ``cycle_id`` and ``household`` for follow-up
+    calls such as ``mark_expense_paid``.
+
+    Args:
+        query: Text to look for in the expense description.
+        household: Optional household name to narrow to. Omit to cover all.
+        include_paid: When False (default), only unpaid (pending/overdue)
+            expenses are returned.
+
+    Returns:
+        Matching expenses sorted by due date (soonest first).
+    """
+    needle = query.strip().lower()
+    matches = [
+        expense
+        for expense in await _open_cycle_expenses(household)
+        if needle in expense["description"].lower()
+        and (include_paid or expense["status"] in _UNPAID_STATUSES)
+    ]
+    return sorted(matches, key=lambda expense: expense["due_date"])
+
+
 async def expenses_due_this_week(household: str | None = None) -> list[dict[str, Any]]:
     """List unpaid expenses due within the next 7 days.
 
@@ -104,7 +147,7 @@ async def upcoming_expenses(
     today_iso = today.isoformat()
     due = [
         expense
-        for expense in await _active_cycle_expenses(household)
+        for expense in await _open_cycle_expenses(household)
         if expense["status"] in _UNPAID_STATUSES
         and today_iso <= expense["due_date"] <= horizon
     ]
@@ -119,7 +162,7 @@ async def overdue_expenses(household: str | None = None) -> list[dict[str, Any]]
     """
     overdue = [
         expense
-        for expense in await _active_cycle_expenses(household)
+        for expense in await _open_cycle_expenses(household)
         if expense["status"] == "overdue"
     ]
     return sorted(overdue, key=lambda expense: expense["due_date"])
@@ -137,7 +180,7 @@ async def next_payment(household: str | None = None) -> dict[str, Any]:
     """
     unpaid = [
         expense
-        for expense in await _active_cycle_expenses(household)
+        for expense in await _open_cycle_expenses(household)
         if expense["status"] in _UNPAID_STATUSES
     ]
     if not unpaid:
@@ -155,27 +198,83 @@ async def list_autopay_expenses(household: str | None = None) -> list[dict[str, 
     """
     return [
         expense
-        for expense in await _active_cycle_expenses(household)
+        for expense in await _open_cycle_expenses(household)
         if expense.get("autopay")
     ]
 
 
-async def mark_expense_paid(cycle_id: str, expense_id: str) -> dict[str, Any]:
-    """Mark a cycle expense as paid.
+async def mark_expense_paid(
+    expense_id: str,
+    cycle_id: str | None = None,
+) -> dict[str, Any]:
+    """Mark a single cycle expense as paid.
 
     Sets the expense's status to "paid" and records the payment timestamp.
+    To settle several expenses at once, use ``mark_cycle_expenses_paid``.
 
     Args:
-        cycle_id: UUID of the cycle containing the expense.
         expense_id: UUID of the expense to mark paid.
+        cycle_id: UUID of the cycle containing the expense. Optional — when
+            omitted it is resolved by scanning your open cycles, which costs
+            extra requests, so pass it whenever you already know it.
     """
-    household_id = await resolve_cycle_household_id(cycle_id)
+    if cycle_id is None:
+        cycle_id, household_id = await resolve_expense_location(expense_id)
+    else:
+        household_id = await resolve_cycle_household_id(cycle_id)
     return await colony_request(
         "PUT",
         f"/cycles/{cycle_id}/expenses/{expense_id}",
         params={"household_id": household_id},
         json={"paid": True},
     )
+
+
+async def mark_cycle_expenses_paid(
+    cycle_id: str,
+    expense_ids: list[str] | None = None,
+) -> dict[str, Any]:
+    """Mark several expenses in one cycle as paid in a single call.
+
+    Use this instead of repeated ``mark_expense_paid`` calls when settling
+    a whole cycle at once.
+
+    Args:
+        cycle_id: UUID of the cycle.
+        expense_ids: Explicit UUIDs to mark paid. When omitted, every
+            still-unpaid (pending or overdue) expense in the cycle is
+            marked paid.
+
+    Returns:
+        A summary with the number of expenses marked and their updated
+        records.
+    """
+    household_id = await resolve_cycle_household_id(cycle_id)
+    if expense_ids is None:
+        payload = await colony_request(
+            "GET",
+            f"/cycles/{cycle_id}/expenses",
+            params={"household_id": household_id},
+        )
+        expense_ids = [
+            str(expense["id"])
+            for expense in payload["expenses"]
+            if expense["status"] in _UNPAID_STATUSES
+        ]
+    marked: list[dict[str, Any]] = []
+    for expense_id in expense_ids:
+        updated = await colony_request(
+            "PUT",
+            f"/cycles/{cycle_id}/expenses/{expense_id}",
+            params={"household_id": household_id},
+            json={"paid": True},
+        )
+        marked.append(updated)
+    return {
+        "cycle_id": cycle_id,
+        "marked_count": len(marked),
+        "expenses": marked,
+    }
 
 
 async def add_cycle_expense(
@@ -274,11 +373,13 @@ async def update_cycle_expense(
 def register(mcp: FastMCP) -> None:
     """Register the expense tools on the MCP server."""
     mcp.tool(list_cycle_expenses)
+    mcp.tool(find_expenses)
     mcp.tool(expenses_due_this_week)
     mcp.tool(upcoming_expenses)
     mcp.tool(overdue_expenses)
     mcp.tool(next_payment)
     mcp.tool(list_autopay_expenses)
     mcp.tool(mark_expense_paid)
+    mcp.tool(mark_cycle_expenses_paid)
     mcp.tool(add_cycle_expense)
     mcp.tool(update_cycle_expense)

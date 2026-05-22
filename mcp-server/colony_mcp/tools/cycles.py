@@ -46,21 +46,25 @@ async def list_cycles(
 
 
 async def get_current_cycle(household: str | None = None) -> list[dict[str, Any]]:
-    """Return the active cycle(s) whose date range includes today.
+    """Return the open cycle(s) whose date range includes today.
 
-    This is the cycle "this week" or "this month" lives in.
+    This is the cycle "this week" or "this month" lives in. Both active and
+    draft cycles count — a draft cycle covering today is still your current
+    cycle; only completed cycles are excluded.
 
     Args:
         household: Optional household name to narrow to.
 
     Returns:
-        Active cycles covering today's date, one per household that has one.
+        Open (active or draft) cycles covering today's date, one per
+        household that has one.
     """
     today = date.today().isoformat()
     return [
         cycle
-        for cycle in await list_cycles(household=household, status="active")
-        if cycle["start_date"] <= today <= cycle["end_date"]
+        for cycle in await list_cycles(household=household)
+        if cycle["status"] != "completed"
+        and cycle["start_date"] <= today <= cycle["end_date"]
     ]
 
 

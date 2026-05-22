@@ -115,9 +115,10 @@ Read tools accept an optional `household` argument (omit to aggregate).
 | `whoami` | Identify the account the session is acting as |
 | `list_households` | List the user's households |
 | `list_cycles` | List budgeting cycles (optional `status` filter) |
-| `get_current_cycle` | The active cycle(s) covering today |
+| `get_current_cycle` | The open (active or draft) cycle(s) covering today |
 | `get_cycle_summary` | Totals and status breakdown for a cycle |
 | `list_cycle_expenses` | Expenses of one cycle, with a totals summary |
+| `find_expenses` | Locate expenses across open cycles by description |
 | `expenses_due_this_week` | Unpaid expenses due in the next 7 days |
 | `upcoming_expenses` | Unpaid expenses due within `days` days |
 | `overdue_expenses` | Expenses past due and still unpaid |
@@ -132,7 +133,8 @@ Write tools — limited to cycle expenses and incomes:
 
 | Tool | Purpose |
 |---|---|
-| `mark_expense_paid` | Mark a cycle expense as paid |
+| `mark_expense_paid` | Mark a single cycle expense as paid |
+| `mark_cycle_expenses_paid` | Mark several (or all unpaid) expenses in a cycle paid |
 | `add_cycle_expense` | Add a new expense to a cycle |
 | `update_cycle_expense` | Update fields on a cycle expense |
 | `add_cycle_income` | Record a new income in a cycle |
@@ -211,6 +213,51 @@ Add to `opencode.json`:
 
 Each person uses **their own** token, so the same shared MCP server gives
 each of them only their own data.
+
+### Updating the token
+
+A token stops working when it expires, is revoked, or — as after a
+`docker compose down -v` — the database that stores it is wiped and
+recreated. The MCP server itself keeps no tokens; each agent client
+holds its own copy, so the fix is to update it in that client.
+
+First, generate a fresh token: in the Colony web app go to **API
+Tokens**, create one, and copy the new `colony_pat_…` secret.
+
+**Claude Code** — there is no in-place edit, so remove the server and
+add it again with the new token:
+
+```bash
+claude mcp remove colony
+claude mcp add --transport http colony \
+  http://localhost:8002/mcp \
+  --header "Authorization: Bearer colony_pat_your_new_token_here"
+```
+
+Then run `claude mcp list` to confirm `colony` reconnects. Permission
+rules in `settings.json` are keyed by the server name (`colony`), so
+they survive the re-add — there is no need to re-allow the tools. If
+you originally added the server with an explicit scope (`-s user` or
+`-s project`), pass the same `-s` flag to `claude mcp remove`.
+
+**opencode** — edit `opencode.json` and replace the old `colony_pat_…`
+value in the `Authorization` header with the new one, then restart
+opencode so it picks up the change:
+
+```json
+{
+  "mcp": {
+    "colony": {
+      "type": "remote",
+      "url": "http://localhost:8002/mcp",
+      "enabled": true,
+      "headers": {
+        "Authorization": "Bearer colony_pat_your_new_token_here"
+      }
+    }
+  }
+}
+```
 
 ---
 

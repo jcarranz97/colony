@@ -87,3 +87,44 @@ async def resolve_cycle_household_id(cycle_id: str) -> str:
     raise ColonyAPIError(
         f"Cycle {cycle_id} was not found in any household you belong to."
     )
+
+
+async def resolve_expense_location(expense_id: str) -> tuple[str, str]:
+    """Find the cycle and household that own a cycle expense.
+
+    Scans the open (active or draft) cycles of every household the user
+    belongs to. This is a convenience fallback for callers that only have
+    an expense id; it costs one request per open cycle, so pass an explicit
+    ``cycle_id`` whenever you already know it.
+
+    Args:
+        expense_id: UUID of the expense to locate.
+
+    Returns:
+        A ``(cycle_id, household_id)`` tuple.
+
+    Raises:
+        ColonyAPIError: If the expense is not found in any open cycle.
+    """
+    needle = expense_id.strip()
+    for household_id, _ in await households_to_query(None):
+        cycles = await colony_request(
+            "GET",
+            "/cycles/",
+            params={"household_id": household_id, "per_page": 100},
+        )
+        for cycle in cycles["cycles"]:
+            if cycle["status"] == "completed":
+                continue
+            payload = await colony_request(
+                "GET",
+                f"/cycles/{cycle['id']}/expenses",
+                params={"household_id": household_id},
+            )
+            for expense in payload["expenses"]:
+                if str(expense["id"]) == needle:
+                    return str(cycle["id"]), household_id
+
+    raise ColonyAPIError(
+        f"Expense {expense_id} was not found in any open cycle you can access."
+    )
