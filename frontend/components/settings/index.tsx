@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import type { ExchangeRate, HouseholdResponse } from "@/helpers/types";
+import { ApiTokens } from "@/components/api-tokens";
 import {
   getExchangeRates,
   addExchangeRate,
@@ -612,6 +613,8 @@ export function Settings() {
         onClose={() => setEditTarget(null)}
         onSave={handleEdit}
       />
+
+      <ApiTokens />
     </>
   );
 }

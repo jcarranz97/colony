@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "colony.fullname" . }}-mcp-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "colony.labels" . | nindent 4 }}
+data:
+  COLONY_API_URL: {{ .Values.mcp.env.colonyApiUrl | default (printf "http://%s-backend:%v/api/v1" (include "colony.fullname" .) .Values.backend.port) | quote }}
+  MCP_HOST: "0.0.0.0"
+  MCP_PORT: {{ .Values.mcp.port | quote }}
+  MCP_TRANSPORT: {{ .Values.mcp.env.transport | quote }}
+  MCP_PATH: {{ .Values.mcp.env.path | quote }}

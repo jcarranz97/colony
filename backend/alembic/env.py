@@ -15,6 +15,7 @@ from alembic import context
 # autogenerate runs. The order doesn't matter — only that every model
 # class has been imported.
 from app.activity import models as _activity_models  # noqa: F401
+from app.api_tokens import models as _api_tokens_models  # noqa: F401
 from app.auth import models as _auth_models  # noqa: F401
 from app.config import settings
 from app.cycles import models as _cycles_models  # noqa: F401

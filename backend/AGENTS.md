@@ -251,8 +251,15 @@ async def endpoint(current_user: CurrentActiveUser): ...
 - `CurrentActiveHousehold` — resolves `current_user.active_household_id` →
   `Household`; raises `UserHasNoActiveHouseholdExceptionError` if null.
   Use this in all data endpoints instead of `current_user.id`.
+- `TargetHousehold` — like `CurrentActiveHousehold`, but also reads an
+  optional `household_id` query param; when given, the user must be a
+  member of it (else `HouseholdForbiddenExceptionError`, 403). Use this on
+  list endpoints so multi-household clients can scope to any household.
 - Passwords hashed with Argon2ID via `pwdlib`.
 - JWT signed with `SECRET_KEY` from config; `ALGORITHM` is HS256 by default.
+- `get_current_user` also accepts **personal access tokens** — bearer
+  tokens prefixed `colony_pat_`, resolved against the `api_tokens` domain.
+  A PAT works anywhere a JWT does.
 - Auth uses **username + password** (no email). A default admin user is
   created automatically on first deploy from the `DEFAULT_ADMIN_USERNAME`
   and `DEFAULT_ADMIN_PASSWORD` env vars (defaults: `admin` / `colony-admin`).

@@ -42,6 +42,7 @@ nav:
     - Backend: architecture/backend.md
     - API: architecture/api-specification.md
     - Activity & Comments: architecture/activity-log.md
+    - MCP Server: architecture/mcp-server.md
     - Deployment: architecture/deployment.md
   # - API Reference:
   #   - Overview: api/index.md

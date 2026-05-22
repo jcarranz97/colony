@@ -37,6 +37,13 @@ docker-compose up -d --build
 - **Backend API**: http://localhost:8000
 - **API Documentation (Swagger UI)**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
+- **Frontend**: http://localhost:3000
+- **MCP server**: http://localhost:8002/mcp (health at `/health`)
+- **Docs**: http://localhost:2011
+
+The `mcp` service exposes the Colony API to agentic clients over the Model
+Context Protocol. See [MCP Server](../architecture/mcp-server.md) for how to
+connect an agent.
 
 ### Hot Reload
 

@@ -4,7 +4,7 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from app.dependencies import get_db
-from app.households.dependencies import CurrentActiveHousehold
+from app.households.dependencies import TargetHousehold
 
 from . import service
 from .exceptions import (
@@ -17,7 +17,7 @@ from .models import Cycle, CycleExpense, CycleIncome
 
 async def get_cycle_by_id(
     cycle_id: str,
-    current_household: CurrentActiveHousehold,
+    current_household: TargetHousehold,
     db: Annotated[Session, Depends(get_db)],
 ) -> Cycle:
     """Dependency that resolves and verifies a cycle by ID.
@@ -45,7 +45,7 @@ async def get_cycle_by_id(
 async def get_cycle_expense_by_id(
     cycle_id: str,
     expense_id: str,
-    current_household: CurrentActiveHousehold,
+    current_household: TargetHousehold,
     db: Annotated[Session, Depends(get_db)],
 ) -> CycleExpense:
     """Dependency that resolves and verifies a cycle expense by ID.
@@ -82,7 +82,7 @@ async def get_cycle_expense_by_id(
 async def get_cycle_income_by_id(
     cycle_id: str,
     income_id: str,
-    current_household: CurrentActiveHousehold,
+    current_household: TargetHousehold,
     db: Annotated[Session, Depends(get_db)],
 ) -> CycleIncome:
     """Dependency that resolves and verifies a cycle income by ID.

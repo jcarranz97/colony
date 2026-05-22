@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "colony.fullname" . }}-mcp
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "colony.labels" . | nindent 4 }}
+    app.kubernetes.io/component: mcp
+spec:
+  replicas: {{ .Values.mcp.replicas }}
+  selector:
+    matchLabels:
+      {{- include "colony.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: mcp
+  template:
+    metadata:
+      labels:
+        {{- include "colony.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: mcp
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: mcp
+          image: {{ include "colony.image" (dict "registry" .Values.image.registry "repository" .Values.mcp.image.repository "tag" .Values.mcp.image.tag) }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.mcp.port }}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ include "colony.fullname" . }}-mcp-config
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.mcp.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.mcp.port }}
+            initialDelaySeconds: 20
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3

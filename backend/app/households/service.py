@@ -268,6 +268,28 @@ class HouseholdService:
         )
 
     @staticmethod
+    def is_member(db: Session, user_id: UUID, household_id: UUID) -> bool:
+        """Return whether a user is a member of a household.
+
+        Args:
+            db: Active database session.
+            user_id: UUID of the user.
+            household_id: UUID of the household.
+
+        Returns:
+            True if a membership record links the user and household.
+        """
+        membership = (
+            db.query(UserHouseholdMembership)
+            .filter(
+                UserHouseholdMembership.user_id == user_id,
+                UserHouseholdMembership.household_id == household_id,
+            )
+            .first()
+        )
+        return membership is not None
+
+    @staticmethod
     def get_user_households(db: Session, user_id: UUID) -> list[Household]:
         """Return all active households the user belongs to.
 

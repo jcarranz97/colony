@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "colony.fullname" . }}-mcp
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "colony.labels" . | nindent 4 }}
+    app.kubernetes.io/component: mcp
+spec:
+  type: {{ .Values.mcp.service.type }}
+  ports:
+    - port: {{ .Values.mcp.port }}
+      targetPort: {{ .Values.mcp.port }}
+      protocol: TCP
+      name: http
+      {{- if and (eq .Values.mcp.service.type "NodePort") .Values.mcp.service.nodePort }}
+      nodePort: {{ .Values.mcp.service.nodePort }}
+      {{- end }}
+  selector:
+    {{- include "colony.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: mcp

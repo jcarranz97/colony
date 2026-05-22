@@ -125,10 +125,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
         {/* Backdrop — only rendered while the mobile drawer is open */}
         {navOpen && (
-          <div
-            className="nb-nav-backdrop"
-            onClick={() => setNavOpen(false)}
-          />
+          <div className="nb-nav-backdrop" onClick={() => setNavOpen(false)} />
         )}
 
         {/* Navigation tabs */}

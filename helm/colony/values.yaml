@@ -94,6 +94,29 @@ frontend:
     cookieSecure: "false"
 
 # ---------------------------------------------------------------------------
+# MCP server (FastMCP — agentic access to the Colony API)
+# ---------------------------------------------------------------------------
+# A stateless wrapper that exposes Colony to MCP-capable agents. It holds no
+# credentials: every request forwards the caller's Colony personal access
+# token, so each user only sees their own data.
+mcp:
+  image:
+    repository: library/colony-mcp
+    tag: "latest"
+  replicas: 1
+  port: 8002
+
+  service:
+    type: NodePort
+    nodePort: 30820
+
+  env:
+    # Colony API base URL. Leave empty to use the in-cluster backend Service.
+    colonyApiUrl: ""
+    transport: "http"
+    path: "/mcp"
+
+# ---------------------------------------------------------------------------
 # Ingress (Traefik on k3s)
 # ---------------------------------------------------------------------------
 # When enabled, creates Ingress resources for the frontend and backend
@@ -115,6 +138,10 @@ ingress:
     host: ""   # e.g. colony.dev.lan
   backend:
     host: ""   # e.g. api.colony.dev.lan
+  # Optional — the MCP server ingress only renders when a host is set.
+  # Leave empty to reach the MCP server by NodePort instead.
+  mcp:
+    host: ""   # e.g. mcp.colony.dev.lan
 
 # ---------------------------------------------------------------------------
 # PostgreSQL
