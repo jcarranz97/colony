@@ -12,7 +12,6 @@ const BASE_NAV_ITEMS = [
   { href: "/payment-methods", label: "Payment Methods", icon: "💳" },
   { href: "/recurrent-expenses", label: "Recurrent Expenses", icon: "📋" },
   { href: "/incomes", label: "Incomes", icon: "💰" },
-  { href: "/api-tokens", label: "API Tokens", icon: "🔑" },
   { href: "/settings", label: "Settings", icon: "⚙️" },
 ];
 

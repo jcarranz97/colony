@@ -41,6 +41,40 @@ async def resolve_household(name_or_id: str) -> tuple[str, str]:
     )
 
 
+async def resolve_target_household(household: str | None) -> tuple[str, str]:
+    """Resolve the single household a write tool should create data in.
+
+    Unlike read tools, a write tool must commit to exactly one household.
+
+    Args:
+        household: An optional household name/UUID. When ``None``, the
+            user's sole household is used; if they belong to several, an
+            error asks them to name one.
+
+    Returns:
+        A ``(household_id, household_name)`` tuple.
+
+    Raises:
+        ColonyAPIError: If a given name matches nothing, or ``household``
+            is omitted while the user belongs to zero or several
+            households.
+    """
+    if household:
+        return await resolve_household(household)
+
+    households = await fetch_households()
+    if len(households) == 1:
+        return str(households[0]["id"]), households[0]["name"]
+    if not households:
+        raise ColonyAPIError("You do not belong to any household.")
+
+    available = ", ".join(h["name"] for h in households)
+    raise ColonyAPIError(
+        "You belong to several households; pass `household` to choose which "
+        f"one to use. Your households: {available}."
+    )
+
+
 async def households_to_query(household: str | None) -> list[tuple[str, str]]:
     """Return the households a read tool should cover.
 

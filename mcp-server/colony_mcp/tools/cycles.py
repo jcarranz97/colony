@@ -11,7 +11,11 @@ from typing import Any
 from fastmcp import FastMCP
 
 from ..client import ColonyAPIError, colony_request
-from ..households import households_to_query, resolve_cycle_household_id
+from ..households import (
+    households_to_query,
+    resolve_cycle_household_id,
+    resolve_target_household,
+)
 
 
 async def list_cycles(
@@ -66,6 +70,47 @@ async def get_current_cycle(household: str | None = None) -> list[dict[str, Any]
         if cycle["status"] != "completed"
         and cycle["start_date"] <= today <= cycle["end_date"]
     ]
+
+
+async def create_cycle(
+    name: str,
+    start_date: str,
+    end_date: str,
+    household: str | None = None,
+    generate_from_templates: bool = False,
+) -> dict[str, Any]:
+    """Create a new budgeting cycle.
+
+    A cycle is a budgeting period (typically a month) that expenses and
+    incomes are recorded against. The end date must be after the start
+    date, and the name must be unique within its household. A new cycle
+    starts in "draft" status.
+
+    Args:
+        name: Name for the cycle, e.g. "May-June 2026 Cycle".
+        start_date: First day the cycle covers (YYYY-MM-DD).
+        end_date: Last day the cycle covers (YYYY-MM-DD); must be after
+            ``start_date``.
+        household: Optional household name to create the cycle in. Required
+            only when you belong to more than one household.
+        generate_from_templates: When true, the cycle is pre-populated with
+            expenses generated from every active recurrent template.
+
+    Returns:
+        The newly created cycle.
+    """
+    household_id, _ = await resolve_target_household(household)
+    return await colony_request(
+        "POST",
+        "/cycles/",
+        params={"household_id": household_id},
+        json={
+            "name": name,
+            "start_date": start_date,
+            "end_date": end_date,
+            "generate_from_templates": generate_from_templates,
+        },
+    )
 
 
 async def get_cycle_summary(cycle_id: str) -> dict[str, Any]:
@@ -183,6 +228,7 @@ def register(mcp: FastMCP) -> None:
     """Register the cycle tools on the MCP server."""
     mcp.tool(list_cycles)
     mcp.tool(get_current_cycle)
+    mcp.tool(create_cycle)
     mcp.tool(get_cycle_summary)
     mcp.tool(list_cycle_incomes)
     mcp.tool(add_cycle_income)

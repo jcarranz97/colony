@@ -409,31 +409,32 @@ export function ApiTokens() {
     setRevokeTarget(null);
   };
 
-  if (loading) {
-    return (
-      <div className="nb-empty">
-        <div className="nb-empty-icon">📖</div>
-        <div className="nb-empty-text">Loading…</div>
-      </div>
-    );
-  }
-
   return (
     <>
-      <div className="nb-page-title">API Tokens</div>
-      <div className="nb-page-subtitle">
-        Personal access tokens for agents &amp; the MCP server
+      <div className="nb-section-title">🔑 API Tokens</div>
+      <div
+        style={{
+          fontFamily: "var(--font-hand)",
+          fontSize: 13,
+          color: "var(--ink-light)",
+          marginBottom: 16,
+        }}
+      >
+        Personal access tokens for agents &amp; the MCP server. A token acts as
+        you — only your data is reachable with it.
       </div>
 
       {error && <p style={errorText}>{error}</p>}
 
-      {tokens.length > 0 ? (
-        <>
-          <div className="nb-section-title">🔑 Your tokens</div>
-          {tokens.map((t) => (
-            <TokenCard key={t.id} token={t} onRevoke={setRevokeTarget} />
-          ))}
-        </>
+      {loading ? (
+        <div className="nb-empty">
+          <div className="nb-empty-icon">📖</div>
+          <div className="nb-empty-text">Loading…</div>
+        </div>
+      ) : tokens.length > 0 ? (
+        tokens.map((t) => (
+          <TokenCard key={t.id} token={t} onRevoke={setRevokeTarget} />
+        ))
       ) : (
         <div className="nb-empty">
           <div className="nb-empty-icon">🔑</div>

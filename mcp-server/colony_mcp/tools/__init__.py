@@ -2,7 +2,7 @@
 
 from fastmcp import FastMCP
 
-from . import cycles, expenses, overview, payments
+from . import comments, cycles, expenses, overview, payments
 
 
 def register_all(mcp: FastMCP) -> None:
@@ -11,3 +11,4 @@ def register_all(mcp: FastMCP) -> None:
     cycles.register(mcp)
     expenses.register(mcp)
     payments.register(mcp)
+    comments.register(mcp)

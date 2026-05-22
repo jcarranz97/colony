@@ -115,10 +115,54 @@ function formatRelative(iso: string): string {
   }
 }
 
-function isDiff(
-  v: ActivityChange,
-): v is { from: unknown; to: unknown } {
+function isDiff(v: ActivityChange): v is { from: unknown; to: unknown } {
   return typeof v === "object" && v !== null && "from" in v && "to" in v;
+}
+
+// Human-readable labels for the raw field names in an activity diff.
+const CHANGE_KEY_LABEL: Record<string, string> = {
+  paid: "Paid",
+  paid_at: "Paid at",
+  status: "Status",
+  due_date: "Due date",
+  income_date: "Income date",
+  amount: "Amount",
+  description: "Description",
+  autopay: "Autopay",
+  comments: "Comments",
+  active: "Active",
+  name: "Name",
+};
+
+function humanizeKey(key: string): string {
+  return (
+    CHANGE_KEY_LABEL[key] ??
+    key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, " ")
+  );
+}
+
+function fmtDateTime(iso: string): string {
+  // Backend serializes naive UTC without a `Z` (see formatRelative above);
+  // append one so the value is parsed as UTC and shown in local time.
+  const hasTz = /[zZ]|[+-]\d\d:?\d\d$/.test(iso);
+  const dt = new Date(hasTz ? iso : `${iso}Z`);
+  if (Number.isNaN(dt.getTime())) return iso;
+  return dt.toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+function fmtChangeValue(key: string, value: unknown): string {
+  if (value === null || value === undefined || value === "") return "—";
+  if (typeof value === "string") {
+    if (key.endsWith("_at")) return fmtDateTime(value);
+    if (key.endsWith("_date")) return fmtShortDate(value);
+  }
+  return String(value);
 }
 
 function renderChanges(changes: Record<string, ActivityChange>): string | null {
@@ -128,9 +172,9 @@ function renderChanges(changes: Record<string, ActivityChange>): string | null {
     .map((k) => {
       const v = changes[k];
       if (isDiff(v)) {
-        return `${k}: ${String(v.from ?? "—")} → ${String(v.to ?? "—")}`;
+        return `${humanizeKey(k)}: ${fmtChangeValue(k, v.from)} → ${fmtChangeValue(k, v.to)}`;
       }
-      return `${k}: ${String(v)}`;
+      return `${humanizeKey(k)}: ${fmtChangeValue(k, v)}`;
     })
     .join(", ");
 }

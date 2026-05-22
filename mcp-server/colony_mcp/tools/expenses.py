@@ -277,6 +277,95 @@ async def mark_cycle_expenses_paid(
     }
 
 
+async def _set_expense_status(
+    expense_id: str,
+    status: str,
+    cycle_id: str | None,
+) -> dict[str, Any]:
+    """Resolve an expense's cycle, then write a new status onto it.
+
+    Shared backend for the status-changing tools below. When ``cycle_id``
+    is omitted the expense is located by scanning the user's open cycles.
+    """
+    if cycle_id is None:
+        cycle_id, household_id = await resolve_expense_location(expense_id)
+    else:
+        household_id = await resolve_cycle_household_id(cycle_id)
+    return await colony_request(
+        "PUT",
+        f"/cycles/{cycle_id}/expenses/{expense_id}",
+        params={"household_id": household_id},
+        json={"status": status},
+    )
+
+
+async def skip_expense(
+    expense_id: str,
+    cycle_id: str | None = None,
+) -> dict[str, Any]:
+    """Mark a cycle expense as skipped for this cycle.
+
+    "Skipped" means the expense does not apply this cycle — e.g. a bill
+    that will not be charged this month. A skipped expense is excluded
+    from the cycle's expense total, so it does not reduce the remaining
+    balance, and it stops appearing as due or overdue. Use this when an
+    expense should be neither paid nor counted as still owed.
+
+    To undo a skip, call ``reset_expense_to_pending``.
+
+    Args:
+        expense_id: UUID of the expense to skip.
+        cycle_id: UUID of the cycle containing the expense. Optional —
+            when omitted it is resolved by scanning your open cycles,
+            which costs extra requests, so pass it whenever you know it.
+    """
+    return await _set_expense_status(expense_id, "skipped", cycle_id)
+
+
+async def mark_expense_paid_other(
+    expense_id: str,
+    cycle_id: str | None = None,
+) -> dict[str, Any]:
+    """Mark a cycle expense as paid by other means.
+
+    "Paid (other)" means the expense was settled outside your tracked
+    income and payment methods — for example covered by someone else or
+    paid from an untracked account. Like a skip, it is excluded from the
+    cycle's expense total and remaining balance and stops appearing as
+    due, but it records the expense as handled rather than not
+    applicable. For a normal payment from a tracked method, use
+    ``mark_expense_paid`` instead.
+
+    To undo this, call ``reset_expense_to_pending``.
+
+    Args:
+        expense_id: UUID of the expense to mark as paid by other means.
+        cycle_id: UUID of the cycle containing the expense. Optional —
+            when omitted it is resolved by scanning your open cycles,
+            which costs extra requests, so pass it whenever you know it.
+    """
+    return await _set_expense_status(expense_id, "paid_other", cycle_id)
+
+
+async def reset_expense_to_pending(
+    expense_id: str,
+    cycle_id: str | None = None,
+) -> dict[str, Any]:
+    """Return an expense to the pending (still-owed) state.
+
+    Undoes a skip or a "paid (other)" mark, putting the expense back into
+    the cycle's expense total as money still owed. To instead mark an
+    expense paid, use ``mark_expense_paid``.
+
+    Args:
+        expense_id: UUID of the expense to reset to pending.
+        cycle_id: UUID of the cycle containing the expense. Optional —
+            when omitted it is resolved by scanning your open cycles,
+            which costs extra requests, so pass it whenever you know it.
+    """
+    return await _set_expense_status(expense_id, "pending", cycle_id)
+
+
 async def add_cycle_expense(
     cycle_id: str,
     description: str,
@@ -381,5 +470,8 @@ def register(mcp: FastMCP) -> None:
     mcp.tool(list_autopay_expenses)
     mcp.tool(mark_expense_paid)
     mcp.tool(mark_cycle_expenses_paid)
+    mcp.tool(skip_expense)
+    mcp.tool(mark_expense_paid_other)
+    mcp.tool(reset_expense_to_pending)
     mcp.tool(add_cycle_expense)
     mcp.tool(update_cycle_expense)

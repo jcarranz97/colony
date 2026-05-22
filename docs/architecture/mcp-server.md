@@ -21,9 +21,10 @@ and docs.
 - **Curated tools.** Tools map to real tasks ("expenses due this week"),
   not 1:1 to REST endpoints. Fewer, well-described tools are easier for an
   agent to use correctly.
-- **Deliberate write scope.** Tools can read everything and mutate cycle
-  expenses and incomes. They **cannot** edit recurrent templates, delete
-  anything, or manage cycles, households, users, or payment methods.
+- **Deliberate write scope.** Tools can read everything, create cycles,
+  mutate cycle expenses and incomes, and post comments on any item. They
+  **cannot** edit or delete existing cycles, edit recurrent templates,
+  delete anything, or manage households, users, or payment methods.
 - **Multi-household by default.** Read tools aggregate across every
   household the user belongs to unless a household name is given.
 
@@ -53,7 +54,7 @@ carries, not by separate deployments.
 
 Colony users authenticate the API with **Personal Access Tokens (PATs)** —
 long-lived, named, revocable tokens, similar to GitHub PATs. They are
-generated in the web app under **API Tokens**.
+generated in the web app under **Settings → API Tokens**.
 
 A PAT is prefixed `colony_pat_`. Only a SHA-256 hash is stored; the
 plaintext is shown **once** at creation and is never recoverable.
@@ -104,6 +105,11 @@ The MCP read tools expose this as an optional `household` argument:
 Cycle-scoped tools (those taking a `cycle_id`) resolve the owning
 household automatically — no `household` argument is needed.
 
+`create_cycle` has no cycle to resolve from, so it accepts an optional
+`household`. It must commit to exactly one household: when omitted, the
+user's sole household is used; if they belong to several, the tool asks
+them to name one.
+
 ---
 
 ## Tool catalogue
@@ -129,26 +135,44 @@ Read tools accept an optional `household` argument (omit to aggregate).
 | `recurrent_expenses_overview` | Recurrent expense templates (read-only) |
 | `recurrent_incomes_overview` | Recurrent income templates (read-only) |
 
-Write tools — limited to cycle expenses and incomes:
+Write tools — cycle creation, plus cycle expenses and incomes:
 
 | Tool | Purpose |
 |---|---|
+| `create_cycle` | Create a new budgeting cycle (optionally seeded from templates) |
 | `mark_expense_paid` | Mark a single cycle expense as paid |
 | `mark_cycle_expenses_paid` | Mark several (or all unpaid) expenses in a cycle paid |
+| `skip_expense` | Mark an expense as skipped (not applicable this cycle) |
+| `mark_expense_paid_other` | Mark an expense as paid by other means (off-budget) |
+| `reset_expense_to_pending` | Undo a skip or "paid (other)" mark, back to pending |
 | `add_cycle_expense` | Add a new expense to a cycle |
 | `update_cycle_expense` | Update fields on a cycle expense |
 | `add_cycle_income` | Record a new income in a cycle |
 | `update_cycle_income` | Update fields on a cycle income |
 
-Recurrent templates, cycles, households, users, payment methods, and
-exchange rates are **not** writable through the MCP server.
+Comments — read and write notes on any Colony item:
+
+| Tool | Purpose |
+|---|---|
+| `add_comment` | Post a comment on any item (cycle, expense, income, …) |
+| `get_comments` | List the comments on a single item |
+| `get_cycle_comments` | List every comment across a whole cycle |
+
+Comments resolve against the user's **active household** — the comments
+endpoints are not multi-household, so an item in a different household
+has no visible comments and cannot be commented on.
+
+Editing or deleting existing cycles, recurrent templates, households,
+users, payment methods, and exchange rates are **not** supported through
+the MCP server. Comments themselves cannot be edited or deleted through
+the MCP server either — only created and read.
 
 ---
 
 ## Connecting an agent
 
-First, generate a token: open the Colony web app, go to **API Tokens**,
-create one, and copy the `colony_pat_…` secret (shown once).
+First, generate a token: open the Colony web app, go to **Settings → API
+Tokens**, create one, and copy the `colony_pat_…` secret (shown once).
 
 ### Claude Code
 
@@ -221,8 +245,8 @@ A token stops working when it expires, is revoked, or — as after a
 recreated. The MCP server itself keeps no tokens; each agent client
 holds its own copy, so the fix is to update it in that client.
 
-First, generate a fresh token: in the Colony web app go to **API
-Tokens**, create one, and copy the new `colony_pat_…` secret.
+First, generate a fresh token: in the Colony web app go to **Settings →
+API Tokens**, create one, and copy the new `colony_pat_…` secret.
 
 **Claude Code** — there is no in-place edit, so remove the server and
 add it again with the new token:

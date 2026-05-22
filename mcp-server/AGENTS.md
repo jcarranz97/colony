@@ -16,7 +16,8 @@ mcp-server/
 │       ├── overview.py  # whoami, list_households
 │       ├── cycles.py    # cycles, summaries, incomes
 │       ├── expenses.py  # due / overdue / autopay, mark paid
-│       └── payments.py  # payment methods, recurrent templates (read-only)
+│       ├── payments.py  # payment methods, recurrent templates (read-only)
+│       └── comments.py  # read / write comments on any item
 └── Dockerfile
 ```
 
@@ -37,9 +38,10 @@ uv run pyright .
 - **Curated tools only.** Each tool is a small, well-documented async
   function — not a 1:1 mirror of a REST endpoint. Docstrings and type
   hints become the schema the agent sees, so keep them clear.
-- **Write scope is deliberate.** Tools may read anything and mutate cycle
-  expenses/incomes only. Do **not** add tools that create/edit/delete
-  recurrent templates, cycles, households, users, or payment methods.
+- **Write scope is deliberate.** Tools may read anything, create cycles,
+  and mutate cycle expenses/incomes. Do **not** add tools that edit or
+  delete existing cycles, or that create/edit/delete recurrent templates,
+  households, users, or payment methods.
 - **Adding a tool:** write the async function in the relevant
   `tools/*.py` module, then register it in that module's `register()`.
 - Type-hint everything; Google-style docstrings; 88-char lines.
