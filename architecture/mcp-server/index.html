@@ -1213,9 +1213,10 @@ and docs.</p>
   not 1:1 to REST endpoints. Fewer, well-described tools are easier for an
   agent to use correctly.</li>
 <li><strong>Deliberate write scope.</strong> Tools can read everything, create cycles,
-  mutate cycle expenses and incomes, and post comments on any item. They
-  <strong>cannot</strong> edit or delete existing cycles, edit recurrent templates,
-  delete anything, or manage households, users, or payment methods.</li>
+  mutate cycle expenses and incomes, post comments on any item, and read
+  the activity log. They <strong>cannot</strong> edit or delete existing cycles, edit
+  recurrent templates, delete anything, or manage households, users, or
+  payment methods.</li>
 <li><strong>Multi-household by default.</strong> Read tools aggregate across every
   household the user belongs to unless a household name is given.</li>
 </ul>
@@ -1436,6 +1437,32 @@ them to name one.</p>
 <p>Comments resolve against the user's <strong>active household</strong> — the comments
 endpoints are not multi-household, so an item in a different household
 has no visible comments and cannot be commented on.</p>
+<p>Activity — read the change history of any item:</p>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>get_activity</code></td>
+<td>List the change history of a single item, newest first</td>
+</tr>
+<tr>
+<td><code>get_cycle_activity</code></td>
+<td>List every activity row across a whole cycle</td>
+</tr>
+</tbody>
+</table>
+<p>Activity is the audit log that runs alongside comments: each row records
+who changed what field, when (e.g. a due-date move appears as <code>changes =
+{"due_date": {"from": "...", "to": "..."}}</code>). Reach for these tools
+whenever the user asks "what changed", "who moved this", or "when did
+this become paid" — an item's <code>updated_at</code> only reflects the last
+mutation. Like comments, activity resolves against the user's active
+household.</p>
 <p>Editing or deleting existing cycles, recurrent templates, households,
 users, payment methods, and exchange rates are <strong>not</strong> supported through
 the MCP server. Comments themselves cannot be edited or deleted through
