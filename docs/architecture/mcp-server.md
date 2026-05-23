@@ -22,9 +22,10 @@ and docs.
   not 1:1 to REST endpoints. Fewer, well-described tools are easier for an
   agent to use correctly.
 - **Deliberate write scope.** Tools can read everything, create cycles,
-  mutate cycle expenses and incomes, and post comments on any item. They
-  **cannot** edit or delete existing cycles, edit recurrent templates,
-  delete anything, or manage households, users, or payment methods.
+  mutate cycle expenses and incomes, post comments on any item, and read
+  the activity log. They **cannot** edit or delete existing cycles, edit
+  recurrent templates, delete anything, or manage households, users, or
+  payment methods.
 - **Multi-household by default.** Read tools aggregate across every
   household the user belongs to unless a household name is given.
 
@@ -161,6 +162,21 @@ Comments — read and write notes on any Colony item:
 Comments resolve against the user's **active household** — the comments
 endpoints are not multi-household, so an item in a different household
 has no visible comments and cannot be commented on.
+
+Activity — read the change history of any item:
+
+| Tool | Purpose |
+|---|---|
+| `get_activity` | List the change history of a single item, newest first |
+| `get_cycle_activity` | List every activity row across a whole cycle |
+
+Activity is the audit log that runs alongside comments: each row records
+who changed what field, when (e.g. a due-date move appears as `changes =
+{"due_date": {"from": "...", "to": "..."}}`). Reach for these tools
+whenever the user asks "what changed", "who moved this", or "when did
+this become paid" — an item's `updated_at` only reflects the last
+mutation. Like comments, activity resolves against the user's active
+household.
 
 Editing or deleting existing cycles, recurrent templates, households,
 users, payment methods, and exchange rates are **not** supported through
