@@ -12,8 +12,10 @@ import type {
   CycleIncome,
   EntityType,
   ExpenseStatus,
+  PaymentMethod,
   UserResponse,
 } from "@/helpers/types";
+import { formatPaymentMethodName } from "@/helpers/formatters";
 
 import {
   addComment,
@@ -47,6 +49,11 @@ interface ActivityFeedProps {
    */
   expenses?: CycleExpense[];
   incomes?: CycleIncome[];
+  /**
+   * Optional payment methods used to resolve `payment_method_id` change
+   * diffs to readable names instead of raw UUIDs.
+   */
+  paymentMethods?: PaymentMethod[];
 }
 
 const EXPENSE_STATUS_LABEL: Record<ExpenseStatus, string> = {
@@ -132,6 +139,7 @@ const CHANGE_KEY_LABEL: Record<string, string> = {
   comments: "Comments",
   active: "Active",
   name: "Name",
+  payment_method_id: "Payment method",
 };
 
 function humanizeKey(key: string): string {
@@ -156,25 +164,36 @@ function fmtDateTime(iso: string): string {
   });
 }
 
-function fmtChangeValue(key: string, value: unknown): string {
+function fmtChangeValue(
+  key: string,
+  value: unknown,
+  pmNames?: Map<string, string>,
+): string {
   if (value === null || value === undefined || value === "") return "—";
   if (typeof value === "string") {
     if (key.endsWith("_at")) return fmtDateTime(value);
     if (key.endsWith("_date")) return fmtShortDate(value);
+    // Resolve payment method UUIDs to readable names; fall back to the raw
+    // value (e.g. a method that has since been deactivated and isn't in the
+    // provided list).
+    if (key === "payment_method_id") return pmNames?.get(value) ?? value;
   }
   return String(value);
 }
 
-function renderChanges(changes: Record<string, ActivityChange>): string | null {
+function renderChanges(
+  changes: Record<string, ActivityChange>,
+  pmNames?: Map<string, string>,
+): string | null {
   const keys = Object.keys(changes).filter((k) => k !== "comment_id");
   if (keys.length === 0) return null;
   return keys
     .map((k) => {
       const v = changes[k];
       if (isDiff(v)) {
-        return `${humanizeKey(k)}: ${fmtChangeValue(k, v.from)} → ${fmtChangeValue(k, v.to)}`;
+        return `${humanizeKey(k)}: ${fmtChangeValue(k, v.from, pmNames)} → ${fmtChangeValue(k, v.to, pmNames)}`;
       }
-      return `${humanizeKey(k)}: ${fmtChangeValue(k, v)}`;
+      return `${humanizeKey(k)}: ${fmtChangeValue(k, v, pmNames)}`;
     })
     .join(", ");
 }
@@ -220,6 +239,7 @@ export function ActivityFeed({
   onCommentMutated,
   expenses = [],
   incomes = [],
+  paymentMethods = [],
 }: ActivityFeedProps) {
   const [entries, setEntries] = useState<ActivityEntry[]>([]);
   const [comments, setComments] = useState<CommentType[]>([]);
@@ -301,6 +321,9 @@ export function ActivityFeed({
   // Hydrate cycle_expense / cycle_income rows from the parent-provided lists.
   const expenseById = new Map(expenses.map((e) => [e.id, e]));
   const incomeById = new Map(incomes.map((i) => [i.id, i]));
+  const pmNames = new Map(
+    paymentMethods.map((m) => [m.id, formatPaymentMethodName(m)]),
+  );
 
   const filtered = showOnlyComments
     ? entries.filter((e) => e.action === "commented")
@@ -426,7 +449,7 @@ export function ActivityFeed({
                       <IncomeCard income={incomeById.get(entry.entity_id)!} />
                     )}
                   <div className="nb-activity-changes">
-                    {renderChanges(entry.changes)}
+                    {renderChanges(entry.changes, pmNames)}
                   </div>
                 </>
               )}

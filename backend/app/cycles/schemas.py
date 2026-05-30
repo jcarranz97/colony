@@ -198,6 +198,7 @@ class CycleExpenseUpdate(AppBaseModel):
     status: ExpenseStatus | None = None
     paid: bool | None = None
     paid_at: datetime | None = None
+    payment_method_id: uuid.UUID | None = None
     comments: str | None = Field(None, max_length=1000)
     autopay: bool = False
 
@@ -239,6 +240,7 @@ class CycleExpenseResponse(BaseModel):
     comments: str | None
     autopay: bool
     template_id: uuid.UUID | None
+    payment_method_id: uuid.UUID
     payment_method: PaymentMethodSummary
     created_at: datetime
     updated_at: datetime

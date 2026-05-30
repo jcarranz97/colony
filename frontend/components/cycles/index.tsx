@@ -1,10 +1,6 @@
 "use client";
 import Link from "next/link";
-import {
-  useRouter,
-  useSearchParams,
-  usePathname,
-} from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import type {
   Cycle,
@@ -377,6 +373,7 @@ function ExpenseRow({
 interface EditExpenseForm {
   amount: string;
   due_date: string;
+  payment_method_id: string;
 }
 
 function EditExpenseModal({
@@ -384,6 +381,7 @@ function EditExpenseModal({
   onClose,
   expense,
   cycleId,
+  paymentMethods,
   currentUser,
   onEdited,
   onActivityChanged,
@@ -392,6 +390,7 @@ function EditExpenseModal({
   onClose: () => void;
   expense: CycleExpense | null;
   cycleId: string;
+  paymentMethods: PaymentMethod[];
   currentUser: UserResponse | null;
   onEdited: (updated: CycleExpense) => void;
   onActivityChanged?: () => void;
@@ -399,6 +398,7 @@ function EditExpenseModal({
   const [form, setForm] = useState<EditExpenseForm>({
     amount: "",
     due_date: "",
+    payment_method_id: "",
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -408,6 +408,7 @@ function EditExpenseModal({
   const initialFormRef = useRef<EditExpenseForm>({
     amount: "",
     due_date: "",
+    payment_method_id: "",
   });
 
   useEffect(() => {
@@ -415,6 +416,7 @@ function EditExpenseModal({
       const initial = {
         amount: expense.amount,
         due_date: expense.due_date ?? "",
+        payment_method_id: expense.payment_method_id ?? "",
       };
       setForm(initial);
       initialFormRef.current = initial;
@@ -425,7 +427,8 @@ function EditExpenseModal({
 
   const isDirty =
     form.amount !== initialFormRef.current.amount ||
-    form.due_date !== initialFormRef.current.due_date;
+    form.due_date !== initialFormRef.current.due_date ||
+    form.payment_method_id !== initialFormRef.current.payment_method_id;
 
   const handleAttemptClose = () => {
     if (isDirty) setConfirmDiscard(true);
@@ -442,6 +445,7 @@ function EditExpenseModal({
     const res = await editExpense(cycleId, expense.id, {
       amount: form.amount,
       due_date: form.due_date || null,
+      payment_method_id: form.payment_method_id || undefined,
     });
     if (res.success) {
       // Keep the modal open so the user can confirm the change landed in
@@ -452,6 +456,7 @@ function EditExpenseModal({
       initialFormRef.current = {
         amount: res.data.amount,
         due_date: res.data.due_date ?? "",
+        payment_method_id: res.data.payment_method_id ?? "",
       };
       setForm(initialFormRef.current);
       setActivityRefresh((n) => n + 1);
@@ -470,7 +475,12 @@ function EditExpenseModal({
     >
       <div
         className="nb-modal"
-        style={{ maxWidth: 640, width: "100%", maxHeight: "90vh", overflowY: "auto" }}
+        style={{
+          maxWidth: 640,
+          width: "100%",
+          maxHeight: "90vh",
+          overflowY: "auto",
+        }}
       >
         <button className="nb-modal-close" onClick={handleAttemptClose}>
           ✕
@@ -508,6 +518,25 @@ function EditExpenseModal({
             />
           </div>
         </div>
+
+        {paymentMethods.length > 0 && (
+          <div className="nb-form-group">
+            <label className="nb-form-label">Payment method</label>
+            <select
+              className="nb-form-select"
+              value={form.payment_method_id}
+              onChange={(e) => set("payment_method_id", e.target.value)}
+            >
+              {paymentMethods
+                .filter((m) => m.active)
+                .map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {formatPaymentMethodName(m)}
+                  </option>
+                ))}
+            </select>
+          </div>
+        )}
 
         {error && (
           <p
@@ -561,6 +590,7 @@ function EditExpenseModal({
             onActivityChanged?.();
           }}
           expenses={[expense]}
+          paymentMethods={paymentMethods}
         />
       </div>
       <DiscardChangesDialog
@@ -671,7 +701,12 @@ function EditIncomeModal({
     >
       <div
         className="nb-modal"
-        style={{ maxWidth: 640, width: "100%", maxHeight: "90vh", overflowY: "auto" }}
+        style={{
+          maxWidth: 640,
+          width: "100%",
+          maxHeight: "90vh",
+          overflowY: "auto",
+        }}
       >
         <button className="nb-modal-close" onClick={handleAttemptClose}>
           ✕
@@ -1679,10 +1714,7 @@ export function CycleDetail({
   const editExpenseOpen = !!editingExpense;
   const editIncomeOpen = !!editingIncome;
 
-  const setUrlParam = (
-    key: "expense" | "income",
-    value: string | null,
-  ) => {
+  const setUrlParam = (key: "expense" | "income", value: string | null) => {
     const params = new URLSearchParams(searchParams.toString());
     if (value) params.set(key, value);
     else params.delete(key);
@@ -1833,95 +1865,99 @@ export function CycleDetail({
         incomes.map((income) => {
           const editable = cycle.status !== "completed";
           return (
-          <div
-            key={income.id}
-            role={editable ? "button" : undefined}
-            tabIndex={editable ? 0 : undefined}
-            onClick={editable ? () => handleEditIncome(income) : undefined}
-            onKeyDown={
-              editable
-                ? (e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      handleEditIncome(income);
+            <div
+              key={income.id}
+              role={editable ? "button" : undefined}
+              tabIndex={editable ? 0 : undefined}
+              onClick={editable ? () => handleEditIncome(income) : undefined}
+              onKeyDown={
+                editable
+                  ? (e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleEditIncome(income);
+                      }
                     }
-                  }
-                : undefined
-            }
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              padding: "6px 10px",
-              marginBottom: 4,
-              borderRadius: 4,
-              background: "rgba(80,200,100,0.10)",
-              border: "1px solid rgba(80,200,100,0.25)",
-              fontFamily: "var(--font-hand)",
-              cursor: editable ? "pointer" : "default",
-            }}
-          >
-            <span style={{ fontSize: 14, color: "var(--ink)", flex: 1 }}>
-              {income.description}
-            </span>
-            {income.template_id ? (
+                  : undefined
+              }
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                padding: "6px 10px",
+                marginBottom: 4,
+                borderRadius: 4,
+                background: "rgba(80,200,100,0.10)",
+                border: "1px solid rgba(80,200,100,0.25)",
+                fontFamily: "var(--font-hand)",
+                cursor: editable ? "pointer" : "default",
+              }}
+            >
+              <span style={{ fontSize: 14, color: "var(--ink)", flex: 1 }}>
+                {income.description}
+              </span>
+              {income.template_id ? (
+                <span
+                  style={{
+                    fontSize: 11,
+                    color: "var(--ink-light)",
+                    opacity: 0.6,
+                    background: "rgba(44,74,62,0.08)",
+                    borderRadius: 3,
+                    padding: "1px 5px",
+                  }}
+                >
+                  recurring
+                </span>
+              ) : (
+                <span
+                  style={{
+                    fontSize: 11,
+                    color: "var(--ink-light)",
+                    opacity: 0.6,
+                    background: "rgba(201,168,76,0.12)",
+                    borderRadius: 3,
+                    padding: "1px 5px",
+                  }}
+                >
+                  manual
+                </span>
+              )}
+              <span
+                style={{ fontSize: 13, color: "var(--ink)", fontWeight: 700 }}
+              >
+                {fmtAmount(income.amount, income.currency)}
+              </span>
               <span
                 style={{
-                  fontSize: 11,
+                  fontSize: 12,
                   color: "var(--ink-light)",
-                  opacity: 0.6,
-                  background: "rgba(44,74,62,0.08)",
-                  borderRadius: 3,
-                  padding: "1px 5px",
+                  opacity: 0.55,
                 }}
               >
-                recurring
+                {fmtDate(income.income_date)}
               </span>
-            ) : (
-              <span
-                style={{
-                  fontSize: 11,
-                  color: "var(--ink-light)",
-                  opacity: 0.6,
-                  background: "rgba(201,168,76,0.12)",
-                  borderRadius: 3,
-                  padding: "1px 5px",
-                }}
-              >
-                manual
-              </span>
-            )}
-            <span
-              style={{ fontSize: 13, color: "var(--ink)", fontWeight: 700 }}
-            >
-              {fmtAmount(income.amount, income.currency)}
-            </span>
-            <span
-              style={{ fontSize: 12, color: "var(--ink-light)", opacity: 0.55 }}
-            >
-              {fmtDate(income.income_date)}
-            </span>
-            {editable && (
-              <button
-                style={{
-                  background: "transparent",
-                  border: "none",
-                  cursor: "pointer",
-                  color: "var(--ink-light)",
-                  fontSize: 14,
-                  padding: "0 4px",
-                  opacity: 0.5,
-                }}
-                title="Remove income"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onIncomeRemoved(income.id);
-                }}
-              >
-                ✕
-              </button>
-            )}
-          </div>
+              {editable && (
+                <button
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    color: "var(--ink-light)",
+                    fontSize: 14,
+                    padding: "0 4px",
+                    opacity: 0.5,
+                  }}
+                  title="Remove income"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onIncomeRemoved(income.id);
+                  }}
+                >
+                  ✕
+                </button>
+              )}
+            </div>
           );
         })
       ) : (
@@ -2027,6 +2063,7 @@ export function CycleDetail({
         onClose={closeEditExpense}
         expense={editingExpense}
         cycleId={cycle.id}
+        paymentMethods={paymentMethods}
         currentUser={currentUser ?? null}
         onEdited={onExpenseEdited}
         onActivityChanged={onActivityChanged}
