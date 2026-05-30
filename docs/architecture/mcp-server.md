@@ -147,7 +147,7 @@ Write tools — cycle creation, plus cycle expenses and incomes:
 | `mark_expense_paid_other` | Mark an expense as paid by other means (off-budget) |
 | `reset_expense_to_pending` | Undo a skip or "paid (other)" mark, back to pending |
 | `add_cycle_expense` | Add a new expense to a cycle |
-| `update_cycle_expense` | Update fields on a cycle expense |
+| `update_cycle_expense` | Update fields on a cycle expense (amount, due date, category, payment method, comments, paid) |
 | `add_cycle_income` | Record a new income in a cycle |
 | `update_cycle_income` | Update fields on a cycle income |
 

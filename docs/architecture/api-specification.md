@@ -714,6 +714,7 @@ with status `paid` and `paid_at` set to the current timestamp.
   "paid_at": null,
   "autopay": false,
   "template_id": null,
+  "payment_method_id": "123e4567-e89b-12d3-a456-426614174002",
   "payment_method": {
     "id": "123e4567-e89b-12d3-a456-426614174002",
     "name": "Capital One Credit",
@@ -728,15 +729,18 @@ with status `paid` and `paid_at` set to the current timestamp.
 Get a specific expense.
 
 #### PUT /cycles/{cycle_id}/expenses/{expense_id}
-Update an expense.
+Update an expense. All fields are optional; only the fields provided are
+changed. The `payment_method_id` must reference an active payment method in
+the same household, and the change is recorded in the activity log.
 
 **Request Body:**
 ```json
 {
   "amount": "375.00",
+  "payment_method_id": "123e4567-e89b-12d3-a456-426614174002",
   "paid": true,
   "paid_at": "2025-01-15T14:30:00Z",
-  "comments": "Updated amount and marked as paid"
+  "comments": "Updated amount, payment method, and marked as paid"
 }
 ```
 

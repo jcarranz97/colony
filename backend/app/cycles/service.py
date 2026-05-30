@@ -943,6 +943,11 @@ class CycleExpenseService:
             stripped = (raw or "").strip()
             new_comment_body = stripped or None
 
+        if update_data.get("payment_method_id"):
+            _verify_payment_method(
+                db, update_data["payment_method_id"], str(cycle.household_id)
+            )
+
         # Keep paid / status / paid_at in sync
         if "paid" in update_data:
             if update_data["paid"] and "paid_at" not in update_data:

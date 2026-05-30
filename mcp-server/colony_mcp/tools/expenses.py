@@ -418,6 +418,7 @@ async def update_cycle_expense(
     amount: float | None = None,
     due_date: str | None = None,
     category: str | None = None,
+    payment_method_id: str | None = None,
     comments: str | None = None,
     paid: bool | None = None,
 ) -> dict[str, Any]:
@@ -433,6 +434,8 @@ async def update_cycle_expense(
         amount: New amount, if changing it.
         due_date: New due date (YYYY-MM-DD), if changing it.
         category: New category (fixed/variable/extra), if changing it.
+        payment_method_id: New payment method UUID, if changing it. Use
+            ``list_payment_methods`` to find a valid id.
         comments: New comment text, if changing it.
         paid: New paid flag, if changing it.
     """
@@ -444,6 +447,7 @@ async def update_cycle_expense(
             "amount": amount,
             "due_date": due_date,
             "category": category,
+            "payment_method_id": payment_method_id,
             "comments": comments,
             "paid": paid,
         }.items()
