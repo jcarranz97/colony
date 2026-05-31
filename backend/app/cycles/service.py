@@ -948,14 +948,30 @@ class CycleExpenseService:
                 db, update_data["payment_method_id"], str(cycle.household_id)
             )
 
-        # Keep paid / status / paid_at in sync
+        # Keep paid / status / paid_at in sync.
+        # Two entry points can mutate payment state:
+        #   (a) caller sets `paid` → derive status and paid_at from it
+        #   (b) caller sets `status` directly → derive paid and paid_at from it
+        # Both branches must be handled so the three fields never diverge.
         if "paid" in update_data:
-            if update_data["paid"] and "paid_at" not in update_data:
-                update_data["paid_at"] = datetime.now(tz=UTC)
-            if update_data["paid"] and "status" not in update_data:
-                update_data["status"] = ExpenseStatus.PAID
-            elif not update_data["paid"] and "status" not in update_data:
-                update_data["status"] = ExpenseStatus.PENDING
+            if update_data["paid"]:
+                if "paid_at" not in update_data:
+                    update_data["paid_at"] = datetime.now(tz=UTC)
+                if "status" not in update_data:
+                    update_data["status"] = ExpenseStatus.PAID
+            else:
+                if "status" not in update_data:
+                    update_data["status"] = ExpenseStatus.PENDING
+                update_data["paid_at"] = None
+        elif "status" in update_data:
+            if update_data["status"] == ExpenseStatus.PAID:
+                # Status explicitly set to paid without touching the paid flag.
+                update_data["paid"] = True
+                if "paid_at" not in update_data:
+                    update_data["paid_at"] = datetime.now(tz=UTC)
+            else:
+                # Status set to any non-paid value; clear payment fields.
+                update_data["paid"] = False
                 update_data["paid_at"] = None
 
         before = {field: getattr(expense, field) for field in update_data}
