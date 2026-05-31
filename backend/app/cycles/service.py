@@ -935,7 +935,7 @@ class CycleExpenseService:
         return expense
 
     @staticmethod
-    def update_expense(  # noqa: C901, PLR0912 - one branch per derived semantic action
+    def update_expense(  # noqa: C901
         db: Session,
         cycle: models.Cycle,
         expense: models.CycleExpense,
