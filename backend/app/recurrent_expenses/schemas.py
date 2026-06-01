@@ -183,6 +183,7 @@ class RecurrentExpenseUpdate(AppBaseModel):
     reference_date: date | None = None
     autopay: bool = False
     active: bool | None = None
+    propagate_to_open_cycles: bool = False
 
     @field_validator("description")
     @classmethod

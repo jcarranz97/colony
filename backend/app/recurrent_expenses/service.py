@@ -1,4 +1,5 @@
 import logging
+from decimal import Decimal
 from uuid import UUID
 
 from sqlalchemy import and_
@@ -8,6 +9,8 @@ from app.activity.constants import ActivityAction, EntityType
 from app.activity.helpers import compute_diff
 from app.activity.service import activity_service
 from app.auth.models import User
+from app.cycles import models as cycle_models
+from app.cycles.constants import CurrencyCode as CycleCurrencyCode, CycleStatus
 from app.payment_methods import models as pm_models
 
 from . import models, schemas
@@ -18,6 +21,107 @@ from .exceptions import (
 from .schemas import _RECURRENCE_VALIDATORS
 
 logger = logging.getLogger(__name__)
+
+# Fields that may be propagated from a recurrent expense template to the
+# unpaid cycle expenses generated from it.
+_PROPAGATABLE_FIELDS: frozenset[str] = frozenset(
+    {"description", "autopay", "payment_method_id", "base_amount"}
+)
+
+
+def _get_cycle_usd_rate(db: Session, from_currency: str) -> Decimal:
+    """Return the most recent exchange rate to convert *from_currency* to USD.
+
+    This is a local read-only helper used only by the propagation path so
+    that this module does not need to import ``cycles.service``.
+
+    Args:
+        db: Active database session.
+        from_currency: Source currency code (e.g. ``"MXN"``).
+
+    Returns:
+        Decimal exchange rate.  Returns ``1`` immediately for USD.
+    """
+    if from_currency in {CycleCurrencyCode.USD.value, CycleCurrencyCode.USD}:
+        return Decimal("1")
+
+    rate_row = (
+        db.query(cycle_models.ExchangeRate)
+        .filter(
+            and_(
+                cycle_models.ExchangeRate.from_currency == from_currency,
+                cycle_models.ExchangeRate.to_currency == CycleCurrencyCode.USD.value,
+            )
+        )
+        .order_by(cycle_models.ExchangeRate.rate_date.desc())
+        .first()
+    )
+
+    if not rate_row:
+        return Decimal("1")
+
+    return rate_row.rate
+
+
+def _propagate_to_open_cycles(
+    db: Session,
+    template_id: UUID,
+    update_data: dict,
+) -> int:
+    """Apply propagatable template fields to unpaid expenses in open cycles.
+
+    Queries all active, unpaid ``CycleExpense`` rows linked to *template_id*
+    whose parent cycle is not completed, then applies the intersection of
+    *update_data* with ``_PROPAGATABLE_FIELDS``.  ``base_amount`` is mapped
+    to ``amount`` and ``amount_usd`` is recalculated using the most recent
+    exchange rate for the expense's currency.
+
+    Flushes but does **not** commit — the caller owns the transaction.
+
+    Args:
+        db: Active database session.
+        template_id: UUID of the recurrent expense template.
+        update_data: Dict of field→value pairs from the template update.
+
+    Returns:
+        Number of cycle expenses touched.
+    """
+    propagatable = {k: v for k, v in update_data.items() if k in _PROPAGATABLE_FIELDS}
+    if not propagatable:
+        return 0
+
+    # Remap template field name to the cycle-expense column name
+    amount_value = propagatable.pop("base_amount", None)
+    if amount_value is not None:
+        propagatable["amount"] = amount_value
+
+    expenses = (
+        db.query(cycle_models.CycleExpense)
+        .join(
+            cycle_models.Cycle,
+            cycle_models.CycleExpense.cycle_id == cycle_models.Cycle.id,
+        )
+        .filter(
+            cycle_models.CycleExpense.template_id == template_id,
+            cycle_models.CycleExpense.paid.is_(False),
+            cycle_models.CycleExpense.active.is_(True),
+            cycle_models.Cycle.status != CycleStatus.COMPLETED,
+            cycle_models.Cycle.active.is_(True),
+        )
+        .all()
+    )
+
+    for expense in expenses:
+        for field, value in propagatable.items():
+            setattr(expense, field, value)
+        if "amount" in propagatable:
+            rate = _get_cycle_usd_rate(db, str(expense.currency.value))
+            expense.amount_usd = (expense.amount * rate).quantize(Decimal("0.01"))
+
+    if expenses:
+        db.flush()
+
+    return len(expenses)
 
 
 class RecurrentExpenseService:
@@ -221,6 +325,9 @@ class RecurrentExpenseService:
 
         update_data = data.model_dump(exclude_unset=True)
 
+        # Strip control flag — not a model field
+        should_propagate = update_data.pop("propagate_to_open_cycles", False)
+
         if "payment_method_id" in update_data:
             RecurrentExpenseService._verify_payment_method(
                 db, update_data["payment_method_id"], household_id
@@ -259,6 +366,20 @@ class RecurrentExpenseService:
                 actor_user_id=actor.id,
                 action=action,
                 changes=diff,
+            )
+
+        if should_propagate:
+            propagated_count = _propagate_to_open_cycles(
+                db,
+                template_id=recurrent_expense.id,
+                update_data=update_data,
+            )
+            logger.info(
+                "Propagated template fields to open cycle expenses",
+                extra={
+                    "recurrent_expense_id": str(recurrent_expense.id),
+                    "propagated_count": propagated_count,
+                },
             )
 
         db.commit()
