@@ -219,6 +219,7 @@ export interface CreateRecurrentExpenseRequest {
 
 export interface UpdateRecurrentExpenseRequest extends Partial<CreateRecurrentExpenseRequest> {
   active?: boolean;
+  propagate_to_open_cycles?: boolean;
 }
 
 // Cycles
