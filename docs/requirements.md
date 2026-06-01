@@ -84,6 +84,13 @@ Colony is a standalone web application consisting of:
     - **Monthly**: Same date each month
     - **Custom**: User-defined intervals
 - **FR-020**: Users must be able to edit recurrent expenses
+- **FR-066**: When editing a recurrent expense, users must be able to opt in to
+  propagating the changes to all unpaid cycle expenses in open (non-completed)
+  cycles that were generated from that template. The propagatable fields are:
+  `description`, `autopay`, `payment_method_id`, and `amount` (which also
+  triggers a recalculation of `amount_usd`). The frontend must present a
+  confirmation dialog before sending the request with
+  `propagate_to_open_cycles: true`.
 - **FR-021**: Users must be able to delete recurrent expenses
 - **FR-022**: Users must be able to view all recurrent expenses
 - **FR-023**: Each expense must specify currency and payment method

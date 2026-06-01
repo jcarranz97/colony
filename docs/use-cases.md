@@ -42,6 +42,7 @@ Each use case references the functional requirements it satisfies (FR-###).
 | [UC-17](#uc-17-edit-cycle-expense) | Edit Cycle Expense | User |
 | [UC-18](#uc-18-delete-cycle-expense) | Delete Cycle Expense | User |
 | [UC-19](#uc-19-mark-expense-as-paid) | Mark Expense as Paid | User |
+| [UC-20](#uc-20-propagate-recurrent-expense-update-to-open-cycles) | Propagate Recurrent Expense Update to Open Cycles | User |
 
 ---
 
@@ -59,7 +60,7 @@ graph LR
         direction TB
         Auth(["Authentication\nUC-01 – UC-03"])
         PM(["Payment Methods\nUC-04 – UC-07"])
-        ET(["Recurrent Expenses\nUC-08 – UC-11"])
+        ET(["Recurrent Expenses\nUC-08 – UC-11, UC-20"])
         CM(["Cycle Management\nUC-12 – UC-15"])
         CE(["Cycle Expenses\nUC-16 – UC-19"])
     end
@@ -281,11 +282,14 @@ graph LR
     UC09([UC-09: Edit Recurrent Expense])
     UC10([UC-10: Delete Recurrent Expense])
     UC11([UC-11: View Recurrent Expenses])
+    UC20([UC-20: Propagate Update to Open Cycles])
 
     User --> UC08
     User --> UC09
     User --> UC10
     User --> UC11
+    User --> UC20
+    UC09 -.->|optionally triggers| UC20
 ```
 
 ### UC-08: Create Recurrent Expense
@@ -386,6 +390,51 @@ Cycle expenses previously generated from this template are unaffected.
 1. User requests the list of recurrent expenses.
 2. System returns all recurrent expenses belonging to the user, including
    recurrence pattern details and linked payment method info.
+
+---
+
+### UC-20: Propagate Recurrent Expense Update to Open Cycles
+
+**Actor:** User
+
+**Related Requirements:** FR-020, FR-066
+
+**Preconditions:** User is authenticated. The recurrent expense template exists
+and belongs to the user's active household. At least one open cycle contains
+unpaid expenses generated from this template.
+
+**Main Flow:**
+
+1. User edits one or more propagatable fields of a recurrent expense template
+   (description, amount, autopay, or payment method).
+2. Frontend presents a confirmation dialog asking whether to also apply the
+   changes to matching unpaid expenses in open cycles.
+3. User confirms propagation.
+4. Client sends `PUT /recurrent-expenses/{id}` with the updated fields and
+   `propagate_to_open_cycles: true`.
+5. System updates the template record.
+6. System identifies all unpaid, active cycle expenses whose `template_id`
+   matches the updated template and whose parent cycle is not completed.
+7. System applies the propagatable fields to each matched cycle expense. When
+   `base_amount` is propagated, `amount_usd` is recalculated using the most
+   recent exchange rate for the expense currency.
+8. System commits all changes in a single transaction.
+9. System returns the updated recurrent expense template.
+
+**Alternative Flows:**
+
+- **A1 — User declines propagation:** Client omits `propagate_to_open_cycles`
+  (or sets it to `false`). Only the template is updated; existing cycle
+  expenses are unchanged.
+- **A2 — No matching open cycle expenses:** Propagation completes silently with
+  zero expenses updated. The template is still saved.
+- **A3 — Non-propagatable fields only:** If only fields such as
+  `recurrence_type` or `reference_date` are updated, propagation is a no-op
+  even when `propagate_to_open_cycles` is `true`.
+
+**Postconditions:** The template reflects the new values. All matched unpaid
+cycle expenses in open cycles reflect the propagated field values. Already-paid
+expenses and expenses in completed cycles are never modified.
 
 ---
 

@@ -412,7 +412,52 @@ Create a new recurrent expense.
 Get a specific recurrent expense.
 
 #### PUT /recurrent-expenses/{id}
-Update a recurrent expense.
+Update a recurrent expense. All fields are optional; only the fields provided
+are changed.
+
+The optional `propagate_to_open_cycles` flag (default `false`) controls whether
+the changes are also applied to unpaid cycle expenses that were generated from
+this template in open (non-completed) cycles.
+
+**Request Body:**
+```json
+{
+  "description": "Updated Rent",
+  "amount": "1300.00",
+  "autopay": true,
+  "payment_method_id": "123e4567-e89b-12d3-a456-426614174001",
+  "propagate_to_open_cycles": true
+}
+```
+
+**Propagatable fields** — only these fields are carried through to existing
+cycle expenses when `propagate_to_open_cycles` is `true`:
+
+| Template field | Cycle expense field | Notes |
+| --- | --- | --- |
+| `description` | `description` | Direct copy |
+| `autopay` | `autopay` | Direct copy |
+| `payment_method_id` | `payment_method_id` | Direct copy |
+| `base_amount` | `amount` + `amount_usd` | `amount_usd` is recalculated using the most recent exchange rate for the expense currency |
+
+**Propagation target** — a cycle expense is updated if **all** of the
+following are true:
+
+- Its `template_id` matches this recurrent expense.
+- Its `paid` flag is `false`.
+- Its `active` flag is `true`.
+- Its parent cycle's `status` is not `completed`.
+- Its parent cycle's `active` flag is `true`.
+
+**Response:** `200 OK` — updated recurrent expense (same shape as GET).
+
+**Error Codes:**
+
+| Code | Status | Description |
+| ---- | ------ | ----------- |
+| `RECURRENT_EXPENSE_NOT_FOUND` | 404 | Template not found or not owned |
+| `PAYMENT_METHOD_NOT_FOUND` | 404 | New payment method not found or not in household |
+| `INVALID_RECURRENCE_CONFIG` | 422 | Config does not match recurrence type |
 
 #### DELETE /recurrent-expenses/{id}
 Delete a recurrent expense.
