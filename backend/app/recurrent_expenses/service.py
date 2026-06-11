@@ -67,7 +67,9 @@ def _propagate_to_open_cycles(
     db: Session,
     template_id: UUID,
     update_data: dict,
-) -> int:
+    household_id: UUID,
+    actor_user_id: UUID,
+) -> schemas.PropagationSummary:
     """Apply propagatable template fields to unpaid expenses in open cycles.
 
     Queries all active, unpaid ``CycleExpense`` rows linked to *template_id*
@@ -76,24 +78,36 @@ def _propagate_to_open_cycles(
     to ``amount`` and ``amount_usd`` is recalculated using the most recent
     exchange rate for the expense's currency.
 
+    Every cycle expense that actually changes is recorded in the activity log
+    (one ``updated`` event per expense, scoped to its cycle) so the change is
+    visible from each affected cycle expense's activity feed.
+
     Flushes but does **not** commit — the caller owns the transaction.
 
     Args:
         db: Active database session.
         template_id: UUID of the recurrent expense template.
         update_data: Dict of field→value pairs from the template update.
+        household_id: Household that owns the template and its cycle expenses.
+        actor_user_id: User performing the update (recorded in activity log).
 
     Returns:
-        Number of cycle expenses touched.
+        A :class:`schemas.PropagationSummary` with the total number of cycle
+        expenses updated and a per-cycle breakdown.
     """
     propagatable = {k: v for k, v in update_data.items() if k in _PROPAGATABLE_FIELDS}
     if not propagatable:
-        return 0
+        return schemas.PropagationSummary(total_updated=0, cycles=[])
 
     # Remap template field name to the cycle-expense column name
     amount_value = propagatable.pop("base_amount", None)
     if amount_value is not None:
         propagatable["amount"] = amount_value
+
+    # Fields whose before/after state should be tracked in the activity diff.
+    tracked_fields = list(propagatable)
+    if "amount" in propagatable:
+        tracked_fields.append("amount_usd")
 
     expenses = (
         db.query(cycle_models.CycleExpense)
@@ -111,17 +125,49 @@ def _propagate_to_open_cycles(
         .all()
     )
 
+    # Per-cycle breakdown so the caller can report exactly what changed.
+    cycle_counts: dict[UUID, int] = {}
+    cycle_names: dict[UUID, str] = {}
+    total_updated = 0
     for expense in expenses:
+        before = {field: getattr(expense, field) for field in tracked_fields}
         for field, value in propagatable.items():
             setattr(expense, field, value)
         if "amount" in propagatable:
             rate = _get_cycle_usd_rate(db, str(expense.currency.value))
             expense.amount_usd = (expense.amount * rate).quantize(Decimal("0.01"))
+        after = {field: getattr(expense, field) for field in tracked_fields}
 
-    if expenses:
-        db.flush()
+        diff = compute_diff(before, after)
+        if not diff:
+            # Values were already identical — nothing to record or count.
+            continue
 
-    return len(expenses)
+        activity_service.record(
+            db,
+            household_id=household_id,
+            entity_type=EntityType.CYCLE_EXPENSE,
+            entity_id=expense.id,
+            cycle_id=expense.cycle_id,
+            actor_user_id=actor_user_id,
+            action=ActivityAction.UPDATED,
+            changes=diff,
+        )
+        total_updated += 1
+        cycle_counts[expense.cycle_id] = cycle_counts.get(expense.cycle_id, 0) + 1
+        cycle_names[expense.cycle_id] = expense.cycle.name
+
+    return schemas.PropagationSummary(
+        total_updated=total_updated,
+        cycles=[
+            schemas.CyclePropagationResult(
+                cycle_id=cycle_id,
+                cycle_name=cycle_names[cycle_id],
+                updated_count=count,
+            )
+            for cycle_id, count in cycle_counts.items()
+        ],
+    )
 
 
 class RecurrentExpenseService:
@@ -301,7 +347,7 @@ class RecurrentExpenseService:
         data: schemas.RecurrentExpenseUpdate,
         household_id: str,
         actor: User,
-    ) -> models.RecurrentExpense:
+    ) -> tuple[models.RecurrentExpense, schemas.PropagationSummary | None]:
         """Update an existing recurrent expense.
 
         Args:
@@ -312,7 +358,9 @@ class RecurrentExpenseService:
             actor: The user performing the update (recorded in activity log).
 
         Returns:
-            The updated RecurrentExpense.
+            A tuple of the updated RecurrentExpense and, when propagation was
+            requested, a :class:`schemas.PropagationSummary` describing which
+            open-cycle expenses were updated (``None`` otherwise).
 
         Raises:
             PaymentMethodNotFoundExceptionError: If the new payment method is invalid.
@@ -368,17 +416,20 @@ class RecurrentExpenseService:
                 changes=diff,
             )
 
+        propagation: schemas.PropagationSummary | None = None
         if should_propagate:
-            propagated_count = _propagate_to_open_cycles(
+            propagation = _propagate_to_open_cycles(
                 db,
                 template_id=recurrent_expense.id,
                 update_data=update_data,
+                household_id=recurrent_expense.household_id,
+                actor_user_id=actor.id,
             )
             logger.info(
                 "Propagated template fields to open cycle expenses",
                 extra={
                     "recurrent_expense_id": str(recurrent_expense.id),
-                    "propagated_count": propagated_count,
+                    "propagated_count": propagation.total_updated,
                 },
             )
 
@@ -390,7 +441,7 @@ class RecurrentExpenseService:
             extra={"recurrent_expense_id": str(recurrent_expense.id)},
         )
 
-        return recurrent_expense
+        return recurrent_expense, propagation
 
     @staticmethod
     def delete_recurrent_expense(

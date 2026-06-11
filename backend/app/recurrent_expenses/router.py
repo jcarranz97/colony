@@ -105,7 +105,7 @@ async def get_recurrent_expense(
 
 @router.put(
     "/{recurrent_expense_id}",
-    response_model=schemas.RecurrentExpenseResponse,
+    response_model=schemas.RecurrentExpenseUpdateResponse,
     summary="Update a recurrent expense",
     description="Update an existing recurrent expense.",
 )
@@ -115,17 +115,21 @@ async def update_recurrent_expense(
     current_household: CurrentActiveHousehold,
     current_user: CurrentActiveUser,
     db: DatabaseDep,
-) -> schemas.RecurrentExpenseResponse:
+) -> schemas.RecurrentExpenseUpdateResponse:
     """Update an existing recurrent expense."""
     try:
-        updated = service.recurrent_expense_service.update_recurrent_expense(
-            db,
-            recurrent_expense,
-            data,
-            str(current_household.id),
-            actor=current_user,
+        updated, propagation = (
+            service.recurrent_expense_service.update_recurrent_expense(
+                db,
+                recurrent_expense,
+                data,
+                str(current_household.id),
+                actor=current_user,
+            )
         )
-        return schemas.RecurrentExpenseResponse.model_validate(updated)
+        response = schemas.RecurrentExpenseUpdateResponse.model_validate(updated)
+        response.propagation = propagation
+        return response
     except PaymentMethodNotFoundExceptionError as e:
         raise HTTPException(status_code=e.status_code, detail=e.message) from e
     except InvalidRecurrenceConfigExceptionError as e:

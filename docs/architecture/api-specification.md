@@ -449,7 +449,26 @@ following are true:
 - Its parent cycle's `status` is not `completed`.
 - Its parent cycle's `active` flag is `true`.
 
-**Response:** `200 OK` — updated recurrent expense (same shape as GET).
+**Response:** `200 OK` — updated recurrent expense (same shape as GET) plus an
+optional `propagation` summary. `propagation` is `null` when
+`propagate_to_open_cycles` was `false`, and otherwise reports how many cycle
+expenses were updated, broken down per cycle:
+
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "description": "Updated Rent",
+  "base_amount": "1300.00",
+  "...": "remaining template fields as in GET",
+  "propagation": {
+    "total_updated": 3,
+    "cycles": [
+      { "cycle_id": "...", "cycle_name": "March 2025", "updated_count": 2 },
+      { "cycle_id": "...", "cycle_name": "April 2025", "updated_count": 1 }
+    ]
+  }
+}
+```
 
 **Error Codes:**
 

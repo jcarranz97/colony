@@ -5,6 +5,8 @@ from decimal import Decimal
 import pytest
 from sqlalchemy.orm import Session
 
+from app.activity.constants import ActivityAction, EntityType
+from app.activity.models import ActivityLog
 from app.cycles.constants import CurrencyCode as CycleCurrencyCode, CycleStatus
 from app.cycles.models import Cycle, CycleExpense
 from app.households.models import Household
@@ -228,11 +230,12 @@ class TestCreateRecurrentExpense:
 class TestUpdateRecurrentExpense:
     def test_partial_update(self, db, test_household, test_template, test_user):
         data = RecurrentExpenseUpdate(description="Updated Groceries")
-        updated = recurrent_expense_service.update_recurrent_expense(
+        updated, propagation = recurrent_expense_service.update_recurrent_expense(
             db, test_template, data, str(test_household.id), actor=test_user
         )
         assert updated.description == "Updated Groceries"
         assert updated.category == test_template.category
+        assert propagation is None
 
     def test_update_recurrence_config_validates_against_existing_type(
         self, db, test_household, test_template, test_user
@@ -251,7 +254,7 @@ class TestUpdateRecurrentExpense:
             recurrence_type=RecurrenceType.MONTHLY,
             recurrence_config={"day_of_month": 15},
         )
-        updated = recurrent_expense_service.update_recurrent_expense(
+        updated, _ = recurrent_expense_service.update_recurrent_expense(
             db, test_template, data, str(test_household.id), actor=test_user
         )
         assert updated.recurrence_type == RecurrenceType.MONTHLY
@@ -567,3 +570,106 @@ class TestPropagatToOpenCycles:
 
         db.refresh(expense)
         assert expense.category == original_category
+
+    def test_summary_reports_per_cycle_counts(
+        self,
+        db,
+        test_household,
+        test_template,
+        test_payment_method,
+        test_user,
+    ):
+        """The returned summary totals and breaks down updates per cycle."""
+        cycle_a = _make_cycle(db, test_household)
+        cycle_b = _make_cycle(db, test_household)
+        _make_cycle_expense(db, cycle_a, test_template, test_payment_method)
+        _make_cycle_expense(db, cycle_a, test_template, test_payment_method)
+        _make_cycle_expense(db, cycle_b, test_template, test_payment_method)
+        # A paid expense in cycle_a must not be counted.
+        _make_cycle_expense(db, cycle_a, test_template, test_payment_method, paid=True)
+        db.commit()
+
+        data = RecurrentExpenseUpdate(
+            description="Renamed",
+            propagate_to_open_cycles=True,
+        )
+        _, propagation = recurrent_expense_service.update_recurrent_expense(
+            db, test_template, data, str(test_household.id), actor=test_user
+        )
+
+        assert propagation is not None
+        assert propagation.total_updated == 3
+        counts = {c.cycle_id: c.updated_count for c in propagation.cycles}
+        names = {c.cycle_id: c.cycle_name for c in propagation.cycles}
+        assert counts == {cycle_a.id: 2, cycle_b.id: 1}
+        assert names == {cycle_a.id: cycle_a.name, cycle_b.id: cycle_b.name}
+
+    def test_records_activity_for_each_propagated_expense(
+        self,
+        db,
+        test_household,
+        test_template,
+        test_payment_method,
+        test_user,
+    ):
+        """Each propagated cycle expense gets its own ``updated`` activity event."""
+        cycle = _make_cycle(db, test_household)
+        expense = _make_cycle_expense(db, cycle, test_template, test_payment_method)
+        db.commit()
+
+        data = RecurrentExpenseUpdate(
+            description="New Groceries",
+            propagate_to_open_cycles=True,
+        )
+        recurrent_expense_service.update_recurrent_expense(
+            db, test_template, data, str(test_household.id), actor=test_user
+        )
+
+        events = (
+            db.query(ActivityLog)
+            .filter(
+                ActivityLog.entity_type == EntityType.CYCLE_EXPENSE.value,
+                ActivityLog.entity_id == expense.id,
+            )
+            .all()
+        )
+        assert len(events) == 1
+        event = events[0]
+        assert event.action == ActivityAction.UPDATED.value
+        assert event.cycle_id == cycle.id
+        assert event.actor_user_id == test_user.id
+        assert event.changes["description"]["to"] == "New Groceries"
+
+    def test_no_activity_when_value_unchanged(
+        self,
+        db,
+        test_household,
+        test_template,
+        test_payment_method,
+        test_user,
+    ):
+        """Propagating a value identical to the expense's records no activity."""
+        cycle = _make_cycle(db, test_household)
+        expense = _make_cycle_expense(db, cycle, test_template, test_payment_method)
+        db.commit()
+
+        # test_template.description is already the expense's description.
+        data = RecurrentExpenseUpdate(
+            description=test_template.description,
+            propagate_to_open_cycles=True,
+        )
+        _, propagation = recurrent_expense_service.update_recurrent_expense(
+            db, test_template, data, str(test_household.id), actor=test_user
+        )
+
+        assert propagation is not None
+        assert propagation.total_updated == 0
+        events = (
+            db.query(ActivityLog)
+            .filter(
+                ActivityLog.entity_type == EntityType.CYCLE_EXPENSE.value,
+                ActivityLog.entity_id == expense.id,
+            )
+            .all()
+        )
+        assert events == []

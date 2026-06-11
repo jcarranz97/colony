@@ -222,6 +222,23 @@ export interface UpdateRecurrentExpenseRequest extends Partial<CreateRecurrentEx
   propagate_to_open_cycles?: boolean;
 }
 
+export interface CyclePropagationResult {
+  cycle_id: string;
+  cycle_name: string;
+  updated_count: number;
+}
+
+export interface PropagationSummary {
+  total_updated: number;
+  cycles: CyclePropagationResult[];
+}
+
+// PUT /recurrent-expenses/{id} returns the template plus, when propagation
+// was requested, a summary of which open-cycle expenses were updated.
+export interface UpdateRecurrentExpenseResponse extends RecurrentExpense {
+  propagation?: PropagationSummary | null;
+}
+
 // Cycles
 export interface Cycle {
   id: string;
