@@ -9,6 +9,7 @@ import type {
   RecurrenceType,
   RecurrenceConfig,
   PaymentMethodType,
+  PropagationSummary,
 } from "@/helpers/types";
 import { formatPaymentMethodName } from "@/helpers/formatters";
 import {
@@ -423,6 +424,197 @@ export function ConfirmTrashModal({
             disabled={trashing}
           >
             {trashing ? "Moving…" : "Move to Trash 🗑"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Payload shape passed to editRecurrentExpense (without the propagate flag).
+type EditPayload = Parameters<typeof editRecurrentExpense>[1];
+
+export type PropagatePending = {
+  id: string;
+  description: string;
+  payload: EditPayload;
+};
+
+export function ConfirmPropagateModal({
+  isOpen,
+  onClose,
+  pending,
+  onPropagated,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  pending: PropagatePending | null;
+  onPropagated: (updated: RecurrentExpense) => void;
+}) {
+  const [propagating, setPropagating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  // Set after a successful propagation so the modal can report what changed.
+  const [result, setResult] = useState<PropagationSummary | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setError(null);
+      setResult(null);
+    }
+  }, [isOpen]);
+
+  const handleConfirm = async () => {
+    if (!pending) return;
+    setPropagating(true);
+    setError(null);
+    const res = await editRecurrentExpense(pending.id, pending.payload, true);
+    if (res.success) {
+      onPropagated(res.data);
+      setResult(res.data.propagation ?? { total_updated: 0, cycles: [] });
+    } else {
+      setError(res.error.message);
+    }
+    setPropagating(false);
+  };
+
+  if (!isOpen || !pending) return null;
+
+  const plural = (n: number) => (n === 1 ? "" : "s");
+
+  // Result view — shown after a successful propagation.
+  if (result) {
+    return (
+      <div
+        className="nb-modal-backdrop"
+        onClick={(e) => e.target === e.currentTarget && onClose()}
+      >
+        <div className="nb-modal">
+          <button className="nb-modal-close" onClick={onClose}>
+            ✕
+          </button>
+          <div className="nb-modal-title">
+            {result.total_updated === 0
+              ? "Nothing to update"
+              : "Changes propagated"}
+          </div>
+          <p
+            style={{
+              fontFamily: "var(--font-hand)",
+              fontSize: 15,
+              color: "var(--ink)",
+              marginBottom: result.cycles.length > 0 ? 10 : 8,
+              lineHeight: 1.5,
+            }}
+          >
+            {result.total_updated === 0
+              ? "No unpaid expenses in open cycles were generated from this template, so nothing changed."
+              : `Updated ${result.total_updated} expense${plural(
+                  result.total_updated,
+                )} across ${result.cycles.length} cycle${plural(
+                  result.cycles.length,
+                )}:`}
+          </p>
+          {result.cycles.length > 0 && (
+            <ul
+              style={{
+                listStyle: "none",
+                margin: "0 0 8px",
+                padding: 0,
+                display: "flex",
+                flexDirection: "column",
+                gap: 6,
+              }}
+            >
+              {result.cycles.map((c) => (
+                <li
+                  key={c.cycle_id}
+                  style={{
+                    fontFamily: "var(--font-hand)",
+                    fontSize: 14,
+                    color: "var(--ink)",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    gap: 12,
+                    borderBottom: "1px dashed rgba(180,180,180,0.4)",
+                    paddingBottom: 4,
+                  }}
+                >
+                  <span
+                    style={{
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {c.cycle_name}
+                  </span>
+                  <span style={{ flexShrink: 0, opacity: 0.75 }}>
+                    {c.updated_count} expense{plural(c.updated_count)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+          <div className="nb-modal-actions">
+            <button className="nb-btn-primary" onClick={onClose}>
+              Done
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Confirmation view.
+  return (
+    <div
+      className="nb-modal-backdrop"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div className="nb-modal">
+        <button className="nb-modal-close" onClick={onClose}>
+          ✕
+        </button>
+        <div className="nb-modal-title">Apply changes to open cycles?</div>
+        <p
+          style={{
+            fontFamily: "var(--font-hand)",
+            fontSize: 15,
+            color: "var(--ink)",
+            marginBottom: 8,
+            lineHeight: 1.5,
+          }}
+        >
+          The template was updated. Also update all unpaid expenses in open
+          cycles that were generated from <strong>{pending.description}</strong>
+          ? Paid expenses and completed cycles are never changed.
+        </p>
+        {error && (
+          <p
+            style={{
+              fontFamily: "var(--font-hand)",
+              color: "var(--hl-overdue-border)",
+              fontSize: 14,
+              marginBottom: 8,
+            }}
+          >
+            {error}
+          </p>
+        )}
+        <div className="nb-modal-actions">
+          <button
+            className="nb-btn-cancel"
+            onClick={onClose}
+            disabled={propagating}
+          >
+            Template only
+          </button>
+          <button
+            className="nb-btn-primary"
+            onClick={handleConfirm}
+            disabled={propagating}
+          >
+            {propagating ? "Updating…" : "Update open cycles"}
           </button>
         </div>
       </div>
@@ -861,6 +1053,8 @@ export function RecurrentExpenses() {
   const [addOpen, setAddOpen] = useState(false);
   const [addInitial, setAddInitial] = useState<TemplateForm>(BLANK_FORM);
   const [editTarget, setEditTarget] = useState<RecurrentExpense | null>(null);
+  const [propagatePending, setPropagatePending] =
+    useState<PropagatePending | null>(null);
   const [trashTarget, setTrashTarget] = useState<RecurrentExpense | null>(null);
   const [restoringId, setRestoringId] = useState<string | null>(null);
   const [restoreError, setRestoreError] = useState<string | null>(null);
@@ -938,7 +1132,7 @@ export function RecurrentExpenses() {
 
   const handleEdit = async (form: TemplateForm): Promise<string | null> => {
     if (!editTarget) return null;
-    const res = await editRecurrentExpense(editTarget.id, {
+    const payload = {
       description: form.description,
       base_amount: form.base_amount,
       currency: form.currency,
@@ -948,11 +1142,17 @@ export function RecurrentExpenses() {
       reference_date: form.reference_date,
       autopay: form.autopay,
       payment_method_id: form.payment_method_id || null,
-    });
+    };
+    const res = await editRecurrentExpense(editTarget.id, payload);
     if (res.success) {
       setTemplates((prev) =>
         prev.map((t) => (t.id === editTarget.id ? res.data : t)),
       );
+      setPropagatePending({
+        id: editTarget.id,
+        description: form.description,
+        payload,
+      });
       setEditTarget(null);
       return null;
     }
@@ -1099,6 +1299,18 @@ export function RecurrentExpenses() {
         paymentMethods={paymentMethods}
         onClose={() => setEditTarget(null)}
         onSave={handleEdit}
+      />
+
+      {/* Propagate-to-open-cycles confirm modal */}
+      <ConfirmPropagateModal
+        isOpen={propagatePending !== null}
+        pending={propagatePending}
+        onClose={() => setPropagatePending(null)}
+        onPropagated={(updated) =>
+          setTemplates((prev) =>
+            prev.map((t) => (t.id === updated.id ? updated : t)),
+          )
+        }
       />
 
       {/* Confirm trash modal */}

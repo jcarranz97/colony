@@ -3,6 +3,7 @@ import type {
   RecurrentExpense,
   CreateRecurrentExpenseRequest,
   UpdateRecurrentExpenseRequest,
+  UpdateRecurrentExpenseResponse,
 } from "@/helpers/types";
 
 export const fetchRecurrentExpenses = (
@@ -34,7 +35,7 @@ export const updateRecurrentExpense = (
   payload: UpdateRecurrentExpenseRequest,
   token: string,
 ) =>
-  apiClient<RecurrentExpense>(`/recurrent-expenses/${id}`, {
+  apiClient<UpdateRecurrentExpenseResponse>(`/recurrent-expenses/${id}`, {
     method: "PUT",
     body: JSON.stringify(payload),
     token,

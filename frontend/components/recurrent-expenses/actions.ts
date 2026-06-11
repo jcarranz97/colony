@@ -31,7 +31,13 @@ export const addRecurrentExpense = async (
 export const editRecurrentExpense = async (
   id: string,
   payload: UpdateRecurrentExpenseRequest,
-) => updateRecurrentExpense(id, payload, await token());
+  propagateToOpenCycles = false,
+) =>
+  updateRecurrentExpense(
+    id,
+    { ...payload, propagate_to_open_cycles: propagateToOpenCycles },
+    await token(),
+  );
 
 export const deactivateRecurrentExpense = async (id: string) =>
   deleteRecurrentExpense(id, await token());

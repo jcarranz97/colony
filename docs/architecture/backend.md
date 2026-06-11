@@ -435,6 +435,48 @@ async def get_current_user(
     return user
 ```
 
+## Recurrent Expense Propagation
+
+When a recurrent expense template is updated with
+`propagate_to_open_cycles: true`, the service applies a subset of the template
+changes to every unpaid cycle expense that was generated from that template and
+whose parent cycle is still open (not completed).
+
+### Propagatable Fields
+
+Only the following fields are propagated; all other template fields (e.g.
+`recurrence_type`, `recurrence_config`, `reference_date`) are intentionally
+excluded because they do not have a direct counterpart on the cycle expense:
+
+| Template field | Cycle expense field | Notes |
+| --- | --- | --- |
+| `description` | `description` | Direct copy |
+| `autopay` | `autopay` | Direct copy |
+| `payment_method_id` | `payment_method_id` | Direct copy |
+| `base_amount` | `amount` + `amount_usd` | `amount_usd` recalculated via latest exchange rate |
+
+### Target Expenses
+
+An expense is eligible for propagation if **all** conditions hold:
+
+1. `template_id` matches the updated recurrent expense.
+2. `paid` is `false`.
+3. `active` is `true`.
+4. The parent cycle `status` is not `completed`.
+5. The parent cycle `active` is `true`.
+
+### Implementation Notes
+
+- The propagation helper (`_propagate_to_open_cycles`) lives in
+  `app/recurrent_expenses/service.py` and performs a read-only exchange-rate
+  lookup so that this module does not need to import `cycles.service`,
+  preserving domain isolation.
+- The function flushes but does **not** commit; the caller
+  (`update_recurrent_expense`) owns the transaction and commits once.
+- `propagate_to_open_cycles` is a schema-level control flag
+  (`RecurrentExpenseUpdate`). It is stripped from `update_data` before any
+  field is written to the template, so it is never persisted.
+
 ## Cross-Domain Communication
 
 When domains need to interact, they import services explicitly:

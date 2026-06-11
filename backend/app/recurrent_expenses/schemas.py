@@ -183,6 +183,7 @@ class RecurrentExpenseUpdate(AppBaseModel):
     reference_date: date | None = None
     autopay: bool = False
     active: bool | None = None
+    propagate_to_open_cycles: bool = False
 
     @field_validator("description")
     @classmethod
@@ -251,3 +252,28 @@ class RecurrentExpenseResponse(BaseModel):
         # Serialize Decimal as string to match API spec (e.g. "1200.00")
         "json_encoders": {Decimal: str},
     }
+
+
+class CyclePropagationResult(BaseModel):
+    """Per-cycle breakdown of cycle expenses updated by propagation."""
+
+    cycle_id: uuid.UUID
+    cycle_name: str
+    updated_count: int
+
+
+class PropagationSummary(BaseModel):
+    """Summary of how a template update propagated to open cycle expenses."""
+
+    total_updated: int
+    cycles: list[CyclePropagationResult]
+
+
+class RecurrentExpenseUpdateResponse(RecurrentExpenseResponse):
+    """Update response — same as the base plus an optional propagation summary.
+
+    ``propagation`` is ``None`` when the caller did not request propagation
+    (``propagate_to_open_cycles`` was false) and a populated summary otherwise.
+    """
+
+    propagation: PropagationSummary | None = None

@@ -25,8 +25,10 @@ import { getPaymentMethods } from "@/components/payment-methods/actions";
 import {
   TemplateModal,
   ConfirmTrashModal,
+  ConfirmPropagateModal,
   templateToForm,
   type TemplateForm,
+  type PropagatePending,
 } from "@/components/recurrent-expenses";
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -74,6 +76,8 @@ export default function RecurrentExpenseDetailPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [currentUser, setCurrentUser] = useState<UserResponse | null>(null);
   const [editOpen, setEditOpen] = useState(false);
+  const [propagatePending, setPropagatePending] =
+    useState<PropagatePending | null>(null);
   const [duplicateOpen, setDuplicateOpen] = useState(false);
   const [trashOpen, setTrashOpen] = useState(false);
   const [restoring, setRestoring] = useState(false);
@@ -110,7 +114,7 @@ export default function RecurrentExpenseDetailPage() {
 
   const handleEditSave = async (form: TemplateForm): Promise<string | null> => {
     if (!template) return null;
-    const res = await editRecurrentExpense(template.id, {
+    const payload = {
       description: form.description,
       base_amount: form.base_amount,
       currency: form.currency,
@@ -120,9 +124,15 @@ export default function RecurrentExpenseDetailPage() {
       reference_date: form.reference_date,
       autopay: form.autopay,
       payment_method_id: form.payment_method_id || null,
-    });
+    };
+    const res = await editRecurrentExpense(template.id, payload);
     if (res.success) {
       setTemplate(res.data);
+      setPropagatePending({
+        id: template.id,
+        description: form.description,
+        payload,
+      });
       setEditOpen(false);
       return null;
     }
@@ -404,6 +414,13 @@ export default function RecurrentExpenseDetailPage() {
         paymentMethods={paymentMethods}
         onClose={() => setDuplicateOpen(false)}
         onSave={handleDuplicateSave}
+      />
+
+      <ConfirmPropagateModal
+        isOpen={propagatePending !== null}
+        pending={propagatePending}
+        onClose={() => setPropagatePending(null)}
+        onPropagated={(updated) => setTemplate(updated)}
       />
 
       <ConfirmTrashModal

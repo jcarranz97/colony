@@ -3,7 +3,18 @@ from datetime import date
 from decimal import Decimal
 
 import pytest
+from sqlalchemy.orm import Session
 
+from app.activity.constants import ActivityAction, EntityType
+from app.activity.models import ActivityLog
+from app.cycles.constants import CurrencyCode as CycleCurrencyCode, CycleStatus
+from app.cycles.models import Cycle, CycleExpense
+from app.households.models import Household
+from app.payment_methods.constants import (
+    CurrencyCode as PMCurrencyCode,
+    PaymentMethodType,
+)
+from app.payment_methods.models import PaymentMethod
 from app.recurrent_expenses.constants import (
     CurrencyCode,
     ExpenseCategory,
@@ -219,11 +230,12 @@ class TestCreateRecurrentExpense:
 class TestUpdateRecurrentExpense:
     def test_partial_update(self, db, test_household, test_template, test_user):
         data = RecurrentExpenseUpdate(description="Updated Groceries")
-        updated = recurrent_expense_service.update_recurrent_expense(
+        updated, propagation = recurrent_expense_service.update_recurrent_expense(
             db, test_template, data, str(test_household.id), actor=test_user
         )
         assert updated.description == "Updated Groceries"
         assert updated.category == test_template.category
+        assert propagation is None
 
     def test_update_recurrence_config_validates_against_existing_type(
         self, db, test_household, test_template, test_user
@@ -242,7 +254,7 @@ class TestUpdateRecurrentExpense:
             recurrence_type=RecurrenceType.MONTHLY,
             recurrence_config={"day_of_month": 15},
         )
-        updated = recurrent_expense_service.update_recurrent_expense(
+        updated, _ = recurrent_expense_service.update_recurrent_expense(
             db, test_template, data, str(test_household.id), actor=test_user
         )
         assert updated.recurrence_type == RecurrenceType.MONTHLY
@@ -270,3 +282,394 @@ class TestDeleteRecurrentExpense:
         )
         assert record is not None
         assert record.active is False
+
+
+# ---------------------------------------------------------------------------
+# Helpers for propagation tests
+# ---------------------------------------------------------------------------
+
+
+def _make_cycle(
+    db: Session,
+    household: Household,
+    status: CycleStatus = CycleStatus.ACTIVE,
+    active: bool = True,
+) -> Cycle:
+    cycle = Cycle(
+        household_id=household.id,
+        name=f"Cycle {uuid.uuid4().hex[:6]}",
+        start_date=date(2025, 1, 1),
+        end_date=date(2025, 1, 31),
+        remaining_balance=Decimal("0"),
+        status=status,
+        active=active,
+    )
+    db.add(cycle)
+    db.flush()
+    return cycle
+
+
+def _make_cycle_expense(
+    db: Session,
+    cycle: Cycle,
+    template: RecurrentExpense,
+    payment_method: PaymentMethod,
+    paid: bool = False,
+    active: bool = True,
+) -> CycleExpense:
+    expense = CycleExpense(
+        cycle_id=cycle.id,
+        template_id=template.id,
+        payment_method_id=payment_method.id,
+        description=template.description,
+        currency=CycleCurrencyCode.USD,
+        amount=template.base_amount,
+        amount_usd=template.base_amount,
+        due_date=date(2025, 1, 15),
+        category=template.category,
+        autopay=template.autopay,
+        paid=paid,
+        active=active,
+    )
+    db.add(expense)
+    db.flush()
+    return expense
+
+
+# ---------------------------------------------------------------------------
+# Propagation tests
+# ---------------------------------------------------------------------------
+
+
+class TestPropagatToOpenCycles:
+    """Tests for propagate_to_open_cycles behaviour in update_recurrent_expense."""
+
+    def test_no_propagation_when_flag_false(
+        self,
+        db,
+        test_household,
+        test_template,
+        test_payment_method,
+        test_user,
+    ):
+        """Default behaviour: cycle expenses are NOT changed."""
+        cycle = _make_cycle(db, test_household)
+        expense = _make_cycle_expense(db, cycle, test_template, test_payment_method)
+        db.commit()
+
+        data = RecurrentExpenseUpdate(description="New Name")
+        recurrent_expense_service.update_recurrent_expense(
+            db, test_template, data, str(test_household.id), actor=test_user
+        )
+
+        db.refresh(expense)
+        assert expense.description == "Groceries"  # original, unchanged
+
+    def test_propagates_description_to_unpaid_expenses(
+        self,
+        db,
+        test_household,
+        test_template,
+        test_payment_method,
+        test_user,
+    ):
+        cycle = _make_cycle(db, test_household)
+        expense = _make_cycle_expense(db, cycle, test_template, test_payment_method)
+        db.commit()
+
+        data = RecurrentExpenseUpdate(
+            description="New Groceries",
+            propagate_to_open_cycles=True,
+        )
+        recurrent_expense_service.update_recurrent_expense(
+            db, test_template, data, str(test_household.id), actor=test_user
+        )
+
+        db.refresh(expense)
+        assert expense.description == "New Groceries"
+
+    def test_propagates_autopay_to_unpaid_expenses(
+        self,
+        db,
+        test_household,
+        test_template,
+        test_payment_method,
+        test_user,
+    ):
+        cycle = _make_cycle(db, test_household)
+        expense = _make_cycle_expense(db, cycle, test_template, test_payment_method)
+        db.commit()
+        assert expense.autopay is False
+
+        data = RecurrentExpenseUpdate(
+            autopay=True,
+            propagate_to_open_cycles=True,
+        )
+        recurrent_expense_service.update_recurrent_expense(
+            db, test_template, data, str(test_household.id), actor=test_user
+        )
+
+        db.refresh(expense)
+        assert expense.autopay is True
+
+    def test_propagates_amount_and_recalculates_amount_usd(
+        self,
+        db,
+        test_household,
+        test_template,
+        test_payment_method,
+        test_user,
+    ):
+        cycle = _make_cycle(db, test_household)
+        expense = _make_cycle_expense(db, cycle, test_template, test_payment_method)
+        db.commit()
+
+        data = RecurrentExpenseUpdate(
+            base_amount=Decimal("200.00"),
+            propagate_to_open_cycles=True,
+        )
+        recurrent_expense_service.update_recurrent_expense(
+            db, test_template, data, str(test_household.id), actor=test_user
+        )
+
+        db.refresh(expense)
+        # USD → USD rate is 1; amount_usd should equal the new amount
+        assert expense.amount == Decimal("200.00")
+        assert expense.amount_usd == Decimal("200.00")
+
+    def test_does_not_touch_paid_expenses(
+        self,
+        db,
+        test_household,
+        test_template,
+        test_payment_method,
+        test_user,
+    ):
+        cycle = _make_cycle(db, test_household)
+        paid_expense = _make_cycle_expense(
+            db, cycle, test_template, test_payment_method, paid=True
+        )
+        db.commit()
+
+        data = RecurrentExpenseUpdate(
+            description="Should Not Apply",
+            propagate_to_open_cycles=True,
+        )
+        recurrent_expense_service.update_recurrent_expense(
+            db, test_template, data, str(test_household.id), actor=test_user
+        )
+
+        db.refresh(paid_expense)
+        assert paid_expense.description == "Groceries"  # unchanged
+
+    def test_does_not_touch_expenses_in_completed_cycles(
+        self,
+        db,
+        test_household,
+        test_template,
+        test_payment_method,
+        test_user,
+    ):
+        completed_cycle = _make_cycle(db, test_household, status=CycleStatus.COMPLETED)
+        expense = _make_cycle_expense(
+            db, completed_cycle, test_template, test_payment_method
+        )
+        db.commit()
+
+        data = RecurrentExpenseUpdate(
+            description="Should Not Apply",
+            propagate_to_open_cycles=True,
+        )
+        recurrent_expense_service.update_recurrent_expense(
+            db, test_template, data, str(test_household.id), actor=test_user
+        )
+
+        db.refresh(expense)
+        assert expense.description == "Groceries"  # unchanged
+
+    def test_does_not_touch_expenses_in_draft_cycles_false(
+        self,
+        db,
+        test_household,
+        test_template,
+        test_payment_method,
+        test_user,
+    ):
+        """DRAFT cycles are open (not completed) — expenses SHOULD be updated."""
+        draft_cycle = _make_cycle(db, test_household, status=CycleStatus.DRAFT)
+        expense = _make_cycle_expense(
+            db, draft_cycle, test_template, test_payment_method
+        )
+        db.commit()
+
+        data = RecurrentExpenseUpdate(
+            description="Draft Cycle Update",
+            propagate_to_open_cycles=True,
+        )
+        recurrent_expense_service.update_recurrent_expense(
+            db, test_template, data, str(test_household.id), actor=test_user
+        )
+
+        db.refresh(expense)
+        assert expense.description == "Draft Cycle Update"
+
+    def test_propagates_payment_method(
+        self,
+        db,
+        test_household,
+        test_template,
+        test_payment_method,
+        test_user,
+    ):
+        cycle = _make_cycle(db, test_household)
+        expense = _make_cycle_expense(db, cycle, test_template, test_payment_method)
+        db.commit()
+
+        # Create a second payment method in the same household
+        new_pm = PaymentMethod(
+            household_id=test_household.id,
+            name="New Card",
+            method_type=PaymentMethodType.CREDIT,
+            default_currency=PMCurrencyCode.USD,
+        )
+        db.add(new_pm)
+        db.commit()
+
+        data = RecurrentExpenseUpdate(
+            payment_method_id=new_pm.id,
+            propagate_to_open_cycles=True,
+        )
+        recurrent_expense_service.update_recurrent_expense(
+            db, test_template, data, str(test_household.id), actor=test_user
+        )
+
+        db.refresh(expense)
+        assert expense.payment_method_id == new_pm.id
+
+    def test_non_propagatable_fields_are_not_applied(
+        self,
+        db,
+        test_household,
+        test_template,
+        test_payment_method,
+        test_user,
+    ):
+        """category and currency are template-only; cycle expenses stay unchanged."""
+        cycle = _make_cycle(db, test_household)
+        expense = _make_cycle_expense(db, cycle, test_template, test_payment_method)
+        original_category = expense.category
+        db.commit()
+
+        data = RecurrentExpenseUpdate(
+            category=ExpenseCategory.EXTRA,
+            propagate_to_open_cycles=True,
+        )
+        recurrent_expense_service.update_recurrent_expense(
+            db, test_template, data, str(test_household.id), actor=test_user
+        )
+
+        db.refresh(expense)
+        assert expense.category == original_category
+
+    def test_summary_reports_per_cycle_counts(
+        self,
+        db,
+        test_household,
+        test_template,
+        test_payment_method,
+        test_user,
+    ):
+        """The returned summary totals and breaks down updates per cycle."""
+        cycle_a = _make_cycle(db, test_household)
+        cycle_b = _make_cycle(db, test_household)
+        _make_cycle_expense(db, cycle_a, test_template, test_payment_method)
+        _make_cycle_expense(db, cycle_a, test_template, test_payment_method)
+        _make_cycle_expense(db, cycle_b, test_template, test_payment_method)
+        # A paid expense in cycle_a must not be counted.
+        _make_cycle_expense(db, cycle_a, test_template, test_payment_method, paid=True)
+        db.commit()
+
+        data = RecurrentExpenseUpdate(
+            description="Renamed",
+            propagate_to_open_cycles=True,
+        )
+        _, propagation = recurrent_expense_service.update_recurrent_expense(
+            db, test_template, data, str(test_household.id), actor=test_user
+        )
+
+        assert propagation is not None
+        assert propagation.total_updated == 3
+        counts = {c.cycle_id: c.updated_count for c in propagation.cycles}
+        names = {c.cycle_id: c.cycle_name for c in propagation.cycles}
+        assert counts == {cycle_a.id: 2, cycle_b.id: 1}
+        assert names == {cycle_a.id: cycle_a.name, cycle_b.id: cycle_b.name}
+
+    def test_records_activity_for_each_propagated_expense(
+        self,
+        db,
+        test_household,
+        test_template,
+        test_payment_method,
+        test_user,
+    ):
+        """Each propagated cycle expense gets its own ``updated`` activity event."""
+        cycle = _make_cycle(db, test_household)
+        expense = _make_cycle_expense(db, cycle, test_template, test_payment_method)
+        db.commit()
+
+        data = RecurrentExpenseUpdate(
+            description="New Groceries",
+            propagate_to_open_cycles=True,
+        )
+        recurrent_expense_service.update_recurrent_expense(
+            db, test_template, data, str(test_household.id), actor=test_user
+        )
+
+        events = (
+            db.query(ActivityLog)
+            .filter(
+                ActivityLog.entity_type == EntityType.CYCLE_EXPENSE.value,
+                ActivityLog.entity_id == expense.id,
+            )
+            .all()
+        )
+        assert len(events) == 1
+        event = events[0]
+        assert event.action == ActivityAction.UPDATED.value
+        assert event.cycle_id == cycle.id
+        assert event.actor_user_id == test_user.id
+        assert event.changes["description"]["to"] == "New Groceries"
+
+    def test_no_activity_when_value_unchanged(
+        self,
+        db,
+        test_household,
+        test_template,
+        test_payment_method,
+        test_user,
+    ):
+        """Propagating a value identical to the expense's records no activity."""
+        cycle = _make_cycle(db, test_household)
+        expense = _make_cycle_expense(db, cycle, test_template, test_payment_method)
+        db.commit()
+
+        # test_template.description is already the expense's description.
+        data = RecurrentExpenseUpdate(
+            description=test_template.description,
+            propagate_to_open_cycles=True,
+        )
+        _, propagation = recurrent_expense_service.update_recurrent_expense(
+            db, test_template, data, str(test_household.id), actor=test_user
+        )
+
+        assert propagation is not None
+        assert propagation.total_updated == 0
+        events = (
+            db.query(ActivityLog)
+            .filter(
+                ActivityLog.entity_type == EntityType.CYCLE_EXPENSE.value,
+                ActivityLog.entity_id == expense.id,
+            )
+            .all()
+        )
+        assert events == []
