@@ -895,6 +895,56 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#recurrent-expense-propagation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recurrent Expense Propagation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Recurrent Expense Propagation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#propagatable-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Propagatable Fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#target-expenses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Target Expenses
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implementation-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Notes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#cross-domain-communication" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2094,6 +2144,67 @@
 <a id="__codelineno-12-20" name="__codelineno-12-20" href="#__codelineno-12-20"></a>        <span class="p">)</span>
 <a id="__codelineno-12-21" name="__codelineno-12-21" href="#__codelineno-12-21"></a>    <span class="k">return</span> <span class="n">user</span>
 </code></pre></div>
+<h2 id="recurrent-expense-propagation">Recurrent Expense Propagation</h2>
+<p>When a recurrent expense template is updated with
+<code>propagate_to_open_cycles: true</code>, the service applies a subset of the template
+changes to every unpaid cycle expense that was generated from that template and
+whose parent cycle is still open (not completed).</p>
+<h3 id="propagatable-fields">Propagatable Fields</h3>
+<p>Only the following fields are propagated; all other template fields (e.g.
+<code>recurrence_type</code>, <code>recurrence_config</code>, <code>reference_date</code>) are intentionally
+excluded because they do not have a direct counterpart on the cycle expense:</p>
+<table>
+<thead>
+<tr>
+<th>Template field</th>
+<th>Cycle expense field</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>description</code></td>
+<td><code>description</code></td>
+<td>Direct copy</td>
+</tr>
+<tr>
+<td><code>autopay</code></td>
+<td><code>autopay</code></td>
+<td>Direct copy</td>
+</tr>
+<tr>
+<td><code>payment_method_id</code></td>
+<td><code>payment_method_id</code></td>
+<td>Direct copy</td>
+</tr>
+<tr>
+<td><code>base_amount</code></td>
+<td><code>amount</code> + <code>amount_usd</code></td>
+<td><code>amount_usd</code> recalculated via latest exchange rate</td>
+</tr>
+</tbody>
+</table>
+<h3 id="target-expenses">Target Expenses</h3>
+<p>An expense is eligible for propagation if <strong>all</strong> conditions hold:</p>
+<ol>
+<li><code>template_id</code> matches the updated recurrent expense.</li>
+<li><code>paid</code> is <code>false</code>.</li>
+<li><code>active</code> is <code>true</code>.</li>
+<li>The parent cycle <code>status</code> is not <code>completed</code>.</li>
+<li>The parent cycle <code>active</code> is <code>true</code>.</li>
+</ol>
+<h3 id="implementation-notes">Implementation Notes</h3>
+<ul>
+<li>The propagation helper (<code>_propagate_to_open_cycles</code>) lives in
+  <code>app/recurrent_expenses/service.py</code> and performs a read-only exchange-rate
+  lookup so that this module does not need to import <code>cycles.service</code>,
+  preserving domain isolation.</li>
+<li>The function flushes but does <strong>not</strong> commit; the caller
+  (<code>update_recurrent_expense</code>) owns the transaction and commits once.</li>
+<li><code>propagate_to_open_cycles</code> is a schema-level control flag
+  (<code>RecurrentExpenseUpdate</code>). It is stripped from <code>update_data</code> before any
+  field is written to the template, so it is never persisted.</li>
+</ul>
 <h2 id="cross-domain-communication">Cross-Domain Communication</h2>
 <p>When domains need to interact, they import services explicitly:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># In app/cycles/service.py</span>

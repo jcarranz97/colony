@@ -1531,6 +1531,13 @@
 </ul>
 </li>
 <li><strong>FR-020</strong>: Users must be able to edit recurrent expenses</li>
+<li><strong>FR-066</strong>: When editing a recurrent expense, users must be able to opt in to
+  propagating the changes to all unpaid cycle expenses in open (non-completed)
+  cycles that were generated from that template. The propagatable fields are:
+  <code>description</code>, <code>autopay</code>, <code>payment_method_id</code>, and <code>amount</code> (which also
+  triggers a recalculation of <code>amount_usd</code>). The frontend must present a
+  confirmation dialog before sending the request with
+  <code>propagate_to_open_cycles: true</code>.</li>
 <li><strong>FR-021</strong>: Users must be able to delete recurrent expenses</li>
 <li><strong>FR-022</strong>: Users must be able to view all recurrent expenses</li>
 <li><strong>FR-023</strong>: Each expense must specify currency and payment method</li>

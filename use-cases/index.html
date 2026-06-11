@@ -732,6 +732,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#uc-20-propagate-recurrent-expense-update-to-open-cycles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UC-20: Propagate Recurrent Expense Update to Open Cycles
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1492,6 +1503,11 @@ by describing the <em>how</em>, not just the <em>what</em>.</p>
 <td>Mark Expense as Paid</td>
 <td>User</td>
 </tr>
+<tr>
+<td><a href="#uc-20-propagate-recurrent-expense-update-to-open-cycles">UC-20</a></td>
+<td>Propagate Recurrent Expense Update to Open Cycles</td>
+<td>User</td>
+</tr>
 </tbody>
 </table>
 <hr />
@@ -1506,7 +1522,7 @@ with. Each area maps to the detailed sections below.</p>
         direction TB
         Auth(["Authentication\nUC-01 – UC-03"])
         PM(["Payment Methods\nUC-04 – UC-07"])
-        ET(["Recurrent Expenses\nUC-08 – UC-11"])
+        ET(["Recurrent Expenses\nUC-08 – UC-11, UC-20"])
         CM(["Cycle Management\nUC-12 – UC-15"])
         CE(["Cycle Expenses\nUC-16 – UC-19"])
     end
@@ -1673,11 +1689,14 @@ and show all records in management screens.</p>
     UC09([UC-09: Edit Recurrent Expense])
     UC10([UC-10: Delete Recurrent Expense])
     UC11([UC-11: View Recurrent Expenses])
+    UC20([UC-20: Propagate Update to Open Cycles])
 
     User --&gt; UC08
     User --&gt; UC09
     User --&gt; UC10
-    User --&gt; UC11</code></pre>
+    User --&gt; UC11
+    User --&gt; UC20
+    UC09 -.-&gt;|optionally triggers| UC20</code></pre>
 <h3 id="uc-08-create-recurrent-expense">UC-08: Create Recurrent Expense</h3>
 <p><strong>Actor:</strong> User</p>
 <p><strong>Related Requirements:</strong> FR-018, FR-019, FR-023</p>
@@ -1772,6 +1791,45 @@ Cycle expenses previously generated from this template are unaffected.</p>
 <li>System returns all recurrent expenses belonging to the user, including
    recurrence pattern details and linked payment method info.</li>
 </ol>
+<hr />
+<h3 id="uc-20-propagate-recurrent-expense-update-to-open-cycles">UC-20: Propagate Recurrent Expense Update to Open Cycles</h3>
+<p><strong>Actor:</strong> User</p>
+<p><strong>Related Requirements:</strong> FR-020, FR-066</p>
+<p><strong>Preconditions:</strong> User is authenticated. The recurrent expense template exists
+and belongs to the user's active household. At least one open cycle contains
+unpaid expenses generated from this template.</p>
+<p><strong>Main Flow:</strong></p>
+<ol>
+<li>User edits one or more propagatable fields of a recurrent expense template
+   (description, amount, autopay, or payment method).</li>
+<li>Frontend presents a confirmation dialog asking whether to also apply the
+   changes to matching unpaid expenses in open cycles.</li>
+<li>User confirms propagation.</li>
+<li>Client sends <code>PUT /recurrent-expenses/{id}</code> with the updated fields and
+   <code>propagate_to_open_cycles: true</code>.</li>
+<li>System updates the template record.</li>
+<li>System identifies all unpaid, active cycle expenses whose <code>template_id</code>
+   matches the updated template and whose parent cycle is not completed.</li>
+<li>System applies the propagatable fields to each matched cycle expense. When
+   <code>base_amount</code> is propagated, <code>amount_usd</code> is recalculated using the most
+   recent exchange rate for the expense currency.</li>
+<li>System commits all changes in a single transaction.</li>
+<li>System returns the updated recurrent expense template.</li>
+</ol>
+<p><strong>Alternative Flows:</strong></p>
+<ul>
+<li><strong>A1 — User declines propagation:</strong> Client omits <code>propagate_to_open_cycles</code>
+  (or sets it to <code>false</code>). Only the template is updated; existing cycle
+  expenses are unchanged.</li>
+<li><strong>A2 — No matching open cycle expenses:</strong> Propagation completes silently with
+  zero expenses updated. The template is still saved.</li>
+<li><strong>A3 — Non-propagatable fields only:</strong> If only fields such as
+  <code>recurrence_type</code> or <code>reference_date</code> are updated, propagation is a no-op
+  even when <code>propagate_to_open_cycles</code> is <code>true</code>.</li>
+</ul>
+<p><strong>Postconditions:</strong> The template reflects the new values. All matched unpaid
+cycle expenses in open cycles reflect the propagated field values. Already-paid
+expenses and expenses in completed cycles are never modified.</p>
 <hr />
 <h2 id="cycle-management">Cycle Management</h2>
 <pre class="mermaid"><code>graph LR
