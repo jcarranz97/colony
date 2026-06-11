@@ -140,6 +140,35 @@ def _verify_payment_method(
     return pm
 
 
+def _sync_payment_fields(update_data: dict) -> None:  # type: ignore[type-arg]
+    """Keep paid / status / paid_at consistent inside an update payload.
+
+    Called before applying *update_data* to an expense.  Handles two entry
+    points that can mutate payment state:
+
+    - Caller sets ``paid`` → derive ``status`` and ``paid_at`` from it.
+    - Caller sets ``status`` directly → derive ``paid`` and ``paid_at`` from it.
+    """
+    if "paid" in update_data:
+        if update_data["paid"]:
+            if "paid_at" not in update_data:
+                update_data["paid_at"] = datetime.now(tz=UTC)
+            if "status" not in update_data:
+                update_data["status"] = ExpenseStatus.PAID
+        else:
+            if "status" not in update_data:
+                update_data["status"] = ExpenseStatus.PENDING
+            update_data["paid_at"] = None
+    elif "status" in update_data:
+        if update_data["status"] == ExpenseStatus.PAID:
+            update_data["paid"] = True
+            if "paid_at" not in update_data:
+                update_data["paid_at"] = datetime.now(tz=UTC)
+        else:
+            update_data["paid"] = False
+            update_data["paid_at"] = None
+
+
 # ---------------------------------------------------------------------------
 # Cycle service
 # ---------------------------------------------------------------------------
@@ -906,7 +935,7 @@ class CycleExpenseService:
         return expense
 
     @staticmethod
-    def update_expense(  # noqa: C901, PLR0912 - one branch per derived semantic action
+    def update_expense(  # noqa: C901
         db: Session,
         cycle: models.Cycle,
         expense: models.CycleExpense,
@@ -948,15 +977,7 @@ class CycleExpenseService:
                 db, update_data["payment_method_id"], str(cycle.household_id)
             )
 
-        # Keep paid / status / paid_at in sync
-        if "paid" in update_data:
-            if update_data["paid"] and "paid_at" not in update_data:
-                update_data["paid_at"] = datetime.now(tz=UTC)
-            if update_data["paid"] and "status" not in update_data:
-                update_data["status"] = ExpenseStatus.PAID
-            elif not update_data["paid"] and "status" not in update_data:
-                update_data["status"] = ExpenseStatus.PENDING
-                update_data["paid_at"] = None
+        _sync_payment_fields(update_data)
 
         before = {field: getattr(expense, field) for field in update_data}
 
